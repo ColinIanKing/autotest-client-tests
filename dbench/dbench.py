@@ -13,6 +13,9 @@ class dbench(test.test):
 
         utils.system('patch -p1 < %s' %
                      os.path.join(self.bindir, 'dbench_startup.patch'))
+        utils.system('patch < %s' %
+                     os.path.join(self.bindir, 'dbench_lpthread.patch'))
+
         utils.configure()
         utils.make()
 

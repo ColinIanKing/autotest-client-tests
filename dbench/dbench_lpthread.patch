@@ -1,0 +1,19 @@
+--- Makefile.in	2012-01-24 13:26:14.977605737 -0600
++++ Makefile.in.orig	2012-01-24 13:25:52.937606548 -0600
+@@ -22,13 +22,13 @@
+ all: dbench tbench tbench_srv
+
+ dbench: $(DB_OBJS)
+-	$(CC) -lpthread -o $@ $(DB_OBJS) $(LIBS)
++	$(CC) -lpthread -o $@ $(DB_OBJS) $(LIBS) -lpthread
+
+ tbench: $(TB_OBJS)
+-	$(CC) -lpthread -o $@ $(TB_OBJS) $(LIBS)
++	$(CC) -lpthread -o $@ $(TB_OBJS) $(LIBS) -lpthread
+
+ tbench_srv: $(SRV_OBJS)
+-	$(CC) -o $@ $(SRV_OBJS) $(LIBS)
++	$(CC) -o $@ $(SRV_OBJS) $(LIBS) -lpthread
+
+ # Careful here: don't install client.txt over itself.
+ install: all

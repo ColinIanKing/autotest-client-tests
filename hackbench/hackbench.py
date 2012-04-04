@@ -21,7 +21,7 @@ class hackbench(test.test):
             cc = '$CC'
         else:
             cc = 'cc'
-        utils.system('%s -lpthread hackbench.c -o hackbench' % cc)
+        utils.system('%s -pthread hackbench.c -o hackbench' % cc)
 
 
     def initialize(self):

@@ -1,0 +1,13 @@
+AUTHOR = "Brad Figg <brad.figg@canonical.com>"
+DOC = """
+iperf is a network connectivity test
+"""
+NAME = 'iperf'
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = 'client'
+TIME = "SHORT"
+
+result = job.run_test_detail('iperf', server_ip='kernel-jenkins', client_ip='rizzo', role='client', test_time=300, stream_list=[5], barriers=False)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

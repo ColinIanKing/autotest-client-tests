@@ -40,7 +40,7 @@ class iperf(test.test):
 
 
     def run_once(self, server_ip, client_ip, role, udp=False,
-                 bidirectional=False, test_time=10, dev='', stream_list=[1]):
+                 bidirectional=False, test_time=10, dev='', stream_list=[1], barriers=True):
         self.role = role
         self.udp = udp
         self.bidirectional = bidirectional
@@ -66,13 +66,15 @@ class iperf(test.test):
                 try:
                     # Wait up to ten minutes for the server and client
                     # to reach this point
-                    self.job.barrier(server_tag, 'start_%d' % num_streams,
-                                     600).rendezvous(*all)
+                    if barriers:
+                        self.job.barrier(server_tag, 'start_%d' % num_streams,
+                                         600).rendezvous(*all)
 
                     # Stop the server when the client finishes
                     # Wait up to test_time + five minutes
-                    self.job.barrier(server_tag, 'finish_%d' % num_streams,
-                                     test_time+300).rendezvous(*all)
+                    if barriers:
+                        self.job.barrier(server_tag, 'finish_%d' % num_streams,
+                                         test_time+300).rendezvous(*all)
                 finally:
                     self.server_stop()
 
@@ -80,13 +82,15 @@ class iperf(test.test):
                 self.ip = socket.gethostbyname(client_ip)
                 # Wait up to ten minutes for the server and client
                 # to reach this point
-                self.job.barrier(client_tag, 'start_%d' % num_streams,
-                                 600).rendezvous(*all)
+                if barriers:
+                    self.job.barrier(client_tag, 'start_%d' % num_streams,
+                                     600).rendezvous(*all)
                 self.client(server_ip, test_time, num_streams)
 
                 # Wait up to 5 minutes for the server to also reach this point
-                self.job.barrier(client_tag, 'finish_%d' % num_streams,
-                                 300).rendezvous(*all)
+                if barriers:
+                    self.job.barrier(client_tag, 'finish_%d' % num_streams,
+                                     300).rendezvous(*all)
             else:
                 raise error.TestError('invalid role specified')
 

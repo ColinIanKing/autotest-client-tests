@@ -25,7 +25,7 @@ class ltp(test.test):
 
 
     # http://sourceforge.net/projects/ltp/files/LTP%20Source/ltp-20120104/
-    def setup(self, tarball = 'ltp-full-20120614.bz2'):
+    def setup(self, tarball = 'ltp-full-20120903.bz2'):
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

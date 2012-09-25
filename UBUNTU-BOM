@@ -1,0 +1,6 @@
+A list of the tests that we snapshot and where we get them
+from.
+
+xfstests                     git://oss.sgi.com/xfs/cmds/xfstests
+qrt                          snapshot-qrt script in the tests/qrt directory
+ecryptfs                     snapshot-ecryptfs script in the tests/ecryptfs directory

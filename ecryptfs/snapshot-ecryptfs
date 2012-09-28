@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+
+bzr branch lp:ecryptfs
+rm -rf ecryptfs/.bzr
+tar jcvf ecryptfs.tar.bz2 ./ecryptfs

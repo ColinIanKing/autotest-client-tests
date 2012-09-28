@@ -1,0 +1,20 @@
+ME="SHORT"
+AUTHOR = "Colin Ian King <colin.king@canonical.com>"
+DOC = """
+wakeup_events are the ubuntu tests for measuring all wakeup events
+"""
+NAME = 'wakeup_events'
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = 'client'
+
+result = job.run_test_detail('wakeup_events', test_name='setup', tag='setup')
+
+tests = [
+    'test-idle.sh'
+]
+
+for test in tests:
+    result = job.run_test_detail('wakeup_events', test_name=test, tag=test)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

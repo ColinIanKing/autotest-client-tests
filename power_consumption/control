@@ -1,0 +1,39 @@
+TIME="SHORT"
+AUTHOR = "Colin Ian King <colin.king@canonical.com>"
+DOC = """
+power_consumption is the ubuntu power consumption test suite
+"""
+NAME = 'power_consumption'
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = 'client'
+
+# Get the device name from the arguments passed in
+argdict = {}
+for uarg in args:
+    key, val = uarg.split('=')
+    argdict[key] = val
+
+# for debugging if needed
+print "argdict = ", argdict
+
+# take the input arguments and get them into the test environment
+os.environ['METER_ADDR'] = argdict['METER_ADDR']
+os.environ['METER_PORT'] = argdict['METER_PORT']
+os.environ['METER_TAGPORT'] = argdict['METER_TAGPORT']
+
+result = job.run_test_detail('power_consumption', test_name='setup', tag='setup')
+
+tests = [
+    'test-idle.sh',
+    'test-cpu.sh',
+    'test-vm.sh',
+    'test-iosync.sh',
+    'test-stress.sh',
+    'test-dd.sh'
+]
+
+for test in tests:
+    result = job.run_test_detail('power_consumption', test_name=test, tag=test)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

@@ -1,0 +1,13 @@
+AUTHOR = 'brad.figg@canonical.com (Brad Figg)'
+TIME = 'MEDIUM'
+NAME = 'Leap Second Regression Test'
+TEST_TYPE = 'client'
+TEST_CLASS = 'Kernel'
+TEST_CATEGORY = 'Stress'
+
+DOC = '''
+Runs a modified version of the test application that John Stultz wrote to
+test for hrtimer issues dealing with leap seconds added to the clock.
+'''
+
+job.run_test_detail('leap_seconds', test_time=600)

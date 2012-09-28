@@ -1,0 +1,57 @@
+ME="SHORT"
+AUTHOR = "Brad Figg <brad.figg@canonical.com>"
+DOC = """
+ecryptfs is a set of regression tests developed by Tyler Hicks and Colin King of
+canonical that test the ecryptfs, layered filesystem.
+"""
+NAME = 'ecryptfs'
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = 'client'
+
+# BLACKLIST is a list of ecryptfs tests that we know we don't want to run
+#
+BLACKLIST = [
+    'lp-1009207.sh',   # Fails consistently
+    'enospc.sh',       # Hangs forever on rizzo, amd64, quantal
+    'lp-994247.sh',    # Causes an oops on Precise. A fix is inbound and this should be enabled on 7/30/12.
+    'file-concurrent.sh', # Lots of errors and never completes. On Lucid, Natty and Oneiric.
+    'inode-race-stat.sh', # Known to not pass on Lucid, Natty, and Oneiric
+]
+
+FS_BLACKLIST = {
+    'xfs' : ['extend-file-random.sh'],
+}
+
+result = job.run_test_detail('ecryptfs', test_name='setup', fs_type=None, tag='setup.all')
+
+for dir in ['/mnt/upper', '/mnt/lower', '/mnt/image']:
+    if not os.path.isdir(dir):
+        os.makedirs(dir)
+
+FS_TYPES = ['ext2', 'ext3', 'ext4', 'xfs', 'btrfs']
+
+tests_rc = os.path.join(job.testdir, NAME, 'src', 'tests', 'kernel', 'tests.rc')
+if os.path.exists(tests_rc):
+    with open(tests_rc, 'r') as f:
+        content = f.read().split('\n')
+
+    tests = []
+    for line in content:
+        if line == '': continue
+        (category, t) = line.split('=')
+        t = t.replace('"', '')
+        for test in t.split(' '):
+            if test in BLACKLIST:
+                print("BLACKLISTED: '%s'" % (test))
+                continue
+            tests.append(test)
+
+    for fs_type in FS_TYPES:
+        for test in tests:
+            if test not in FS_BLACKLIST[fs_type]:
+                tag = "%s.%s" % (test, fs_type)
+                result = job.run_test_detail('ecryptfs', test_name=test, fs_type=fs_type, tag=tag, timeout=60*60)
+
+
+# vi:set ts=4 sw=4 expandtab:

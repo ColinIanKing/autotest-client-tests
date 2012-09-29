@@ -1,0 +1,19 @@
+ME="SHORT"
+AUTHOR = "Brad Figg <brad.figg@canonical.com>"
+DOC = """
+qrt is the ubuntu quality-regression-tests
+"""
+NAME = 'ubuntu_qrt_kernel_hardening'
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = 'client'
+
+tests = [
+    'setup',
+    'test-kernel-hardening.py',
+]
+
+for test in tests:
+    result = job.run_test_detail('ubuntu_qrt_kernel_hardening', test_name=test, tag=test, timeout=60*60)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

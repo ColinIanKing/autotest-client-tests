@@ -1,14 +1,14 @@
-import os
+import os, shutil
 from autotest.client import test, utils
 
 
-class leap_seconds(test.test):
+class ubuntu_leap_seconds(test.test):
     version = 1
 
     def setup(self):
-        os.mkdir(self.srcdir)
+        shutil.copyfile(os.path.join(self.bindir, 'leap_seconds.c'),
+                        os.path.join(self.srcdir, 'leap_seconds.c'))
         os.chdir(self.bindir)
-        utils.system('cp leap_seconds.c src/')
         os.chdir(self.srcdir)
         utils.system(utils.get_cc() + ' leap_seconds.c -D_POSIX_C_SOURCE=200112 -o leap_seconds -lrt')
 

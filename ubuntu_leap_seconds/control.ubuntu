@@ -10,4 +10,4 @@ Runs a modified version of the test application that John Stultz wrote to
 test for hrtimer issues dealing with leap seconds added to the clock.
 '''
 
-job.run_test_detail('leap_seconds', test_time=600)
+job.run_test_detail('ubuntu_leap_seconds', test_time=600)

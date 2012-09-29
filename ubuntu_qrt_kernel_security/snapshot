@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+
+SD=qa-regression-testing/scripts
+bzr branch lp:qa-regression-testing
+tar jcvf ubuntu_qrt_kernel_security.tar.bz2 $SD/testlib.py $SD/test-kernel-security.py $SD/kernel-security

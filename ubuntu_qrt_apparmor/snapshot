@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+
+SD=qa-regression-testing/scripts
+bzr branch lp:qa-regression-testing
+tar jcvf ubuntu-qrt-apparmor.tar.bz2 $SD/testlib.py $SD/test-apparmor.py $SD/apparmor

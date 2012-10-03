@@ -8,4 +8,72 @@ DOC = """
 Linux Test Project. See http://ltp.sourceforge.net/
 """
 
-job.run_test('ltp')
+
+# TD - Tests Dictionary
+#
+TD = {
+    'syscall' : {
+    },
+
+    'commands' : {
+        'skip' : ['cron01', 'cron02', 'mail_tests::mail02', 'mail_tests::mail03'],
+    },
+
+    'containers' : {
+        'skip' : ['pidns30', 'pidns31', 'check_netns_enabled'],
+    },
+
+    'stress' : {
+    },
+
+    'filecaps' : {
+    },
+
+    'fs' : {
+    },
+
+    'fs_perms_simple' : {
+    },
+
+    'fsx' : {
+    },
+
+    'hugetlb' : {
+    },
+
+    'hyperthreading' : {
+    },
+
+    'io' : {
+    },
+
+    'ipc' : {
+    },
+
+    'mm' : {
+    },
+
+    'modules' : {
+    },
+
+    'sched' : {
+    },
+
+    'stress.part1' : {
+        'skip' : ['nfs01', 'nfs02', 'nfs03', 'nfs04', 'nfsstress', 'nfsx-linux' ],
+    },
+
+    'stress.part2' : {
+    },
+
+    #'stress.part3' : {
+    #    'skip' : ['rpc01', 'run_rpc_tests.sh']
+    #},
+}
+
+for test_case in TD:
+    if 'skip' in TD[test_case]:
+        result = job.run_test_detail('ltp', args='-f %s' % test_case, tag=test_case, ignore_tests=TD[test_case]['skip'])
+    else:
+        result = job.run_test_detail('ltp', args='-f %s' % test_case, tag=test_case)
+

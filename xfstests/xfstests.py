@@ -133,6 +133,8 @@ class xfstests(test.test):
         os.chdir(self.srcdir)
         if single:
             if test_number == '000':
+                self.unmount_partitions()
+                self.create_partitions(filesystem)
                 logging.debug('Dummy test to setup xfstests')
                 return
 

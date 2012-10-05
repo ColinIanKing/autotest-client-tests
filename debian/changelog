@@ -1,0 +1,25 @@
+ubuntu-autotest (0.0.1-1) unstable; urgency=low
+
+ * Initial Ubuntu changelog creation
+ * New Autotest client test in a separate repo from upstream
+ * Consolidation of Ubuntu sause patches
+ * UBUNTU: SAUCE: [xfstests] For lucid and oneiric, the drive must be partitioned as part of test 0.
+ * UBUNTU: SAUCE: [ltp] Modified the control file to run a series of ltp testcases
+ * UBUNTU: SAUCE: [xfstests/control.ubuntu.lucid] Fixed bad import due to autotest code restructuring.
+ * UBUNTU: SAUCE: [xfstests] Updated due to autotest upgrade.
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] Renamed ecryptfs to ubuntu_ecryptfs.
+ * UBUNTU: SAUCE: [ubuntu_leap_seconds] Renamed leap_seconds to ubuntu_leap_seconds.
+ * UBUNTU: SAUCE: [ubuntu_qrt_*] Split the single qrt suite into individual tests.
+ * UBUNTU: SAUCE: [wakeup_events] Add test
+ * UBUNTU: SAUCE: [power_consumption] Add the test
+ * UBUNTU: SAUCE: [leap_seconds] Add leap seconds test
+ * UBUNTU: SAUCE: [hackbench] Fix unresolved symbols for pthread_* functions
+ * UBUNTU: SAUCE: [qrt] Add Ubuntu qrt tests
+ * UBUNTU: SAUCE: [ltp] New snapshot of upstream ltp code and ubuntu control files.
+ * UBUNTU: SAUCE: [iperf] Add control.ubuntu
+ * UBUNTU: SAUCE: [iperf] Added a parameter 'barriers' to the iperf.py run_once which allows the caller to not use barriers.
+ * UBUNTU: SAUCE: [ecryptfs] Add ecryptfs tests
+ * UBUNTU: SAUCE: [dbench] Add lpthread linker option so dbench will build
+ * UBUNTU: SAUCE: UBUNTU-BOM, a file listing the snapshots that we keep updated
+
+ -- Steve Conklin <sconklin@canonical.com>  Fri, 05 Oct 2012 13:12:14 -0600

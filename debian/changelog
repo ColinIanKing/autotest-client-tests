@@ -1,8 +1,10 @@
 ubuntu-autotest (0.0.2-1) unstable; urgency=low
 
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] New snapshot of qrt test code.
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] New snapshot of qrt test code.
  * Start new release
 
- -- Steve Conklin <sconklin@canonical.com>  Fri, 05 Oct 2012 13:16:36 -0600
+ -- Brad Figg <brad.figg@canonical.com>  Tue, 09 Oct 2012 15:59:25 -0700
 
 ubuntu-autotest (0.0.1-1) unstable; urgency=low
 

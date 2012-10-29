@@ -79,7 +79,7 @@ for uarg in args:
 #device='/dev/sdb1'
 scratch_device = argdict['UBUNTU_SCRATCH_DEVICE']
 device = '%s1' % scratch_device
-os.environ['XFSTESTS_TEST_DRIVE'] = device
+os.environ['XFSTESTS_TEST_DRIVE'] = scratch_device
 
 # By default, we create a directory under autotest
 mountpoint = os.path.join(job.tmpdir, 'xfstests')

@@ -1,8 +1,17 @@
 ubuntu-autotest (0.0.3-1) unstable; urgency=low
 
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] trim down the snapshot by not tar'ing up the img directory
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [xfstests] The XFSTESTS_DRIVE was being set incorrect. It was including a partion number
  * Start new release
 
- -- Brad Figg <brad.figg@canonical.com>  Tue, 09 Oct 2012 16:02:42 -0700
+ -- Brad Figg <brad.figg@canonical.com>  Wed, 07 Nov 2012 09:31:09 -0800
 
 ubuntu-autotest (0.0.2-1) unstable; urgency=low
 

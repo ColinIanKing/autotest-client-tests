@@ -1,3 +1,9 @@
+ubuntu-autotest (0.0.4-1) unstable; urgency=low
+
+ * Start new release
+
+ -- Brad Figg <brad.figg@canonical.com>  Wed, 07 Nov 2012 09:39:55 -0800
+
 ubuntu-autotest (0.0.3-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: [ubuntu_ecryptfs] trim down the snapshot by not tar'ing up the img directory

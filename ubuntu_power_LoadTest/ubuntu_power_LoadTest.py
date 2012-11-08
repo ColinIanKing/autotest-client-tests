@@ -13,7 +13,8 @@ class ubuntu_power_LoadTest(test.test):
 
     def run_once(self):
         ext_path = os.path.join(os.path.dirname(__file__), 'extension')
+        ck = os.path.join(os.path.dirname(__file__), 'chromium-browser-killer')
+        utils.run_parallel(['DISPLAY=:0 chromium-browser --user-data-dir=/home/bradf --load-extension=%s' % ext_path, ck])
 
-        utils.run('DISPLAY=:0 chromium-browser --load-extension=%s --user-data-dir=/home/bradf' % ext_path, timeout = 1 * 60)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

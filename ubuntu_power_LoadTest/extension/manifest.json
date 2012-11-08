@@ -1,0 +1,29 @@
+{
+  "format_version": 1,
+  "id": "00023456789ABCDEF0123456789ABCDEF012CEEE",
+  "version": "2.0",
+  "name": "Power Test",
+  "browser_action": {
+    "default_icon": "skin/chrome_bug.png",
+    "default_title": "test the web with the web"
+  },
+  "icons": { "48": "skin/chrome_bug.png",
+          "128": "skin/chrome_bug.png" },
+  "permissions": [
+    "http://*/", "https://*/", "tabs"
+  ],
+  "background_page": "background.html",
+  "description": "GoogleTest",
+  "content_scripts": [
+    {
+      "matches": ["http://localhost/testparams.html"],
+      "js": ["testparams.js"]
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["ct.js"],
+      "run_at": "document_end",
+      "all_frames": false
+    }
+  ]
+}

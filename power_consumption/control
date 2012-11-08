@@ -30,7 +30,8 @@ tests = [
     'test-vm.sh',
     'test-iosync.sh',
     'test-stress.sh',
-    'test-dd.sh'
+    'test-dd.sh',
+    'test-chromium-browser.sh'
 ]
 
 for test in tests:

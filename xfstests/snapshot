@@ -1,0 +1,5 @@
+#!/bin/sh
+git clone git://oss.sgi.com/xfs/cmds/xfstests
+rm -rf xfstests/.git
+tar jcvf ./xfstests.tar.bz2 ./xfstests
+rm -rf xfstests

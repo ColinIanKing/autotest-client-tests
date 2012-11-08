@@ -1,0 +1,14 @@
+AUTHOR = 'brad.figg@canonical.com (Brad Figg)'
+TIME = 'MEDIUM'
+NAME = 'ubuntu_power_LoadTest'
+TEST_TYPE = 'client'
+TEST_CLASS = 'Kernel'
+TEST_CATEGORY = 'Stress'
+
+DOC = '''
+This test runs a load test consisting of cycling though web pages, playing
+videos, etc. and measures battery power draw.
+'''
+
+job.run_test('ubuntu_power_LoadTest')
+

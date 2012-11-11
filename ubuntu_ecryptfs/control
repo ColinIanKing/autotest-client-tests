@@ -4,7 +4,7 @@ DOC = """
 ecryptfs is a set of regression tests developed by Tyler Hicks and Colin King of
 canonical that test the ecryptfs, layered filesystem.
 """
-NAME = 'ecryptfs'
+NAME = 'ubuntu_ecryptfs'
 TEST_CLASS = 'kernel'
 TEST_CATEGORY = 'Functional'
 TEST_TYPE = 'client'
@@ -20,7 +20,7 @@ BLACKLIST = [
 FS_BLACKLIST = {
 }
 
-result = job.run_test_detail('ecryptfs', test_name='setup', fs_type=None, tag='setup.all')
+result = job.run_test_detail('ubuntu_ecryptfs', test_name='setup', fs_type=None, tag='setup.all')
 
 for dir in ['/mnt/upper', '/mnt/lower', '/mnt/image']:
     if not os.path.isdir(dir):
@@ -50,6 +50,6 @@ if os.path.exists(tests_rc):
                 if test in FS_BLACKLIST[fs_type]:
                     continue
             tag = "%s.%s" % (test, fs_type)
-            result = job.run_test_detail('ecryptfs', test_name=test, fs_type=fs_type, tag=tag, timeout=60*60)
+            result = job.run_test_detail('ubuntu_ecryptfs', test_name=test, fs_type=fs_type, tag=tag, timeout=60*60)
 
 # vi:set ts=4 sw=4 expandtab:

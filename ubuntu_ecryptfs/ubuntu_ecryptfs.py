@@ -1,13 +1,13 @@
 import os
 from autotest.client import test, utils
 
-class ecryptfs(test.test):
+class ubuntu_ecryptfs(test.test):
     version = 1
 
     def initialize(self):
         self.job.require_gcc()
 
-    def setup(self, tarball = 'ecryptfs.tar.bz2'):
+    def setup(self, tarball = 'ubuntu_ecryptfs.tar.bz2'):
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
 

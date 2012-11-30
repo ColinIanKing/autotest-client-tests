@@ -4,12 +4,12 @@
  all: dbench tbench tbench_srv
 
  dbench: $(DB_OBJS)
--	$(CC) -lpthread -o $@ $(DB_OBJS) $(LIBS)
-+	$(CC) -lpthread -o $@ $(DB_OBJS) $(LIBS) -lpthread
+-	$(CC) -pthread -o $@ $(DB_OBJS) $(LIBS)
++	$(CC) -pthread -o $@ $(DB_OBJS) $(LIBS) -lpthread
 
  tbench: $(TB_OBJS)
--	$(CC) -lpthread -o $@ $(TB_OBJS) $(LIBS)
-+	$(CC) -lpthread -o $@ $(TB_OBJS) $(LIBS) -lpthread
+-	$(CC) -pthread -o $@ $(TB_OBJS) $(LIBS)
++	$(CC) -pthread -o $@ $(TB_OBJS) $(LIBS) -lpthread
 
  tbench_srv: $(SRV_OBJS)
 -	$(CC) -o $@ $(SRV_OBJS) $(LIBS)

@@ -1,8 +1,19 @@
 ubuntu-autotest (0.0.4-1) unstable; urgency=low
 
- * Start new release
+ * UBUNTU: SAUCE: [dbench] Fix the lpthread patch so it will apply
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ * UBUNTU: SAUCE: update-snapshots script
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [power_consumption] added chromium-browser test
+ * UBUNTU: SAUCE: [ubuntu_power_LoadTest] Run the browser for a while and then kill it
+ * UBUNTU: SAUCE: [ubuntu_power_LoadTest] run chromium-browser as a stress test
+ * UBUNTU: SAUCE: [xfstests] snapshot updated
 
- -- Brad Figg <brad.figg@canonical.com>  Wed, 07 Nov 2012 09:39:55 -0800
+ -- Brad Figg <brad.figg@canonical.com>  Tue, 04 Dec 2012 11:53:29 -0800
 
 ubuntu-autotest (0.0.3-1) unstable; urgency=low
 

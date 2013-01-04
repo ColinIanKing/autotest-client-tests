@@ -1,3 +1,14 @@
+ubuntu-autotest (0.0.5-1) unstable; urgency=low
+
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+
+ -- Brad Figg <brad.figg@canonical.com>  Fri, 04 Jan 2013 08:26:39 -0800
+
 ubuntu-autotest (0.0.4-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: [dbench] Fix the lpthread patch so it will apply

@@ -15,6 +15,6 @@ $LOGMETER --addr=$METER_ADDR --port=$METER_PORT --tagport=$METER_TAGPORT \
 	  --out=$SAMPLES_LOG > /dev/null
 
 #
-# Compute stats, scale by 1000 because we are using a power clamp
+# Compute stats, scale by 100 because we are using a power clamp
 #
-$STATSTOOL -S -T -X 1000 -a $SAMPLES_LOG | grep metric: | sed 's/metric:/metric:idle_system_/'
+$STATSTOOL -S -T -X 100 -a $SAMPLES_LOG | grep metric: | sed 's/metric:/metric:idle_system_/'

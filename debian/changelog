@@ -1,3 +1,7 @@
+ubuntu-autotest (0.0.6-1) unstable; urgency=low
+
+ -- Brad Figg <brad.figg@canonical.com>  Wed, 09 Jan 2013 08:35:11 -0800
+
 ubuntu-autotest (0.0.5-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated

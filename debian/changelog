@@ -1,3 +1,7 @@
+ubuntu-autotest (0.0.9-1) unstable; urgency=low
+
+ -- Brad Figg <brad.figg@canonical.com>  Fri, 25 Jan 2013 08:48:01 -0800
+
 ubuntu-autotest (0.0.8-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: [power_consumption] add debug into test scripts

@@ -1,6 +1,8 @@
 ubuntu-autotest (0.0.9-1) unstable; urgency=low
 
- -- Brad Figg <brad.figg@canonical.com>  Fri, 25 Jan 2013 08:48:01 -0800
+ * UBUNTU: SAUCE: [power_consumption] update with latest instrument-lib tarball
+
+ -- Brad Figg <brad.figg@canonical.com>  Sun, 27 Jan 2013 11:42:13 -0800
 
 ubuntu-autotest (0.0.8-1) unstable; urgency=low
 

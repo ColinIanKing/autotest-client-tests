@@ -1,6 +1,8 @@
 ubuntu-autotest (0.0.10-1) unstable; urgency=low
 
- -- Brad Figg <brad.figg@canonical.com>  Sun, 27 Jan 2013 11:45:10 -0800
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated with: Fix two compilation failures that occur with -Werror on raring.
+
+ -- Brad Figg <brad.figg@canonical.com>  Mon, 04 Feb 2013 15:10:41 -0800
 
 ubuntu-autotest (0.0.9-1) unstable; urgency=low
 

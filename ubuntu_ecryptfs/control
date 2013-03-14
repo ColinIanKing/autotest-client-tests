@@ -50,6 +50,6 @@ if os.path.exists(tests_rc):
                 if test in FS_BLACKLIST[fs_type]:
                     continue
             tag = "%s.%s" % (test, fs_type)
-            result = job.run_test_detail('ubuntu_ecryptfs', test_name=test, fs_type=fs_type, tag=tag, timeout=60*60)
+            result = job.run_test_detail('ubuntu_ecryptfs', test_name=test, fs_type=fs_type, tag=tag)
 
 # vi:set ts=4 sw=4 expandtab:

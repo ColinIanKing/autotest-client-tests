@@ -13,6 +13,6 @@ tests = [
 ]
 
 for test in tests:
-    result = job.run_test_detail('ubuntu_qrt_kernel', test_name=test, tag=test, timeout=60*60)
+    result = job.run_test_detail('ubuntu_qrt_kernel', test_name=test, tag=test)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -1,5 +1,7 @@
 ubuntu-autotest (0.0.13-1) unstable; urgency=low
 
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] Added lp-872905.sh to the blacklist
+
  -- Brad Figg <brad.figg@canonical.com>  Thu, 04 Apr 2013 09:38:15 -0700
 
 ubuntu-autotest (0.0.12-1) unstable; urgency=low

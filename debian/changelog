@@ -1,3 +1,7 @@
+ubuntu-autotest (0.0.13-1) unstable; urgency=low
+
+ -- Brad Figg <brad.figg@canonical.com>  Thu, 04 Apr 2013 09:38:15 -0700
+
 ubuntu-autotest (0.0.12-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: Remove the timeouts from the individual test invocations (systems left in bad state).

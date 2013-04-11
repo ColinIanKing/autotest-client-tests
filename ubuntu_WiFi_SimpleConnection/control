@@ -1,0 +1,18 @@
+AUTHOR = "Ubuntu"
+NAME = "Ubuntu WiFi Simple Connection"
+PURPOSE = "Establishes a connection to a wireless network."
+CRITERIA = """
+This test will fail if it cannot connect to a wireless network and navigate
+to www.msn.com.
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CATEGORY = "Functional"
+TEST_CLASS = "network"
+TEST_TYPE = "client"
+DOC = """
+This test connects to a wireless network and navigates to www.msn.com
+"""
+
+name = 'ubuntu_WiFi_SimpleConnection'
+job.run_test_detail(name, tag=name)

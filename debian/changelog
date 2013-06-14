@@ -1,3 +1,16 @@
+ubuntu-autotest (0.0.14-1) unstable; urgency=low
+
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_WiFi_SimpleConnection] Setup a wireless connection and download a file.
+ * UBUNTU: SAUCE: [network_WiFiCaps] wireless capabilities testing
+
+ -- Brad Figg <brad.figg@canonical.com>  Fri, 14 Jun 2013 10:43:19 -0700
+
 ubuntu-autotest (0.0.13-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: [ubuntu_ecryptfs] Added lp-872905.sh to the blacklist

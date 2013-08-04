@@ -1,0 +1,18 @@
+AUTHOR = "Ubuntu"
+NAME = "Ubuntu Simple Python Example"
+PURPOSE = "Just something for people to start with as an example"
+CRITERIA = """
+This test will fail if it cannot connect to a wireless network and navigate
+to www.msn.com.
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CATEGORY = "Functional"
+TEST_CLASS = "network"
+TEST_TYPE = "client"
+DOC = """
+Should just fail every time.
+"""
+
+name = 'ubuntu_simple_py_example'
+job.run_test_detail(name, tag=name)

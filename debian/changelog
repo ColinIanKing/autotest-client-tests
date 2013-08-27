@@ -1,6 +1,13 @@
 ubuntu-autotest (0.0.15-1) unstable; urgency=low
 
- -- Brad Figg <brad.figg@canonical.com>  Tue, 27 Aug 2013 13:14:11 -0700
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+
+ -- Brad Figg <brad.figg@canonical.com>  Tue, 27 Aug 2013 13:18:08 -0700
 
 ubuntu-autotest (0.0.14-1) unstable; urgency=low
 

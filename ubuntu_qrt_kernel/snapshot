@@ -3,4 +3,5 @@
 
 SD=qa-regression-testing/scripts
 bzr branch lp:qa-regression-testing
-tar jcvf ubuntu_qrt_kernel.tar.bz2 $SD/testlib.py $SD/test-kernel.py $SD/kernel 
+(cd qa-regression-testing;bzr log > scripts/bzr.log)
+tar jcvf ubuntu_qrt_kernel.tar.bz2 $SD/bzr.log $SD/testlib.py $SD/test-kernel.py $SD/kernel 

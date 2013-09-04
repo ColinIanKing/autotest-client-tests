@@ -1,5 +1,7 @@
 ubuntu-autotest (0.0.16-1) unstable; urgency=low
 
+ * UBUNTU: resync upstream autotest-client-tests
+
  -- Brad Figg <brad.figg@canonical.com>  Tue, 27 Aug 2013 13:18:08 -0700
 
 ubuntu-autotest (0.0.15-1) unstable; urgency=low

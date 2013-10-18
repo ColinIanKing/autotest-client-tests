@@ -10,15 +10,29 @@ class power_consumption(test.test):
 
     def setup(self, instrument_lib_tarball = 'instrument-lib.tar.bz2'):
         instrument_lib_tarball = utils.unmap_url(self.bindir, instrument_lib_tarball, self.tmpdir)
-        utils.extract_tarball_to_dir(instrument_lib_tarball, self.srcdir)
+	instrument_lib_srcpath = os.path.join(self.srcdir, 'instrument-lib')
+        utils.extract_tarball_to_dir(instrument_lib_tarball, instrument_lib_srcpath)
+
+	sys.stderr.write('SRCPATH' + instrument_lib_srcpath + '\n')
+
+	stress_ng_srcpath = os.path.join(self.srcdir, 'stress-ng')
+        stress_ng_tarball = 'stress-ng.tar.bz2'
+        stress_ng_tarball = utils.unmap_url(self.bindir, stress_ng_tarball, stress_ng_srcpath)
+        utils.extract_tarball_to_dir(stress_ng_tarball, stress_ng_srcpath)
+
+        #
+        # make instrument lib statstool
+        #
+        statstool = os.path.join(instrument_lib_srcpath, 'statstool')
+        os.chdir(statstool)
+        utils.make()
 
 	#
-	# make the tools
+	# make stress-ng
 	#
-	statstool = os.path.join(self.srcdir, 'statstool')
-	os.chdir(statstool)
-	utils.make()
-	
+        os.chdir(stress_ng_srcpath)
+        utils.make()
+
     def run_once(self, test_name):
         if test_name == 'setup':
             return
@@ -29,15 +43,19 @@ class power_consumption(test.test):
 	#
 	# Env variables METER_ADDR, METER_PORT, and METER_TAGPORT must be passed in to the test
         # See the control file
-	os.putenv('LOGMETER', os.path.join(self.srcdir, 'logmeter'))
-	os.putenv('SENDTAG', os.path.join(self.srcdir, 'sendtag'))
-	os.putenv('STATSTOOL', os.path.join(os.path.join(self.srcdir, 'statstool'), 'statstool'))
+	instrument_lib_srcpath = os.path.join(self.srcdir, 'instrument-lib')
+	stress_ng_srcpath = os.path.join(self.srcdir, 'stress-ng')
+        
+	os.putenv('LOGMETER', os.path.join(instrument_lib_srcpath, 'logmeter'))
+	os.putenv('SENDTAG', os.path.join(instrument_lib_srcpath, 'sendtag'))
+	os.putenv('STATSTOOL', os.path.join(os.path.join(instrument_lib_srcpath, 'statstool'), 'statstool'))
 	os.putenv('SAMPLES_LOG', os.path.join(os.path.join(self.tmpdir, 'samples.log')))
 	os.putenv('STATISTICS_LOG', os.path.join(os.path.join(self.tmpdir, 'statistics.log')))
-	os.putenv('SAMPLES', '60')
-	os.putenv('SAMPLE_INTERVAL', '5')
+	os.putenv('SAMPLES', '150')
+	os.putenv('SAMPLE_INTERVAL', '2')
 	os.putenv('SETTLE_DURATION', '30')
 	os.putenv('SCRIPT_PATH', os.path.join(self.bindir, 'power_consumption_tests'))
+	os.putenv('STRESS', os.path.join(stress_ng_srcpath, 'stress-ng'))
 
 	script = os.path.join(os.path.join(self.bindir, 'power_consumption_tests'), test_name)
         output = utils.system_output(script, retain_output=True)

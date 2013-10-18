@@ -7,11 +7,11 @@
 #
 # Number of samples
 #
-SAMPLES=${SAMPLES:-60}
+SAMPLES=${SAMPLES:-150}
 #
 # Interval between samples in seconds
 #
-SAMPLE_INTERVAL=${SAMPLE_ITERVAL:-5}
+SAMPLE_INTERVAL=${SAMPLE_ITERVAL:-2}
 #
 # Default for tests is to wait SETTLE_DURATION before kicking
 # of a new test.
@@ -90,10 +90,15 @@ if [ ! -x $STATSTOOL ]; then
 	echo "DEBUG: Cannot find STATSTOOL at $STATSTOOL" > /dev/stderr
 	exit 1
 fi
+if [ -z $STRESS ]; then
+	echo "DEBUG: STRESS not configured!" > /dev/stderr
+	exit 1
+fi
 
 echo "DEBUG: LOGMETER: $LOGMETER" > /dev/stderr
 echo "DEBUG: SENDTAG: $SENDTAG" > /dev/stderr
 echo "DEBUG: STATSTOOL: $STATSTOOL" > /dev/stderr
+echo "DEBUG: STRESS: $STRESS" > /dev/stderr
 
 echo "DEBUG: Flushing dirty pages and dropping caches" > /dev/stderr
 #

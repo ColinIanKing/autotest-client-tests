@@ -9,7 +9,7 @@
 # Kick off stress test
 #
 echo "DEBUG: Invoking stress tool for $DURATION seconds on $CPUS CPUs" > /dev/stderr
-stress -t $DURATION --cpu $CPUS --io $CPUS --vm $CPUS > /dev/null 2>&1 &
+$STRESS -t $DURATION --cpu $CPUS --io $CPUS --vm $CPUS > /dev/null 2>&1 &
 pid=$!
 
 #

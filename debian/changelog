@@ -1,8 +1,20 @@
 ubuntu-autotest (0.0.16-1) unstable; urgency=low
 
  * UBUNTU: resync upstream autotest-client-tests
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ * UBUNTU: SAUCE: [power-consumption] remove chromium browser from the control file
+ * UBUNTU: SAUCE: [power-consumption] allow for fixed compute for cpu, vm, io tests
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor/snapshot] fix where the bzr.log file is
+ * UBUNTU: Rebase onto upstream next branch
+ * UBUNTU: Have the snapshot script create a log of the the bzr history and add that to the snapshot tar file.
 
- -- Brad Figg <brad.figg@canonical.com>  Tue, 27 Aug 2013 13:18:08 -0700
+ -- Brad Figg <brad.figg@canonical.com>  Mon, 21 Oct 2013 08:11:57 -0700
 
 ubuntu-autotest (0.0.15-1) unstable; urgency=low
 

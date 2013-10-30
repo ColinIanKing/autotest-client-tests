@@ -1,3 +1,9 @@
+ubuntu-autotest (0.0.17-1) unstable; urgency=low
+
+ * UBUNTU: SAUCE: 
+
+ -- Brad Figg <brad.figg@canonical.com>  Wed, 30 Oct 2013 08:12:48 -0700
+
 ubuntu-autotest (0.0.16-1) unstable; urgency=low
 
  * UBUNTU: resync upstream autotest-client-tests

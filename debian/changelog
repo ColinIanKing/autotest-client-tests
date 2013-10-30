@@ -1,6 +1,6 @@
 ubuntu-autotest (0.0.17-1) unstable; urgency=low
 
- * UBUNTU: SAUCE: 
+ * UBUNTU: SAUCE: [power_consumption] test-iosync: correct the io-ops to ensure test runs in ~300 seconds
 
  -- Brad Figg <brad.figg@canonical.com>  Wed, 30 Oct 2013 08:12:48 -0700
 

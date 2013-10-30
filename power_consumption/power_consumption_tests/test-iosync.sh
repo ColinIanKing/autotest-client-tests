@@ -5,7 +5,7 @@
 
 . ${SCRIPT_PATH}/test-common.sh
 
-IO_OPS=3308000
+IO_OPS=574000
 
 stress_iosync()
 {

@@ -427,7 +427,7 @@ class IOzonePlotter(object):
             commands += "set logscale x 2\n"
             commands += "set logscale y 2\n"
             commands += "set logscale z\n"
-            commands += "set xrange [2.**5:2.**24]\n"
+            commands += "set xrange [2.**4:2.**24]\n"
             commands += "set xlabel 'File size (KB)'\n"
             commands += "set ylabel 'Record size (KB)'\n"
             commands += "set zlabel 'Througput (KB/s)'\n"

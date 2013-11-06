@@ -25,7 +25,7 @@ class iozone(test.test):
         self.job.require_gcc()
 
 
-    def setup(self, tarball='iozone3_414.tar'):
+    def setup(self, tarball='iozone3_420.tar'):
         """
         Builds the given version of IOzone from a tarball.
         @param tarball: Tarball with IOzone

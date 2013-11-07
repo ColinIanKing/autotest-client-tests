@@ -55,12 +55,13 @@ class iozone(test.test):
 
         @param dir: IOzone file generation dir.
         @param args: Arguments to the iozone program.
+        @param fstype: Type of file system to test
         """
         if not dir:
             dir = self.tmpdir
         os.chdir(dir)
         if not args:
-            args = '-a -b /home/jenkins/autotest/client/results/default/iozone/testresults.xls'
+            args = '-a'
         cmd = os.path.join(self.srcdir, 'src', 'current', 'iozone')
         self.results = utils.system_output('%s %s' % (cmd, args))
         self.auto_mode = ("-a" in args)

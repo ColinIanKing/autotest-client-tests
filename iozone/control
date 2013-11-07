@@ -15,4 +15,4 @@ operations:
 For more information see http://www.iozone.org
 """
 
-job.run_test('iozone', dir='/home/jenkins/mnt')
+job.run_test('iozone', dir='/media/iozonemount')

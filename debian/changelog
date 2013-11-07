@@ -1,3 +1,9 @@
+ubuntu-autotest (0.0.18-1) unstable; urgency=low
+
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+
+ -- Brad Figg <brad.figg@canonical.com>  Thu, 07 Nov 2013 13:36:28 -0800
+
 ubuntu-autotest (0.0.17-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: [power_consumption] test-iosync: correct the io-ops to ensure test runs in ~300 seconds

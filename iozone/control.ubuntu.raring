@@ -21,11 +21,13 @@ fs = job.partition('/dev/sdb1', mountpoint='/media/iozonemount')
 for fstype, mkfsopts, mountops, tag in (('ext4',   '-E lazy_itable_init', '',         'ext4'),
     	    	      	      ('ext3',   '-E lazy_itable_init', '',         'ext3'),
     	    	      	      ('xfs',    '-f',                  '',         'xfs'),
-    	    	      	      ('btrfs',  '',                    '',         'btrfs')):
-    fs.mkfs(fstype, args=mkfsopts, record=True)
-    fs.mount(mountops)
-    try:
-        job.run_test('iozone', dir='/media/iozonemount', tag=tag, args = '-a -M')
-    finally:
-	fs.unmount()
+    	    	      	      ('btrfs',  '',                  '',         'btrfs')):
+    for testnum in ('1','2','3','4','5'):
+        tagname = fstype + "_" + testnum
+        fs.mkfs(fstype, args=mkfsopts, record=True)
+        fs.mount(args=mountops)
+        try:
+            job.run_test('iozone', dir='/media/iozonemount', tag=tagname, args = '-a -M')
+        finally:
+	    fs.unmount()
 

@@ -123,7 +123,7 @@ class IOzoneAnalyzer(object):
     def average_performance(self, results, size=None):
         """
         Flattens a list containing performance results.
-
+b
         @param results: List of n lists containing data from performance runs.
         @param size: Numerical value of a size (say, file_size) that was used
                 to filter the original results list.
@@ -448,6 +448,30 @@ class IOzonePlotter(object):
                               commands_path)
 
 
+    def make_index(self):
+        """
+        Generate an html index file with links for each each one of the graphs generated
+        """
+        index_path = os.path.join(self.output_dir, 'index.html')
+        index_file = open(index_path, 'w')
+        index_file.write('''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>iozone Analysis</title><body>''')
+
+        for index, label in zip(range(2, 15), _LABELS[2:]):
+            # 2d
+            title_text = '<h1>2d-%s</h1>' % label
+            index_file.write('%s <br/><img src="2d-%s.png">' % (title_text, label))
+        for index, label in zip(range(1, 14), _LABELS[2:]):
+            # 3d
+            title_text = '<h1>%s</h1>' % label
+            index_file.write('%s <br/><img src="%s.png">' % (title_text, label))
+        index_file.write('</body></html>')
+        index_file.close()
+
     def plot_all(self):
         """
         Plot all graphs that are to be plotted, provided that we have gnuplot.
@@ -455,7 +479,7 @@ class IOzonePlotter(object):
         if self.active:
             self.plot_2d_graphs()
             self.plot_3d_graphs()
-
+            self.make_index()
 
 class AnalyzerLoggingConfig(logging_config.LoggingConfig):
     def configure_logging(self, results_dir=None, verbose=False):

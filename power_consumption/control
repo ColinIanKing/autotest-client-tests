@@ -18,7 +18,9 @@ for uarg in args:
 print "argdict = ", argdict
 
 # take the input arguments and get them into the test environment
-os.environ['METER_ADDR'] = argdict['METER_ADDR']
+#os.environ['METER_ADDR'] = argdict['METER_ADDR']
+#  fluke-ac, or IP addr 10.98.4.49
+os.environ['METER_ADDR'] = 'fluke-ac'
 os.environ['METER_PORT'] = argdict['METER_PORT']
 os.environ['METER_TAGPORT'] = argdict['METER_TAGPORT']
 

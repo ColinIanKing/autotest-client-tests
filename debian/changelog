@@ -1,6 +1,14 @@
 ubuntu-autotest (0.0.19-1) unstable; urgency=low
 
- -- Brad Figg <brad.figg@canonical.com>  Mon, 09 Dec 2013 09:00:23 -0800
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ * UBUNTU: SAUCE: [power-consumption] Override the env settings for the fluke address
+
+ -- Brad Figg <brad.figg@canonical.com>  Mon, 09 Dec 2013 09:22:08 -0800
 
 ubuntu-autotest (0.0.18-1) unstable; urgency=low
 

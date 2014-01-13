@@ -4,4 +4,5 @@
 SD=qa-regression-testing/scripts
 bzr branch lp:qa-regression-testing
 (cd qa-regression-testing;bzr log > scripts/bzr.log)
+(cd qa-regression-testing;bzr log scripts/test-kernel-aslr-collisions.py > scripts/test-kernel-aslr-collisions.py.log)
 tar jcvf ubuntu_qrt_kernel_aslr_collisions.tar.bz2 $SD/bzr.log $SD/testlib.py $SD/test-kernel-aslr-collisions.py $SD/kernel-aslr-collisions

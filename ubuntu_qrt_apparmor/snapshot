@@ -4,4 +4,5 @@
 SD=qa-regression-testing/scripts
 bzr branch lp:qa-regression-testing
 (cd qa-regression-testing;bzr log > scripts/bzr.log)
+(cd qa-regression-testing;bzr log scripts/test-apparmor.py > scripts/test-apparmor.py.log)
 tar jcvf ubuntu-qrt-apparmor.tar.bz2 $SD/bzr.log $SD/testlib.py $SD/test-apparmor.py $SD/apparmor

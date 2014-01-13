@@ -4,4 +4,5 @@
 SD=qa-regression-testing/scripts
 bzr branch lp:qa-regression-testing
 (cd qa-regression-testing;bzr log > scripts/bzr.log)
+(cd qa-regression-testing;bzr log scripts/test-kernel-panic.py > scripts/test-kernel-panic.py.log)
 tar jcvf ubuntu_qrt_kernel_panic.tar.bz2 $SD/bzr.log $SD/testlib.py $SD/test-kernel-panic.py $SD/kernel-panic

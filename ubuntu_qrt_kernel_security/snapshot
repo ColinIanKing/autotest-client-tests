@@ -4,4 +4,5 @@
 SD=qa-regression-testing/scripts
 bzr branch lp:qa-regression-testing
 (cd qa-regression-testing;bzr log > scripts/bzr.log)
+(cd qa-regression-testing;bzr log scripts/test-kernel-security.py > scripts/test-kernel-security.log)
 tar jcvf ubuntu_qrt_kernel_security.tar.bz2 $SD/bzr.log $SD/testlib.py $SD/test-kernel-security.py $SD/kernel-security

@@ -1,0 +1,40 @@
+AUTHOR = "Ying Tao <yingtao@cn.ibm.com>"
+TIME = "MEDIUM"
+NAME = "IOzone"
+TEST_TYPE = "client"
+TEST_CLASS = "Kernel"
+TEST_CATEGORY = "Benchmark"
+
+DOC = """
+Iozone is useful for performing a broad filesystem analysis of a vendors
+computer platform. The benchmark tests file I/O performance for the following
+operations:
+      Read, write, re-read, re-write, read backwards, read strided, fread,
+      fwrite, random read, pread ,mmap, aio_read, aio_write
+
+For more information see http://www.iozone.org
+"""
+
+fs = job.partition('/dev/sdb1', mountpoint='/media/iozonemount')
+fstype = 'xfs'
+mkfsopts = '-f'
+mountops = ''
+
+#job.add_sysinfo_command("cat /sys/block/sda/queue/scheduler", on_every_test=True)
+#job.add_sysinfo_command("cat /sys/block/sdb/queue/scheduler", on_every_test=True)
+
+for schedtype in ('deadline', 'noop', 'cfq'):
+    os.system("echo %s > /sys/block/sdb/queue/scheduler" % schedtype)
+    os.system("echo sda scheduler:")
+    os.system("cat /sys/block/sda/queue/scheduler")
+    os.system("echo sdb scheduler:")
+    os.system("cat /sys/block/sdb/queue/scheduler")
+
+    for testnum in ('1','2','3','4','5'):
+        tagname = schedtype + "_" + testnum
+        fs.mkfs(fstype, args=mkfsopts, record=True)
+        fs.mount(args=mountops)
+        try:
+            job.run_test('iozone', dir='/media/iozonemount', tag=tagname, args = '-a -M')
+        finally:
+	    fs.unmount()

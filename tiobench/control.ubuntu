@@ -1,0 +1,37 @@
+NAME = 'Threaded IO Bench'
+AUTHOR = 'walkinair@cn.ibm.com'
+TIME = 'MEDIUM'
+TEST_CLASS = 'IO'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = 'client'
+
+DOC = """
+Performs threaded I/O benchmarks.
+"""
+
+fs = job.partition('/dev/sdb1', mountpoint='/media/testmount')
+
+for fstype, mkfsopts, mountops, tag in (('ext4',   '-E lazy_itable_init',    '',         'ext4'),
+#                              fstype     mkfsopts                           mountopts   tag
+    	    	      	      ('ext3',   '-E lazy_itable_init',              '',         'ext3'),
+    	    	      	      ('ext2',   '',                                 '',         'ext2'),
+    	    	      	      ('xfs',    '-f',                               '',         'xfs'),
+    	    	      	      ('btrfs',  '-f',                               '',         'btrfs')):
+    for schedtype in ('deadline', 'noop', 'cfq'):
+        os.system("echo %s > /sys/block/sdb/queue/scheduler" % schedtype)
+        os.system("echo sda scheduler:")
+        os.system("cat /sys/block/sda/queue/scheduler")
+        os.system("echo sdb scheduler:")
+        os.system("cat /sys/block/sdb/queue/scheduler")
+
+        for testnum in ('1','2','3','4','5'):
+            tagname = fstype + "_" + schedtype + "_" + testnum
+            fs.mkfs(fstype, args=mkfsopts, record=True)
+            fs.mount(args=mountops)
+            try:
+              job.run_test('tiobench',
+                args='--block=4096 --block=8192 --threads=10 --size=1024',
+                iterations=2,
+                dir='/media/testmount')
+            finally:
+              fs.unmount()

@@ -31,6 +31,7 @@ for fstype, mkfsopts, mountops, tag in (('ext4',   '-E lazy_itable_init',    '',
             try:
               job.run_test('tiobench',
                 args='--block=4096 --block=8192 --threads=10 --size=1024',
+                tag=tagname,		
                 iterations=2,
                 dir='/media/testmount')
             finally:

@@ -1,3 +1,28 @@
+ubuntu-autotest (0.0.22-1) unstable; urgency=low
+
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_lxc] First cut at adding the LXC tests
+ * Fix tiobench autotest tags in control file
+ * UBUNTU: SAUCE: ubuntu control file for tiobench
+ * UBUNTU: SAUCE: Add test to compare ext4 without lazy init
+ * UBUNTU: SAUCE: Add iozone io scheduler xfs test
+ * UBUNTU: Capter the log of the relevant qrt script
+ * Add iozone test with fsync 247a2228650f9460210f09f00ab2ea064438c843 Add control file for Lucid
+ * Add iozone benchmark control file for precise
+ * Add iozone control file for quantal
+ * UBUNTU: SAUCE: Add control file for iozone on Trusty
+ * UBUNTU: SAUCE: Iozone changes for Ubuntu tests
+ * UBUNTU: SAUCE: Bring iozone up to latest tarball
+ * UBUNTU: SAUCE: Fix plot range that was breaking gnuplot
+ * UBUNTU: SAUCE: changes to iozone for file system benchmarking
+
+ -- Brad Figg <brad.figg@canonical.com>  Fri, 07 Feb 2014 06:09:24 -0800
+
 ubuntu-autotest (0.0.21-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: [power_consumption] update with latest instrument-lib tarball

@@ -1,5 +1,13 @@
 ubuntu-autotest (0.0.24-1) unstable; urgency=low
 
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ * UBUNTU: SAUCE: update-snapshots, clean the tree first
+
  -- Brad Figg <brad.figg@canonical.com>  Tue, 11 Feb 2014 07:59:19 -0800
 
 ubuntu-autotest (0.0.23-1) unstable; urgency=low

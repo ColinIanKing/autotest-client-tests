@@ -1,6 +1,7 @@
 #!/bin/sh
 #
 
+git clean -dxf
 UBUNTU_AUTOTEST_TESTS="ubuntu_qrt_apparmor ubuntu_qrt_kernel_security ubuntu_qrt_kernel_aslr_collisions ubuntu_qrt_kernel_hardening ubuntu_qrt_kernel_panic ubuntu_ecryptfs"
 for AT in $UBUNTU_AUTOTEST_TESTS; do
     echo ==========================================================  $AT

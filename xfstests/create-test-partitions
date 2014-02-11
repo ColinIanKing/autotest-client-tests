@@ -37,7 +37,7 @@ sudo parted $DEVICE mkpart -s p4 60001MiB 80000MiB
 sudo parted $DEVICE mkpart -s p5 80001MiB 80500MiB
 sudo parted $DEVICE mkpart -s p6 80501MiB 81000MiB
 
-if [ $FS = "xfs" ]; then
+if [ $FS = "btrfs" ]; then
     FS_OPT=-f
 fi
 sudo mkfs.$FS $FS_OPT ${DEVICE}1

@@ -1,5 +1,7 @@
 ubuntu-autotest (0.0.25-1) unstable; urgency=low
 
+ * UBUNTU: SAUCE: Do a head on the bzr.log file at the start of each test so we know what version is being run
+
  -- Brad Figg <brad.figg@canonical.com>  Wed, 12 Feb 2014 11:29:04 -0800
 
 ubuntu-autotest (0.0.24-1) unstable; urgency=low

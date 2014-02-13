@@ -1,5 +1,7 @@
 ubuntu-autotest (0.0.26-1) unstable; urgency=low
 
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+
  -- Brad Figg <brad.figg@canonical.com>  Thu, 13 Feb 2014 05:58:18 -0800
 
 ubuntu-autotest (0.0.25-1) unstable; urgency=low

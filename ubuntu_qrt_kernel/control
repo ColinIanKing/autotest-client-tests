@@ -10,6 +10,7 @@ TEST_TYPE = 'client'
 
 tests = [
     'setup',
+    'test-kernel.py'
 ]
 
 for test in tests:

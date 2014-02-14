@@ -2,6 +2,7 @@
 #
 
 SD=qa-regression-testing/scripts
+rm -rf qa-regression-testing
 bzr branch lp:qa-regression-testing
 (cd qa-regression-testing;bzr log > scripts/bzr.log)
 (cd qa-regression-testing;bzr log scripts/test-kernel.py > scripts/test-kernel.py.log)

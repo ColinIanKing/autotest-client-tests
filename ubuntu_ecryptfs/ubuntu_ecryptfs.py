@@ -10,6 +10,7 @@ class ubuntu_ecryptfs(test.test):
     def setup(self, tarball = 'ubuntu_ecryptfs.tar.bz2'):
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
+        print(utils.system_output('head %s/bzr.log' % self.srcdir, retain_output=True))
 
         os.chdir(self.srcdir)
         utils.system('patch -p1 < %s/run_one.patch' % self.bindir)

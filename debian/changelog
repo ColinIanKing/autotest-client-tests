@@ -1,5 +1,12 @@
 ubuntu-autotest (0.0.27-1) unstable; urgency=low
 
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel] snapshot updated
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel/snapshot] Make sure to remove any existing copy of the QRT before getting a new snapshot
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel] Add test-kernel.py to the list of tests to be run.
+ * UBUNTU: SAUCE: [ubuntu_qrt_kernel] Run the tests as the 'ubuntu' user
+
  -- Brad Figg <brad.figg@canonical.com>  Fri, 14 Feb 2014 11:09:17 -0800
 
 ubuntu-autotest (0.0.26-1) unstable; urgency=low

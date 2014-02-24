@@ -2,5 +2,6 @@
 #
 
 bzr branch lp:ecryptfs
+(cd ecryptfs;bzr log > bzr.log)
 rm -rf ecryptfs/.bzr ecryptfs/img
 tar jcvf ubuntu_ecryptfs.tar.bz2 ./ecryptfs

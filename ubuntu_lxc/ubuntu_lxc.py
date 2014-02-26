@@ -9,8 +9,7 @@ class ubuntu_lxc(test.test):
         pass
 
     def run_once(self, test_name):
-        print('test name: "%s"' % test_name)
-        cmd = '/usr/bin/%s' % test_name
+        cmd = '/bin/sh %s/exercise' % self.bindir
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -12,15 +12,6 @@ DOC = "Test as much of the LXC kernel functionality as possible"
 
 name = 'ubuntu_lxc'
 
-import glob
-
-tests = glob.glob('/usr/bin/lxc-test-*')
-for test in tests:
-    test = test.replace('/usr/bin/', '')
-    if 'lxc-test-may-control' in test:
-        # Some tests can't be run standalone
-        continue
-
-    results = job.run_test_detail('ubuntu_lxc', test_name=test, tag=test)
+results = job.run_test_detail('ubuntu_lxc', test_name='exercise', tag='exercise')
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

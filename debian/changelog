@@ -1,3 +1,16 @@
+ubuntu-autotest (0.0.28-1) unstable; urgency=low
+
+ *  UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ *  UBUNTU: SAUCE: [wakeup_events]: update to latest trusty eventstat
+ *  UBUNTU: SAUCE: [ubuntu_lxc] Working to drive lxc testing with stgrabers script
+
+ -- Brad Figg <brad.figg@canonical.com>  Fri, 14 Mar 2014 12:57:07 -0700
+
 ubuntu-autotest (0.0.27-1) unstable; urgency=low
 
  * UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated

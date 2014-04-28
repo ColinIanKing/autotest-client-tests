@@ -1,14 +1,10 @@
-import os
-import re
-import glob
-import logging
-from autotest.client.shared import error, software_manager
+import os, re, glob, logging
+from autotest.client.shared import error
 from autotest.client import test, utils, os_dep
-
 
 class xfstests(test.test):
 
-    version = 2
+    version = 1
 
     PASSED_RE = re.compile(r'Passed all \d+ tests')
     FAILED_RE = re.compile(r'Failed \d+ of \d+ tests')
@@ -23,6 +19,7 @@ class xfstests(test.test):
         tests_list = [t[:-4] for t in tests if os.path.exists(t[:-4])]
         tests_list.sort()
         return tests_list
+
 
     def _run_sub_test(self, test):
         os.chdir(self.srcdir)
@@ -68,6 +65,7 @@ class xfstests(test.test):
                         groups.add(g)
         return groups
 
+
     def _get_tests_for_group(self, group):
         '''
         Returns the list of tests that belong to a certain test group
@@ -83,11 +81,17 @@ class xfstests(test.test):
                         tests.append(test)
         return tests
 
+
+    def _run_suite(self):
+        os.chdir(self.srcdir)
+        output = utils.system_output('./check -g auto -x dangerous',
+                                     ignore_status=True,
+                                     retain_output=True)
+
     def setup(self, tarball='xfstests.tar.bz2'):
         '''
         Sets up the environment necessary for running xfstests
         '''
-        #
         # Anticipate failures due to missing devel tools, libraries, headers
         # and xfs commands
         #
@@ -102,28 +106,49 @@ class xfstests(test.test):
         os_dep.command('xfs_db')
         os_dep.command('xfs_bmap')
         os_dep.command('xfsdump')
+
         self.job.require_gcc()
 
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
+        #utils.system('patch < %s/xfstests_103_text.patch' % self.bindir)
+        #utils.system('patch < %s/xfstests_228_text.patch' % self.bindir)
+        #utils.system('patch < %s/xfstests_change_e4defrag_location.patch' % self.bindir)
+        utils.system('patch < %s/common_rc.patch' % self.bindir)
         utils.make()
 
         logging.debug("Available tests in srcdir: %s" %
                       ", ".join(self._get_available_tests()))
 
-    def run_once(self, test_number, skip_dangerous=True):
+    def create_partitions(self, filesystem):
+        print('/bin/bash %s/create-test-partitions %s %s' % (self.bindir, os.environ['XFSTESTS_TEST_DRIVE'], filesystem))
+        return utils.system('/bin/bash %s/create-test-partitions %s %s' % (self.bindir, os.environ['XFSTESTS_TEST_DRIVE'], filesystem))
+
+    def unmount_partitions(self):
+        for mnt_point in [ os.environ['SCRATCH_MNT'], os.environ['TEST_DIR'] ]:
+            utils.system('umount %s' % mnt_point, ignore_status=True)
+
+    def run_once(self, filesystem='ext4', test_number='000', single=False, skip_dangerous=True):
         os.chdir(self.srcdir)
-        if test_number == '000':
-            logging.debug('Dummy test to setup xfstests')
-            return
+        if single:
+            if test_number == '000':
+                self.unmount_partitions()
+                self.create_partitions(filesystem)
+                logging.debug('Dummy test to setup xfstests')
+                return
 
-        if test_number not in self._get_available_tests():
-            raise error.TestError('test file %s not found' % test_number)
+            if test_number not in self._get_available_tests():
+                raise error.TestError('test file %s not found' % test_number)
 
-        if skip_dangerous:
-            if test_number in self._get_tests_for_group('dangerous'):
-                raise error.TestNAError('test is dangerous, skipped')
+            if skip_dangerous:
+                if test_number in self._get_tests_for_group('dangerous'):
+                    raise error.TestNAError('test is dangerous, skipped')
 
-        logging.debug("Running test: %s" % test_number)
-        self._run_sub_test(test_number)
+            logging.debug("Running test: %s" % test_number)
+            self._run_sub_test(test_number)
+
+        else:
+            self.create_partitions(filesystem)
+            self._run_suite()
+            self.unmount_partitions()

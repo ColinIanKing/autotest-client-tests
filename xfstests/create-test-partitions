@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+
+set +x
+
+DEVICE=$1
+FS=$2
+
+if [ -z $DEVICE ]; then
+    echo ""
+    echo " ** Error: A device must be specified."
+    echo ""
+    echo "Usage: $0 <device> <file-system>"
+    exit
+fi
+
+if [ -z $FS ]; then
+    echo ""
+    echo " ** Error: A file-system must be specified."
+    echo ""
+    echo "Usage: $0 <device> <file-system>"
+    exit
+fi
+
+sudo parted $DEVICE rm -s 1
+sudo parted $DEVICE rm -s 2
+sudo parted $DEVICE rm -s 3
+sudo parted $DEVICE rm -s 4
+sudo parted $DEVICE rm -s 5
+sudo parted $DEVICE rm -s 6
+set -e
+sudo parted $DEVICE mklabel -s gpt
+sudo parted $DEVICE mkpart -s p1 1MiB 20000MiB
+sudo parted $DEVICE mkpart -s p2 20001MiB 40000MiB
+sudo parted $DEVICE mkpart -s p3 40001MiB 60000MiB
+sudo parted $DEVICE mkpart -s p4 60001MiB 80000MiB
+sudo parted $DEVICE mkpart -s p5 80001MiB 80500MiB
+sudo parted $DEVICE mkpart -s p6 80501MiB 81000MiB
+
+if [ $FS = "btrfs" ]; then
+    FS_OPT=-f
+fi
+sudo mkfs.$FS $FS_OPT ${DEVICE}1
+sudo mkfs.$FS $FS_OPT ${DEVICE}2
+sudo mkfs.$FS $FS_OPT ${DEVICE}3
+sudo mkfs.$FS $FS_OPT ${DEVICE}4
+sudo mkfs.$FS $FS_OPT ${DEVICE}5
+sudo parted $DEVICE print
+

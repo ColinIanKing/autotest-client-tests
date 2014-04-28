@@ -1,0 +1,19 @@
+--- xfstests/common.rc	2012-04-04 12:11:49.000000000 -0700
++++ ./common.rc	2012-08-17 12:41:10.411865269 -0700
+@@ -229,15 +229,7 @@
+     [ $last_index -gt 0 ] && shift $last_index
+     FS_ESCAPED=$1
+     
+-    # irix is fussy about how it is fed its mount options
+-    # - multiple -o's are not allowed
+-    # - no spaces between comma delimitered options
+-    # the sed script replaces all -o's (except the first) with a comma
+-    # not required for linux, but won't hurt
+-    
+-    echo $params | sed -e 's/[[:space:]]*-o[[:space:]]*/UnIqUe/1; s/[[:space:]]*-o[[:space:]]*/,/g; s/UnIqUe/ -o /1' \
+-        | sed -e 's/dmapi/dmi/' \
+-        | $PERL_PROG -ne "s#mtpt=[^,|^\n|^\s]*#mtpt=$FS_ESCAPED\1\2#; print;"
++    echo $params | sed -e 's/dmapi/dmi/' | $PERL_PROG -ne "s#mtpt=[^,|^\n|^\s]*#mtpt=$FS_ESCAPED\1\2#; print;"
+ 
+ }
+ 

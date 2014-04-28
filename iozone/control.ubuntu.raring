@@ -1,0 +1,34 @@
+AUTHOR = "Ying Tao <yingtao@cn.ibm.com>"
+TIME = "MEDIUM"
+NAME = "IOzone"
+TEST_TYPE = "client"
+TEST_CLASS = "Kernel"
+TEST_CATEGORY = "Benchmark"
+
+DOC = """
+Iozone is useful for performing a broad filesystem analysis of a vendors
+computer platform. The benchmark tests file I/O performance for the following
+operations:
+      Read, write, re-read, re-write, read backwards, read strided, fread,
+      fwrite, random read, pread ,mmap, aio_read, aio_write
+
+For more information see http://www.iozone.org
+"""
+
+fs = job.partition('/dev/sdb1', mountpoint='/media/iozonemount')
+
+#                               fstype    mkfsopts               mountopts   tag
+for fstype, mkfsopts, mountops, tag in (('ext4',   '-E lazy_itable_init', '',         'ext4'),
+    	    	      	      ('ext3',   '-E lazy_itable_init', '',         'ext3'),
+    	    	      	      ('ext2',   '',                    '',         'ext2'),
+    	    	      	      ('xfs',    '-f',                  '',         'xfs'),
+    	    	      	      ('btrfs',  '',                  '',         'btrfs')):
+    for testnum in ('1','2','3','4','5'):
+        tagname = fstype + "_" + testnum
+        fs.mkfs(fstype, args=mkfsopts, record=True)
+        fs.mount(args=mountops)
+        try:
+            job.run_test('iozone', dir='/media/iozonemount', tag=tagname, args = '-a -M')
+        finally:
+	    fs.unmount()
+

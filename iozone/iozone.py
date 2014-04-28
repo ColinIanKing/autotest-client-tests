@@ -1,11 +1,9 @@
-import os
-import re
+import os, re
 from autotest.client import test, utils
 import postprocessing
 
 
 class iozone(test.test):
-
     """
     This autotest module runs the IOzone filesystem benchmark. The benchmark
     generates and measures a variety of file operations. Iozone has been ported
@@ -26,10 +24,11 @@ class iozone(test.test):
     def initialize(self):
         self.job.require_gcc()
 
-    def setup(self, tarball='iozone3_414.tar'):
+
+    def setup(self, tarball='iozone3_420.tar'):
         """
         Builds the given version of IOzone from a tarball.
-        :param tarball: Tarball with IOzone
+        @param tarball: Tarball with IOzone
         @see: http://www.iozone.org/src/current/iozone3_414.tar
         """
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
@@ -48,19 +47,21 @@ class iozone(test.test):
         else:
             utils.make('linux')
 
+
     def run_once(self, dir=None, args=None):
         """
         Runs IOzone with appropriate parameters, record raw results in a per
         iteration raw output file as well as in the results attribute
 
-        :param dir: IOzone file generation dir.
-        :param args: Arguments to the iozone program.
+        @param dir: IOzone file generation dir.
+        @param args: Arguments to the iozone program.
+        @param fstype: Type of file system to test
         """
         if not dir:
             dir = self.tmpdir
         os.chdir(dir)
         if not args:
-            args = '-a -b /home/jenkins/autotest/client/results/default/iozone/testresults.xls'
+            args = '-a'
         cmd = os.path.join(self.srcdir, 'src', 'current', 'iozone')
         self.results = utils.system_output('%s %s' % (cmd, args))
         self.auto_mode = ("-a" in args)
@@ -72,8 +73,10 @@ class iozone(test.test):
 
         utils.open_write_close(self.results_path, self.results)
 
+
     def __get_section_name(self, desc):
         return desc.strip().replace(' ', '_')
+
 
     def generate_keyval(self):
         keylist = {}
@@ -94,13 +97,13 @@ class iozone(test.test):
                     key_name = "%d-%d-%s" % (fields[0], fields[1], l)
                     keylist[key_name] = v
         else:
-            child_regexp = re.compile('Children see throughput for[\s]+'
-                                      '([\d]+)\s+([-\w]+[-\w\s]*)\=[\s]+([\d\.]*) KB/sec')
+            child_regexp  = re.compile('Children see throughput for[\s]+'
+                            '([\d]+)\s+([-\w]+[-\w\s]*)\=[\s]+([\d\.]*) KB/sec')
             parent_regexp = re.compile('Parent sees throughput for[\s]+'
-                                       '([\d]+)\s+([-\w]+[-\w\s]*)\=[\s]+([\d\.]*) KB/sec')
+                            '([\d]+)\s+([-\w]+[-\w\s]*)\=[\s]+([\d\.]*) KB/sec')
 
-            KBsec_regexp = re.compile('\=[\s]+([\d\.]*) KB/sec')
-            KBval_regexp = re.compile('\=[\s]+([\d\.]*) KB')
+            KBsec_regexp  = re.compile('\=[\s]+([\d\.]*) KB/sec')
+            KBval_regexp  = re.compile('\=[\s]+([\d\.]*) KB')
 
             section = None
             w_count = 0
@@ -152,6 +155,7 @@ class iozone(test.test):
                             keylist[key_name] = result
 
         self.write_perf_keyval(keylist)
+
 
     def postprocess_iteration(self):
         self.generate_keyval()

@@ -8,12 +8,7 @@ is not present, functionality degrates gracefully.
 
 @copyright: Red Hat 2010
 """
-import os
-import sys
-import optparse
-import logging
-import math
-import time
+import os, sys, optparse, logging, math, time
 try:
     import autotest.common as common
 except ImportError:
@@ -32,8 +27,8 @@ def unique(list):
     """
     Return a list of the elements in list, but without duplicates.
 
-    :param list: List with values.
-    :return: List with non duplicate elements.
+    @param list: List with values.
+    @return: List with non duplicate elements.
     """
     n = len(list)
     if n == 0:
@@ -52,8 +47,8 @@ def geometric_mean(values):
     """
     Evaluates the geometric mean for a list of numeric values.
 
-    :param values: List with values.
-    :return: Single value representing the geometric mean for the list values.
+    @param values: List with values.
+    @return: Single value representing the geometric mean for the list values.
     @see: http://en.wikipedia.org/wiki/Geometric_mean
     """
     try:
@@ -64,16 +59,16 @@ def geometric_mean(values):
     n = len(values)
     if n == 0:
         return None
-    return math.exp(sum([math.log(x) for x in values]) / n)
+    return math.exp(sum([math.log(x) for x in values])/n)
 
 
 def compare_matrices(matrix1, matrix2, treshold=0.05):
     """
     Compare 2 matrices nxm and return a matrix nxm with comparison data
 
-    :param matrix1: Reference Matrix with numeric data
-    :param matrix2: Matrix that will be compared
-    :param treshold: Any difference bigger than this percent treshold will be
+    @param matrix1: Reference Matrix with numeric data
+    @param matrix2: Matrix that will be compared
+    @param treshold: Any difference bigger than this percent treshold will be
             reported.
     """
     improvements = 0
@@ -106,7 +101,6 @@ def compare_matrices(matrix1, matrix2, treshold=0.05):
 
 
 class IOzoneAnalyzer(object):
-
     """
     Analyze an unprocessed IOzone file, and generate the following types of
     report:
@@ -118,7 +112,6 @@ class IOzoneAnalyzer(object):
     If more than one file is provided to the analyzer object, a comparison
     between the two runs is made, searching for regressions in performance.
     """
-
     def __init__(self, list_files, output_dir):
         self.list_files = list_files
         if not os.path.isdir(output_dir):
@@ -126,14 +119,15 @@ class IOzoneAnalyzer(object):
         self.output_dir = output_dir
         logging.info("Results will be stored in %s", output_dir)
 
+
     def average_performance(self, results, size=None):
         """
         Flattens a list containing performance results.
-
-        :param results: List of n lists containing data from performance runs.
-        :param size: Numerical value of a size (say, file_size) that was used
+b
+        @param results: List of n lists containing data from performance runs.
+        @param size: Numerical value of a size (say, file_size) that was used
                 to filter the original results list.
-        :return: List with 1 list containing average data from the performance
+        @return: List with 1 list containing average data from the performance
                 run.
         """
         average_line = []
@@ -145,6 +139,7 @@ class IOzoneAnalyzer(object):
             average_line.append(average)
         return average_line
 
+
     def process_results(self, results, label=None):
         """
         Process a list of IOzone results according to label.
@@ -153,7 +148,7 @@ class IOzoneAnalyzer(object):
                 geometric mean results, in practical term either 'file_size'
                 or 'record_size'.
         @result: A list of n x m columns with original iozone results.
-        :return: A list of n-? x (m-1) columns with geometric averages for
+        @return: A list of n-? x (m-1) columns with geometric averages for
                 values of each label (ex, average for all file_sizes).
         """
         performance = []
@@ -169,12 +164,13 @@ class IOzoneAnalyzer(object):
 
         return performance
 
+
     def parse_file(self, file):
         """
         Parse an IOzone results file.
 
-        :param file: File object that will be parsed.
-        :return: Matrix containing IOzone results extracted from the file.
+        @param file: File object that will be parsed.
+        @return: Matrix containing IOzone results extracted from the file.
         """
         lines = []
         for line in file.readlines():
@@ -187,6 +183,7 @@ class IOzoneAnalyzer(object):
                 continue
         return lines
 
+
     def report(self, overall_results, record_size_results, file_size_results):
         """
         Generates analysis data for IOZone run.
@@ -194,11 +191,11 @@ class IOzoneAnalyzer(object):
         Generates a report to both logs (where it goes with nice headers) and
         output files for further processing (graph generation).
 
-        :param overall_results: 1x15 Matrix containing IOzone results for all
+        @param overall_results: 1x15 Matrix containing IOzone results for all
                 file sizes
-        :param record_size_results: nx15 Matrix containing IOzone results for
+        @param record_size_results: nx15 Matrix containing IOzone results for
                 each record size tested.
-        :param file_size_results: nx15 Matrix containing file size results
+        @param file_size_results: nx15 Matrix containing file size results
                 for each file size tested.
         """
         # Here we'll use the logging system to put the output of our analysis
@@ -256,6 +253,7 @@ class IOzoneAnalyzer(object):
 
         logging.info("")
 
+
     def report_comparison(self, record, file):
         """
         Generates comparison data for 2 IOZone runs.
@@ -264,8 +262,8 @@ class IOzoneAnalyzer(object):
         If a difference higher or smaller than 5% is found, a warning is
         triggered.
 
-        :param record: Tuple with 4 elements containing results for record size.
-        :param file: Tuple with 4 elements containing results for file size.
+        @param record: Tuple with 4 elements containing results for record size.
+        @param file: Tuple with 4 elements containing results for file size.
         """
         (record_size, record_improvements, record_regressions,
          record_total) = record
@@ -283,9 +281,9 @@ class IOzoneAnalyzer(object):
             logging.info("%-10s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s" % tuple(result_line))
         logging.info("REGRESSIONS: %d (%.2f%%)    Improvements: %d (%.2f%%)",
                      record_regressions,
-                     (100 * record_regressions / float(record_total)),
+                     (100 * record_regressions/float(record_total)),
                      record_improvements,
-                     (100 * record_improvements / float(record_total)))
+                     (100 * record_improvements/float(record_total)))
         logging.info("")
 
         logging.info("")
@@ -298,10 +296,11 @@ class IOzoneAnalyzer(object):
             logging.info("%-10s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s%-8.6s" % tuple(result_line))
         logging.info("REGRESSIONS: %d (%.2f%%)    Improvements: %d (%.2f%%)",
                      file_regressions,
-                     (100 * file_regressions / float(file_total)),
+                     (100 * file_regressions/float(file_total)),
                      file_improvements,
-                     (100 * file_improvements / float(file_total)))
+                     (100 * file_improvements/float(file_total)))
         logging.info("")
+
 
     def analyze(self):
         """
@@ -333,14 +332,12 @@ class IOzoneAnalyzer(object):
 
 
 class IOzonePlotter(object):
-
     """
     Plots graphs based on the results of an IOzone run.
 
     Plots graphs based on the results of an IOzone run. Uses gnuplot to
     generate the graphs.
     """
-
     def __init__(self, results_file, output_dir):
         self.active = True
         try:
@@ -363,6 +360,7 @@ class IOzonePlotter(object):
             self.results_file = results_file
             self.generate_data_source()
 
+
     def generate_data_source(self):
         """
         Creates data file without headers for gnuplot consumption.
@@ -380,6 +378,7 @@ class IOzonePlotter(object):
             except ValueError:
                 continue
         datasource.close()
+
 
     def plot_2d_graphs(self):
         """
@@ -408,6 +407,7 @@ class IOzonePlotter(object):
             except error.CmdError:
                 logging.error("Problem plotting from commands file %s",
                               commands_path)
+
 
     def plot_3d_graphs(self):
         """
@@ -447,6 +447,31 @@ class IOzonePlotter(object):
                 logging.error("Problem plotting from commands file %s",
                               commands_path)
 
+
+    def make_index(self):
+        """
+        Generate an html index file with links for each each one of the graphs generated
+        """
+        index_path = os.path.join(self.output_dir, 'index.html')
+        index_file = open(index_path, 'w')
+        index_file.write('''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>iozone Analysis</title><body>''')
+
+        for index, label in zip(range(2, 15), _LABELS[2:]):
+            # 2d
+            title_text = '<h1>2d-%s</h1>' % label
+            index_file.write('%s <br/><img src="2d-%s.png">' % (title_text, label))
+        for index, label in zip(range(1, 14), _LABELS[2:]):
+            # 3d
+            title_text = '<h1>%s</h1>' % label
+            index_file.write('%s <br/><img src="%s.png">' % (title_text, label))
+        index_file.write('</body></html>')
+        index_file.close()
+
     def plot_all(self):
         """
         Plot all graphs that are to be plotted, provided that we have gnuplot.
@@ -454,13 +479,12 @@ class IOzonePlotter(object):
         if self.active:
             self.plot_2d_graphs()
             self.plot_3d_graphs()
-
+            self.make_index()
 
 class AnalyzerLoggingConfig(logging_config.LoggingConfig):
-
     def configure_logging(self, results_dir=None, verbose=False):
         super(AnalyzerLoggingConfig, self).configure_logging(use_console=True,
-                                                             verbose=verbose)
+                                                        verbose=verbose)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,4 @@
-import os
-import re
-import socket
-import time
-import logging
+import os, re, socket, time, logging
 from autotest.client import test, utils
 from autotest.client.net import net_utils
 from autotest.client.shared import error
@@ -10,12 +6,11 @@ from autotest.client.shared import error
 MPSTAT_IX = 0
 IPERF_IX = 1
 
-
 class iperf(test.test):
     version = 1
 
     # http://downloads.sourceforge.net/iperf/iperf-2.0.4.tar.gz
-    def setup(self, tarball='iperf-2.0.4.tar.gz'):
+    def setup(self, tarball = 'iperf-2.0.4.tar.gz'):
         self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
@@ -24,6 +19,7 @@ class iperf(test.test):
         utils.configure()
         utils.make()
         utils.system('sync')
+
 
     def initialize(self):
         self.SERVER_PORT = '5001'
@@ -42,8 +38,9 @@ class iperf(test.test):
         self.netif = ''
         self.network_utils = net_utils.network_utils()
 
+
     def run_once(self, server_ip, client_ip, role, udp=False,
-                 bidirectional=False, test_time=10, dev='', stream_list=[1]):
+                 bidirectional=False, test_time=10, dev='', stream_list=[1], barriers=True):
         self.role = role
         self.udp = udp
         self.bidirectional = bidirectional
@@ -69,13 +66,15 @@ class iperf(test.test):
                 try:
                     # Wait up to ten minutes for the server and client
                     # to reach this point
-                    self.job.barrier(server_tag, 'start_%d' % num_streams,
-                                     600).rendezvous(*all)
+                    if barriers:
+                        self.job.barrier(server_tag, 'start_%d' % num_streams,
+                                         600).rendezvous(*all)
 
                     # Stop the server when the client finishes
                     # Wait up to test_time + five minutes
-                    self.job.barrier(server_tag, 'finish_%d' % num_streams,
-                                     test_time + 300).rendezvous(*all)
+                    if barriers:
+                        self.job.barrier(server_tag, 'finish_%d' % num_streams,
+                                         test_time+300).rendezvous(*all)
                 finally:
                     self.server_stop()
 
@@ -83,17 +82,20 @@ class iperf(test.test):
                 self.ip = socket.gethostbyname(client_ip)
                 # Wait up to ten minutes for the server and client
                 # to reach this point
-                self.job.barrier(client_tag, 'start_%d' % num_streams,
-                                 600).rendezvous(*all)
+                if barriers:
+                    self.job.barrier(client_tag, 'start_%d' % num_streams,
+                                     600).rendezvous(*all)
                 self.client(server_ip, test_time, num_streams)
 
                 # Wait up to 5 minutes for the server to also reach this point
-                self.job.barrier(client_tag, 'finish_%d' % num_streams,
-                                 300).rendezvous(*all)
+                if barriers:
+                    self.job.barrier(client_tag, 'finish_%d' % num_streams,
+                                     300).rendezvous(*all)
             else:
                 raise error.TestError('invalid role specified')
 
         self.restore_interface()
+
 
     def configure_interface(self, dev, ip_addr):
         self.netif = net_utils.netif(dev)
@@ -101,9 +103,11 @@ class iperf(test.test):
         if self.netif.get_ipaddr() != ip_addr:
             self.netif.set_ipaddr(ip_addr)
 
+
     def restore_interface(self):
         if self.netif:
             self.netif.restore()
+
 
     def server_start(self):
         args = ''
@@ -114,8 +118,10 @@ class iperf(test.test):
         self.results.append(utils.system_output(self.server_path % args,
                                                 retain_output=True))
 
+
     def server_stop(self):
         utils.system('killall -9 iperf', ignore_status=True)
+
 
     def client(self, server_ip, test_time, num_streams):
         args = '-t %d -P %d ' % (test_time, num_streams)
@@ -137,7 +143,7 @@ class iperf(test.test):
             cmds.append(cmd)
 
             t0 = time.time()
-            out = utils.run_parallel(cmds, timeout=test_time + 60)
+            out = utils.run_parallel(cmds, timeout = test_time + 60)
             t1 = time.time()
 
             self.results.append(out)
@@ -157,6 +163,7 @@ class iperf(test.test):
                 self.actual_times.append(1)
             else:
                 raise
+
 
     def postprocess(self):
         """The following patterns parse the following outputs:
@@ -194,7 +201,7 @@ class iperf(test.test):
                 raise error.TestError('Mismatched number of results')
 
             for i, streams in enumerate(self.stream_list):
-                attr = {'stream_count': streams}
+                attr = {'stream_count':streams}
                 keyval = {}
 
                 # Short circuit to handle errors due to client timeouts
@@ -213,14 +220,14 @@ class iperf(test.test):
                 keyval['CPU_C_SI'] = cpu_stats['soft']
                 keyval['INTRS_C'] = cpu_stats['intr/s']
 
-                runs = {'Bandwidth_S2C': [], 'Bandwidth_C2S': [],
-                        'Jitter_S2C': [], 'Jitter_C2S': []}
+                runs = {'Bandwidth_S2C':[], 'Bandwidth_C2S':[],
+                        'Jitter_S2C':[], 'Jitter_C2S':[]}
 
                 if self.udp:
                     regex = udp_regex
                     keys = udp_keys
                     # Ignore the first line
-                    stdout = iperf_out.split('\n', 1)[1]
+                    stdout = iperf_out.split('\n',1)[1]
                 else:
                     regex = tcp_regex
                     keys = tcp_keys
@@ -229,11 +236,11 @@ class iperf(test.test):
                 # This will not find the average lines because the 'id' field
                 # is negative and doesn't match the patterns -- this is good
                 for match in regex.findall(stdout):
-                    stats = dict(zip(keys, match))
+                    stats = dict(zip(keys,match))
 
                     # Determine Flow Direction
                     if (stats['local_ip'] == self.ip and
-                            stats['local_port'] == self.SERVER_PORT):
+                        stats['local_port'] == self.SERVER_PORT):
                         runs['Bandwidth_S2C'].append(int(stats['bandwidth']))
                         try:
                             runs['Jitter_S2C'].append(float(stats['jitter']))
@@ -252,7 +259,7 @@ class iperf(test.test):
 
                 # scale the bandwidth based on the actual time taken
                 # by tests to run
-                scale = self.test_time / self.actual_times[i]
+                scale = self.test_time/self.actual_times[i]
                 total_bw = 0
                 for key in ['Bandwidth_S2C', 'Bandwidth_C2S']:
                     if len(runs[key]) > 0:
@@ -260,7 +267,7 @@ class iperf(test.test):
                         total_bw = total_bw + keyval[key]
 
                 if keyval['CPU_C']:
-                    keyval['Efficiency_C'] = total_bw / keyval['CPU_C']
+                    keyval['Efficiency_C'] = total_bw/keyval['CPU_C']
                 else:
                     keyval['Efficiency_C'] = total_bw
                 self.write_iteration_keyval(attr, keyval)

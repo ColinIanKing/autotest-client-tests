@@ -1,0 +1,7 @@
+#!/bin/bash
+# https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1256988
+# Depends: iproute2
+ip netns add foobar
+ip netns exec foobar iptables -A OUTPUT -m recent --rcheck --rsource
+ip netns del foobar
+exit 0

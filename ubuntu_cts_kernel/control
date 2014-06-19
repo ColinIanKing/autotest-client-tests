@@ -1,0 +1,17 @@
+AUTHOR = "Chris J Arges"
+NAME = "Ubuntu CTS Kernel Regression Tests"
+PURPOSE = "Provide regression testing for CTS related bugs"
+CRITERIA = """
+Tests kernel related regressions that are relevant for the CTS team.
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CATEGORY = "Functional"
+TEST_CLASS = "regression"
+TEST_TYPE = "client"
+DOC = """
+These test regressions of specific kernel bugs.
+"""
+
+name = 'ubuntu_cts_kernel'
+job.run_test_detail(name, tag=name)

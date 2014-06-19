@@ -1,0 +1,4 @@
+#!/bin/bash
+# https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1153769
+# Depends: linux-tools-`uname -r`
+perf stat -e cycles ls > /dev/null 2>&1

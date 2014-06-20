@@ -1,6 +1,9 @@
 #!/bin/bash
 # https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1056078
 # Depends: coreutils, apparmor
+
+set -e # Exit with a non-zero exit code if any errors occure
+
 PWD=`pwd`
 cp /bin/sleep ./sleep1
 ./sleep1 10000000 < ./sleep1 &

@@ -1,4 +1,7 @@
 #!/bin/bash
 # https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1153769
 # Depends: linux-tools-`uname -r`
+
+set -e # Exit with a non-zero exit code if any errors occure
+
 perf stat -e cycles ls > /dev/null 2>&1

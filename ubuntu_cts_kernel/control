@@ -14,4 +14,8 @@ These test regressions of specific kernel bugs.
 """
 
 name = 'ubuntu_cts_kernel'
-job.run_test_detail(name, tag=name)
+
+BUGS=['lp1256988','lp1153769','lp1262692','lp1026116']
+for bug in BUGS:
+    result = job.run_test_detail(name, bug=bug, tag=bug)
+

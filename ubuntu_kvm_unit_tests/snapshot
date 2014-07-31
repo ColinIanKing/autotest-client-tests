@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+
+rm -rf kvm-unit-tests
+git clone git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+( cd kvm-unit-tests; git archive --prefix kvm-unit-tests/ --format=tar master | bzip2 > ../kvm-unit-tests.tar.bz2 )
+rm -rf kvm-unit-tests

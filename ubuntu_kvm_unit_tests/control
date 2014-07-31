@@ -1,0 +1,14 @@
+AUTHOR = 'Chris J Arges <chris.j.arges@canonical.com>'
+TIME = 'MEDIUM'
+NAME = 'ubuntu_kvm-unit-tests'
+TEST_TYPE = 'client'
+TEST_CLASS = 'Kernel'
+TEST_CATEGORY = 'Functional'
+DOC = '''
+kvm-unit-tests is the upstream project that tests KVM:
+http://git.kernel.org/cgit/virt/kvm/kvm-unit-tests.git
+'''
+
+job.run_test_detail('ubuntu_kvm_unit_tests')
+
+# vi:set ts=4 sw=4 expandtab:

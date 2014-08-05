@@ -17,6 +17,7 @@ class ubuntu_kvm_unit_tests(test.test):
 
         # patch x86/unittests.cfg
         utils.system('patch -p1 < %s/unittests.patch' % self.bindir)
+        utils.system('patch -p1 < %s/drop-qemu-return-value.patch' % self.bindir)
 
         # HACK: enumerate tests that need to be run from run_tests.sh
         cmd="sed 's/eval $cmdline.*$//g' run_tests.sh > show_tests.sh;\

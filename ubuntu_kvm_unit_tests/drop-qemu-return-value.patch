@@ -1,9 +1,0 @@
-diff --git a/x86/run b/x86/run
-index 646c577..06726bc 100755
---- a/x86/run
-+++ b/x86/run
-@@ -38,4 +38,3 @@ echo ${command} "$@"
- ${command} "$@"
- ret=$?
- echo Return value from qemu: $ret
--exit $ret

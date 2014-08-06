@@ -9,42 +9,25 @@ kvm-unit-tests is the upstream project that tests KVM:
 http://git.kernel.org/cgit/virt/kvm/kvm-unit-tests.git
 '''
 
-# BLACKLIST is a list of ecryptfs tests that we know we don't want to run
+# BLACKLIST is a list of kvm-unit-tests that we know we don't want to run
 #
-BLACKLIST = [
-    ]
+BLACKLIST = ['apic','emulator','idt_test','pmu','s3','vmx','debug']
 
 job.run_test_detail(NAME, test_name='setup', tag='setup.all')
 
 tests_rc = os.path.join(job.bindir, 'tmp', NAME, 'src', 'tests.txt')
 if os.path.exists(tests_rc):
-    with open(tests_rc, 'r') as f:
-        content = f.read().split('\n')
-
-    tests = []
-    for line in content:
-        if line == '': continue
-
-        if line in BLACKLIST:
-            print("BLACKLISTED: " + line)
-            continue
-
-        tests.append(line)
+    content = open(tests_rc).readlines()
+    tests = [ line.split(':') for line in content ]
 
     for test in tests:
-        test_cmd = test  # The command line to be run
-
-        # In a very hackish way, figure out a name for the test so it looks pretty
-        # in the log.
-        #
-        #./x86-run x86/vmexit.flat -smp 1 -append 'cpuid'
-        pretty = test_cmd.replace('./x86-run x86/', '')    # drop the first part
-        pretty = pretty.replace(' ', '_')
-        pretty = pretty.replace('\'', '')
-        pretty = pretty.replace('`', '')
-        pretty = pretty.replace('"', '')
-        pretty = pretty.replace('%s', '')
-        job.run_test_detail(NAME, test_name=pretty, tag=pretty, cmd=test_cmd)
+        test_name = test[0].strip() # The name of the test we want to run
+        if test_name in BLACKLIST:
+            print("BLACKLISTED: " + test_name)
+            continue
+        # constuct test command, append return polarity switch
+        test_cmd = test[1].strip() + "; [ $? -le 1 ]"
+        job.run_test_detail(NAME, test_name=test_name, tag=test_name, cmd=test_cmd)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:
 

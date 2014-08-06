@@ -15,19 +15,12 @@ class ubuntu_kvm_unit_tests(test.test):
         utils.configure()
         utils.make()
 
-        # patch x86/unittests.cfg
-        utils.system('patch -p1 < %s/unittests.patch' % self.bindir)
-        utils.system('patch -p1 < %s/drop-qemu-return-value.patch' % self.bindir)
-
-        # HACK: enumerate tests that need to be run from run_tests.sh
-        cmd="sed 's/eval $cmdline.*$//g' run_tests.sh > show_tests.sh;\
-             chmod +x show_tests.sh;\
-             ./show_tests.sh -v | egrep '(^./)' > tests.txt"
-        utils.system(cmd)
+        # patch run_tests.sh to build our tests list
+        utils.system('patch -p1 < %s/run_tests_show.patch' % self.bindir)
+        utils.system('./run_tests.sh -v > tests.txt')
 
     def run_once(self, test_name, cmd=''):
         os.chdir(self.srcdir)
-
         if test_name == 'setup':
             return
 

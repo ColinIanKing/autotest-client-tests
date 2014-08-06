@@ -1,0 +1,37 @@
+diff --git a/run_tests.sh b/run_tests.sh
+index 4758573..862f7be 100755
+--- a/run_tests.sh
++++ b/run_tests.sh
+@@ -28,24 +28,24 @@ function run()
+     fi
+ 
+     if [ -n "$arch" ] && [ "$arch" != "$ARCH" ]; then
+-        echo "skip $1 ($arch only)"
++        #echo "skip $1 ($arch only)"
+         return
+     fi
+ 
+     cmdline="./$TEST_DIR-run $kernel -smp $smp $opts"
+     if [ $verbose != 0 ]; then
+-        echo $cmdline
++        echo $testname : $cmdline
+     fi
+ 
+     # extra_params in the config file may contain backticks that need to be
+     # expanded, so use eval to start qemu
+-    eval $cmdline >> test.log
++    #eval $cmdline >> test.log
+ 
+-    if [ $? -le 1 ]; then
+-        echo -e "\e[32mPASS\e[0m $1"
+-    else
+-        echo -e "\e[31mFAIL\e[0m $1"
+-    fi
++    #if [ $? -le 1 ]; then
++    #    echo -e "\e[32mPASS\e[0m $1"
++    #else
++    #    echo -e "\e[31mFAIL\e[0m $1"
++    #fi
+ }
+ 
+ function run_all()

@@ -4,15 +4,15 @@
 
 set -e # Exit with a non-zero exit code if any errors occure
 
-ip link add testeth0 type veth peer $1
+ip link add type veth peer $1 name testveth0
 ovs-vsctl add-br integbr
-ifconfig testeth0 192.168.234.21 netmask 255.255.255.0
+ifconfig testveth0 192.168.234.21 netmask 255.255.255.0
 ovs-vsctl add-port integbr gre0 -- set interface gre0 type=gre options:remote_ip=192.168.234.20
 ovs-vsctl add-port integbr tsp0 -- set interface tsp0 type=internal
 ifconfig tsp0 192.168.15.2 netmask 255.255.255.0
 iptables -F
 iptables -F -t nat
 # Cleanup
-sudo ip link del testeth0
+sudo ip link del testveth0
 ovs-vsctl del-br integbr
 

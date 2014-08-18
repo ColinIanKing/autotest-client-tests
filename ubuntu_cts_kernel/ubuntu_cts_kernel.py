@@ -9,9 +9,9 @@ class ubuntu_cts_kernel(test.test):
     def initialize(self):
         pass
 
-    def run_once(self, bug, exit_on_error=True, set_time=True):
+    def run_once(self, bug, exit_on_error=True, set_time=True, ifname='eth0'):
         print('*** %s ***' % bug)
-        cmd = '%s/bugs/%s' % (self.bindir, bug)
+        cmd = '%s/bugs/%s %s' % (self.bindir, bug, ifname)
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

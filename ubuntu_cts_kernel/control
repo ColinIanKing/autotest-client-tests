@@ -12,10 +12,18 @@ TEST_TYPE = "client"
 DOC = """
 These test regressions of specific kernel bugs.
 """
+# Try to figure out the name of the network device. With biosdevname it could
+# be other than 'eth0'.
+#
+ifname = 'eth0'
+content = open('/etc/network/interfaces').readlines()
+for line in content:
+    if 'dhcp' in line:
+        ifname = line.split()[1]
 
 name = 'ubuntu_cts_kernel'
 
 BUGS=['lp1256988','lp1153769','lp1262692','lp1026116']
 for bug in BUGS:
-    result = job.run_test_detail(name, bug=bug, tag=bug)
+    result = job.run_test_detail(name, bug=bug, tag=bug, ifname=ifname)
 

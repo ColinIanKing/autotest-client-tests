@@ -1,0 +1,17 @@
+AUTHOR = "colin.king@canonical.com"
+NAME = "Exhaustive File System Performance Tests"
+PURPOSE = "File system performance tests"
+CRITERIA = """
+This test should only be run on gonzo
+"""
+SUITE = "None"
+TIME = "LONG"
+TEST_CATEGORY = "Filesystem"
+TEST_CLASS = "Benchmark"
+TEST_TYPE = "Client"
+DOC = """
+Should just gather data
+"""
+
+test = 'ubuntu_fs_fio_perf'
+job.run_test_detail(test, test_name=test, tag=test)

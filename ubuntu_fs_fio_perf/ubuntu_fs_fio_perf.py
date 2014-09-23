@@ -7,8 +7,8 @@ class ubuntu_fs_fio_perf(test.test):
 
     def initialize(self):
         self.job.require_gcc()
-	self.valid_clients = ['gonzo', 'intel-uefi']
-	self.hostname = os.uname()[1]
+        self.valid_clients = ['gonzo', 'intel-uefi']
+        self.hostname = os.uname()[1]
         if self.hostname == 'gonzo':
             self.dev = '/dev/sdb'
         elif self.hostname == 'intel-uefi':
@@ -16,6 +16,7 @@ class ubuntu_fs_fio_perf(test.test):
             self.dev = '/dev/sda'
         else:
             self.dev = ''
+        self.fio_tests_dir = os.path.join(self.srcdir, 'fs-test-proto', 'fio-tests')
 
     def setup(self):
         #
@@ -30,9 +31,9 @@ class ubuntu_fs_fio_perf(test.test):
         os.chdir(self.srcdir)
         utils.system('rm -rf fs-test-proto')
         utils.system('git clone git://kernel.ubuntu.com/cking/fs-test-proto.git')
-        os.chdir(os.path.join(os.path.join(self.srcdir, 'fs-test-proto'), 'fio-tests'))
+        os.chdir(self.fio_tests_dir)
         utils.system('tar xvfz ../tools/fio-2.1.9.tar.gz')
-        os.chdir(os.path.join(os.path.join(os.path.join(self.srcdir, 'fs-test-proto'), 'fio-tests'), 'fio'))
+        os.chdir(os.path.join(self.fio_tests_dir, 'fio'))
         utils.system('make clean')
         utils.system('make -j 4')
         os.chdir(self.srcdir)
@@ -55,7 +56,6 @@ class ubuntu_fs_fio_perf(test.test):
         if not os.uname()[1] in self.valid_clients:
             return
 
-        os.chdir(self.srcdir)
         date_start = time.strftime("%Y-%m-%d")
         time_start = time.strftime("%H%M")
 
@@ -67,10 +67,16 @@ class ubuntu_fs_fio_perf(test.test):
             #
             # Test 5 different file systems, across 20+ tests..
             #
-            os.chdir(os.path.join(os.path.join(self.srcdir, 'fs-test-proto'), 'fio-tests'))
+            os.chdir(self.fio_tests_dir)
             cmd = './test.sh'
             cmd += ' -d ' + self.dev + '1 -m 8G -S -s ' + iosched + ' -f ext2,ext3,ext4,xfs,btrfs'
             cmd += ' -D ' + date_start + ' -T ' + time_start
             output += utils.system_output(cmd, retain_output=True)
+
+        #
+        # Move the results from the src tree into the autotest results tree where it will automatically
+        # get picked up and copied over to the jenkins server.
+        #
+        os.rename(os.path.join(self.srcdir, 'fs-test-proto'), os.path.join(self.resultsdir, 'fs-test-proto'))
 
 # vi:set ts=4 sw=4 expandtab:

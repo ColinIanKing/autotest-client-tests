@@ -1,3 +1,62 @@
+ubuntu-autotest (0.0.30-1) unstable; urgency=low
+
+ *  UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_fs_fio_perf/ubuntu_fs_fio_perf.py] A little python tweaking and move the results to the autotes
+ *  UBUNTU: SAUCE: [ubuntu_fs_fio_perf] Add new test
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] remove blacklisted tests
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] update snapshot.
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] Blacklist realmode
+ *  UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_cts_kernel] adjust parameters for iproute2
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ *  [ubuntu_cts_kernel] Make an attempt to handle biosdevname interfaces
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] Update/Enable Tests and Fixes
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] Apply the drop-qemu-return-value patch
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] patch added to drop the return value for qemu from the x86/run script
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] Run the tests as individual tests.
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] patch unittests.cfg to select testcases
+ *  UBUNTU: SAUCE: [ubuntu_kvm_unit_tests] New test suite for kvm testing.
+ *  UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ *  [ubuntu_cts_kernel] Added 'set -e' to all tests so the tests have non-zero exit on error.
+ *  [ubuntu_cts_kernel] Moved the looping over the individual tests to the control file for better test granularity.
+ *  UBUNTU: SAUCE: Add initial ubuntu_cts_kernel regression autotests
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ *  [update-snapshots] ubuntu_qrt_kernel added to list of tests to be snapshot
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_ecryptfs] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_panic] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_hardening] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_aslr_collisions] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ *  UBUNTU: SAUCE: [iperf] Added a parameter 'barriers' to the iperf.py run_once which allows the caller to not use barri
+ *  UBUNTU: SAUCE: [iozone] Slam our iozone changes over the upstream ones.
+ *  UBUNTU: SAUCE: [xfstests] Slam our xfstests changes over the upstream ones.
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+ *  UBUNTU: SAUCE: [ubuntu_qrt_apparmor] snapshot updated
+
+ -- Brad Figg <brad.figg@canonical.com>  Mon, 24 Mar 2014 09:58:15 -0700
+
 ubuntu-autotest (0.0.29-1) unstable; urgency=low
 
  *  UBUNTU: SAUCE: [ubuntu_qrt_kernel_security] snapshot updated

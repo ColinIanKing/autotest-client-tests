@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "seccomp"
+CRITERIA = """
+Uses Kees Cook's seccomp tests.
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_seccomp'
+
+results = job.run_test_detail('ubuntu_seccomp', test_name='seccomp', tag='seccomp')
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

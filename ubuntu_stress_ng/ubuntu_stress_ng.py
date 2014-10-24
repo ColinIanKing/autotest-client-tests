@@ -12,7 +12,7 @@ class ubuntu_stress_ng(test.test):
 
         print(self.srcdir)
         os.chdir(self.srcdir)
-        cmd = 'bzr branch lp:ubuntu/stress-ng'
+        cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng'
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))

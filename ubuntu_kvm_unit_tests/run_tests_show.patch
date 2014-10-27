@@ -1,8 +1,8 @@
 diff --git a/run_tests.sh b/run_tests.sh
-index 4758573..862f7be 100755
+index e48f1db..4285b52 100755
 --- a/run_tests.sh
 +++ b/run_tests.sh
-@@ -28,24 +28,24 @@ function run()
+@@ -29,7 +29,7 @@ function run()
      fi
  
      if [ -n "$arch" ] && [ "$arch" != "$ARCH" ]; then
@@ -11,6 +11,16 @@ index 4758573..862f7be 100755
          return
      fi
  
+@@ -40,25 +40,25 @@ function run()
+         path=${check_param%%=*}
+         value=${check_param#*=}
+         if [ "$path" ] && [ "$(cat $path)" != "$value" ]; then
+-            echo "skip $1 ($path not equal to $value)"
++            #echo "skip $1 ($path not equal to $value)"
+             return
+         fi
+     done
+
      cmdline="./$TEST_DIR-run $kernel -smp $smp $opts"
      if [ $verbose != 0 ]; then
 -        echo $cmdline

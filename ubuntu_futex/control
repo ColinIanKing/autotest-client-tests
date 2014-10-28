@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "futex"
+CRITERIA = """
+Darren Hart's futex test suite
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_futex'
+
+results = job.run_test_detail('ubuntu_futex', test_name='futex', tag='futex')
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

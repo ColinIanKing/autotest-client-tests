@@ -1,0 +1,19 @@
+AUTHOR = "Ubuntu"
+NAME = "unionmount-overlayfs-suite"
+CRITERIA = """
+Darren Hart's futex test suite
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_unionmount_overlayfs_suite'
+
+results = job.run_test_detail('ubuntu_unionmount_overlayfs_suite', test_name='setup', tag='setup')
+results = job.run_test_detail('ubuntu_unionmount_overlayfs_suite', test_name='unionmount', tag='unionmount')
+results = job.run_test_detail('ubuntu_unionmount_overlayfs_suite', test_name='overlayfs', tag='overlayfs')
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

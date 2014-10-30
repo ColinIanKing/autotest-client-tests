@@ -9,8 +9,11 @@ class ubuntu_seccomp(test.test):
     def initialize(self):
         self.job.require_gcc()
 
-        print(self.srcdir)
-        os.makedirs(self.srcdir)
+    # setup
+    #
+    #    Automatically run when there is no autotest/client/tmp/<test-suite> directory
+    #
+    def setup(self):
         os.chdir(self.srcdir)
         cmd = 'git clone https://github.com/redpig/seccomp.git'
         self.results = utils.system_output(cmd, retain_output=True)
@@ -19,10 +22,14 @@ class ubuntu_seccomp(test.test):
         cmd = 'make'
         self.results = utils.system_output(cmd, retain_output=True)
 
+    # run_once
+    #
+    #    Driven by the control file for each individual test.
+    #
+    def run_once(self, test_name):
+        os.chdir(os.path.join(self.srcdir, 'seccomp', 'tests'))
+
         cmd = 'make run_tests'
         self.results = utils.system_output(cmd, retain_output=True)
-
-    def run_once(self, test_name):
-        pass
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

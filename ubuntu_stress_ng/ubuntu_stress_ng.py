@@ -7,10 +7,14 @@ import multiprocessing
 class ubuntu_stress_ng(test.test):
     version = 1
 
-    def run_once(self, test_name):
+    def initialize(self, test_name):
         self.job.require_gcc()
 
-        print(self.srcdir)
+    # setup
+    #
+    #    Automatically run when there is no autotest/client/tmp/<test-suite> directory
+    #
+    def setup(self):
         os.chdir(self.srcdir)
         cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng'
         self.results = utils.system_output(cmd, retain_output=True)
@@ -19,6 +23,11 @@ class ubuntu_stress_ng(test.test):
         cmd = 'make'
         self.results = utils.system_output(cmd, retain_output=True)
 
+    # run_once
+    #
+    #    Driven by the control file for each individual test.
+    #
+    def run_once(self, test_name):
         cmd = './stress-ng --timeout 15m --all %d' % multiprocessing.cpu_count()
         self.results = utils.system_output(cmd, retain_output=True)
 

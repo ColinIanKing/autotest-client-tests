@@ -30,16 +30,21 @@ sudo parted $DEVICE rm -s 5
 sudo parted $DEVICE rm -s 6
 set -e
 sudo parted $DEVICE mklabel -s gpt
-sudo parted $DEVICE mkpart -s p1 1MiB 20000MiB
-sudo parted $DEVICE mkpart -s p2 20001MiB 40000MiB
-sudo parted $DEVICE mkpart -s p3 40001MiB 60000MiB
-sudo parted $DEVICE mkpart -s p4 60001MiB 80000MiB
-sudo parted $DEVICE mkpart -s p5 80001MiB 80500MiB
-sudo parted $DEVICE mkpart -s p6 80501MiB 81000MiB
+sudo parted $DEVICE mkpart -s p1 $FS 1MiB 20000MiB
+sudo parted $DEVICE mkpart -s p2 $FS 20001MiB 40000MiB
+sudo parted $DEVICE mkpart -s p3 $FS 40001MiB 60000MiB
+sudo parted $DEVICE mkpart -s p4 $FS 60001MiB 80000MiB
+sudo parted $DEVICE mkpart -s p5 $FS 80001MiB 80500MiB
+sudo parted $DEVICE mkpart -s p6 $FS 80501MiB 81000MiB
 
 if [ $FS = "btrfs" ]; then
     FS_OPT=-f
+elif [ $FS = "xfs" ]; then
+    FS_OPT=-f
+elif [ $FS = "ext4" ]; then
+    FS_OPT=-F
 fi
+
 sudo mkfs.$FS $FS_OPT ${DEVICE}1
 sudo mkfs.$FS $FS_OPT ${DEVICE}2
 sudo mkfs.$FS $FS_OPT ${DEVICE}3

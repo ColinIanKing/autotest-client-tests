@@ -67,10 +67,24 @@ for testbin in /usr/bin/lxc-test-*; do
 
     # Skip some tests when running in a container
     if [ -f /run/container_type ]; then
+        [ "$testbin" = "/usr/bin/lxc-test-apparmor" ] && \
+            ignore "$STRING" && continue
+
         [ "$testbin" = "/usr/bin/lxc-test-device-add-remove" ] && \
             ignore "$STRING" && continue
 
         [ "$testbin" = "/usr/bin/lxc-test-reboot" ] && \
+            ignore "$STRING" && continue
+    fi
+
+    # Skip userns tests in unprivileged containers
+    if [ -f /proc/self/uid_map ] && \
+            ! grep -q "4294967295$" /proc/self/uid_map; then
+
+        [ "$testbin" = "/usr/bin/lxc-test-unpriv" ] && \
+            ignore "$STRING" && continue
+
+        [ "$testbin" = "/usr/bin/lxc-test-usernic" ] && \
             ignore "$STRING" && continue
     fi
 
@@ -104,6 +118,8 @@ done
 ## Python3 testsuite
 STRING="python3: API"
 if [ "$(dpkg --print-architecture)" = "ppc64el" ]; then
+    ignore "$STRING"
+elif [ ! -f /usr/share/doc/python3-lxc/examples/api_test.py.gz ]; then
     ignore "$STRING"
 else
     OUT=$(mktemp)

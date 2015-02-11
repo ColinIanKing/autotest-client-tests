@@ -29,7 +29,10 @@ class ubuntu_stress_ng(test.test):
     #
     def run_once(self, test_name):
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
-        cmd = './stress-ng --timeout 15m --all %d' % multiprocessing.cpu_count()
+
+        # Run each stressor for 60 seconds and gather some stats at the end
+        #
+        cmd = './stress-ng --timeout 60s --seq 0 --metrics --times'
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

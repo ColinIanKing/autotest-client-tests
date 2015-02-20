@@ -9,21 +9,9 @@ kvm-unit-tests is the upstream project that tests KVM:
 http://git.kernel.org/cgit/virt/kvm/kvm-unit-tests.git
 '''
 
-# blacklist is a dictionary of kvm-unit-tests with a list of archs where we do
-# NOT want to run these tests.  If this list contain the keyword 'all', the
-# test will be blacklisted for all archs.
-blacklist = {
-    'apic'		: [ 'all' ],
-    'emulator'		: [ 'all' ],
-    'idt_test'		: [ 'all' ],
-    'pmu'		: [ 'all' ],
-    'vmx'		: [ 'all' ],
-    'debug'		: [ 'all' ],
-    'msr'		: [ 'i686' ],
-    's3'		: [ 'i686' ],
-    'realmode'		: [ 'i686' ],
-    'taskswitch2'	: [ 'i686' ]
-}
+# BLACKLIST is a list of kvm-unit-tests that we know we don't want to run
+#
+BLACKLIST = ['apic','emulator','idt_test','pmu','vmx','debug']
 
 job.run_test_detail(NAME, test_name='setup', tag='setup.all')
 
@@ -35,15 +23,16 @@ if os.path.exists(tests_rc):
     # returns a 5-tuple: (sysname, nodename, release, version, machine)
     arch = os.uname()[4]
 
-    for test in tests:
-        test_name = test[0].strip() # The name of the test we want to run
-        if test_name in blacklist:
-            if arch in blacklist[test_name] or 'all' in blacklist[test_name]:
-                print("BLACKLISTED test '" + test_name + "' for arch: " + arch)
+    if 'i686' in arch:
+        print "BLACKLISTED tests on i686"
+    else:
+        for test in tests:
+            test_name = test[0].strip() # The name of the test we want to run
+            if test_name in BLACKLIST:
+                print("BLACKLISTED: " + test_name)
                 continue
-        # constuct test command, append return polarity switch
-        test_cmd = test[1].strip() + "; [ $? -le 1 ]"
-        job.run_test_detail(NAME, test_name=test_name, tag=test_name, cmd=test_cmd)
+            # constuct test command, append return polarity switch
+            test_cmd = test[1].strip() + "; [ $? -le 1 ]"
+            job.run_test_detail(NAME, test_name=test_name, tag=test_name, cmd=test_cmd)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:
-

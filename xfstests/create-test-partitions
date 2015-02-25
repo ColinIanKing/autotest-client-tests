@@ -45,6 +45,8 @@ elif [ $FS = "ext4" ]; then
     FS_OPT=-F
 fi
 
+sleep 60 # Give things a minute to settle before creating new partitions
+
 sudo mkfs.$FS $FS_OPT ${DEVICE}1
 sudo mkfs.$FS $FS_OPT ${DEVICE}2
 sudo mkfs.$FS $FS_OPT ${DEVICE}3

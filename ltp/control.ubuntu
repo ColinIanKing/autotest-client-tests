@@ -8,10 +8,104 @@ DOC = """
 Linux Test Project. See http://ltp.sourceforge.net/
 """
 
+#                                                                                      network_stress.selected           quickhit          tcp_cmds
+# can                                                                                  network_stress.tcp                                  tcp_cmds_addition
+# cap_bounds                           ipv6_lib                                        network_stress.udp                rpc_tests         tcp_cmds_expect
+#                     fs_ext4                                                          network_stress.whole                                tcp_cmds_noexpect
+#                                      ltp-aiodio.part1                                nfs                               scsi_debug.part1
+#                     fs_readonly      ltp-aiodio.part2                                                                                    tirpc_tests
+#                                      ltp-aiodio.part3      network_stress.appl                                                           tpm_tools
+#                                      ltp-aiodio.part4      network_stress.broken_ip  nw_under_ns
+# cpuhotplug                           ltp-aio-stress.part1  network_stress.features
+# crashme             ima              ltp-aio-stress.part2  network_stress.icmp
+#                                      ltplite               network_stress.interface  power_management_tests
+# dma_thread_diotest  io_cd            lvm.part1             network_stress.multicast  power_management_tests_exclusive
+# fcntl-locktests     io_floppy        lvm.part2             network_stress.route      pty
+
 
 # TD - Tests Dictionary
 #
 TD = {
+    #'fs_bind' : {   # Hangs
+    #},
+
+    #'ipv6' : {      # Fail
+    #},
+
+    #'rpc' : {       # Fail
+    #},
+
+    #'sctp' : {      # Fail
+    #},
+
+    #'controllers' : { # Hangs
+    #},
+
+    #'multicast' : { # Fail
+    #},
+
+    #'numa' : { # Fail
+    #},
+
+    #'tcp_cmds' : { #Fail
+    #},
+
+    # ---------------------------------------------------------------------------------
+
+    'nptl' : {
+    },
+
+    'admin_tools' : {
+    },
+
+    'connectors' : {
+    },
+
+    'cpuacct' : {
+    },
+
+    'dio' : {
+    },
+
+    'timers' : {
+    },
+
+    'tracing' : {
+    },
+
+    'securebits' : {
+    },
+
+    'smack' : {
+    },
+
+    'syscalls-ipc' : {
+    },
+
+    'network_commands' : {
+    },
+
+    'perfcounters' : {
+    },
+
+    'pipes' : {
+    },
+
+    'math' : {
+    },
+
+    'kernel_misc' : {
+    },
+
+    'ipc' : {
+    },
+
+    'hugetlb' : {
+    },
+
+    'hyperthreading' : {
+    },
+
     'syscall' : {
     },
 
@@ -38,16 +132,7 @@ TD = {
     'fsx' : {
     },
 
-    'hugetlb' : {
-    },
-
-    'hyperthreading' : {
-    },
-
     'io' : {
-    },
-
-    'ipc' : {
     },
 
     'mm' : {
@@ -66,9 +151,9 @@ TD = {
     'stress.part2' : {
     },
 
-    #'stress.part3' : {
-    #    'skip' : ['rpc01', 'run_rpc_tests.sh']
-    #},
+    'stress.part3' : {
+        'skip' : ['rpc01', 'run_rpc_tests.sh']
+    },
 }
 
 for test_case in TD:

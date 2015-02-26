@@ -24,7 +24,7 @@ class ltp(test.test):
         self.job.require_gcc()
 
     # http://sourceforge.net/projects/ltp/files/LTP%20Source/ltp-20140115/
-    def setup(self, tarball='ltp-full-20140115.tar.bz2'):
+    def setup(self, tarball='ltp-full-20150224.tar.bz2'):
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
@@ -34,6 +34,7 @@ class ltp(test.test):
         # saves having lex installed
         shutil.copy(os.path.join(self.bindir, 'scan.c'),
                     os.path.join(self.srcdir, 'pan'))
+        utils.system('make autotools')
         utils.configure('--prefix=%s' % ltpbin_dir)
         utils.make('-j %d all' % utils.count_cpus())
         utils.system('yes n | make SKIP_IDCHECK=1 install')

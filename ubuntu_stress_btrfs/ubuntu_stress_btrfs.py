@@ -12,7 +12,7 @@ class ubuntu_stress_btrfs(test.test):
 
         self.valid_clients = ['gonzo', 'btrfs-scratch']
         self.hostname = os.uname()[1]
-        if self.hostname == 'gonzo':
+        if self.hostname in ['gonzo', 'modoc']:
             self.dev = '/dev/sdb'
         elif self.hostname == 'btrfs-scratch':
             # cking's scratch test VM server

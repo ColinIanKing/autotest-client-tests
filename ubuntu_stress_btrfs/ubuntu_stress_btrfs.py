@@ -60,7 +60,7 @@ class ubuntu_stress_btrfs(test.test):
         #
         #  stress-ng "long soak" tests
         #
-        dur = '2m'
+        dur = '1m'
         cmd = 'DEV=%s MNT=%s LOG=%s STRESS_NG=%s DURATION=%s %s/ubuntu_stress_btrfs.sh 2>&1' % (dev, mnt, log, stress_ng, dur, self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
 

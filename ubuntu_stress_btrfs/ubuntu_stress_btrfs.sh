@@ -113,7 +113,7 @@ do_test()
 	fi
 
 	dmesg -c > /dev/null
-	mkfs.btrfs --force --mixed $DEV
+	mkfs.btrfs --force --mixed $DEV >& /dev/null
 	if [ $? -ne 0 ]; then
 		echo "Failed to format $DEV, terminating!"
 		exit 1

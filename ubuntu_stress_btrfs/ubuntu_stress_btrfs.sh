@@ -23,8 +23,6 @@ OPTS="$OPTS autodefrag,clear_cache,commit=1,compress-force=zlib,enospc_debug,flu
 #
 OPTS="$OPTS autodefrag,commit=900,compress-force=zlib,inode_cache,max_inline=65536,metadata_ratio=128,nobarrier,skip_balance,thread_pool=512"
 
-OPTS="$OPTS autodefrag,commit=900,compress-force=zlib,inode_cache,max_inline=65536,metadata_ratio=128,nobarrier,skip_balance,thread_pool=512"
-
 N=$(getconf _NPROCESSORS_ONLN)
 N=$((N * 2))
 #STRESS_NG=/home/king/stress-ng/stress-ng

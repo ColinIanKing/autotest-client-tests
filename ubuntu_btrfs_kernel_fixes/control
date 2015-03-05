@@ -1,0 +1,32 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_btrfs_kernel_fixes"
+CRITERIA = """
+Test btrfs with tests associated with kernel fixes
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+#
+# This forces setup() to be run, it is in fact a no-op test
+#
+results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name='setup')
+
+#
+# setup has generated file containing all the available scripts to run
+#
+tests = [line.strip() for line in open(os.path.join(job.bindir, 'tmp', NAME, 'src', 'tests.txt'))]
+
+#
+# ..so run scripts that have the executable x flag set
+#
+for test in tests:
+	if (os.access(test, os.X_OK)):
+		# print "Invoking test: " + os.path.basename(test)
+		results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=test)
+
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

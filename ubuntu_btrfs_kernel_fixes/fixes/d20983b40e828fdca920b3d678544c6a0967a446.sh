@@ -1,8 +1,18 @@
 #!/bin/bash
 cat << EOF
-fix 63dd86fa79db737a50f47488e5249f24e5acebc1
+fix d20983b40e828fdca920b3d678544c6a0967a446
 
-    btrfs: fix rw_devices miss match after seed replace
+    Btrfs: fix writing data into the seed filesystem
+    
+    If we mounted a seed filesystem with degraded option, and then added a new
+    device into the seed filesystem, then we found adding device failed because
+    of the IO failure.
+    
+    Steps to reproduce:
+     # mkfs.btrfs -d raid1 -m raid1 <dev0> <dev1>
+     # btrfstune -S 1 <dev0>
+     # mount <dev0> -o degraded <mnt>
+     # btrfs device add -f <dev2> <mnt>
 
 EOF
 
@@ -23,6 +33,7 @@ losetup $DEV1 $TMPIMG1
 losetup $DEV2 $TMPIMG2
 
 if [ $? -ne 0 ]; then
+
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2

@@ -68,4 +68,4 @@ fi
 umount $DEV
 losetup -d $DEV
 rm $TMPIMG
-exit 0
+exit $RET

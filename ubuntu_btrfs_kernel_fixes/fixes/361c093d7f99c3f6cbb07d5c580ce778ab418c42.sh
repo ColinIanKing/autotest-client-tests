@@ -51,9 +51,9 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 sleep 1
-n1=$(ps -elf | fgrep '[btrfs-uuid]' | grep -v grep)
+n1=$(ps -elf | fgrep '[btrfs-uuid]' | grep -v grep | wc -l)
 mount $TEST_DEV $MNT -o ro,remount
-n2=$(ps -elf | fgrep '[btrfs-uuid]' | grep -v grep)
+n2=$(ps -elf | fgrep '[btrfs-uuid]' | grep -v grep | wc -l)
 sleep 1
 rc=0
 if [ $n2 -gt 0 ]; then

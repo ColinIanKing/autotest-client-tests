@@ -12,6 +12,6 @@ DOC = "Test as much of the LXC kernel functionality as possible"
 
 name = 'ubuntu_lxc'
 
-results = job.run_test_detail('ubuntu_lxc', test_name='exercise', tag='exercise')
+results = job.run_test_detail('ubuntu_lxc', test_name='exercise', tag='exercise', timeout=60*60*2)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

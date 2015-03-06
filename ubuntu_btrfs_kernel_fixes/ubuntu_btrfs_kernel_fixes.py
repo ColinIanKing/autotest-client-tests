@@ -39,7 +39,7 @@ class ubuntu_btrfs_kernel_fixes(test.test):
     def setup(self):
 	# print "test names in: " + (os.path.join(self.srcdir, 'tests.txt'))
 	f = open(os.path.join(self.srcdir, 'tests.txt'), 'w')
-	test_files = glob.glob(os.path.join(self.bindir, 'fixes', '*.sh'))
+	test_files = sorted(glob.glob(os.path.join(self.bindir, 'fixes', '*.sh')))
 	for file in test_files:
 		f.write(file + "\n")
 	f.close()

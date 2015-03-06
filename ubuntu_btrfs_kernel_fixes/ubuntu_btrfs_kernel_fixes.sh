@@ -32,9 +32,11 @@ mkdir $MNT $TMP
 clean_loops
 
 echo "Invoking test $NAME"
+echo "Invoking test $NAME" > /dev/kmsg
 echo ""
 MNT=$MNT TMP=$TMP FIX=$FIX $SCRIPT
 ret=$?
+echo "Test $NAME returned $?" > /dev/kmsg
 
 echo ""
 if [ $ret -eq 0 ]; then

@@ -65,7 +65,7 @@ btrfs replace start -f -B $DEV1 $DEV2 $MNT
 
 n=$(dmesg | grep "BUG:" | wc -l)
 rc=0
-if [ $n -gt 0]; then
+if [ $n -gt 0 ]; then
 	echo "Kernel BUG found:"
 	dmesg
 	rc=1

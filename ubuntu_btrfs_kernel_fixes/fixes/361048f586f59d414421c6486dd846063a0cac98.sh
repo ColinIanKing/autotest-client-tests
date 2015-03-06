@@ -1,30 +1,27 @@
 #!/bin/bash
 cat << EOF
-fix 0061280d2c7240805cfd7b1f493da967c97c2f34
+fix 361048f586f59d414421c6486dd846063a0cac98
 
-    Btrfs: fix the page that is beyond EOF
+    Btrfs: fix full backref problem when inserting shared block reference
+    
+    If we create several snapshots at the same time, the following BUG_ON() will be
+    triggered.
+    
+        kernel BUG at fs/btrfs/extent-tree.c:6047!
 
     Steps to reproduce:
-     # mkfs.btrfs <disk>
-     # mount <disk> <mnt>
-     # dd if=/dev/zero of=<mnt>/<file> bs=512 seek=5 count=8
-     # fallocate -p -o 2048 -l 16384 <mnt>/<file>
-     # dd if=/dev/zero of=<mnt>/<file> bs=4096 seek=3 count=8 conv=notrunc,nocreat
-     # umount <mnt>
-     # dmesg
-     WARNING: at fs/btrfs/inode.c:7140 btrfs_destroy_inode+0x2eb/0x330
-
-    The reason is that we inputed a range which is beyond the end of the file. And
-    because the end of this range was not page-aligned, we had to truncate the last
-    page in this range, this operation is similar to a buffered file write. In other
-    words, we reserved enough space and clear the data which was in the hole range
-    on that page. But when we expanded that test file, write the data into the same
-    page, we forgot that we have reserved enough space for the buffered write of
-    that page because in most cases there is no page that is beyond the end of
-    the file. As a result, we reserved the space twice.
-
-    In fact, we needn't truncate the page if it is beyond the end of the file, just
-    release the allocated space in that range. Fix the above problem by this way.
+     # mkfs.btrfs <partition>
+     # mount <partition> <mnt>
+     # cd <mnt>
+     # for ((i=0;i<2400;i++)); do touch long_name_to_make_tree_more_deep$i; done
+     # for ((i=0; i<4; i++))
+     > do
+     > mkdir $i
+     > for ((j=0; j<200; j++))
+     > do
+     > btrfs sub snap . $i/$j
+     > done &
+     > done
 
 EOF
 

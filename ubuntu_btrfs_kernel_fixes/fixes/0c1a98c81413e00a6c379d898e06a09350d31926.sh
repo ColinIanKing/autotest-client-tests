@@ -45,7 +45,7 @@ umount $MNT >& /dev/null
 #
 #  There should be no errors if the file extent is correct
 #
-m=$(btrfsck $DEV0 | grep "errors" | wc -l)
+errors=$(btrfsck $DEV0 | grep "errors" | wc -l)
 if [ $errors -ne -0 ]; then
 	echo "btrfsck found some unexpected errors"
 	losetup -d $DEV0

@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 cat << EOF
 fix b7fef4f593007d52ba7fe4427e099bd71c63c521
 

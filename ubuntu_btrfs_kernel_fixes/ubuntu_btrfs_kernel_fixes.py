@@ -6,7 +6,7 @@ from autotest.client                        import test, utils
 import multiprocessing
 
 class ubuntu_btrfs_kernel_fixes(test.test):
-    version = 58
+    version = 1001
 
     #
     #  from #  http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
@@ -31,7 +31,7 @@ class ubuntu_btrfs_kernel_fixes(test.test):
     def initialize(self):
         self.job.require_gcc()
         if self.which('sysbench') == None:
-		utils.system_output('sudo apt-get install sysbench', retain_output=True)
+		utils.system_output('sudo apt-get install sysbench --yes --force-yes', retain_output=True)
 
     #
     # if you change setup, be sure to increment version

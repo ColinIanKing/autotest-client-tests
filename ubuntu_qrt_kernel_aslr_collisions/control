@@ -14,6 +14,6 @@ tests = [
 ]
 
 for test in tests:
-    result = job.run_test_detail('ubuntu_qrt_kernel_aslr_collisions', test_name=test, tag=test)
+    result = job.run_test_detail('ubuntu_qrt_kernel_aslr_collisions', test_name=test, tag=test, timeout=(60*60*2))
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

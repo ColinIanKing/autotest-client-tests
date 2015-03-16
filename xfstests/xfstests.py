@@ -112,10 +112,8 @@ class xfstests(test.test):
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
-        #utils.system('patch < %s/xfstests_103_text.patch' % self.bindir)
-        #utils.system('patch < %s/xfstests_228_text.patch' % self.bindir)
-        #utils.system('patch < %s/xfstests_change_e4defrag_location.patch' % self.bindir)
-        utils.system('patch < %s/common_rc.patch' % self.bindir)
+        utils.system('pwd')
+        utils.system('patch -p1 < %s/common_rc.patch' % self.bindir)
         utils.make()
 
         logging.debug("Available tests in srcdir: %s" %

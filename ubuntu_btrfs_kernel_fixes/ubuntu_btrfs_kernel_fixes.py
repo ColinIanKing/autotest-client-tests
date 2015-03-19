@@ -66,6 +66,6 @@ class ubuntu_btrfs_kernel_fixes(test.test):
 	#
         cmd = 'BINDIR=%s %s/ubuntu_btrfs_kernel_fixes.sh %s 2>&1' % (self.bindir, self.bindir, test_name)
         self.results = utils.system_output(cmd, retain_output=True)
-        print self.results
+        #print self.results
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

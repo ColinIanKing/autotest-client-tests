@@ -10,6 +10,56 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
 DOC = ""
 
+import platform
+
+rel = ".".join(platform.release().split(".")[:2])
+
+#
+#  Ugly, but necessary for now :-(
+#
+if rel == '3.13':
+	blacklist = [
+		'03cb4fb9d86d591bc8a3f66eac6fb874b50b1b4d.sh',
+		'0aeb8a6e67cddeac1d42cf64795fde0641a1cffb.sh',
+		'115930cb2d444a684975cf2325759cb48ebf80cc.sh',
+		'361c093d7f99c3f6cbb07d5c580ce778ab418c42.sh',
+		'3821f348889e506efbd268cc8149e0ebfa47c4e5.sh',
+		'3b080b2564287be91605bfd1d5ee985696e61d3c.sh',
+		'4027e0f4c4b2df28d564560a3c65c179bebae4c8.sh',
+		'48fcc3ff7dce0138c053833adf81670494f177f3.sh',
+		'5ed7f9ff15e6ea56bcb78f69e9503dc1a587caf0.sh',
+		'7b119a8b8998f17abd6caf928dee5bf203eef8c5.sh',
+		'9a40f1222a372de77344d85d31f8fe0e1c0e60e7.sh',
+		'bf8e8ca6fd4ac6e8edc58b92cffb2ffd51933138.sh',
+		'bfa7e1f8be4bd7118e485a42cc8889530d415d05.sh',
+		'c1895442be01c58449e3bf9272f22062a670e08f.sh',
+		'c55bfa67e94e22ec0449fe7c55b3ef20fbe13348.sh',
+		'c992ec94f24c3e7135d6c23860615f269f0b1d87.sh',
+		'e755f780865221252ef3321215c9796b78e7b1c5.sh',
+		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh',
+		'f959492fc15b60d874a9cbf55ae4760f2ef261ed.sh'
+	]
+elif rel == '3.16':
+	blacklist = [
+		'0aeb8a6e67cddeac1d42cf64795fde0641a1cffb.sh',
+		'361c093d7f99c3f6cbb07d5c580ce778ab418c42.sh',
+		'4027e0f4c4b2df28d564560a3c65c179bebae4c8.sh',
+		'48fcc3ff7dce0138c053833adf81670494f177f3.sh',
+		'bf8e8ca6fd4ac6e8edc58b92cffb2ffd51933138.sh',
+		'e755f780865221252ef3321215c9796b78e7b1c5.sh',
+		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh'
+	]
+elif rel == '3.19':
+	blacklist = [
+		'361c093d7f99c3f6cbb07d5c580ce778ab418c42.sh',
+		'3821f348889e506efbd268cc8149e0ebfa47c4e5.sh',
+		'5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh'
+	]
+elif rel == '4.0':
+	blacklist = [ ]
+else:
+	blacklist = [ ]
+
 #
 # This forces setup() to be run, it is in fact a no-op test
 #
@@ -20,13 +70,22 @@ results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name='setup')
 #
 tests = [line.strip() for line in open(os.path.join(job.bindir, 'tmp', NAME, 'src', 'tests.txt'))]
 
+run = 0
+skip = 0
 #
 # ..so run scripts that have the executable x flag set
 #
 for test in tests:
-	if (os.access(test, os.X_OK)):
-		# print "Invoking test: " + os.path.basename(test)
-		results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=test)
+	name = os.path.basename(test)
+	if name in blacklist:
+		print "Skipping blacklisted test: " + name
+		skip = skip + 1
+	else:
+		if (os.access(test, os.X_OK)):
+			print "Invoking test: " + name
+			results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=test)
+			run = run + 1
 
+print "Total of %d tests, %d invoked, %d skipped" % (run + skip, run, skip)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

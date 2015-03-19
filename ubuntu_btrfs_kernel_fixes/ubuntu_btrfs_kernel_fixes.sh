@@ -15,6 +15,22 @@ clean_loops()
 	fi
 }
 
+check_kernel()
+{
+	n=$(dmesg | grep "Call Trace" | wc -l)
+	o=$(dmesg | grep "Oops" | wc -l)
+	b=$(dmesg | grep "BUG" | wc -l)
+	t=$((n + $o + $b))
+	if [ $t -gt 0 ]; then
+		echo ""
+		echo "Found kernel issue:"
+		echo ""
+		dmesg
+		return 1
+	fi
+	return 0
+}
+
 if [ $EUID -ne 0 ]; then
 	echo "$SCRIPT needs to be run as root"
 	exit 1
@@ -31,12 +47,28 @@ mkdir $MNT $TMP
 
 clean_loops
 
+#
+# clean kernel log
+#
+dmesg -c > /dev/null
 echo "Invoking test $NAME"
 echo "Invoking test $NAME" > /dev/kmsg
 echo ""
 MNT=$MNT TMP=$TMP FIX=$FIX $SCRIPT
 ret=$?
 echo "Test $NAME returned $?" > /dev/kmsg
+
+#
+# anything bad occurred in the kernel, check after
+# 10 seconds as btrfs can trip issues after a few
+# seconds because of kthread helpers
+#
+sleep 10
+check_kernel
+kern=$?
+if [ $kern -ne 0 ]; then
+	ret=1
+fi
 
 echo ""
 if [ $ret -eq 0 ]; then

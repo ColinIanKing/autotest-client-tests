@@ -18,7 +18,7 @@ TMPIMG0=$TMP/test0.img
 
 DEV0=/dev/loop0
 
-truncate --size 2G $TMPIMG0
+truncate --size 1400M $TMPIMG0
 losetup $DEV0 $TMPIMG0
 
 mkfs.btrfs -f $DEV0 >& /dev/null

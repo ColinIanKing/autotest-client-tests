@@ -22,7 +22,6 @@ if rel == '3.13':
 		'03cb4fb9d86d591bc8a3f66eac6fb874b50b1b4d.sh',
 		'0aeb8a6e67cddeac1d42cf64795fde0641a1cffb.sh',
 		'115930cb2d444a684975cf2325759cb48ebf80cc.sh',
-		'361c093d7f99c3f6cbb07d5c580ce778ab418c42.sh',
 		'3821f348889e506efbd268cc8149e0ebfa47c4e5.sh',
 		'3b080b2564287be91605bfd1d5ee985696e61d3c.sh',
 		'4027e0f4c4b2df28d564560a3c65c179bebae4c8.sh',
@@ -42,7 +41,6 @@ if rel == '3.13':
 elif rel == '3.16':
 	blacklist = [
 		'0aeb8a6e67cddeac1d42cf64795fde0641a1cffb.sh',
-		'361c093d7f99c3f6cbb07d5c580ce778ab418c42.sh',
 		'4027e0f4c4b2df28d564560a3c65c179bebae4c8.sh',
 		'48fcc3ff7dce0138c053833adf81670494f177f3.sh',
 		'bf8e8ca6fd4ac6e8edc58b92cffb2ffd51933138.sh',
@@ -51,7 +49,6 @@ elif rel == '3.16':
 	]
 elif rel == '3.19':
 	blacklist = [
-		'361c093d7f99c3f6cbb07d5c580ce778ab418c42.sh',
 		'3821f348889e506efbd268cc8149e0ebfa47c4e5.sh',
 		'5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh'
 	]

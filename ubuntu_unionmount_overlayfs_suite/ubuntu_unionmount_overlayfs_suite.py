@@ -14,7 +14,6 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
     #    Automatically run when there is no autotest/client/tmp/<test-suite> directory
     #
     def setup(self):
-        os.makedirs(self.srcdir)
         os.chdir(self.srcdir)
         cmd = 'git clone git://git.infradead.org/users/dhowells/unionmount-testsuite.git'
         self.results = utils.system_output(cmd, retain_output=True)

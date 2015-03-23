@@ -19,7 +19,7 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
         if not os.path.exists('/upper'):
             os.mkdir('/upper')
         os.chdir(self.srcdir)
-        cmd = 'git clone git://git.infradead.org/users/dhowells/unionmount-testsuite.git'
+        cmd = 'git clone http://kernel.ubuntu.com/git-repos/kernel-ppa/unionmount-testsuite.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
     # run_once

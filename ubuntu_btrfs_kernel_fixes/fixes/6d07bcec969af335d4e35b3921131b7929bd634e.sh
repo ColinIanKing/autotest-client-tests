@@ -59,8 +59,8 @@ echo "Full device:"
 btrfs filesystem show
 echo ""
 
-if [ $pc -lt 99 ]; then
-	echo "Volume should be full, but only $pc is used according to df"
+if [ $pc -lt 97 ]; then
+	echo "Volume should be full, but only $pc percent is used according to df"
 	rc=1
 else
 	echo "Volume looks full or almost full according to df"

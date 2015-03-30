@@ -80,7 +80,7 @@ for test in tests:
 	else:
 		if (os.access(test, os.X_OK)):
 			print "Invoking test: " + name
-			results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=test.replace('.sh',''), timeout=60*60*2)
+			results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=name.replace('.sh',''), timeout=60*60*2)
 			run = run + 1
 
 print "Total of %d tests, %d invoked, %d skipped" % (run + skip, run, skip)

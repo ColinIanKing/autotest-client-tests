@@ -18,7 +18,7 @@ TMPIMG0=$TMP/test0.img
 
 DEV0=/dev/loop0
 
-truncate --size 1400M $TMPIMG0
+truncate --size 1000M $TMPIMG0
 losetup $DEV0 $TMPIMG0
 
 mkfs.btrfs -f $DEV0 >& /dev/null
@@ -40,9 +40,17 @@ fi
 for i in $(seq 50000)
 do
 	btrfs subvolume create ${MNT}/$i >& /dev/null
+	n=$(dmesg | grep "oom-killer:" | wc -l)
+	if [ $n -gt 0 ]; then
+		echo "OOM killer kicked in, aborting test!"
+		umount $DEV0 >& /dev/null
+		losetup -d $DEV0
+		rm $TMPIMG0
+		exit 1
+	fi
 done
 
-umount $MNT
+umount $DEV0
 mount $DEV0 $MNT -o rescan_uuid_tree >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT -o rescan_uuid_tree failed"
@@ -52,7 +60,7 @@ if [ $? -ne 0 ]; then
 fi
 sleep 1
 n1=$(ps -elf | fgrep '[btrfs-uuid]' | grep -v grep | wc -l)
-mount $TEST_DEV $MNT -o ro,remount
+mount $DEV0 $MNT -o ro,remount
 n2=$(ps -elf | fgrep '[btrfs-uuid]' | grep -v grep | wc -l)
 sleep 1
 rc=0

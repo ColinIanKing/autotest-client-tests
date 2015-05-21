@@ -1,0 +1,37 @@
+diff --git a/Makefile.am b/Makefile.am
+index 59fa211..069c42b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -12,7 +12,8 @@ SUBDIRS += test/zfs-tests/cmd/mmapwrite
+ SUBDIRS += test/zfs-tests/cmd/file_trunc
+ SUBDIRS += test/zfs-tests/cmd/file_check
+ 
+-abs_top_srcdir = /usr/src/zfs-test
++#abs_top_srcdir = /usr/src/zfs-test
++abs_tmp_srcdir = $(SRCDIR)
+ SHELL = /bin/bash
+ 
+ AUTOMAKE_OPTIONS = foreign
+diff --git a/test/test-runner/cmd/run.py b/test/test-runner/cmd/run.py
+index f027b75..91cb0d5 100755
+--- a/test/test-runner/cmd/run.py
++++ b/test/test-runner/cmd/run.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python2.6
++#!/usr/bin/python
+ 
+ #
+ # This file and its contents are supplied under the terms of the
+diff --git a/test/zfs-tests/cmd/rm_lnkcnt_zero_file/rm_lnkcnt_zero_file.c b/test/zfs-tests/cmd/rm_lnkcnt_zero_file/rm_lnkcnt_zero_file.c
+index 8fe867e..4d9a65c 100644
+--- a/test/zfs-tests/cmd/rm_lnkcnt_zero_file/rm_lnkcnt_zero_file.c
++++ b/test/zfs-tests/cmd/rm_lnkcnt_zero_file/rm_lnkcnt_zero_file.c
+@@ -41,7 +41,7 @@
+ #include <pthread.h>
+ #ifdef _LINUX
+ #include <string.h>
+-#include <libspl/thread.h>
++#include <pthread.h>
+ #else
+ #include <thread.h>
+ #endif

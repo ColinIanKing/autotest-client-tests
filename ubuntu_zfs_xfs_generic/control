@@ -1,0 +1,40 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_zfs_xfs_generic"
+CRITERIA = """
+Test zfs with xfs generic functional tests
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+#
+# This forces setup() to be run, it is in fact a no-op test
+#
+results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name='setup')
+
+tests = [ '001', '002', '005', '006', '007', '010', '011',
+	  '013', '014', '023', '028', '029', '035', '037',
+	  '053', '067', '069', '070', '075', '079', '080',
+	  '084', '087', '088', '089', '100', '105', '112',
+	  '117', '123', '124', '126', '128', '129', '131',
+	  '132', '141', '184', '169', '192', '193', '215',
+	  '221', '236', '237', '241', '245', '246', '247',
+	  '248', '249', '257', '258', '285', '286', '294',
+	  '306', '307', '308', '309', '310', '313', '314',
+	  '317', '319' ]
+
+# tests = [ '001', '003', '002', '318', '005' ]
+
+#
+# ..so run scripts that have the executable x flag set
+#
+print "Invoking zfs xfs generic functional tests.."
+for test in tests:
+	results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name=test, tag=test, timeout=60*60*1)
+
+print "Done!"
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

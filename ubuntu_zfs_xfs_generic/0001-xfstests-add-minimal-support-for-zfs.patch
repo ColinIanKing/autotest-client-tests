@@ -1,0 +1,349 @@
+From 3e9e3d2a9e64f5abdec79fffaaf0076159ef6790 Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Wed, 27 May 2015 16:15:59 +0100
+Subject: [PATCH] xfstests: add minimal support for zfs
+
+Currently the following tests work:
+
+001 002 005 006 007 010 011 013 014 023
+028 029 035 037 053 067 069 070 075 079
+080 084 087 088 089 100 105 112 117 123
+124 126 128 129 131 132 141 184 169 192
+193 215 221 236 237 241 245 246 247 248
+249 257 258 285 286 294 306 307 308 309
+310 313 314 317 319
+
+..the following fail with errors (and need
+investigating further):
+
+003     access time has changed after accessing file
+020     set/get/remove really long names , attr_set failure
+062     compare before and after backups - mismatches?
+113     aio-stress.4 : -t 20 -s 10m -O -S ???
+120     file access time updated on executing file (unexpected)
+277     chattr Operation not supported while setting flag
+318     Malformed access ACL
+
+..and the rest don't run because of required functionality
+not yet implemented in ZFS or in the zfs specific xfstest
+common/* scripts:
+
+004	linkat with AT_EMPTY_PATH not supported
+008	FALLOC_FL_ZERO_RANGE not supported in fallocate
+009	FALLOC_FL_ZERO_RANGE not supported in fallocate
+012	FALLOC_FL_ZERO_RANGE not supported in fallocate
+015	_scratch_mkfs_sized needs implementing (no-op at the moment)
+016	FALLOC_FL_ZERO_RANGE not supported in fallocate
+017	fiemap support no implemented in zfs(?)
+018	no defrag support in zfs
+019	CONFIG_FAIL_MAKE_REQUEST required
+021	FALLOC_FL_ZERO_RANGE not supported in fallocate
+022	FALLOC_FL_ZERO_RANGE not supported in fallocate
+024`	renameat2() - RENAME_NOREPLACE not supported in zfs
+025`	renameat2() - RENAME_EXCHANGE not supported in zfs
+026	max acls - REDO!!!!
+027	_scratch_mkfs_sized needs implementing (no-op at the moment)
+030	xfs-io does not support mremap on vivid (why?)
+031	FALLOC_FL_COLLAPSE_RANGE no supported by fallocate on zfs yet
+		(appeared in 3.15)
+032	FALLOC_FL_ZERO_RANGE not supported in fallocate
+033	FALLOC_FL_ZERO_RANGE not supported in fallocate
+034	needs to be a block device, which it is not (pool device)
+036	no O_DIRECT mode on zfs
+038	FALLOC_FL_ZERO_RANGE not supported in fallocate
+039	needs to be a block device, which it is not (pool device)
+040	needs to be a block device, which it is not (pool device)
+041	needs to be a block device, which it is not (pool device)
+042	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+043	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+044	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+045	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+046	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+047	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+048	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+049	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+050	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+051	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+052	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+054	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+055	ignore for zfs, no zfs equivalent of XFS_IOC_GOINGDOWN
+056	needs to be a block device, which it is not (pool device)
+057	needs to be a block device, which it is not (pool device)
+058	FALLOC_FL_ZERO_RANGE not supported in fallocate
+059	needs to be a block device, which it is not (pool device)
+060	FALLOC_FL_ZERO_RANGE not supported in fallocate
+061	FALLOC_FL_ZERO_RANGE not supported in fallocate
+063	FALLOC_FL_ZERO_RANGE not supported in fallocate
+064	fiemap support no implemented in zfs(?)
+065	needs to be a block device, which it is not (pool device)
+066	needs to be a block device, which it is not (pool device)
+068	ZFS does not support file system freezing
+071	FALLOC_FL_ZERO_RANGE not supported in fallocate
+072	FALLOC_FL_COLLAPSE_RANGE no supported by fallocate on zfs yet
+		(appeared in 3.15)
+073	needs to be a block device, which it is not (pool device)
+076	needs to be a block device, which it is not (pool device)
+077	_scratch_mkfs_sized needs implementing (no-op at the moment)
+078	RENAME_WHITEOUT not supported in ZFS (zfs + overlayfs fixme?)
+081	needs to be a block device, which it is not (pool device)
+082	fixme - try enable zfs to quota in common/quota and see if this works
+083	_scratch_mkfs_sized needs implementing (no-op at the moment)
+085	needs to be a block device, which it is not (pool device)
+086	FALLOC_FL_ZERO_RANGE not supported in fallocate
+091	no O_DIRECT mode on zfs
+092	FALLOC_FL_ZERO_RANGE not supported in fallocate
+093	IRIX only
+097	IRIX only
+099	IRIX only
+125	no O_DIRECT mode on zfs
+130	no O_DIRECT mode on zfs
+133	no O_DIRECT mode on zfs
+135	no O_DIRECT mode on zfs
+198	no O_DIRECT mode on zfs
+204	_scratch_mkfs_sized needs implementing (no-op at the moment)
+207	no O_DIRECT mode on zfs
+208	no O_DIRECT mode on zfs
+209	no O_DIRECT mode on zfs
+210	no O_DIRECT mode on zfs
+211	no O_DIRECT mode on zfs
+212	no O_DIRECT mode on zfs
+213	FALLOC_FL_ZERO_RANGE not supported in fallocate
+214	FALLOC_FL_ZERO_RANGE not supported in fallocate
+219	fixme - try enable zfs to quota in common/quota and see if this works
+223	FALLOC_FL_ZERO_RANGE not supported in fallocate
+224	_scratch_mkfs_sized needs implementing (no-op at the moment)
+225	fiemap support no implemented in zfs(?)
+226	no O_DIRECT mode on zfs
+228	FALLOC_FL_ZERO_RANGE not supported in fallocate
+230	fixme - try enable zfs to quota in common/quota and see if this works
+231	fixme - try enable zfs to quota in common/quota and see if this works
+232	fixme - try enable zfs to quota in common/quota and see if this works
+233	fixme - try enable zfs to quota in common/quota and see if this works
+234	fixme - try enable zfs to quota in common/quota and see if this works
+235	fixme - try enable zfs to quota in common/quota and see if this works
+239	no O_DIRECT mode on zfs
+240	no O_DIRECT mode on zfs
+251	FITRIM not supported on ZFS (xfs specific)
+255	FALLOC_FL_ZERO_RANGE not supported in fallocate
+256	_scratch_mkfs_sized needs implementing (no-op at the moment)
+260	FITRIM not supported on ZFS (xfs specific)
+263	no O_DIRECT mode on zfs
+269	_scratch_mkfs_sized needs implementing (no-op at the moment)
+270	fixme - try enable zfs to quota in common/quota and see if this works
+273	_scratch_mkfs_sized needs implementing (no-op at the moment)
+274	FALLOC_FL_ZERO_RANGE not supported in fallocate
+275	_scratch_mkfs_sized needs implementing (no-op at the moment)
+277	chattr failure?
+280	fixme - try enable zfs to quota in common/quota and see if this works
+288	FITRIM not supported on ZFS (xfs specific)
+299	no O_DIRECT mode on zfs
+300	no O_DIRECT mode on zfs
+311	needs to be a block device, which it is not (pool device)
+312	FALLOC_FL_ZERO_RANGE not supported in fallocate
+315	FALLOC_FL_ZERO_RANGE not supported in fallocate
+316	fiemap support no implemented in zfs(?)
+318	duplicate acl?  ..maybe we need to nuke all acls before re-run?
+320	_scratch_mkfs_sized needs implementing (no-op at the moment)
+321	needs to be a block device, which it is not (pool device)
+322	needs to be a block device, which it is not (pool device)
+323	no O_DIRECT mode on zfs
+324	no defrag support in zfs
+325	needs to be a block device, which it is not (pool device)
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ check         |  2 ++
+ common/attr   |  7 +++++--
+ common/config | 23 +++++++++++++++--------
+ common/rc     | 26 +++++++++++++++++++++++++-
+ 4 files changed, 47 insertions(+), 11 deletions(-)
+
+diff --git a/check b/check
+index a300130..0038df6 100755
+--- a/check
++++ b/check
+@@ -69,6 +69,7 @@ check options
+     -nfs                test NFS
+     -cifs               test CIFS
+     -tmpfs              test TMPFS
++    -zfs		test ZFS
+     -l			line mode diff
+     -udiff		show unified diff (default)
+     -n			show me, do not run tests
+@@ -207,6 +208,7 @@ while [ $# -gt 0 ]; do
+ 	-nfs)	FSTYP=nfs ;;
+ 	-cifs)	FSTYP=cifs ;;
+ 	-tmpfs)	FSTYP=tmpfs ;;
++	-zfs)	FSTYP=zfs ;;
+ 
+ 	-g)	group=$2 ; shift ;
+ 		GROUP_LIST="$GROUP_LIST $group"
+diff --git a/common/attr b/common/attr
+index 48c81cc..066ec70 100644
+--- a/common/attr
++++ b/common/attr
+@@ -42,6 +42,9 @@ _acl_get_max()
+ 	jfs)
+ 		echo 8191
+ 		;;
++	zfs)
++		echo 1024
++		;;
+ 	*)
+ 		echo 0
+ 		;;
+@@ -246,7 +249,7 @@ _sort_getfattr_output()
+ }
+ 
+ # set maximum total attr space based on fs type
+-if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" ]; then
++if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf"  -o "$FSTYPE" == "zfs" ]; then
+ 	MAX_ATTRS=1000
+ else # Assume max ~1 block of attrs
+ 	BLOCK_SIZE=`get_block_size $TEST_DIR`
+@@ -257,7 +260,7 @@ fi
+ export MAX_ATTRS
+ 
+ # Set max attr value size based on fs type
+-if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "btrfs" ]; then
++if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "btrfs"  -o "$FSTYPE" == "zfs" ]; then
+ 	MAX_ATTRVAL_SIZE=64
+ else # Assume max ~1 block of attrs
+ 	BLOCK_SIZE=`get_block_size $TEST_DIR`
+diff --git a/common/config b/common/config
+index 8e21c28..5ec3962 100644
+--- a/common/config
++++ b/common/config
+@@ -288,6 +288,9 @@ _mount_opts()
+ 		# We need to specify the size at mount, use 512 MB by default
+ 		export MOUNT_OPTIONS="-o size=512M $TMPFS_MOUNT_OPTIONS"
+ 		;;
++	zfs)
++		export MOUNT_OPTIONS=""
++		;;
+ 	*)
+ 		;;
+ 	esac
+@@ -465,10 +468,12 @@ get_next_config() {
+ 		exit 1
+ 	fi
+ 
+-	echo $TEST_DEV | grep -qE ":|//" > /dev/null 2>&1
+-	if [ ! -b "$TEST_DEV" -a "$?" != "0" ]; then
+-		echo "common/config: Error: \$TEST_DEV ($TEST_DEV) is not a block device or a network filesystem"
+-		exit 1
++	if [ "$FSTYP" != "zfs" ]; then
++		echo $TEST_DEV | grep -qE ":|//" > /dev/null 2>&1
++		if [ ! -b "$TEST_DEV" -a "$?" != "0" ]; then
++			echo "common/config: Error: \$TEST_DEV ($TEST_DEV) is not a block device or a network filesystem"
++			exit 1
++		fi
+ 	fi
+ 
+ 	if [ ! -d "$TEST_DIR" ]; then
+@@ -488,10 +493,12 @@ get_next_config() {
+ 		export SCRATCH_DEV_NOT_SET=true
+ 	fi
+ 
+-	echo $SCRATCH_DEV | grep -qE ":|//" > /dev/null 2>&1
+-	if [ ! -z "$SCRATCH_DEV" -a ! -b "$SCRATCH_DEV" -a "$?" != "0" ]; then
+-		echo "common/config: Error: \$SCRATCH_DEV ($SCRATCH_DEV) is not a block device or a network filesystem"
+-		exit 1
++	if [ "$FSTYP" != "zfs" ]; then
++		echo $SCRATCH_DEV | grep -qE ":|//" > /dev/null 2>&1
++		if [ ! -z "$SCRATCH_DEV" -a ! -b "$SCRATCH_DEV" -a "$?" != "0" ]; then
++			echo "common/config: Error: \$SCRATCH_DEV ($SCRATCH_DEV) is not a block device or a network filesystem"
++			exit 1
++		fi
+ 	fi
+ 
+ 	if [ ! -z "$SCRATCH_MNT" -a ! -d "$SCRATCH_MNT" ]; then
+diff --git a/common/rc b/common/rc
+index 610045e..316f0c2 100644
+--- a/common/rc
++++ b/common/rc
+@@ -128,6 +128,8 @@ case "$FSTYP" in
+     reiser4)
+ 	 [ "$MKFS_REISER4_PROG" = "" ] && _fatal "mkfs.reiser4 not found"
+ 	 ;;
++    zfs)
++         ;;
+ esac
+ 
+ # make sure we have a standard umask
+@@ -544,6 +546,9 @@ _test_mkfs()
+     ext2|ext3|ext4)
+ 	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* $TEST_DEV
+ 	;;
++    zfs)
++	# do nothing for zfs
++	;;
+     *)
+ 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $TEST_DEV
+ 	;;
+@@ -566,7 +571,9 @@ _mkfs_dev()
+ 	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* \
+ 		2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
+ 	;;
+-
++    zfs)
++	# do nothing for zfs
++	;;
+     *)
+ 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* \
+ 		2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
+@@ -625,6 +632,9 @@ _scratch_mkfs()
+     f2fs)
+         $MKFS_F2FS_PROG $MKFS_OPTIONS $* $SCRATCH_DEV > /dev/null
+ 	;;
++    zfs)
++        _scratch_cleanup_files
++	;;
+     *)
+ 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $SCRATCH_DEV
+ 	;;
+@@ -1112,6 +1122,8 @@ _require_scratch_nocheck()
+ 		    _notrun "this test requires a valid \$SCRATCH_MNT and unique $SCRATCH_DEV"
+ 		fi
+ 		;;
++	zfs)
++		;;
+ 	*)
+ 		 if [ -z "$SCRATCH_DEV" -o "`_is_block_dev "$SCRATCH_DEV"`" = "" ]
+ 		 then
+@@ -1186,6 +1198,12 @@ _require_test()
+ 		    _notrun "this test requires a valid \$TEST_DIR and unique $TEST_DEV"
+ 		fi
+ 		;;
++	zfs)
++		if [ -z "$TEST_DEV" -o ! -d "$TEST_DIR" ];
++		then
++		    _notrun "this test requires a valid \$TEST_DIR and unique $TEST_DEV"
++		fi
++		;;
+ 	*)
+ 		 if [ -z "$TEST_DEV" ] || [ "`_is_block_dev "$TEST_DEV"`" = "" ]
+ 		 then
+@@ -2054,6 +2072,9 @@ _check_test_fs()
+     tmpfs)
+ 	# no way to check consistency for tmpfs
+ 	;;
++    zfs)
++	# no way to check consistency for tmpfs
++	;;
+     *)
+ 	_check_generic_filesystem $TEST_DEV
+ 	;;
+@@ -2092,6 +2113,9 @@ _check_scratch_fs()
+     tmpfs)
+ 	# no way to check consistency for tmpfs
+ 	;;
++    zfs)
++	# Don't know how to check an NFS filesystem, yet.
++        ;;
+     *)
+ 	_check_generic_filesystem $device
+ 	;;
+-- 
+2.1.4
+

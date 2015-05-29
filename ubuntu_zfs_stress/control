@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_zfs_stress"
+CRITERIA = """
+Uses stress-ng to stress zfs"
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_zfs_stress'
+
+results = job.run_test_detail('ubuntu_zfs_stress', test_name='zfs-stress', tag='zfs-stress')
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

@@ -42,9 +42,9 @@ class ubuntu_zfs(test.test):
         utils.system('./autogen.sh')
         utils.configure('')
         utils.system('SRCDIR=%s make' % self.srcdir)
-        #utils.make()
 	utils.system('modprobe zfs')
-	utils.system('cp %s/test/zfs-tests/runfiles/linux.run %s/linux.run' % (self.srcdir, self.srcdir))
+	print "Copying ubuntu modified linux run file.."
+	utils.system('cp %s/linux.run.ubuntu %s/linux.run' % (self.bindir, self.srcdir))
 	
 
     def run_once(self, test_name):

@@ -1,0 +1,25 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_generic_fstest"
+CRITERIA = """
+Test generic filesystems with fstest POSIX functional tests
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+#
+# This forces setup() to be run, it is in fact a no-op test
+#
+results = job.run_test_detail('ubuntu_generic_fstest', test_name='setup')
+
+print "Invoking fstest functional tests.."
+tests = [ 'ext2', 'ext3', 'ext4', 'xfs', 'btrfs', 'jfs', 'hfs' ]
+for t in tests:
+	results = job.run_test_detail('ubuntu_generic_fstest', test_name=t, tag=t, timeout=5*60)
+
+print "Done!"
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

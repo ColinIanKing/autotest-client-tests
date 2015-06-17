@@ -6,7 +6,7 @@ from autotest.client                        import test, utils
 #
 # Dictionary of kernel versions and releases for which self tests are supported.
 #
-releases = { '3.13':'trusty', '3.16':'utopic', '3.18':'vivid', '3.19':'vivid' };
+releases = { '3.13':'trusty', '3.16':'utopic', '3.19':'vivid', '4.0':'wily' };
 
 class ubuntu_kernel_selftests(test.test):
     version = 1

@@ -1,31 +1,21 @@
 #
 #
 import os
+import platform
 from autotest.client                        import test, utils
-
-#
-# Dictionary of kernel versions and releases for which self tests are supported.
-#
-releases = { '3.13':'trusty', '3.16':'utopic', '3.19':'vivid', '4.0':'wily' };
 
 class ubuntu_kernel_selftests(test.test):
     version = 1
 
-    # Extract the running kernel version and pair it with an Ubuntu release. Knowing
-    # that allows us to pull the right repository.
-    #
-    release = os.uname()
-    uname = release[2]
-    version = uname[0:4]
-
     def setup(self):
         os.chdir(self.srcdir)
         self.job.require_gcc()
+        series = platform.dist()[2]
 
         # Use a local repo for manual testing. If it does not exist, then clone from the master
         # repository.
         #
-        repo = os.environ['HOME'] + '/ubuntu/ubuntu-%s' % releases[self.version]
+        repo = os.environ['HOME'] + '/ubuntu/ubuntu-%s' % series
         if os.path.exists(repo) == True:
             cmd = 'git clone -q %s linux' % repo
             utils.system(cmd)
@@ -33,7 +23,7 @@ class ubuntu_kernel_selftests(test.test):
         # No local repository, so clone from the master repo.
         #
         if os.path.exists('linux') == False:
-            cmd = 'git clone http://kernel.ubuntu.com/git-repos/ubuntu/ubuntu-%s.git linux' % releases[self.version]
+            cmd = 'git clone https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/%s linux' % series
             utils.system(cmd)
 
     def run_once(self, test_name):

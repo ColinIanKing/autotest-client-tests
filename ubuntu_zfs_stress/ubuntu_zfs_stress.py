@@ -25,19 +25,19 @@ class ubuntu_zfs_stress(test.test):
 
         os.chdir(self.srcdir)
 
-	utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
+        utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
-	utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
-	utils.system_output('apt-get update', retain_output=True)
+        utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
+        utils.system_output('apt-get update || true', retain_output=True)
 
-	pkgs = ['build-essential', 'gdb', 'git', 'ksh', 'autoconf', 'build-essential',
-		'ubuntu-zfs', 'acl', 'dump', 'kpartx', 'pax',
-		'nfs-kernel-server' ]
-	for pkg in pkgs:
-		print "Installing package " + pkg
-		utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)
+        pkgs = ['build-essential', 'gdb', 'git', 'ksh', 'autoconf', 'build-essential',
+                'ubuntu-zfs', 'acl', 'dump', 'kpartx', 'pax',
+                'nfs-kernel-server' ]
+        for pkg in pkgs:
+                print "Installing package " + pkg
+                utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)
 
-	utils.system('modprobe zfs')
+        utils.system('modprobe zfs')
 
 
     def run_once(self, test_name):
@@ -54,9 +54,9 @@ class ubuntu_zfs_stress(test.test):
         dur = '5s'
         cmd = 'LOG=%s STRESS_NG=%s DURATION=%s bash -c %s/ubuntu_zfs_stress.sh 2>&1' % (log, stress_ng, dur, self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
-	#
-	# FIXME: comment this out on production
-	#
+        #
+        # FIXME: comment this out on production
+        #
         #print self.results
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

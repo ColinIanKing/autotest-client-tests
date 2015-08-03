@@ -1,0 +1,23 @@
+import os, shutil
+from autotest.client import test, utils
+
+
+class ubuntu_32_on_64(test.test):
+    version = 1
+
+    def setup(self):
+        shutil.copyfile(os.path.join(self.bindir, 'forkexec.c'),
+                        os.path.join(self.srcdir, 'forkexec.c'))
+        os.chdir(self.bindir)
+        os.chdir(self.srcdir)
+        utils.system(utils.get_cc() + ' forkexec.c -m32 -o forkexec')
+
+    def initialize(self):
+        self.job.require_gcc()
+
+    def run_once(self, test_time=10, exit_on_error=True, set_time=True):
+        cmd = os.path.join(self.srcdir, 'forkexec')
+
+        args = ' date'
+        utils.system(cmd + ' ' + args)
+

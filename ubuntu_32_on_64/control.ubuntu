@@ -1,0 +1,11 @@
+AUTHOR = 'brad.figg@canonical.com (Brad Figg)'
+TIME = 'MEDIUM'
+NAME = 'run 32bit apps on 64bit install'
+TEST_TYPE = 'client'
+TEST_CLASS = 'Kernel'
+TEST_CATEGORY = 'Stress'
+
+DOC = '''
+'''
+
+job.run_test_detail('ubuntu_32_on_64', test_time=600)

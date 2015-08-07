@@ -6,11 +6,10 @@ from autotest.client                        import test, utils
 import multiprocessing
 
 class ubuntu_zfs(test.test):
-    version = 2
+    version = 3
 
     def initialize(self):
         self.job.require_gcc()
-
 
     #
     # if you change setup, be sure to increment version
@@ -44,7 +43,16 @@ class ubuntu_zfs(test.test):
         utils.system('SRCDIR=%s make' % self.srcdir)
         utils.system('modprobe zfs')
         print "Copying ubuntu modified linux run file.."
-        utils.system('cp %s/linux.run.ubuntu %s/linux.run' % (self.bindir, self.srcdir))
+
+        fin = open(os.path.join(self.bindir, 'linux.run.ubuntu'))
+        fout = open(os.path.join(self.srcdir, 'linux.run'), 'w')
+        for line in fin:
+            fout.write(line.replace('PATHNAME', os.path.join(self.srcdir, 'test/zfs-tests')))
+        fin.close()
+        fout.close()
+
+	print "SRCDIR = %" + self.srcdir
+        #utils.system('cp %s/linux.run.ubuntu %s/linux.run' % (self.bindir, self.srcdir))
 
 
     def run_once(self, test_name):

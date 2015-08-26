@@ -2,13 +2,19 @@
 #
 
 git clean -dxf
+
+rm -rf qa-regression-testing
+bzr branch lp:qa-regression-testing
+
 UBUNTU_AUTOTEST_TESTS="ubuntu_qrt_apparmor ubuntu_qrt_kernel_security ubuntu_qrt_kernel_aslr_collisions ubuntu_qrt_kernel_hardening ubuntu_qrt_kernel_panic ubuntu_qrt_kernel ubuntu_ecryptfs"
 for AT in $UBUNTU_AUTOTEST_TESTS; do
     echo ==========================================================  $AT
     (
         cd $AT;
         ./snapshot
-        git add *.tar.bz2
-        git ci -sm "UBUNTU: SAUCE: [$AT] snapshot updated"
+        #git add *.tar.bz2
+        #git ci -sm "UBUNTU: SAUCE: [$AT] snapshot updated"
+        echo "UBUNTU: SAUCE: [$AT] snapshot updated"
     )
 done
+rm -rf qa-regression-testing

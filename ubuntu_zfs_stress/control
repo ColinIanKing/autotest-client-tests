@@ -12,6 +12,6 @@ DOC = ""
 
 name = 'ubuntu_zfs_stress'
 
-results = job.run_test_detail('ubuntu_zfs_stress', test_name='zfs-stress', tag='zfs-stress')
+results = job.run_test_detail('ubuntu_zfs_stress', test_name='zfs-stress', tag='zfs-stress', timeout=60*60*4) # 4hr. timeout
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

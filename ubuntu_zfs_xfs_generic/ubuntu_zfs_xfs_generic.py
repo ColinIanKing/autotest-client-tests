@@ -1,9 +1,8 @@
 #
 #
 import os
-import glob
 from autotest.client                        import test, utils
-import multiprocessing
+import platform
 
 class ubuntu_zfs_xfs_generic(test.test):
     version = 2
@@ -16,17 +15,50 @@ class ubuntu_zfs_xfs_generic(test.test):
     # if you change setup, be sure to increment version
     #
     def setup(self):
+        series = platform.dist()[2]
+
         utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
-        utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
-        utils.system_output('apt-get update || true', retain_output=True)
+        pkgs = [
+            'build-essential',
+            'gdb',
+            'git',
+            'ksh',
+            'autoconf',
+            'build-essential',
+            'acl',
+            'dump',
+            'kpartx',
+            'pax',
+            'nfs-kernel-server',
+            'xfslibs-dev',
+            'uuid-dev',
+            'libtool',
+            'e2fsprogs',
+            'automake',
+            'gcc',
+            'libuuid1',
+            'quota',
+            'attr',
+            'libattr1-dev',
+            'libacl1-dev',
+            'libaio-dev',
+            'xfsprogs',
+            'libgdbm-dev',
+            'gawk',
+            'fio',
+            'dbench',
+            'libtool-bin'
+        ]
 
-        pkgs = ['build-essential', 'gdb', 'git', 'ksh', 'autoconf', 'build-essential',
-                'ubuntu-zfs', 'acl', 'dump', 'kpartx', 'pax',
-                'nfs-kernel-server', 'xfslibs-dev', 'uuid-dev', 'libtool', 'e2fsprogs',
-                'automake', 'gcc', 'libuuid1', 'quota', 'attr', 'libattr1-dev',
-                'libacl1-dev', 'libaio-dev', 'xfsprogs',  'libgdbm-dev', 'gawk',
-                'fio', 'dbench', 'libtool-bin' ]
+        if series == 'wily':
+            pkgs.append('zfs-dkms')
+            pkgs.append('zfsutils')
+        else:
+            utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
+            utils.system_output('apt-get update || true', retain_output=True)
+            pkgs.append('ubuntu-zfs')
+
         for pkg in pkgs:
                 print "Installing package " + pkg
                 utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)

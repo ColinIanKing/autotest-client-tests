@@ -2,7 +2,7 @@
 #
 import os
 from autotest.client                        import test, utils
-import multiprocessing
+import platform
 
 class ubuntu_zfs_stress(test.test):
     version = 1
@@ -11,6 +11,8 @@ class ubuntu_zfs_stress(test.test):
         self.job.require_gcc()
 
     def setup(self):
+        series = platform.dist()[2]
+
         utils.system('cp %s/ubuntu_zfs_stress.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
         cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng 2>&1'
@@ -30,9 +32,28 @@ class ubuntu_zfs_stress(test.test):
         utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
         utils.system_output('apt-get update || true', retain_output=True)
 
-        pkgs = ['build-essential', 'gdb', 'git', 'ksh', 'autoconf', 'build-essential',
-                'ubuntu-zfs', 'acl', 'dump', 'kpartx', 'pax',
-                'nfs-kernel-server' ]
+        pkgs = [
+            'perl',
+            'build-essential',
+            'gdb',
+            'git',
+            'ksh',
+            'autoconf',
+            'acl',
+            'dump',
+            'kpartx',
+            'pax',
+            'nfs-kernel-server'
+        ]
+
+        if series == 'wily':
+            pkgs.append('zfs-dkms')
+            pkgs.append('zfsutils')
+        else:
+            utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
+            utils.system_output('apt-get update || true', retain_output=True)
+            pkgs.append('ubuntu-zfs')
+
         for pkg in pkgs:
                 print "Installing package " + pkg
                 utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)

@@ -1,9 +1,8 @@
 #
 #
 import os
-import glob
 from autotest.client                        import test, utils
-import multiprocessing
+import platform
 
 class ubuntu_zfs_fstest(test.test):
     version = 1
@@ -16,14 +15,33 @@ class ubuntu_zfs_fstest(test.test):
     # if you change setup, be sure to increment version
     #
     def setup(self):
+        series = platform.dist()[2]
+
         utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
-        utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
-        utils.system_output('apt-get update || true', retain_output=True)
+        pkgs = [
+            'perl',
+            'build-essential',
+            'gdb',
+            'git',
+            'ksh',
+            'autoconf',
+            'build-essential',
+            'acl',
+            'dump',
+            'kpartx',
+            'pax',
+            'nfs-kernel-server'
+        ]
 
-        pkgs = ['perl', 'build-essential', 'gdb', 'git', 'ksh', 'autoconf', 'build-essential',
-                'ubuntu-zfs', 'acl', 'dump', 'kpartx', 'pax',
-                'nfs-kernel-server' ]
+        if series == 'wily':
+            pkgs.append('zfs-dkms')
+            pkgs.append('zfsutils')
+        else:
+            utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
+            utils.system_output('apt-get update || true', retain_output=True)
+            pkgs.append('ubuntu-zfs')
+
         for pkg in pkgs:
                 print "Installing package " + pkg
                 utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)

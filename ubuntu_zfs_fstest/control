@@ -10,15 +10,7 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
 DOC = ""
 
-#
-# This forces setup() to be run, it is in fact a no-op test
-#
 results = job.run_test_detail('ubuntu_zfs_fstest', test_name='setup')
-
-#
-#
-# ..so run scripts that have the executable x flag set
-#
 print "Invoking zfs fstest functional tests.."
 results = job.run_test_detail('ubuntu_zfs_fstest', test_name='zfs-tests', tag='zfs-tests', timeout=5*60)
 

@@ -48,7 +48,7 @@ class ubuntu_zfs_stress(test.test):
 
         if series == 'wily':
             pkgs.append('zfs-dkms')
-            pkgs.append('zfsutils')
+            pkgs.append('zfsutils-linux')
         else:
             utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
             utils.system_output('apt-get update || true', retain_output=True)

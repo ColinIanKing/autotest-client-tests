@@ -29,9 +29,6 @@ class ubuntu_zfs_stress(test.test):
 
         utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
-        utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
-        utils.system_output('apt-get update || true', retain_output=True)
-
         pkgs = [
             'perl',
             'build-essential',

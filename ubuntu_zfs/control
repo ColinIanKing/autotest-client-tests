@@ -10,18 +10,19 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
 DOC = ""
 
-#
 # This forces setup() to be run, it is in fact a no-op test
 #
 results = job.run_test_detail('ubuntu_zfs', test_name='setup')
 
-#
-#
-# ..so run scripts that have the executable x flag set
-#
-print "Invoking zfs functional tests.."
-results = job.run_test_detail('ubuntu_zfs', test_name='zfs-tests', tag='zfs-tests', timeout=60*60*3)
+import os
+srcdir = os.path.join(job.bindir, 'tmp', NAME, 'src')
+for fid in os.listdir(os.path.join(srcdir, 'tests')):
+    with open(os.path.join(srcdir, 'tests', fid), 'r') as fin:
+        with open(os.path.join(srcdir, 'linux.run'), 'w') as fout:
+            for line in fin:
+                fout.write(line.replace('PATHNAME', os.path.join(srcdir, 'test/zfs-tests')))
 
-print "Done!"
+    results = job.run_test_detail('ubuntu_zfs', test_name='zfs-tests', tag='zfs-tests.%s' % os.path.split(fid)[-1], timeout=60*60*3)
+
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

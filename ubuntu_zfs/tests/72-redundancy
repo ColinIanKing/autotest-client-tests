@@ -1,0 +1,18 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/redundancy]
+tests = ['redundancy_001_pos', 'redundancy_002_pos', 'redundancy_003_pos']
+

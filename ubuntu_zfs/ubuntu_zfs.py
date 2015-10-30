@@ -2,6 +2,7 @@
 #
 import os
 from autotest.client                        import test, utils
+from autotest.client.shared                 import error
 import platform
 
 class ubuntu_zfs(test.test):
@@ -49,43 +50,33 @@ class ubuntu_zfs(test.test):
         print "Extracting zfs-test tarball.."
         tarball = utils.unmap_url(self.bindir, 'zfs-tests.tar.bz2', self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
-
+        utils.system_output('rsync -arv %s/tests %s/' % (self.bindir, self.srcdir))
 
         os.chdir(self.srcdir)
+
         print "Patching zfs-test tarball.."
         utils.system('patch -p1 < %s/zfs-tweaks.patch' % self.bindir)
+
         print "Building zfs-test tarball.."
         utils.system('./autogen.sh')
         utils.configure('')
         utils.system('SRCDIR=%s make' % self.srcdir)
         utils.system('modprobe zfs')
-        print "Copying ubuntu modified linux run file.."
-
-        fin = open(os.path.join(self.bindir, 'linux.run.ubuntu'))
-        fout = open(os.path.join(self.srcdir, 'linux.run'), 'w')
-        for line in fin:
-            fout.write(line.replace('PATHNAME', os.path.join(self.srcdir, 'test/zfs-tests')))
-        fin.close()
-        fout.close()
-
-	print "SRCDIR = %" + self.srcdir
-        #utils.system('cp %s/linux.run.ubuntu %s/linux.run' % (self.bindir, self.srcdir))
 
 
     def run_once(self, test_name):
-        #
-        #  We need to call setup first to trigger setup() being
-        #  invoked, then we can run run_once per test
-        #
         if test_name == 'setup':
-                return
+            return
 
         os.chdir(self.srcdir)
         cmd = 'RUNFILE="-c %s/linux.run" make test' % self.srcdir
         #cmd = 'LINUX=linux make test'
         print "Running: " + cmd
         self.results = utils.system_output(cmd, retain_output=True)
-        print self.results
-        print "Done!"
+
+        # parse output and raise test failure if 'prove' failed
+        if self.results.find('FAIL') != -1:
+            raise error.TestFail('Test failed for ' + test_name)
+
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

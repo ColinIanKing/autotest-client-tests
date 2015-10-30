@@ -1,0 +1,19 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/snapused]
+tests = ['snapused_001_pos', 'snapused_002_pos', 'snapused_003_pos',
+    'snapused_004_pos', 'snapused_005_pos']
+

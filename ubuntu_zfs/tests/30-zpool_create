@@ -1,0 +1,26 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/cli_root/zpool_create]
+tests = ['zpool_create_001_pos', 'zpool_create_002_pos',
+    'zpool_create_003_pos', 'zpool_create_007_neg',
+    'zpool_create_009_neg', 'zpool_create_010_neg',
+    'zpool_create_012_neg', 'zpool_create_014_neg',
+    'zpool_create_015_neg', 'zpool_create_017_neg',
+    'zpool_create_018_pos', 'zpool_create_019_pos', 'zpool_create_020_pos',
+    'zpool_create_021_pos', 'zpool_create_022_pos', 'zpool_create_023_neg',
+    'zpool_create_features_001_pos', 'zpool_create_features_002_pos',
+    'zpool_create_features_003_pos', 'zpool_create_features_004_neg']
+

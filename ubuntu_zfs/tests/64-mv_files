@@ -1,0 +1,18 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/mv_files]
+tests = ['mv_files_001_pos', 'mv_files_002_pos']
+

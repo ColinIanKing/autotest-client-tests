@@ -1,0 +1,20 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/nopwrite]
+tests = ['nopwrite_copies', 'nopwrite_mtime', 'nopwrite_negative',
+    'nopwrite_promoted_clone', 'nopwrite_recsize', 'nopwrite_sync',
+    'nopwrite_varying_compression', 'nopwrite_volume']
+

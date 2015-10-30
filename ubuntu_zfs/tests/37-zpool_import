@@ -1,0 +1,26 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/cli_root/zpool_import]
+tests = ['zpool_import_001_pos', 'zpool_import_002_pos',
+    'zpool_import_003_pos', 'zpool_import_004_pos', 'zpool_import_005_pos',
+    'zpool_import_006_pos', 'zpool_import_007_pos', 'zpool_import_008_pos',
+    'zpool_import_009_neg', 'zpool_import_010_pos', 'zpool_import_011_neg',
+    'zpool_import_012_pos', 'zpool_import_013_neg', 'zpool_import_all_001_pos',
+    'zpool_import_features_001_pos', 'zpool_import_features_002_neg',
+    'zpool_import_features_003_pos', 'zpool_import_missing_001_pos',
+    'zpool_import_missing_002_pos', 'zpool_import_missing_003_pos',
+    'zpool_import_rename_001_pos']
+

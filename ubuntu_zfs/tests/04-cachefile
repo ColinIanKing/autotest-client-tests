@@ -1,0 +1,21 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/cachefile]
+tests = ['cachefile_001_pos', 'cachefile_002_pos', 'cachefile_003_pos',
+    'cachefile_004_pos']
+pre =
+post =
+

@@ -1,0 +1,19 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/refreserv]
+tests = ['refreserv_001_pos', 'refreserv_002_pos', 'refreserv_003_pos',
+    'refreserv_004_pos', 'refreserv_005_pos']
+

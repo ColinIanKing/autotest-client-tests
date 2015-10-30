@@ -1,0 +1,18 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/cli_root/zfs]
+tests = ['zfs_001_neg', 'zfs_002_pos', 'zfs_003_neg']
+

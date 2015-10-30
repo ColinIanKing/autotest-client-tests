@@ -1,0 +1,24 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/userquota]
+tests = ['groupspace_001_pos', 'groupspace_002_pos', 'userquota_001_pos',
+    'userquota_002_pos', 'userquota_003_pos', 'userquota_004_pos',
+    'userquota_005_neg', 'userquota_006_pos', 'userquota_007_pos',
+    'userquota_008_pos', 'userquota_009_pos', 'userquota_010_pos',
+    'userquota_011_pos', 'userquota_012_neg', 'userspace_001_pos',
+    'userspace_002_pos']
+
+

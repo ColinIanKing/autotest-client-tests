@@ -1,0 +1,21 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/slog]
+tests = ['slog_001_pos', 'slog_002_pos', 'slog_003_pos', 'slog_004_pos',
+    'slog_005_pos', 'slog_006_pos', 'slog_007_pos', 'slog_008_neg',
+    'slog_009_neg', 'slog_010_neg', 'slog_011_neg', 'slog_012_neg',
+    'slog_014_pos']
+

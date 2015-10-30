@@ -1,0 +1,20 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/history]
+tests = ['history_001_pos', 'history_002_pos', 'history_003_pos',
+    'history_004_pos', 'history_005_neg', 'history_006_neg', 'history_007_pos',
+    'history_008_pos', 'history_009_pos', 'history_010_pos']
+

@@ -1,0 +1,24 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/reservation]
+tests = ['reservation_001_pos', 'reservation_002_pos', 'reservation_003_pos',
+    'reservation_004_pos', 'reservation_005_pos', 'reservation_006_pos',
+    'reservation_007_pos', 'reservation_008_pos', 'reservation_009_pos',
+    'reservation_010_pos', 'reservation_011_pos', 'reservation_012_pos',
+    'reservation_013_pos', 'reservation_014_pos', 'reservation_015_pos',
+    'reservation_016_pos', 'reservation_017_pos', 'reservation_018_pos']
+
+

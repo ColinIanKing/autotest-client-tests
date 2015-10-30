@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+#
+
+from argparse                           import ArgumentParser, RawDescriptionHelpFormatter
+
+# Cutter
+#
+class Cutter(object):
+    '''
+    '''
+
+    # __init__
+    #
+    def __init__(self):
+        pass
+
+    # main
+    #
+    def main(s, args):
+        retval = 1
+
+        try:
+            print('Cutting up %s' % args.target)
+            with open(args.target, 'r') as target:
+                content = target.read().split('\n')
+
+            fid = None
+            default = None
+            buff = []
+            ct = 0
+            for line in content:
+                if line.startswith('#'):
+                    continue
+
+                if line.startswith('[PATHNAME'):
+                    if default is None:
+                        default = buff
+                    else:
+                        with open(fid, 'w') as out:
+                            for l in default:
+                                out.write(l)
+                                out.write('\n')
+                            for l in buff:
+                                out.write(l)
+                                out.write('\n')
+
+                    buff = [line]
+                    p = line.replace('[', '').replace(']', '')
+                    ct += 1
+                    fid = '%02d-%s' % (ct, p.split('/')[-1])
+                else:
+                    buff.append(line)
+
+            retval = 0
+
+        # Handle the user presses <ctrl-C>.
+        #
+        except KeyboardInterrupt:
+            print("Aborting ...")
+
+        if retval > 0:
+            print("")
+            print("Due to the above error(s), this script is unable to continue and is terminating.")
+            print("")
+
+        return retval
+
+if __name__ == '__main__':
+    app_description = '''
+    '''
+
+    app_epilog = '''
+    '''
+
+    parser = ArgumentParser(description=app_description, epilog=app_epilog, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument('target', metavar='TARGET', type=str, help='The name of the system to be provisioned.')
+
+    args = parser.parse_args()
+
+    app = Cutter()
+    exit(app.main(args))
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

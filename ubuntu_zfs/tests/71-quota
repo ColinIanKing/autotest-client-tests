@@ -1,0 +1,19 @@
+
+
+[DEFAULT]
+pre = setup
+quiet = False
+pre_user = root
+user = root
+timeout = 600
+post_user = root
+post = cleanup
+outputdir = /var/tmp/test_results
+
+
+
+
+[PATHNAME/tests/functional/quota]
+tests = ['quota_001_pos', 'quota_002_pos', 'quota_003_pos', 'quota_004_pos',
+    'quota_005_pos', 'quota_006_neg']
+

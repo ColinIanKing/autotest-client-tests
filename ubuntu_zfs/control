@@ -22,7 +22,7 @@ for fid in os.listdir(os.path.join(srcdir, 'tests')):
             for line in fin:
                 fout.write(line.replace('PATHNAME', os.path.join(srcdir, 'test/zfs-tests')))
 
-    results = job.run_test_detail('ubuntu_zfs', test_name='zfs-tests', tag='zfs-tests.%s' % os.path.split(fid)[-1], timeout=60*60*3)
+    results = job.run_test_detail('ubuntu_zfs', test_name='zfs-tests', tag='zfs-tests.%s' % os.path.split(fid)[-1].split('-', 1)[1], timeout=60*60*3)
 
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

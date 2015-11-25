@@ -43,7 +43,9 @@ class ubuntu_zfs_stress(test.test):
             'nfs-kernel-server'
         ]
 
-        if series == 'wily':
+        if series == 'xenial':
+            pkgs.append('zfsutils-linux')
+        elif series == 'wily':
             pkgs.append('zfs-dkms')
             pkgs.append('zfsutils-linux')
         else:

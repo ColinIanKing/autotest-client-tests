@@ -50,7 +50,9 @@ class ubuntu_zfs_xfs_generic(test.test):
             'libtool-bin'
         ]
 
-        if series == 'wily':
+        if series == 'xenial':
+            pkgs.append('zfsutils-linux')
+        elif series == 'wily':
             pkgs.append('zfs-dkms')
             pkgs.append('zfsutils-linux')
         else:

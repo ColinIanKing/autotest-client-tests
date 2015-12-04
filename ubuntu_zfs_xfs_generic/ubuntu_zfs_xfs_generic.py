@@ -20,6 +20,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
         pkgs = [
+            'bc',
             'build-essential',
             'gdb',
             'git',
@@ -73,6 +74,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         os.chdir(self.srcdir)
         print "Patching xfstests tarball.."
         utils.system('patch -p1 < %s/0001-xfstests-add-minimal-support-for-zfs.patch' % self.bindir)
+        utils.system('patch -p2 < %s/0002-Fix-build-warnings-and-errors-hit-with-Xenial-gcc-5.patch' % self.bindir)
         print "Building xfstests tarball.."
         #utils.make()
         utils.system('make -j 8')

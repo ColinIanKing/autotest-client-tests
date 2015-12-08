@@ -124,8 +124,7 @@ do_tidy()
 	cd
 	zfs destroy $POOL/$TESTDIR
 	zpool destroy $POOL
-	losetup -d $DEV0 $DEV1 $DEV2 $DEV3 $DEV4 $DEV5
-	rm block-dev-0 block-dev-1 block-dev-2 block-dev-3 block-dev-4 block-dev-5
+	rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4 $VDEV5
 	exit 1
 }
 
@@ -162,6 +161,7 @@ do_test()
 	fi
 
 	dmesg -c > /dev/null
+	echo "TESTING: $*" > /dev/kmsg
 
 	truncate -s 1G ${MYPWD}/block-dev-0
 	truncate -s 1G ${MYPWD}/block-dev-1
@@ -170,24 +170,23 @@ do_test()
 	truncate -s 1G ${MYPWD}/block-dev-4
 	truncate -s 1G ${MYPWD}/block-dev-5
 
-	DEV0=$(losetup --find --show ${MYPWD}/block-dev-0)
-	DEV1=$(losetup --find --show ${MYPWD}/block-dev-1)
-	DEV2=$(losetup --find --show ${MYPWD}/block-dev-2)
-	DEV3=$(losetup --find --show ${MYPWD}/block-dev-3)
-	DEV4=$(losetup --find --show ${MYPWD}/block-dev-4)
-	DEV5=$(losetup --find --show ${MYPWD}/block-dev-5)
+	VDEV0=${MYPWD}/block-dev-0
+	VDEV1=${MYPWD}/block-dev-1
+	VDEV2=${MYPWD}/block-dev-2
+	VDEV3=${MYPWD}/block-dev-3
+	VDEV4=${MYPWD}/block-dev-4
+	VDEV5=${MYPWD}/block-dev-5
 
-	zpool create $POOL mirror $DEV0 $DEV1 -f
-	zpool add $POOL mirror $DEV2 $DEV3 -f
-	zpool add $POOL log $DEV4 -f
-	zpool add $POOL cache $DEV5 -f
+	zpool create $POOL mirror $VDEV0 $VDEV1 -f
+	zpool add $POOL mirror $VDEV2 $VDEV3 -f
+	zpool add $POOL log $VDEV4 -f
+	zpool add $POOL cache $VDEV5 -f
 
 	zfs create $POOL/$TESTDIR
 	if [ $? -ne 0 ]; then
 		echo "Failed to create $POOL/$TESTDIR, terminating!"
 		zpool destroy $POOL
-		losetup -d $DEV0 $DEV1 $DEV2 $DEV3 $DEV4 $DEV5
-		rm ${MYPWD}/block-dev-0 ${MYPWD}/block-dev-1 ${MYPWD}/block-dev-2 ${MYPWD}/block-dev-3 ${MYPWD}/block-dev-4 ${MYPWD}/block-dev-5
+		rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4 $VDEV5
 		exit 1
 	fi
 	sync
@@ -207,7 +206,6 @@ do_test()
 	echo "--------------------------------------------------------------------------------"
 	echo "ZFS options:   $OPT"
 	echo "Stress test:   ${STRESS_NG} $*"
-	echo "Devices:       $DEV0 $DEV1 $DEV2 $DEV3 $DEV4 $DEV5"
 	echo "Mount point:   $MNT"
 	echo "Date:         " $(date)
 	echo "Host:         " $(hostname)
@@ -220,6 +218,9 @@ do_test()
 	echo "Pages total:  " $(getconf _PHYS_PAGES)
 	echo "--------------------------------------------------------------------------------"
 	echo " "
+	echo "ZFS options:   $OPT" > /dev/kmsg
+	echo "Stress test:   ${STRESS_NG} $*" > /dev/kmsg
+	echo "Mount point:   $MNT" > /dev/kmsg
 	for o in $OPT
 	do
 		so=$(echo $o | sed 's/,/ /g')
@@ -251,18 +252,16 @@ do_test()
 	killall -9 stress-ng &> /dev/null
 	sync
 	sleep 1
-	#echo "destroying zfs"
+	echo "destroying zfs"
 	zfs destroy $POOL/$TESTDIR
-	#echo "destroying zpool"
+	echo "destroying zpool"
 	zpool destroy $POOL
 	if [ $? -ne 0 ]; then
 		echo "Failed to destory ZFS pool, terminating!"
 		exit 1
 	fi
-	#echo "destroying lo devs"
-	losetup -d $DEV0 $DEV1 $DEV2 $DEV3 $DEV4 $DEV5
-	#echo "destroying lo images"
-	rm ${MYPWD}/block-dev-0 ${MYPWD}/block-dev-1 ${MYPWD}/block-dev-2 ${MYPWD}/block-dev-3 ${MYPWD}/block-dev-4 ${MYPWD}/block-dev-5
+	echo "destroying VDEVs"
+	rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4 $VDEV5
 	sleep 1
 	kill -TERM $pid &> /dev/null
 
@@ -292,15 +291,20 @@ do
 	#
 	#  Single stressors..
 	#
+	do_test $INFO $IONICE $SCHED -t $DURATION --chdir $N
+	do_test $INFO $IONICE $SCHED -t $DURATION --chmod $N
 	do_test $INFO $IONICE $SCHED -t $DURATION --dentry $N --dentries 100000
 	do_test $INFO $IONICE $SCHED -t $DURATION --dir $N
 	do_test $INFO $IONICE $SCHED -t $DURATION --fallocate $N  --fallocate-bytes 64M
+	do_test $INFO $IONICE $SCHED -t $DURATION --filename $N
 	do_test $INFO $IONICE $SCHED -t $DURATION --flock $N
+	do_test $INFO $IONICE $SCHED -t $DURATION --fstat $N
 	do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd --hdd-bytes 64M --hdd-write-size 512
 	do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts wr-seq,rd-rnd --hdd-bytes 32M --hdd-write-size 32K
 	do_test $INFO $IONICE $SCHED -t $DURATION --lease $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --link $N  --symlink $N
+	do_test $INFO $IONICE $SCHED -t $DURATION --link $N --symlink $N
 	do_test $INFO $IONICE $SCHED -t $DURATION --lockf $N
+	do_test $INFO $IONICE $SCHED -t $DURATION --rename $N
 	do_test $INFO $IONICE $SCHED -t $DURATION --seek $N --seek-size 64M
 	do_test $INFO $IONICE $SCHED -t $DURATION --utime $N --utime-fsync
 	#
@@ -310,6 +314,7 @@ do
 		--link $N --symlink $N --lockf $N --seek $N --aio $N --aio-requests 32 --dentry $N --dir $N \
 		--dentry-order stride --fallocate $N --fstat $N --dentries 65536 --io 1 --lease $N --mmap 0 \
 		--mmap-file --mmap-async --open $N --rename $N --hdd-bytes 128M --fallocate-bytes 128M \
+		--chdir $N --chmod $N --filename $N --rename $N \
 		--mmap-bytes 128M --hdd-write-size 512 --ionice-class besteffort --ionice-level 0
 done
 

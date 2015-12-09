@@ -9,6 +9,7 @@ TEST=$1
 POOL=testpool
 TESTDIR=test
 SCRATCHDIR=scratch
+MYPWD=$(pwd)
 
 export TEST_DIR=/mnt/$TESTDIR
 export TEST_DEV=$POOL/$TESTDIR
@@ -16,25 +17,22 @@ export SCRATCH_MNT=/mnt/$SCRATCHDIR
 export SCRATCH_DEV=$POOL/$SCRATCHDIR
 export FSTYP=zfs
 
-truncate -s 1G block-dev-0
-truncate -s 1G block-dev-1
-truncate -s 1G block-dev-2
-truncate -s 1G block-dev-3
-truncate -s 1G block-dev-4
-truncate -s 1G block-dev-5
+vdev0=${MYPWD}/block-dev-0
+vdev1=${MYPWD}/block-dev-1
+vdev2=${MYPWD}/block-dev-2
+vdev3=${MYPWD}/block-dev-3
+vdev4=${MYPWD}/block-dev-4
 
-dev0=$(losetup --find --show block-dev-0)
-dev1=$(losetup --find --show block-dev-1)
-dev2=$(losetup --find --show block-dev-2)
-dev3=$(losetup --find --show block-dev-3)
-dev4=$(losetup --find --show block-dev-4)
-dev5=$(losetup --find --show block-dev-5)
+truncate -s 1G ${vdev0}
+truncate -s 1G ${vdev1}
+truncate -s 1G ${vdev2}
+truncate -s 1G ${vdev3}
+truncate -s 1G ${vdev4}
 
 echo "Creating zfs pool $POOL.."
-zpool create $POOL mirror $dev0 $dev1 -f
-zpool add $POOL mirror $dev2 $dev3 -f
-zpool add $POOL log $dev4 -f
-zpool add $POOL cache $dev5 -f
+zpool create $POOL mirror $vdev0 $vdev1 -f
+zpool add $POOL mirror $vdev2 $vdev3 -f
+zpool add $POOL log $vdev4 -f
 echo "Creating zfs file systems $TESTDIR and $SCRATCHDIR in $POOL.."
 zfs create $POOL/$TESTDIR
 zfs create $POOL/$SCRATCHDIR
@@ -55,7 +53,6 @@ rmdir /mnt/$TESTDIR /mnt/$SCRATCHDIR
 
 echo "Destroying zfs pool $POOL"
 zpool destroy $POOL
-losetup -d $dev0 $dev1 $dev2 $dev3 $dev4 $dev5
-rm block-dev-0 block-dev-1 block-dev-2 block-dev-3 block-dev-4 block-dev-5
+rm -rf $vdev0 $vdev1 $vdev2 $vdev3 $vdev4
 
 exit $rc

@@ -124,7 +124,7 @@ do_tidy()
 	cd
 	zfs destroy $POOL/$TESTDIR
 	zpool destroy $POOL
-	rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4 $VDEV5
+	rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4
 	exit 1
 }
 
@@ -168,25 +168,22 @@ do_test()
 	truncate -s 1G ${MYPWD}/block-dev-2
 	truncate -s 1G ${MYPWD}/block-dev-3
 	truncate -s 1G ${MYPWD}/block-dev-4
-	truncate -s 1G ${MYPWD}/block-dev-5
 
 	VDEV0=${MYPWD}/block-dev-0
 	VDEV1=${MYPWD}/block-dev-1
 	VDEV2=${MYPWD}/block-dev-2
 	VDEV3=${MYPWD}/block-dev-3
 	VDEV4=${MYPWD}/block-dev-4
-	VDEV5=${MYPWD}/block-dev-5
 
 	zpool create $POOL mirror $VDEV0 $VDEV1 -f
 	zpool add $POOL mirror $VDEV2 $VDEV3 -f
 	zpool add $POOL log $VDEV4 -f
-	zpool add $POOL cache $VDEV5 -f
 
 	zfs create $POOL/$TESTDIR
 	if [ $? -ne 0 ]; then
 		echo "Failed to create $POOL/$TESTDIR, terminating!"
 		zpool destroy $POOL
-		rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4 $VDEV5
+		rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4
 		exit 1
 	fi
 	sync
@@ -245,9 +242,19 @@ do_test()
 	cd $MNT
 	${STRESS_NG} $*
 	rc=$?
-	if [ $rc -ne 0 ]; then
-		echo "Stress-ng returned error: $rc"
-	fi
+	case $rc in
+	0)	echo "Stress-ng exited with no errors"
+		;;
+	1)	echo "Stress-ng framework error, stressor not run"
+		;;
+	2)	echo "Stress-ng stressor failed, error: $rc"
+		;;
+	3)	echo "Stress-ng stressor ran out of memory or disk space"
+		;;
+	*)	echo "Stress-ng unknown error: $rc"
+		;;
+	esac
+
 	cd - > /dev/null
 	killall -9 stress-ng &> /dev/null
 	sync

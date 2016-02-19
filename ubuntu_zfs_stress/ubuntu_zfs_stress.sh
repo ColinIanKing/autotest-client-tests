@@ -95,8 +95,15 @@ OPTS="$OPTS compression=on,atime=on,acltype=posixacl,checksum=sha256,copies=3,de
 #
 OPTS="$OPTS compression=off,atime=off,acltype=noacl,checksum=off,copies=1,dedup=off,logbias=throughput,primarycache=none,recordsize=4096,redundant_metadata=most,relatime=on,sync=disabled,vscan=off,xattr=off,aclinherit=discard"
 
+#
+# Limit to max of 16 CPUs else we get way too much I/O
+# contention making tests take forever to complete
+#
 N=$(getconf _NPROCESSORS_ONLN)
 N=$((N * 2))
+if [ $N -gt 16 ]; then
+	N=16
+fi
 INFO="--verify --times --metrics-brief --syslog --keep-name"
 SCHED=""
 
@@ -191,11 +198,8 @@ do_test()
 	# Ensure clean state
 	#
 	echo 1 > /proc/sys/vm/drop_caches
-	sleep 1
 	echo 2 > /proc/sys/vm/drop_caches
-	sleep 1
 	echo 3 > /proc/sys/vm/drop_caches
-	sleep 1
 	#
 	# And away we go!
 	#
@@ -269,7 +273,6 @@ do_test()
 	fi
 	echo "destroying VDEVs"
 	rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4 $VDEV5
-	sleep 1
 	kill -TERM $pid &> /dev/null
 
 	echo "================================================================================"

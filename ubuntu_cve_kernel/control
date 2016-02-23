@@ -15,7 +15,7 @@ Tests publicly available CVE exploits
 
 name = 'ubuntu_cve_kernel'
 
-CVES=['CVE-2015-8660','CVE-2016-0728','CVE-2015-7550']
+CVES=['CVE-2015-8660','CVE-2016-0728','CVE-2015-7550','CVE-2015-8543']
 for cve in CVES:
     result = job.run_test_detail(name, cve=cve, tag=cve)
 

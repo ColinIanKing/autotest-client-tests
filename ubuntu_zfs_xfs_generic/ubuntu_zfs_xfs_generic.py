@@ -75,6 +75,8 @@ class ubuntu_zfs_xfs_generic(test.test):
         print "Patching xfstests tarball.."
         utils.system('patch -p1 < %s/0001-xfstests-add-minimal-support-for-zfs.patch' % self.bindir)
         utils.system('patch -p2 < %s/0002-Fix-build-warnings-and-errors-hit-with-Xenial-gcc-5.patch' % self.bindir)
+	utils.system('patch -p1 < %s/0003-xfstests-strip-out-single-quotes-to-enable-fuzzier-m.patch' % self.bindir)
+
         print "Building xfstests tarball.."
         #utils.make()
         utils.system('make -j 8')

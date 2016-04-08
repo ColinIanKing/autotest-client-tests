@@ -1,0 +1,40 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_zfs_smoke_tests"
+CRITERIA = """
+Test zfs with kernel smoke tests
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+tests = [
+	'kernel-smoke-test-pool-2x2-mirror',
+	'kernel-smoke-test-pool-4x1-mirror',
+	'kernel-smoke-test-pool-nested-raidz3',
+	'kernel-smoke-test-pool-raidz1',
+	'kernel-smoke-test-pool-raidz2',
+	'kernel-smoke-test-pool-raidz3',
+	'kernel-smoke-test-pool-striped',
+	'kernel-smoke-test-zil',
+	'kernel-smoke-test-filesystem',
+	'kernel-smoke-test-snapshot',
+	'kernel-smoke-test-clone',
+	'kernel-smoke-test-send-receive',
+	'kernel-smoke-test-scrub'
+	]
+
+import os
+import ctypes
+
+#
+# Only run if we are on a 64 bit system
+#
+if ctypes.sizeof(ctypes.c_voidp) == 8:
+	for t in tests:
+		results = job.run_test_detail('ubuntu_zfs_smoke_test', test_name=t, tag=t)
+else:
+	print "SKIPPED: Cannot run on non-64 bit architectures"
+

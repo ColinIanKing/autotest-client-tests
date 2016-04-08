@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_stress_smoke_test"
+CRITERIA = """
+Stress-ng Kernel Smoke Test
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_stress_smoke_test'
+
+results = job.run_test_detail('ubuntu_stress_smoke_test', test_name='stress-smoke-test', tag='stress-smoke-test')
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

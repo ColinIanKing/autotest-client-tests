@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_overlayfs_smoke_test"
+CRITERIA = """
+Overlayfs Kernel Smoke Test
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_overlayfs_smoke_test'
+
+results = job.run_test_detail('ubuntu_overlayfs_smoke_test', test_name='overlayfs-smoke-test', tag='overlayfs-smoke-test')
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

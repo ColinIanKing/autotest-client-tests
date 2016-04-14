@@ -10,7 +10,7 @@ class ubuntu_leap_seconds(test.test):
                         os.path.join(self.srcdir, 'leap_seconds.c'))
         os.chdir(self.bindir)
         os.chdir(self.srcdir)
-        utils.system(utils.get_cc() + ' leap_seconds.c -D_POSIX_C_SOURCE=200112 -o leap_seconds -lrt')
+        utils.system(utils.get_cc() + ' leap_seconds.c -D_BSD_SOURCE -D_POSIX_C_SOURCE=200112 -o leap_seconds -lrt')
 
     def initialize(self):
         self.job.require_gcc()

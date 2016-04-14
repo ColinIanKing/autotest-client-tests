@@ -160,6 +160,12 @@ fanatic_docker_test()
 	echo "PASSED"
 }
 
+if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
+    echo "Running in the Canonical CI environment"
+    echo http_proxy=\"http://squid.internal:3128\" >> /etc/default/docker
+    echo https_proxy=\"http://squid.internal:3128\" >> /etc/default/docker
+    service docker restart
+fi
 
 echo -n "docker pull ubuntu: "
 docker pull ubuntu > /dev/null

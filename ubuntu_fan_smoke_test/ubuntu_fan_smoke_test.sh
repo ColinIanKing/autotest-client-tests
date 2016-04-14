@@ -22,9 +22,25 @@
 #  Trival "smoke test" fan tests just to see
 #  if basic functionality works
 #
-UNDERLAY="192.168.0.0/16"
 OVERLAY="250.0.0.0/8"
 TMP=/tmp/fan-$$.tmp
+
+get_underlay()
+{
+	local i
+	local interfaces=$(ifconfig | grep encap:Ethernet | grep -v lxc | grep -v docker | grep -v virbr | awk '{ print $1 }')
+	for i in $interfaces
+	do
+		local inet=$(ifconfig $i | grep 'inet addr:' | tr ':' ' ' | awk '{print $3}')
+		if [ "$inet" != "" ]; then
+			local a=$(echo $inet | tr '.' ' ' | awk '{print $1}')
+			local b=$(echo $inet | tr '.' ' ' | awk '{print $2}')
+                        echo "$a.$b.0.0/16"
+                        return
+                fi
+        done
+}
+
 
 enable_fan()
 {
@@ -165,6 +181,12 @@ if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
     echo http_proxy=\"http://squid.internal:3128\" >> /etc/default/docker
     echo https_proxy=\"http://squid.internal:3128\" >> /etc/default/docker
     service docker restart
+fi
+
+UNDERLAY=$(get_underlay)
+if [ "$UNDERLAY" = "" ]; then
+	echo "FAILED (could not determine an UNDERLAY address range)"
+	exit 1
 fi
 
 echo -n "docker pull ubuntu: "

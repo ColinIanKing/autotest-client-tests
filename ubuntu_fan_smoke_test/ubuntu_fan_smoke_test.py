@@ -9,8 +9,8 @@ class ubuntu_fan_smoke_test(test.test):
 
     def initialize(self):
 	utils.system_output('apt-get update || true', retain_output=True)
-	utils.system_output('apt-get install docker.io --yes --force-yes', retain_output=True)
-	utils.system_output('apt-get install ubuntu-fan --yes --force-yes', retain_output=True)
+	utils.system_output('apt-get install docker.io  --assume-yes', retain_output=True)
+	utils.system_output('apt-get install ubuntu-fan --assume-yes', retain_output=True)
 
     def setup(self):
 	pass

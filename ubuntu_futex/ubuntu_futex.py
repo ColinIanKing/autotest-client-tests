@@ -30,7 +30,9 @@ class ubuntu_futex(test.test):
     #    Driven by the control file for each individual test.
     #
     def run_once(self, test_name):
-        cmd = './run.sh'
+        os.chdir(os.path.join(self.srcdir, 'futextest', 'functional'))
+        cmd = 'USE_COLOR=0 ./run.sh'
+
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

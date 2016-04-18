@@ -114,6 +114,7 @@ class xfstests(test.test):
         os.chdir(self.srcdir)
         utils.system('pwd')
         utils.system('patch -p1 < %s/common_rc.patch' % self.bindir)
+	utils.system('patch -p1 < %s/Fix-build-warnings-and-errors-hit-with-Xenial-gcc-5.patch' % self.bindir)
         utils.make()
 
         logging.debug("Available tests in srcdir: %s" %

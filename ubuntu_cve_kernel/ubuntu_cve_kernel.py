@@ -1,7 +1,7 @@
 from autotest.client                        import test,utils
 from autotest.client.shared                 import error, software_manager
 
-DEPENDENCIES=['libkeyutils-dev']
+DEPENDENCIES=['libkeyutils-dev', 'libc6-dev-i386']
 
 class ubuntu_cve_kernel(test.test):
     version = 1

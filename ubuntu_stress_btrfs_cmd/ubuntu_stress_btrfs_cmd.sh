@@ -27,6 +27,7 @@ SCHED=""
 #MNT=/tmp/mnt-btrfs
 #DEV=/dev/vdb1
 #LOG="/tmp/btrfs-falure.log"
+LOOPFILE=loop.tmp
 
 if [ -z $DEV ]; then
 	echo "Error: device not defined in DEV"
@@ -509,7 +510,13 @@ fi
 rm -f $LOG
 touch $LOG
 
-
+LOSETUP=0
+if [ $DEV = "loop" ]; then
+	LOSETUP=1
+	DEV=$(losetup -f)
+	truncate -s 256M $LOOPFILE
+	losetup $DEV $LOOPFILE
+fi
 
 #
 #  Run through all the different mount options..
@@ -535,6 +542,11 @@ do
 	do_test 3 "btrfs_chunk_recover"
 	do_test 1 "btrfs_super_recover"
 done
+
+if [ $LOSETUP -eq 1 ]; then
+	losetup -d $DEV
+	rm -f $LOOPFILE
+fi
 
 echo " "
 echo "Completed"

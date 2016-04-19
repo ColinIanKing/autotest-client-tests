@@ -18,7 +18,7 @@ class ubuntu_stress_btrfs(test.test):
             # cking's scratch test VM server
             self.dev = '/dev/vdb1'
         else:
-            self.dev = ''
+            self.dev = 'loop'
 
     def setup(self):
         utils.system('cp %s/ubuntu_stress_btrfs.sh %s' % (self.bindir, self.srcdir))

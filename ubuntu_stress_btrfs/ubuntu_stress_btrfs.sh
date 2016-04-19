@@ -34,6 +34,7 @@ SCHED=""
 #MNT=/tmp/mnt-btrfs
 #DEV=/dev/vdb1
 #LOG="/tmp/btrfs-falure.log"
+LOOPFILE=loop.tmp
 
 if [ -z $DEV ]; then
 	echo "Error: device not defined in DEV"
@@ -193,6 +194,14 @@ fi
 rm -f $LOG
 touch $LOG
 
+LOSETUP=0
+if [ $DEV = "loop" ]; then
+	LOSETUP=1
+	DEV=$(losetup -f)
+	truncate -s 256M $LOOPFILE
+	losetup $DEV $LOOPFILE
+fi
+
 #
 #  Run through all the different mount options..
 #
@@ -221,6 +230,11 @@ do
 		--mmap-file --mmap-async --open $N --rename $N --hdd-bytes 128M --fallocate-bytes 128M \
 		--mmap-bytes 128M --hdd-write-size 512 --ionice-class besteffort --ionice-level 0
 done
+
+if [ $LOSETUP -eq 1 ]; then
+	losetup -d $DEV
+	rm -f $LOOPFILE
+fi
 
 echo " "
 echo "Completed"

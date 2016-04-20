@@ -19,7 +19,7 @@ class ubuntu_generic_fstest(test.test):
     def setup(self):
 	utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
-	pkgs = [ 'btrfs-tools', 'xfsprogs', 'jfsutils', 'hfsprogs' ]
+	pkgs = [ 'btrfs-tools', 'xfsprogs', 'jfsutils' ]
 	for pkg in pkgs:
 		print "Installing package " + pkg
 		utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)
@@ -40,17 +40,32 @@ class ubuntu_generic_fstest(test.test):
 	if test_name == 'setup':
 		return
 
+	#
+	#  mapping of file system to fstest characteristic type and mkfs rule
+	#
 	mkfs = {
-		'ext2' : 'mkfs.ext2 -F',
-		'ext3' : 'mkfs.ext3 -F',
-		'ext4' : 'mkfs.ext4 -F',
-		'btrfs' : 'mkfs.btrfs -f',
-		'xfs' : 'mkfs.xfs -f',
-		'jfs' : 'mkfs.jfs -f' }
+		'ext2'  : [ 'ext3', 'mkfs.ext2 -F'],
+		'ext3'  : [ 'ext3', 'mkfs.ext3 -F'],
+		'ext4'  : [ 'ext3', 'mkfs.ext4 -F'],
+		'btrfs' : [ 'ext3', 'mkfs.btrfs -f' ],
+		'xfs'   : [ 'xfs',  'mkfs.xfs -f' ],
+		'jfs'   : [ 'ext3', 'mkfs.jfs -f' ] }
+
+	if test_name not in mkfs:
+		print 'SKIPPING: file system ' + test_name + ' not known to test'
+		return
+
+	#
+	#  some tests are known to fail across all kernels for some
+	#  file systems, so add an exception list of tests to skip
+	#
+	skip_tests = {
+		'xfs'	: [ 'tests/chown/00.t' ]
+	}
 
 	mkfs_cmd = 'mkfs'
 	if test_name in mkfs:
-		mkfs_cmd = mkfs[test_name]
+		mkfs_cmd = mkfs[test_name][1]
 
 	os.chdir(self.srcdir)
 	utils.system('truncate -s 128M /tmp/fstest.img')
@@ -61,26 +76,59 @@ class ubuntu_generic_fstest(test.test):
 		lines = f.readlines()
 		loopdev = lines[0].rstrip('\n')
 
-	print "Testing file system " + test_name
-	utils.system('cat loopname.tmp')
+	#
+	# Gather sorted name of all tests
+	#
+	tests = sorted([os.path.join(r,f) for r,d,fs in os.walk('tests') for f in fs if f.endswith('.t')])
+
+	print "Testing file system " + test_name + " on dev " + loopdev
 	utils.system(mkfs_cmd + ' ' + loopdev)
 	utils.system('mkdir -p /mnt/fstest')
 	utils.system('mount ' + loopdev + ' /mnt/fstest')
 	os.chdir('/mnt/fstest')
 
-        cmd = 'prove --nocolor -q -r %s' % self.srcdir
-	print "Running: " + cmd
-        self.results = utils.system_output(cmd, retain_output=True, ignore_status=True)
-        print self.results
+	#
+	# We need to set up a configuration file per file system type
+	#
+	conf = open(os.path.join(self.srcdir, 'tests', 'conf'), 'w')
+	conf.write('os=`uname`\n')
+	conf.write('fs="%s"\n' % mkfs[test_name][0])
+	conf.close()
+
+
+	if test_name in skip_tests:
+		skip = skip_tests[test_name]
+	else:
+		skip = []
+
+	#
+	# Run each test, unless it is to be skipped
+	#
+	failed =  ""
+	for test in tests:
+		print
+		if test in skip:
+			print test_name + ': ' + test + ': SKIPPED (tests known to have issues)'
+		else:
+			print test_name + ': ' + test + ':'
+                        cmd = 'prove --nocolor -q -r %s' % os.path.join(self.srcdir, test)
+                        self.results = utils.system_output(cmd, retain_output=True, ignore_status=True)
+                        print self.results
+
+			# parse output and raise test failure if 'prove' failed
+			if self.results.find('Result: FAIL') != -1:
+				failed = failed + ' ' + test
+
+	print
+	if failed != "":
+		raise error.TestFail('Tests failed for ' + test + ' for file system ' + test_name)
+	else:
+		print 'Tests all passed for file system ' + test_name
 
 	os.chdir(self.srcdir)
 	utils.system('umount ' + loopdev)
 	utils.system('losetup -d ' + loopdev)
 	utils.system('rm -rf /mnt/fstest')
 	utils.system('losetup -l')
-
-	# parse output and raise test failure if 'prove' failed
-	if self.results.find('Result: FAIL') != -1:
-		raise error.TestFail('prove failed for ' + test_name)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

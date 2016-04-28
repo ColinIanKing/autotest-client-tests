@@ -152,7 +152,7 @@ fanatic_docker_test()
 	fan_addr=$(ifconfig $fan | grep "inet addr:" | cut -d: -f2 | awk '{print $1}')
 	enable_docker
 	service docker restart
-	docker run ubuntu ping $fan_addr -c 10 > $TMP
+	docker run ubuntu sh -c "apt-get update && apt-get install iputils-ping -y && ping -c 10 $fan_addr" > $TMP
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "FAILED: (docker run returned $ret)"

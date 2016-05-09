@@ -33,6 +33,7 @@ class connectathon(test.test):
         utils.extract_tarball_to_dir(connectathon_tarball, self.srcdir)
 
         os.chdir(self.srcdir)
+        utils.system('patch -p1 < %s/connectathon.diff' % self.bindir)
         utils.system('make clean')
         utils.system('make')
 

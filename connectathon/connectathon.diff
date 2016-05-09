@@ -1,0 +1,457 @@
+diff -Naur connectathon/basic/subr.c connectathon.new/basic/subr.c
+--- connectathon/basic/subr.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/subr.c	2016-05-09 16:32:06.003305583 +0100
+@@ -16,6 +16,8 @@
+ #else
+ #include <sys/param.h>
+ #include <unistd.h>
++#include <sys/stat.h>
++#include <fcntl.h>
+ #endif
+ 
+ #include <sys/types.h>
+@@ -34,6 +36,9 @@
+ #include <stdarg.h>
+ #endif
+ 
++int unix_mkdir(char *path, mode_t mode);
++int unix_chdir(char *path);
++
+ #include "../tests.h"
+ 
+ char *Myname;
+diff -Naur connectathon/basic/test1.c connectathon.new/basic/test1.c
+--- connectathon/basic/test1.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test1.c	2016-05-09 16:32:39.475384693 +0100
+@@ -50,7 +50,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test2.c connectathon.new/basic/test2.c
+--- connectathon/basic/test2.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test2.c	2016-05-09 16:32:42.131390974 +0100
+@@ -48,7 +48,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test3.c connectathon.new/basic/test3.c
+--- connectathon/basic/test3.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test3.c	2016-05-09 16:32:44.739397141 +0100
+@@ -48,7 +48,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test4a.c connectathon.new/basic/test4a.c
+--- connectathon/basic/test4a.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test4a.c	2016-05-09 16:32:47.299403196 +0100
+@@ -52,7 +52,7 @@
+ 		"          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test4.c connectathon.new/basic/test4.c
+--- connectathon/basic/test4.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test4.c	2016-05-09 16:32:50.851411597 +0100
+@@ -52,7 +52,7 @@
+ 		"          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test5a.c connectathon.new/basic/test5a.c
+--- connectathon/basic/test5a.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test5a.c	2016-05-09 16:32:53.479417813 +0100
+@@ -79,7 +79,7 @@
+ #endif
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test5b.c connectathon.new/basic/test5b.c
+--- connectathon/basic/test5b.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test5b.c	2016-05-09 16:32:56.675425373 +0100
+@@ -60,7 +60,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test5.c connectathon.new/basic/test5.c
+--- connectathon/basic/test5.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test5.c	2016-05-09 16:32:59.171431278 +0100
+@@ -80,7 +80,7 @@
+ #endif
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test6.c connectathon.new/basic/test6.c
+--- connectathon/basic/test6.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test6.c	2016-05-09 16:33:01.955437865 +0100
+@@ -65,7 +65,7 @@
+ 	fprintf(stdout, "          i    Ignore non-test files dir entries\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test7a.c connectathon.new/basic/test7a.c
+--- connectathon/basic/test7a.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test7a.c	2016-05-09 16:33:04.599444120 +0100
+@@ -51,7 +51,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test7b.c connectathon.new/basic/test7b.c
+--- connectathon/basic/test7b.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test7b.c	2016-05-09 16:33:07.379450698 +0100
+@@ -53,7 +53,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test7.c connectathon.new/basic/test7.c
+--- connectathon/basic/test7.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test7.c	2016-05-09 16:33:10.639458414 +0100
+@@ -53,7 +53,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test8.c connectathon.new/basic/test8.c
+--- connectathon/basic/test8.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test8.c	2016-05-09 16:33:13.551465305 +0100
+@@ -55,7 +55,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/basic/test9.c connectathon.new/basic/test9.c
+--- connectathon/basic/test9.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/basic/test9.c	2016-05-09 16:33:18.255476438 +0100
+@@ -65,7 +65,7 @@
+ 	fprintf(stdout, "          n    Suppress test directory create operations\n");
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/domount.c connectathon.new/domount.c
+--- connectathon/domount.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/domount.c	2016-05-09 16:28:20.450774771 +0100
+@@ -8,8 +8,11 @@
+  */
+ 
+ #include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <unistd.h>
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char **argv;
+ {
+diff -Naur connectathon/getopt.c connectathon.new/getopt.c
+--- connectathon/getopt.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/getopt.c	2016-05-09 16:29:40.514962685 +0100
+@@ -36,6 +36,7 @@
+ 	(void) write(2, errbuf, 2);}
+ 
+ #include <string.h>
++#include <stdlib.h>
+ 
+ int	opterr = 1;
+ int	optind = 1;
+@@ -94,8 +95,7 @@
+ 
+ #include	<stdio.h>
+ 
+-main(ac, av)
+-char	**av;
++int main(int ac, char **av)
+ {
+ 	register int	i;
+ 	int	first = 1;
+diff -Naur connectathon/lock/tlock.c connectathon.new/lock/tlock.c
+--- connectathon/lock/tlock.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/lock/tlock.c	2016-05-09 16:38:41.056243021 +0100
+@@ -472,21 +472,21 @@
+ 
+ #ifdef LARGE_LOCKS			/* non-native 64-bit */
+ 	if (length != 0)
+-		sprintf(buf, "[%16llx,%16llx] ", offset, length);
++		sprintf(buf, "[%16" PRIx64 ",%16" PRIx64 "] ", (uint64_t)offset, (uint64_t)length);
+ 	else
+-		sprintf(buf, "[%16llx,          ENDING] ", offset);
++		sprintf(buf, "[%16" PRIx64 ",          ENDING] ", (uint64_t)offset);
+ #else /* LARGE_LOCKS */
+ 	if (sizeof (offset) == 4) {
+ 		if (length != 0)
+-			sprintf(buf, "[%8lx,%8lx] ", (int32_t)offset,
+-				(int32_t)length);
++			sprintf(buf, "[%8" PRIx32 ",%8" PRIx32 "] ", (uint32_t)offset,
++				(uint32_t)length);
+ 		else
+-			sprintf(buf, "[%8lx,  ENDING] ", (int32_t)offset);
++			sprintf(buf, "[%8" PRIx32 ",  ENDING] ", (uint32_t)offset);
+ 	} else {
+ 		if (length != 0)
+-			sprintf(buf, "[%16llx,%16llx] ", offset, length);
++			sprintf(buf, "[%16" PRIx64 ",%16" PRIx64 "] ", (uint64_t)offset, (uint64_t)length);
+ 		else
+-			sprintf(buf, "[%16llx,          ENDING] ", offset);
++			sprintf(buf, "[%16" PRIx64 ",          ENDING] ", (uint64_t)offset);
+ 	}
+ #endif /* LARGE_LOCKS */
+ 
+diff -Naur connectathon/special/dupreq.c connectathon.new/special/dupreq.c
+--- connectathon/special/dupreq.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/dupreq.c	2016-05-09 16:33:53.343559525 +0100
+@@ -17,7 +17,7 @@
+ #include <fcntl.h>
+ #endif
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/special/negseek.c connectathon.new/special/negseek.c
+--- connectathon/special/negseek.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/negseek.c	2016-05-09 16:34:04.767586592 +0100
+@@ -21,7 +21,7 @@
+ #endif
+ #endif /* DOSorWIN32 */
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/special/nfsidem.c connectathon.new/special/nfsidem.c
+--- connectathon/special/nfsidem.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/nfsidem.c	2016-05-09 16:34:07.827593843 +0100
+@@ -53,7 +53,7 @@
+ static char LBAR[MAXPATHLEN];
+ static char str[STRCHARS];
+ 
+-main(ac,av)
++int main(ac,av)
+ 	int ac;
+ 	char *av[];
+ {
+diff -Naur connectathon/special/nstat.c connectathon.new/special/nstat.c
+--- connectathon/special/nstat.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/nstat.c	2016-05-09 16:34:10.399599938 +0100
+@@ -26,7 +26,7 @@
+ 
+ static int stats = 0;
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/special/rename.c connectathon.new/special/rename.c
+--- connectathon/special/rename.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/rename.c	2016-05-09 16:34:20.111622957 +0100
+@@ -21,7 +21,7 @@
+ #endif
+ #endif /* DOSorWIN32 */
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/special/rewind.c connectathon.new/special/rewind.c
+--- connectathon/special/rewind.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/rewind.c	2016-05-09 16:34:23.759631605 +0100
+@@ -14,7 +14,7 @@
+ #include <unistd.h>
+ #endif /* DOSorWIN32 */
+ 
+-main()
++int main()
+ {
+ 	char buffer[8192];
+ 	int size = 8192;
+diff -Naur connectathon/special/stat.c connectathon.new/special/stat.c
+--- connectathon/special/stat.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/stat.c	2016-05-09 16:34:28.623643136 +0100
+@@ -34,7 +34,7 @@
+ 
+ static void statit ARGS_((char *));
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/special/touchn.c connectathon.new/special/touchn.c
+--- connectathon/special/touchn.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/touchn.c	2016-05-09 16:35:16.559756843 +0100
+@@ -18,8 +18,7 @@
+ 
+ #include "../tests.h"
+ 
+-main(argc,argv)
+-char **argv;
++int main(int argc, char **argv)
+ {
+ 	int n;
+ 	char buf[1024];
+diff -Naur connectathon/special/truncate.c connectathon.new/special/truncate.c
+--- connectathon/special/truncate.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/special/truncate.c	2016-05-09 16:34:39.919669921 +0100
+@@ -18,7 +18,7 @@
+ #include <unistd.h>
+ #endif /* DOSorWIN32 */
+ 
+-main()
++int main()
+ {
+ 	int fd;
+ 	struct stat statb;
+diff -Naur connectathon/tests.init connectathon.new/tests.init
+--- connectathon/tests.init	2011-10-13 10:36:48.000000000 +0100
++++ connectathon.new/tests.init	2016-05-09 16:44:04.813015285 +0100
+@@ -205,11 +205,18 @@
+ 
+ # Use with Linux 2.4 / GNU libc 2.2
+ #CFLAGS=`echo -DLINUX -DGLIBC=22 -DMMAP -DSTDARG -fwritable-strings`
+-CFLAGS=`echo -DLINUX -DGLIBC=22 -DMMAP -DSTDARG`
++#CFLAGS=`echo -DLINUX -DGLIBC=22 -DMMAP -DSTDARG`
++#LIBS=`echo -lnsl`
++#MOUNT=/bin/mount
++#UMOUNT=/bin/umount
++#LOCKTESTS=`echo tlocklfs tlock64`
++
++# Use with Linux 2.4 / GNU libc 2.2
++#CFLAGS=`echo -DLINUX -DGLIBC=22 -DMMAP -DSTDARG -fwritable-strings`
++CFLAGS=`echo -DLINUX -DGLIBC=22 -DMMAP -DSTDARG` -DHAVE_SOCKLEN_T
+ LIBS=`echo -lnsl`
+ MOUNT=/bin/mount
+ UMOUNT=/bin/umount
+-LOCKTESTS=`echo tlocklfs tlock64`
+ 
+ # Use with Linux if your distro doesn't provide a "cc".
+ CC=gcc
+diff -Naur connectathon/tools/dirdmp.c connectathon.new/tools/dirdmp.c
+--- connectathon/tools/dirdmp.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/tools/dirdmp.c	2016-05-09 16:35:45.131824670 +0100
+@@ -31,7 +31,7 @@
+ static void print ARGS_((char *));
+ static struct dirent *my_readdir ARGS_((DIR *dirp));
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/tools/dirprt.c connectathon.new/tools/dirprt.c
+--- connectathon/tools/dirprt.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/tools/dirprt.c	2016-05-09 16:36:18.383903651 +0100
+@@ -34,7 +34,7 @@
+ static DIR *my_opendir ARGS_((char *));
+ static void print ARGS_((char *));
+ 
+-main(argc, argv)
++int main(argc, argv)
+ 	int argc;
+ 	char *argv[];
+ {
+diff -Naur connectathon/tools/pmapbrd.c connectathon.new/tools/pmapbrd.c
+--- connectathon/tools/pmapbrd.c	2011-06-27 17:21:09.000000000 +0100
++++ connectathon.new/tools/pmapbrd.c	2016-05-09 16:50:13.821897647 +0100
+@@ -174,8 +174,8 @@
+ 		 * XXX shouldn't have to cast eachresult?
+ 		 */
+ 		clnt_stat =
+-		    clnt_broadcast_time(sock, RPROG, RVERS, RPROC_NUM, xdr_void, &a,
+-		    xdr_void, &b, (resultproc_t)eachresult, &t);
++		    clnt_broadcast_time(sock, RPROG, RVERS, RPROC_NUM, (xdrproc_t)xdr_void, &a,
++		    (xdrproc_t)xdr_void, &b, (resultproc_t)eachresult, &t);
+ 		if(clnt_stat != RPC_TIMEDOUT) {
+ 			printf("error: clnt_stat = %d\n", clnt_stat);
+ 			clnt_perrno(clnt_stat);
+@@ -245,7 +245,7 @@
+ #ifdef SVR3
+ 	if (xdr_reference(xdrs, (caddr_t *)&crp->port_ptr, sizeof (ulong), xdr_u_long) &&
+ #else
+-	if (xdr_reference(xdrs, (caddr_t *)&crp->port_ptr, sizeof (u_long), xdr_u_long) &&
++	if (xdr_reference(xdrs, (caddr_t *)&crp->port_ptr, sizeof (u_long), (xdrproc_t)xdr_u_long) &&
+ #endif
+ 		xdr_u_long(xdrs, &crp->resultslen))
+ 		return ((*(crp->xdr_results))(xdrs, crp->results_ptr));
+@@ -387,7 +387,7 @@
+ recv_again:
+ 	msg.acpted_rply.ar_verf = _null_auth;
+ 	msg.acpted_rply.ar_results.where = (caddr_t)&r;
+-	msg.acpted_rply.ar_results.proc = xdr_rmtcallres;
++	msg.acpted_rply.ar_results.proc = (typeof(msg.acpted_rply.ar_results.proc))xdr_rmtcallres;
+ 	readfds = mask;
+ 	switch (select(32, (fd_set *)&readfds, (fd_set *)NULL, (fd_set *)NULL,
+ 			t)) {
+@@ -447,7 +447,7 @@
+ 		/* otherwise, just random garbage */
+ 	}
+ 	xdrs->x_op = XDR_FREE;
+-	msg.acpted_rply.ar_results.proc = xdr_void;
++	msg.acpted_rply.ar_results.proc = (typeof(msg.acpted_rply.ar_results.proc))xdr_void;
+ 	(void)xdr_replymsg(xdrs, &msg);
+ 	(void)(*xresults)(xdrs, resultsp);
+ 	xdr_destroy(xdrs);

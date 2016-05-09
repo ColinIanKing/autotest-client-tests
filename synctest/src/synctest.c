@@ -66,7 +66,7 @@ int main(int argc, char ** argv)
 	post_sync = (int*) shm_addr;
 	*post_sync = 0;
 
-	fd = open("testfile", O_RDWR|O_CREAT|O_APPEND|O_NONBLOCK);
+	fd = open("testfile", O_RDWR|O_CREAT|O_APPEND|O_NONBLOCK, 0666);
 	if (!fd) {
 		perror("main : Failed to create data file \n");
 		goto out;
@@ -99,7 +99,7 @@ int main(int argc, char ** argv)
 	{
 		/* child process */
 		while (count++ < loop) {
-			write(fd, data_array, data_size * (sizeof(char)));
+			ret = write(fd, data_array, data_size * (sizeof(char)));
 		}
 
 		printf("CHLD : start sync \n");
@@ -145,7 +145,7 @@ out:
 	}
 
 	close(fd);
-	system("rm -f testfile \n");
+	ret =system("rm -f testfile \n");
 
 early_out:
 

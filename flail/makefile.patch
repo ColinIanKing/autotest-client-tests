@@ -1,0 +1,16 @@
+diff -Naur flail-0.2.0/Makefile flail-0.2.0.fixed/Makefile
+--- flail-0.2.0/Makefile	2009-06-27 18:29:04.000000000 +0100
++++ flail-0.2.0.fixed/Makefile	2016-05-09 14:54:09.479398487 +0100
+@@ -3,10 +3,10 @@
+ all : flail
+ 
+ flail: flail.c powerpc.h s390.h x86.h x86_64.h
+-	$(CC) -g -Wall -lm -o $@ flail.c
++	$(CC) -g -Wall -o $@ flail.c -lm
+ 
+ flail64: flail.c powerpc.h s390.h x86.h x86_64.h
+-	$(CC) -g -Wall -m64 -lm -o $@ flail.c
++	$(CC) -g -Wall -m64 -o $@ flail.c -lm
+ 
+ clean:
+ 	rm -f flail

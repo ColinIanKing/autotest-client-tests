@@ -411,7 +411,7 @@ static void print_time(struct io_oper *oper) {
     runtime = time_since_now(&oper->start_time); 
     mb = oper_mb_trans(oper);
     tput = mb / runtime;
-    fprintf(stderr, "%s on %s (%.2f MB/s) %.2f MB in %.2fs\n", 
+    fprintf(stderr, "%s on %s (%.2f MB/s) %.2f MB in %.2fs\n",
 	    stage_name(oper->rw), oper->file_name, tput, mb, runtime);
 }
 
@@ -419,7 +419,7 @@ static void print_lat(char *str, struct io_latency *lat) {
     double avg = lat->total_lat / lat->total_io;
     int i;
     double total_counted = 0;
-    fprintf(stderr, "%s min %.2f avg %.2f max %.2f\n\t", 
+    fprintf(stderr, "%s min %.2f avg %.2f max %.2f\n\t",
             str, lat->min, avg, lat->max);
 
     for (i = 0 ; i < DEVIATIONS ; i++) {
@@ -1170,8 +1170,8 @@ restart:
 
     if (t->stage_mb_trans && t->num_files > 0) {
         double seconds = time_since_now(&stage_time);
-	fprintf(stderr, "thread %d %s totals (%.2f MB/s) %.2f MB in %.2fs\n", 
-	        t - global_thread_info, this_stage, t->stage_mb_trans/seconds, 
+	fprintf(stderr, "thread %lu %s totals (%.2f MB/s) %.2f MB in %.2fs\n",
+	        t - global_thread_info, this_stage, (float)t->stage_mb_trans/(float)seconds,
 		t->stage_mb_trans, seconds);
     }
 
@@ -1451,17 +1451,18 @@ int main(int ac, char **av)
     }
 
     if (file_size < num_contexts * context_offset) {
-        fprintf(stderr, "file size %Lu too small for %d contexts\n", 
-	        file_size, num_contexts);
+        fprintf(stderr, "file size %llu too small for %d contexts\n",
+	        (unsigned long long)file_size, num_contexts);
 	exit(1);
     }
 
-    fprintf(stderr, "file size %LuMB, record size %luKB, depth %d, ios per iteration %d\n", file_size / (1024 * 1024), rec_len / 1024, depth, io_iter);
+    fprintf(stderr, "file size %lluMB, record size %luKB, depth %d, ios per iteration %d\n",
+	    (unsigned long long)file_size / (1024 * 1024), rec_len / 1024, depth, io_iter);
     fprintf(stderr, "max io_submit %d, buffer alignment set to %luKB\n", 
             max_io_submit, (page_size_mask + 1)/1024);
-    fprintf(stderr, "threads %d files %d contexts %d context offset %LuMB verification %s\n", 
+    fprintf(stderr, "threads %d files %d contexts %d context offset %lluMB verification %s\n",
             num_threads, num_files, num_contexts, 
-	    context_offset / (1024 * 1024), verify ? "on" : "off");
+	    (unsigned long long)context_offset / (1024 * 1024), verify ? "on" : "off");
     /* open all the files and do any required setup for them */
     for (i = optind ; i < ac ; i++) {
 	int thread_index;

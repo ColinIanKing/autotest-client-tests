@@ -85,6 +85,14 @@ static inline long calcdiff(struct timespec t1, struct timespec t2)
 	return diff;
 }
 
+static void do_system(const char *cmd)
+{
+	int ret = system(cmd);
+
+	if (ret < 0)
+		fprintf(stderr, "system(%s) failed\n", cmd);
+}
+
 /*
  * signal thread
  *
@@ -101,19 +109,19 @@ void *signalthread(void *param)
 	int first = 1;
 
 	if (tracelimit) {
-		system("echo 1 > /proc/sys/kernel/trace_all_cpus");
-		system("echo 1 > /proc/sys/kernel/trace_freerunning");
-		system("echo 0 > /proc/sys/kernel/trace_print_at_crash");
-		system("echo 1 > /proc/sys/kernel/trace_user_triggered");
-		system("echo -1 > /proc/sys/kernel/trace_user_trigger_irq");
-		system("echo 0 > /proc/sys/kernel/trace_verbose");
-		system("echo 0 > /proc/sys/kernel/preempt_thresh");
-		system("echo 0 > /proc/sys/kernel/wakeup_timing");
-		system("echo 0 > /proc/sys/kernel/preempt_max_latency");
+		do_system("echo 1 > /proc/sys/kernel/trace_all_cpus");
+		do_system("echo 1 > /proc/sys/kernel/trace_freerunning");
+		do_system("echo 0 > /proc/sys/kernel/trace_print_at_crash");
+		do_system("echo 1 > /proc/sys/kernel/trace_user_triggered");
+		do_system("echo -1 > /proc/sys/kernel/trace_user_trigger_irq");
+		do_system("echo 0 > /proc/sys/kernel/trace_verbose");
+		do_system("echo 0 > /proc/sys/kernel/preempt_thresh");
+		do_system("echo 0 > /proc/sys/kernel/wakeup_timing");
+		do_system("echo 0 > /proc/sys/kernel/preempt_max_latency");
 		if (ftrace)
-			system("echo 1 > /proc/sys/kernel/mcount_enabled");
+			do_system("echo 1 > /proc/sys/kernel/mcount_enabled");
 
-		system("echo 1 > /proc/sys/kernel/trace_enabled");
+		do_system("echo 1 > /proc/sys/kernel/trace_enabled");
 	}
 
 	stat->tid = gettid();
@@ -130,7 +138,7 @@ void *signalthread(void *param)
 
 	if (tracelimit) {
 		if (oldtrace)
-			gettimeofday(0,(struct timezone *)1);
+			gettimeofday(NULL, (struct timezone *)1);
 		else
 			prctl(0, 1);
 	}
@@ -176,7 +184,7 @@ void *signalthread(void *param)
 		if (!stopped && tracelimit && (diff > tracelimit)) {
 			stopped++;
 			if (oldtrace)
-				gettimeofday(0,0);
+				gettimeofday(NULL, NULL);
 			else
 				prctl(0, 0);
 			shutdown++;

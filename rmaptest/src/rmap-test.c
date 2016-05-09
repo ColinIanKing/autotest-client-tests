@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
 	file_size *= pagesize;
 
 	printf("Total file size: %lldk, Total memory: %lldk\n",
-		file_size / 1024,
+		(long long)file_size / 1024,
 		((long long)nvmas * vmasize * pagesize) / 1024);
 
 	if (ftruncate(fd, file_size) < 0) {

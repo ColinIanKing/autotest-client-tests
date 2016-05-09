@@ -9,16 +9,16 @@ TESTS=aio-dio-invalidate-failure aio-dio-subblock-eof-read \
 all: $(TESTS)
 
 aio-dio-invalidate-failure: aio-dio-invalidate-failure.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 aio-dio-subblock-eof-read: aio-dio-subblock-eof-read.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 aio-free-ring-with-bogus-nr-pages: aio-free-ring-with-bogus-nr-pages.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 aio-io-setup-with-nonwritable-context-pointer: aio-io-setup-with-nonwritable-context-pointer.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 aio-dio-extend-stat: aio-dio-extend-stat.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -lpthread -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lpthread

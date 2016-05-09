@@ -115,6 +115,8 @@ void fun_read(void *ptr)
 	long i;
 	long r;
 
+	(void)ptr;
+
 	while (n > 0) {
 		r = io_getevents(ctxp, 1, MAX_AIO_EVENTS, ioevents, NULL);
 		if (r < 0) 
@@ -145,6 +147,8 @@ void fun_writeN(void *ptr)
 	int i;
 	int ret;
 
+	(void)ptr;
+
 	for(i = 0; i < MAX_AIO_EVENTS; ++i) {
 		ret = io_submit(ctxp, 1, &(iocbs[i]));
 		if (ret != 1)
@@ -155,6 +159,8 @@ void fun_writeN(void *ptr)
 void fun_write1(void *ptr)
 {
 	int ret;
+
+	(void)ptr;
     
 	ret = io_submit(ctxp, MAX_AIO_EVENTS, iocbs);
 	if (ret !=  MAX_AIO_EVENTS)

@@ -10,13 +10,17 @@
 
 #define O_NOATIME     01000000 
 
-inline uint64_t
-rdtsc(void)
+static inline uint64_t rdtsc(void)
 {
-	int64_t tsc;
-
-	__asm __volatile("rdtsc" : "=A" (tsc));
-	return (tsc);
+	if (sizeof(long) == sizeof(uint64_t)) {
+		uint32_t lo, hi;
+		asm volatile("rdtsc" : "=a" (lo), "=d" (hi));
+		return ((uint64_t)(hi) << 32) | lo;
+	} else {
+		uint64_t tsc;
+		asm volatile("rdtsc" : "=A" (tsc));
+		return tsc;
+	}
 }
 
 int
@@ -50,11 +54,11 @@ main(int argc, char **argv)
 		__asm __volatile(""::: "memory");
 		e = rdtsc();
 		if (argc > 2)
-			printf("%d: %lld cycles %jd %jd\n", i, e - s, (intmax_t)s, (intmax_t)e);
+			printf("%ld: %lld cycles %jd %jd\n", i, (long long)(e - s), (intmax_t)s, (intmax_t)e);
 		t += e - s;
 	}
 
-	printf("average time: %lld cycles\n", t / 1000);
+	printf("average time: %llu cycles\n", (unsigned long long)t / 1000);
 
 	return (0);
 }

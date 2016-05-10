@@ -24,7 +24,7 @@ class ltp(test.test):
         self.job.require_gcc()
 
     # http://sourceforge.net/projects/ltp/files/LTP%20Source/ltp-20140115/
-    def setup(self, tarball='ltp-full-20150224.tar.bz2'):
+    def setup(self, tarball='ltp-full-20160510.tar.bz2'):
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

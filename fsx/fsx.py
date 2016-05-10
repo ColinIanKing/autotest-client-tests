@@ -28,8 +28,10 @@ class fsx(test.test):
         os.chdir(self.srcdir)
         p1 = '0001-Minor-fixes-to-PAGE_SIZE-handling.patch'
         p2 = '0002-Enable-cross-compiling-for-fsx.patch'
+        p3 = '0003-ext3-tools.patch'
         utils.system('patch -p1 < %s/%s' % (self.bindir, p1))
         utils.system('patch -p1 < %s/%s' % (self.bindir, p2))
+        utils.system('patch -p1 < %s/%s' % (self.bindir, p3))
         utils.system(self.make_flags + ' make fsx-linux')
 
     def run_once(self, dir=None, repeat=100000):

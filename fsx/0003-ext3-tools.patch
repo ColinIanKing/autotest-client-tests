@@ -1,0 +1,1994 @@
+diff -Naur ../ext3-tools.orig/aio-stress.c ./aio-stress.c
+--- ../ext3-tools.orig/aio-stress.c	2004-05-17 08:49:53.000000000 +0100
++++ ./aio-stress.c	2016-05-10 10:28:11.613373435 +0100
+@@ -867,6 +867,7 @@
+     } else if (use_shm == USE_SHMFS) {
+         char mmap_name[16]; /* /dev/shm/ + null + XXXXXX */    
+ 	int fd;
++	int ret;
+ 
+ 	strcpy(mmap_name, "/dev/shm/XXXXXX");
+ 	fd = mkstemp(mmap_name);
+@@ -875,7 +876,8 @@
+ 	    goto free_buffers;
+ 	}
+ 	unlink(mmap_name);
+-	ftruncate(fd, total_ram);
++	ret = ftruncate(fd, total_ram);
++	(void)ret;
+ 	shm_id = fd;
+ 	p = mmap((char *)0x50000000, total_ram,
+ 	         PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+@@ -890,7 +892,7 @@
+ 	goto free_buffers;
+     }
+     unaligned_buffer = p;
+-    (unsigned long)p = ((unsigned long) (p + page_size_mask) & ~page_size_mask);
++    p = (void *)((unsigned long) (p + page_size_mask) & ~page_size_mask);
+     aligned_buffer = p;
+     return 0;
+ 
+@@ -939,7 +941,7 @@
+ int worker(struct thread_info *t)
+ {
+     struct io_oper *oper;
+-    char *this_stage;
++    char *this_stage = NULL;
+     struct timeval stage_time;
+     int status = 0;
+ 
+@@ -1006,7 +1008,7 @@
+ 
+     if (t->stage_mb_trans && t->num_files > 0) {
+         double seconds = time_since(&stage_time);
+-	fprintf(stderr, "thread %d %s totals (%.2f MB/s) %.2f MB in %.2fs\n", 
++	fprintf(stderr, "thread %ld %s totals (%.2f MB/s) %.2f MB in %.2fs\n", 
+ 	        t - global_thread_info, this_stage, t->stage_mb_trans/seconds, 
+ 		t->stage_mb_trans, seconds);
+     }
+@@ -1129,7 +1131,7 @@
+     off_t file_size = 1 * 1024 * 1024 * 1024;
+     int first_stage = WRITE;
+     struct io_oper *oper;
+-    int status;
++    int status = 0;
+     int num_files = 0;
+     struct thread_info *t;
+ 
+@@ -1251,7 +1253,7 @@
+ 	}
+     }
+ 
+-    fprintf(stderr, "file size %LuMB, record size %luKB, depth %d, ios per iteration %d\n", file_size / (1024 * 1024), rec_len / 1024, depth, io_iter);
++    fprintf(stderr, "file size %lluMB, record size %luKB, depth %d, ios per iteration %d\n", (long long)file_size / (1024 * 1024), rec_len / 1024, depth, io_iter);
+     fprintf(stderr, "max io_submit %d, buffer alignment set to %luKB\n", 
+             max_io_submit, (page_size_mask + 1)/1024);
+     fprintf(stderr, "threads %d files %d\n", num_threads, num_files);
+diff -Naur ../ext3-tools.orig/aio-test.c ./aio-test.c
+--- ../ext3-tools.orig/aio-test.c	2004-05-17 08:49:53.000000000 +0100
++++ ./aio-test.c	2016-05-10 10:24:44.807740136 +0100
+@@ -68,7 +68,7 @@
+ 	}
+ 
+ 	/* Setup */
+-	fd = open("raw1", O_RDWR|O_CREAT);
++	fd = open("raw1", O_RDWR|O_CREAT, 0666);
+ 	if (aio_setup() != 0) exit(1);
+ 
+ 	/* Bunch of writes */
+diff -Naur ../ext3-tools.orig/bash-shared-mapping.c ./bash-shared-mapping.c
+--- ../ext3-tools.orig/bash-shared-mapping.c	2004-05-17 08:49:53.000000000 +0100
++++ ./bash-shared-mapping.c	2016-05-10 10:03:19.069870481 +0100
+@@ -73,7 +73,7 @@
+ 	int ret;
+ 
+ 	if (verbose)
+-		printf("stretch file to %Ld\n", size);
++		printf("stretch file to %lld\n", (long long)size);
+ 	if ((ret = my_pwrite(fd, (const char *)&c,
+ 				sizeof(c), size - sizeof(c))) != sizeof(c)) {
+ 		fprintf(stderr, "%s: my_pwrite returned %d\n",
+@@ -98,7 +98,7 @@
+ 	install_signal_handler();
+ 
+ 	if (verbose)
+-		printf("sigbus - stretch to %Ld\n", new_len);
++		printf("sigbus - stretch to %lld\n", (long long)new_len);
+ 	got_sigbus = 1;
+ 	/* Instantiate the file up to the sigbus address */
+ 	if ((ret = my_pwrite(fd, (const char *)&c, sizeof(c), sigbus_offset)) != sizeof(c)) {
+@@ -132,7 +132,7 @@
+ 		amount = size - offset;
+ 
+ 	if (verbose)
+-		printf("dirty %Ld bytes at %Ld\n", amount, offset);
++		printf("dirty %lld bytes at %lld\n", (long long)amount, (long long)offset);
+ 
+ 	val = 0;
+ 	p = mapped_mem;
+@@ -160,12 +160,12 @@
+ 		amount = size - to;
+ 
+ 	if (verbose)
+-		printf("my_pwrite %Ld bytes from %Ld to %Ld\n", amount, from, to);
++		printf("my_pwrite %lld bytes from %lld to %lld\n", (long long)amount, (long long)from, (long long)to);
+ 
+ 	if ((ret = my_pwrite(fd, (char *)mapped_mem + from, amount, to)) != amount) {
+ 		if (verbose)
+-			printf("%s: my_pwrite returned %d, not %Ld\n",
+-					__FUNCTION__, ret, amount);
++			printf("%s: my_pwrite returned %d, not %lld\n",
++					__FUNCTION__, ret, (long long)amount);
+ 		if (errno == EFAULT) {
+ 			/*
+ 			 * It was unmapped under us
+@@ -188,7 +188,7 @@
+ 	dret *= drand48();
+ 	ret = dret;
+ 	if (ret < 0 || ret > 0x80000000)
+-		printf("I goofed: %Ld\n", ret);
++		printf("I goofed: %lld\n", (long long)ret);
+ 	return ret;
+ }
+ #else
+@@ -233,7 +233,7 @@
+ 	filename = argv[optind++];
+ 	if (optind == argc)
+ 		usage();
+-	sscanf(argv[optind++], "%Ld", &size);
++	sscanf(argv[optind++], "%lld", (long long *)&size);
+ 	if (optind != argc)
+ 		usage();
+ 	if (size < 10)
+@@ -252,9 +252,12 @@
+ 	srand(10 * getpid());
+ 
+ 	while (niters--) {
++		int ret;
++
+ 		dirty_pages(rand_of(size), rand_of(size));
+ 		write_stuff(rand_of(size), rand_of(size), rand_of(size));
+-		ftruncate64(fd, rand_of(size));
++		ret = ftruncate64(fd, rand_of(size));
++		(void)ret;
+ 		stretch_file(rand_of(size) + 10);
+ 	}
+ 	exit(0);
+diff -Naur ../ext3-tools.orig/chains.c ./chains.c
+--- ../ext3-tools.orig/chains.c	2004-05-17 08:49:53.000000000 +0100
++++ ./chains.c	2016-05-10 10:08:54.108556042 +0100
+@@ -36,7 +36,7 @@
+ 	vsnprintf (error_buf, 1024, fmt, args);
+ 	va_end (args);
+ 
+-	fprintf(stderr, error_buf);
++	fprintf(stderr, "%s", error_buf);
+ 	
+ 	exit (1);
+ }
+diff -Naur ../ext3-tools.orig/copy-user-test.c ./copy-user-test.c
+--- ../ext3-tools.orig/copy-user-test.c	2004-05-17 08:49:53.000000000 +0100
++++ ./copy-user-test.c	2016-05-10 10:08:38.316445987 +0100
+@@ -17,6 +17,7 @@
+ 	char *mapped_mem;
+ 	char buf[26];
+ 	int i;
++	int ret;
+ 
+ 	if (argc != 2) {
+ 		fprintf(stderr, "Usage; %s filename\n", argv[0]);
+@@ -39,9 +40,11 @@
+ 		perror("mmap");
+ 		exit(1);
+ 	}
+-	write(fd, buf, 26);
++	ret = write(fd, buf, 26);
++	(void)ret;
+ 	lseek(fd, 1, SEEK_SET);
+-	write(fd, mapped_mem, 25);
++	ret = write(fd, mapped_mem, 25);
++	(void)ret;
+ 	msync(mapped_mem, 26, MS_SYNC);
+ 	munmap(mapped_mem, 26);
+ 	close(fd);
+@@ -49,7 +52,8 @@
+ 	{
+ 		char *p = malloc(strlen(filename) + 20);
+ 		sprintf(p, "cat %s ; echo", filename);
+-		system(p);
++		ret = system(p);
++		(void)ret;
+ 	}
+ 	exit(0);
+ }
+diff -Naur ../ext3-tools.orig/create-delete-data.c ./create-delete-data.c
+--- ../ext3-tools.orig/create-delete-data.c	2004-05-17 08:49:53.000000000 +0100
++++ ./create-delete-data.c	2016-05-10 10:07:53.708138005 +0100
+@@ -29,7 +29,7 @@
+ 	for ( ; ; ) {
+ 		for (i = 0; i < NR; i++) {
+ 			char buf[32];
+-			int fd;
++			int fd, ret;
+ 
+ 			sprintf(buf, "%06d", i);
+ 			fd = creat(buf, 0666);
+@@ -39,7 +39,8 @@
+ 				exit(1);
+ 			}
+ 
+-			write(fd, dbuf, sizeof(dbuf));
++			ret = write(fd, dbuf, sizeof(dbuf));
++			(void)ret;
+ 			close(fd);
+ 		}
+ 		usleep(20 * 1000);
+diff -Naur ../ext3-tools.orig/direct_read_under.c ./direct_read_under.c
+--- ../ext3-tools.orig/direct_read_under.c	2004-05-17 08:49:53.000000000 +0100
++++ ./direct_read_under.c	2016-05-10 11:09:22.782415981 +0100
+@@ -1,5 +1,5 @@
+ #define _XOPEN_SOURCE 600
+-#define _GNU_SOURCE
++#define _GNU_SOURCE 1
+ 
+ #include <unistd.h>
+ #include <stdlib.h>
+@@ -70,6 +70,7 @@
+ 				char cmd[1024];
+ 				int fd2;
+ 				int readdata2;
++				int ret;
+ 
+ 				fprintf(stderr,
+ 					"Found data (%08x) at offset %d+%d\n",
+@@ -91,8 +92,9 @@
+ 				 * read the data buffered interface to check.
+ 				 */
+ 				fd2 = open(filename, O_RDONLY, 0);
+-				pread(fd2, &readdata2, sizeof(readdata2),
++				ret = pread(fd2, &readdata2, sizeof(readdata2),
+ 					offset+i);
++				(void)ret;
+ 				fprintf(stderr,
+ 				"Buffered data (%08x) at offset %d+%d\n",
+ 					readdata2, offset, i);
+@@ -101,8 +103,9 @@
+ 				 * Re-read using DIO to read page with
+ 				 * bad data.
+ 				 */
+-				pread(fd, pagebuf, pagesize, 
++				ret = pread(fd, pagebuf, pagesize, 
+ 					(offset + i) & ~(pagesize - 1));
++				(void)ret;
+ 				fprintf(stderr,
+ 					"DIO read2 data (%08x) %d+%d\n",
+ 			*(int *)&pagebuf[((offset + i) & (pagesize - 1))],
+@@ -116,7 +119,8 @@
+ 				 */
+ 				sprintf(cmd, "od -c %s > %s.od.output",
+ 					filename, filename);
+-				system(cmd);
++				ret = system(cmd);
++				(void)ret;
+ 				
+ 				close(fd);
+ 				return 1;
+diff -Naur ../ext3-tools.orig/enospc-write-middle.c ./enospc-write-middle.c
+--- ../ext3-tools.orig/enospc-write-middle.c	2004-05-17 08:49:53.000000000 +0100
++++ ./enospc-write-middle.c	2016-05-10 10:12:08.761950051 +0100
+@@ -26,14 +26,14 @@
+ 	}
+ 
+ 	filename = argv[1];
+-	fd = open(filename, O_CREAT|O_TRUNC|O_RDWR);
++	fd = open(filename, O_CREAT|O_TRUNC|O_RDWR, 0666);
+ 	if (fd < 0) {
+ 		fprintf(stderr, "%s: Cannot open `%s': %s\n",
+ 			argv[0], filename, strerror(errno));
+ 		exit(1);
+ 	}
+ 
+-	sscanf(argv[2], "%Ld", &size);
++	sscanf(argv[2], "%lld", (long long *)&size);
+ 	if (pwrite(fd, buf, 1, size - 1) != 1) {
+ 		fprintf(stderr, "%s: error pwriting: %s\n",
+ 			argv[0], strerror(errno));
+diff -Naur ../ext3-tools.orig/ext3_add_blocks.c ./ext3_add_blocks.c
+--- ../ext3-tools.orig/ext3_add_blocks.c	2004-05-17 08:49:53.000000000 +0100
++++ ./ext3_add_blocks.c	2016-05-10 11:03:41.808606903 +0100
+@@ -51,10 +51,10 @@
+ 
+ 	if (optind == argc)
+ 		usage();
+-	sscanf(argv[optind++], "%Ld", &start_byte);
++	sscanf(argv[optind++], "%lld", (long long *)&start_byte);
+ 	if (optind == argc)
+ 		usage();
+-	sscanf(argv[optind++], "%Ld", &nbytes);
++	sscanf(argv[optind++], "%lld", (long long *)&nbytes);
+ 	if (optind == argc)
+ 		usage();
+ 	filename = argv[optind++];
+diff -Naur ../ext3-tools.orig/fadvise.c ./fadvise.c
+--- ../ext3-tools.orig/fadvise.c	2006-02-16 03:53:52.000000000 +0000
++++ ./fadvise.c	2016-05-10 10:43:33.146694298 +0100
+@@ -5,8 +5,6 @@
+ #include <stdio.h>
+ #include <string.h>
+ 
+-#include "fadvise.h"
+-
+ char *progname;
+ 
+ static void usage(void)
+@@ -66,10 +64,6 @@
+ 	else if (!strcmp(sadvice, "dontneed"))
+ 		advice = POSIX_FADV_DONTNEED;
+ 	else if (!strcmp(sadvice, "asyncwrite"))
+-		advice = LINUX_FADV_ASYNC_WRITE;
+-	else if (!strcmp(sadvice, "writewait"))
+-		advice = LINUX_FADV_WRITE_WAIT;
+-	else
+ 		usage();
+ 
+ 	fd = open(filename, O_RDONLY);
+@@ -79,7 +73,7 @@
+ 		exit(1);
+ 	}
+ 
+-	ret = __posix_fadvise64(fd, offset, length, advice);
++	ret = posix_fadvise64(fd, offset, length, advice);
+ 	if (ret) {
+ 		fprintf(stderr, "%s: fadvise() failed: %s\n",
+ 			progname, strerror(errno));
+diff -Naur ../ext3-tools.orig/fadvise.h ./fadvise.h
+--- ../ext3-tools.orig/fadvise.h	2006-02-16 03:53:52.000000000 +0000
++++ ./fadvise.h	2016-05-10 10:36:48.409488893 +0100
+@@ -1,4 +1,4 @@
+-#include <asm/unistd.h>
++#include <linux/unistd.h>
+ 
+ #ifndef __NR_fadvise64
+ #if defined (__i386__)
+diff -Naur ../ext3-tools.orig/fsstress.c ./fsstress.c
+--- ../ext3-tools.orig/fsstress.c	2004-05-17 08:49:53.000000000 +0100
++++ ./fsstress.c	2016-05-10 12:10:59.419851267 +0100
+@@ -487,8 +487,11 @@
+ #endif
+ 	if (cleanup == 0)
+ 	{
+-	  sprintf(cmd,"rm -rf %s",dirname);
+-	  system(cmd);
++		int ret;
++
++		sprintf(cmd,"rm -rf %s",dirname);
++		ret = system(cmd);
++		(void)ret;
+ 	}	
+         loopcntr++;
+ 	}
+@@ -519,8 +522,11 @@
+ 	len = strlen(str);
+ #ifdef DEBUG
+ 	if (len && *str == '/' && name->len == 0) {
++		int ret;
++
+ 		fprintf(stderr, "fsstress: append_pathname failure\n");
+-		chdir(homedir);
++		ret = chdir(homedir);
++		(void)ret;
+ 		abort();
+ 		/* NOTREACHED */
+ 	}
+@@ -544,9 +550,12 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = attr_list_path(&newname, buffer, buffersize, flags,
+ 			cursor);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -564,8 +573,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = attr_remove_path(&newname, attrname, flags);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -584,9 +596,12 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = attr_set_path(&newname, attrname, attrvalue, valuelength,
+ 			flags);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -598,10 +613,12 @@
+ {
+ #ifdef DEBUG
+ 	struct stat64	statbuf;
++	int ret;
+ 
+ 	if (stat64(".", &statbuf) == 0 && statbuf.st_ino == top_ino)
+ 		return;
+-	chdir(homedir);
++	ret = chdir(homedir);
++	(void)ret;
+ 	fprintf(stderr, "fsstress: check_cwd failure\n");
+ 	abort();
+ 	/* NOTREACHED */
+@@ -620,8 +637,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = creat_path(&newname, mode);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -887,8 +907,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = lchown_path(&newname, owner, group);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -911,8 +934,11 @@
+ 	separate_pathname(name2, buf2, &newname2);
+ 	if (strcmp(buf1, buf2) == 0) {
+ 		if (chdir(buf1) == 0) {
++			int ret;
++
+ 			rval = link_path(&newname1, &newname2);
+-			chdir("..");
++			ret = chdir("..");
++			(void)ret;
+ 		}
+ 	} else {
+ 		if (strcmp(buf1, "..") == 0)
+@@ -931,16 +957,22 @@
+ 			append_pathname(&newname2, "../");
+ 			append_pathname(&newname2, name2->path);
+ 			if (chdir(buf1) == 0) {
++				int ret;
++
+ 				rval = link_path(&newname1, &newname2);
+-				chdir("..");
++				ret = chdir("..");
++				(void)ret;
+ 			}
+ 		} else {
+ 			free_pathname(&newname1);
+ 			append_pathname(&newname1, "../");
+ 			append_pathname(&newname1, name1->path);
+ 			if (chdir(buf2) == 0) {
++				int ret;
++
+ 				rval = link_path(&newname1, &newname2);
+-				chdir("..");
++				ret = chdir("..");
++				(void)ret;
+ 			}
+ 		}
+ 	}
+@@ -961,8 +993,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = lstat64_path(&newname, sbuf);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -997,8 +1032,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = mkdir_path(&newname, mode);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1016,8 +1054,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = mknod_path(&newname, mode, dev);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1057,8 +1098,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = open_path(&newname, oflag);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1076,8 +1120,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = opendir_path(&newname);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1117,8 +1164,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = readlink_path(&newname, lbuf, lbufsiz);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1141,8 +1191,11 @@
+ 	separate_pathname(name2, buf2, &newname2);
+ 	if (strcmp(buf1, buf2) == 0) {
+ 		if (chdir(buf1) == 0) {
++			int ret;
+ 			rval = rename_path(&newname1, &newname2);
+-			chdir("..");
++
++			ret = chdir("..");
++			(void)ret;
+ 		}
+ 	} else {
+ 		if (strcmp(buf1, "..") == 0)
+@@ -1161,16 +1214,22 @@
+ 			append_pathname(&newname2, "../");
+ 			append_pathname(&newname2, name2->path);
+ 			if (chdir(buf1) == 0) {
++				int ret;
+ 				rval = rename_path(&newname1, &newname2);
+-				chdir("..");
++
++				ret = chdir("..");
++				(void)ret;
+ 			}
+ 		} else {
+ 			free_pathname(&newname1);
+ 			append_pathname(&newname1, "../");
+ 			append_pathname(&newname1, name1->path);
+ 			if (chdir(buf2) == 0) {
++				int ret;
++
+ 				rval = rename_path(&newname1, &newname2);
+-				chdir("..");
++				ret = chdir("..");
++				(void)ret;
+ 			}
+ 		}
+ 	}
+@@ -1191,8 +1250,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = rmdir_path(&newname);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1264,8 +1326,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = stat64_path(&newname, sbuf);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1288,8 +1353,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = symlink_path(name1, &newname);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1307,8 +1375,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = truncate64_path(&newname, length);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1326,8 +1397,11 @@
+ 		return rval;
+ 	separate_pathname(name, buf, &newname);
+ 	if (chdir(buf) == 0) {
++		int ret;
++
+ 		rval = unlink_path(&newname);
+-		chdir("..");
++		ret = chdir("..");
++		(void)ret;
+ 	}
+ 	free_pathname(&newname);
+ 	return rval;
+@@ -1673,6 +1747,9 @@
+ 		extsize = (random() % 10) + 1;
+ 	else
+ 		extsize = 0;
++
++	(void)extsize;
++
+ 	e = generate_fname(fep, type, &f, &id, &v);
+ 	v |= v1;
+ 	if (!e) {
+@@ -1753,6 +1830,7 @@
+ 	struct stat64	stb;
+ 	int		v;
+        
++	memset(&diob, 0, sizeof(diob));
+ 	init_pathname(&f);
+ 	if (!get_fname(FT_REGFILE, r, &f, NULL, NULL, &v)) {
+ 		if (v)
+@@ -1844,6 +1922,7 @@
+ 	struct stat64	stb;
+ 	int		v;
+ 
++	memset(&diob, 0, sizeof(diob));
+ 	init_pathname(&f);
+ 	if (!get_fname(FT_REGFILE, r, &f, NULL, NULL, &v)) {
+ 		if (v)
+diff -Naur ../ext3-tools.orig/fsx-linux.c ./fsx-linux.c
+--- ../ext3-tools.orig/fsx-linux.c	2004-07-04 11:44:16.000000000 +0100
++++ ./fsx-linux.c	2016-05-10 10:10:38.349294603 +0100
+@@ -392,15 +392,19 @@
+ check_trunc_hack(void)
+ {
+ 	struct stat statbuf;
++	int ret;
+ 
+-	ftruncate(fd, (off_t)0);
+-	ftruncate(fd, (off_t)100000);
++	ret = ftruncate(fd, (off_t)0);
++	(void)ret;
++	ret = ftruncate(fd, (off_t)100000);
++	(void)ret;
+ 	fstat(fd, &statbuf);
+ 	if (statbuf.st_size != (off_t)100000) {
+ 		prt("no extend on truncate! not posix!\n");
+ 		exit(130);
+ 	}
+-	ftruncate(fd, 0);
++	ret = ftruncate(fd, 0);
++	(void)ret;
+ }
+ 
+ 
+diff -Naur ../ext3-tools.orig/ftruncate.c ./ftruncate.c
+--- ../ext3-tools.orig/ftruncate.c	2004-05-17 08:49:53.000000000 +0100
++++ ./ftruncate.c	2016-05-10 10:43:52.682587022 +0100
+@@ -35,7 +35,7 @@
+ 		exit(1);
+ 	}
+ 
+-	printf("%s: truncating `%s' to size %Ld\n", argv[0], filename, size);
++	printf("%s: truncating `%s' to size %lld\n", argv[0], filename, (long long)size);
+ 	if (ftruncate(fd, size) < 0) {
+ 		perror("ftruncate");
+ 		exit(1);
+diff -Naur ../ext3-tools.orig/jasper.c ./jasper.c
+--- ../ext3-tools.orig/jasper.c	2004-05-17 08:49:53.000000000 +0100
++++ ./jasper.c	2016-05-10 10:09:19.020730689 +0100
+@@ -28,7 +28,7 @@
+ 
+ 	for (i = 0; i < 100; i++) {
+ 		sprintf(filename, "foo-%03d", i);
+-		fd = open(filename, O_RDWR|O_CREAT|O_TRUNC);
++		fd = open(filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
+ 		if (fd < 0) {
+ 			fprintf(stderr, "%s: Cannot open `%s': %s\n",
+ 				argv[0], filename, strerror(errno));
+diff -Naur ../ext3-tools.orig/kswapd-writepage.c ./kswapd-writepage.c
+--- ../ext3-tools.orig/kswapd-writepage.c	2004-05-17 08:49:53.000000000 +0100
++++ ./kswapd-writepage.c	2016-05-10 10:00:27.836387356 +0100
+@@ -35,8 +35,8 @@
+ 		exit(1);
+ 	}
+ 
+-	sscanf(argv[2], "%Ld", &size);
+-	printf("%s: expanding `%s' to size %Ld\n", argv[0], filename, size);
++	sscanf(argv[2], "%lld", (long long *)&size);
++	printf("%s: expanding `%s' to size %lld\n", argv[0], filename, (long long)size);
+ 	if (pwrite(fd, &c, 1, size - 1) != 1) {
+ 		perror("pwrite");
+ 		exit(1);
+@@ -46,7 +46,7 @@
+ 		perror("mmap");
+ 		exit(1);
+ 	}
+-	printf("dirtying %Ld bytes of memory\n", size);
++	printf("dirtying %lld bytes of memory\n", (long long)size);
+ 	val = 0;
+ 	p = mapped_mem;
+ 	for (idx = 0; idx < size / sizeof(*p); idx++) {
+diff -Naur ../ext3-tools.orig/Makefile ./Makefile
+--- ../ext3-tools.orig/Makefile	2006-03-29 06:23:21.000000000 +0100
++++ ./Makefile	2016-05-10 12:01:13.073153963 +0100
+@@ -10,14 +10,14 @@
+ 		bsmith make-many-files qs qsbench write-and-fsync \
+ 		atime-timer enospc-writepage fsx-linux enospc-write-middle \
+ 		dribble mmap-eof time-read ra-thrash pwrite time-msync \
+-		write-super keep-file-dirty vm-eviction fsstress \
++		keep-file-dirty vm-eviction fsstress \
+ 		create-and-unlink odwrite odread writev-speed mremap-test \
+ 		create-delete make-teeny-files aio-test aio-stress \
+ 		randfiles o1 fadvise ftruncate open-o_trunc \
+ 		mmap-truncate mmap-munmap remap_file_pages randread \
+ 		seek-then-straight rmap-test randwrite madvise \
+ 		rawread bmap ext3_add_blocks sys_readahead direct_read_under \
+-		remap-test mq_test wbtest test_remap read-and-fsync \
++		remap-test mq_test wbtest read-and-fsync \
+ 		sync_file_range
+ 
+ %.o : %.c
+@@ -91,26 +91,25 @@
+ remap-test:		remap-test.o
+ mq_test:		mq_test.o
+ wbtest:			wbtest.o
+-test_remap:		test_remap.o
+ read-and-fsync:		read-and-fsync.o
+ sync_file_range:	sync_file_range.o
+ 
+ fsstress.c:		global.h xfscompat.h
+ 
+ aio-test:		aio-test.o
+-	$(CC) $(LDFLAGS) -laio aio-test.o -o aio-test
++	$(CC) $(LDFLAGS) aio-test.o -o aio-test -laio
+ 
+ aio-stress:		aio-stress.o
+-	$(CC) $(LDFLAGS) -laio -lpthread aio-stress.o -o aio-stress
++	$(CC) $(LDFLAGS) aio-stress.o -o aio-stress -laio -lpthread
+ 
+ fsx-linux:		fsx-linux.o
+-	$(CC) $(LDFLAGS) -laio fsx-linux.o -o fsx-linux
++	$(CC) $(LDFLAGS) fsx-linux.o -o fsx-linux -laio
+ 
+ rawread:		rawread.o
+-	$(CC) $(LDFLAGS) -laio -lpthread rawread.o -o rawread
++	$(CC) $(LDFLAGS) rawread.o -o rawread -laio -lpthread
+ 
+ #pollbench:		pollbench.o
+-#	$(CXX) $(LDFLAGS) -lpthread polbench.o -o pollbench
++#	$(CXX) $(LDFLAGS) polbench.o -o pollbench -lpthread
+ 
+ clean:
+ 	$(RM) *.o $(ALL)
+diff -Naur ../ext3-tools.orig/make-many-files.c ./make-many-files.c
+--- ../ext3-tools.orig/make-many-files.c	2004-05-17 08:49:53.000000000 +0100
++++ ./make-many-files.c	2016-05-10 10:09:41.324888079 +0100
+@@ -9,13 +9,15 @@
+ {
+ 	static char stuff[4096];
+ 	int fd;
++	int ret;
+ 
+ 	fd = creat(name, 0666);
+ 	if (fd < 0) {
+ 		perror(name);
+ 		exit(1);
+ 	}
+-	write(fd, stuff, sizeof(stuff));
++	ret = write(fd, stuff, sizeof(stuff));
++	(void)ret;
+ 	close(fd);
+ }
+ 
+diff -Naur ../ext3-tools.orig/make-teeny-files.c ./make-teeny-files.c
+--- ../ext3-tools.orig/make-teeny-files.c	2004-05-17 08:49:53.000000000 +0100
++++ ./make-teeny-files.c	2016-05-10 10:24:21.239554771 +0100
+@@ -35,13 +35,17 @@
+ 
+ 	for (i = 0; i < fpd; i++) {
+ 		char buf[100];
++		int ret;
++
+ 		sprintf(buf, "%08d", i);
+ 
+ 		if (depth) {
+ 			mkdir(buf, 0777);
+-			chdir(buf);
++			ret = chdir(buf);
++			(void)ret;
+ 			doit(depth - 1, fpd);
+-			chdir("..");
++			ret = chdir("..");
++			(void)ret;
+ 		} else {
+ 			int fd = creat(buf, 0666);
+ 
+@@ -50,7 +54,8 @@
+ 				exit(1);
+ 			}
+ 			lseek(fd, offset, SEEK_SET);
+-			write(fd, write_buffer, nbytes);
++			ret = write(fd, write_buffer, nbytes);
++			(void)ret;
+ 			close(fd);
+ 		}
+ 	}
+diff -Naur ../ext3-tools.orig/mmap-eof.c ./mmap-eof.c
+--- ../ext3-tools.orig/mmap-eof.c	2004-05-17 08:49:53.000000000 +0100
++++ ./mmap-eof.c	2016-05-10 10:12:35.050142868 +0100
+@@ -30,7 +30,7 @@
+ 		exit(1);
+ 	}
+ 
+-	printf("%s: expanding `%s' to size %Ld\n", argv[0], filename, size);
++	printf("%s: expanding `%s' to size %lld\n", argv[0], filename, (long long)size);
+ 	if (ftruncate(fd, size) < 0) {
+ 		perror("ftruncate");
+ 		exit(1);
+@@ -40,7 +40,7 @@
+ 		perror("mmap");
+ 		exit(1);
+ 	}
+-	printf("dirtying %Ld bytes of memory\n", size);
++	printf("dirtying %lld bytes of memory\n", (long long)size);
+ 	memset(mapped_mem, 0, size);
+ 	msync(mapped_mem, size, MS_SYNC);
+ 	exit(0);
+diff -Naur ../ext3-tools.orig/mmap-munmap.c ./mmap-munmap.c
+--- ../ext3-tools.orig/mmap-munmap.c	2004-05-17 08:49:53.000000000 +0100
++++ ./mmap-munmap.c	2016-05-10 10:46:27.686012405 +0100
+@@ -12,7 +12,7 @@
+ #include <sys/wait.h>
+ #include <sys/mman.h>
+ 
+-#include <asm/unistd.h>
++//#include <asm/unistd.h>
+ 
+ #ifndef MREMAP_MAYMOVE
+ #define MREMAP_MAYMOVE  1
+@@ -24,15 +24,6 @@
+ 
+ #define ALIGN(x,a) (((x)+(a)-1)&~((a)-1))
+ 
+-#define __NR_mremap2	__NR_mremap
+-
+-_syscall5(	void *, mremap2,
+-		void *, old_addr,
+-		unsigned long, old_len,
+-		unsigned long, new_len,
+-		unsigned long, flags,
+-		void *, new_addr)
+-
+ char *ourname;
+ char *filename;
+ int got_segv;
+@@ -178,7 +169,7 @@
+ 			break;
+ 		case 'f':	/* f old_addr old_size new_size */
+ 			get4(buf, &old_addr, &old_size, &new_addr, &new_size);
+-			map = mremap2((void *)old_addr,
++			map = mremap((void *)old_addr,
+ 					old_size,
+ 					new_size,
+ 					MREMAP_FIXED|MREMAP_MAYMOVE,
+diff -Naur ../ext3-tools.orig/mq_test.c ./mq_test.c
+--- ../ext3-tools.orig/mq_test.c	2004-05-17 08:49:53.000000000 +0100
++++ ./mq_test.c	2016-05-10 11:09:56.846605560 +0100
+@@ -7,7 +7,7 @@
+  * Public License (GPL)
+  * $Header: /cvsroot/gkernel/ext3/tools/mq_test.c,v 1.1 2004/04/10 17:58:44 akpm Exp $
+  */
+-#define _GNU_SOURCE
++#define _GNU_SOURCE	1
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+diff -Naur ../ext3-tools.orig/mremap-test.c ./mremap-test.c
+--- ../ext3-tools.orig/mremap-test.c	2004-05-17 08:49:53.000000000 +0100
++++ ./mremap-test.c	2016-05-10 10:31:53.183133490 +0100
+@@ -42,7 +42,7 @@
+ 		exit(1);
+ 	}
+ 
+-	printf("%s: expanding `%s' to size %Ld\n", argv[0], filename1, size);
++	printf("%s: expanding `%s' to size %lld\n", argv[0], filename1, (long long)size);
+ 	if (ftruncate(fd1, size) < 0) {
+ 		perror("ftruncate");
+ 		exit(1);
+@@ -52,7 +52,7 @@
+ 		perror("mmap");
+ 		exit(1);
+ 	}
+-	printf("dirtying %Ld bytes of memory\n", size);
++	printf("dirtying %lld bytes of memory\n", (long long)size);
+ 	memset(mapped_mem1, 0, size);
+ 	msync(mapped_mem1, size, MS_SYNC);
+ 
+@@ -65,7 +65,7 @@
+ 		exit(1);
+ 	}
+ 
+-	printf("%s: expanding `%s' to size %Ld\n", argv[0], filename2, size);
++	printf("%s: expanding `%s' to size %lld\n", argv[0], filename2, (long long)size);
+ 	if (ftruncate(fd2, size) < 0) {
+ 		perror("ftruncate");
+ 		exit(1);
+@@ -75,7 +75,7 @@
+ 		perror("mmap");
+ 		exit(1);
+ 	}
+-	printf("dirtying %Ld bytes of memory\n", size);
++	printf("dirtying %lld bytes of memory\n", (long long)size);
+ 	memset(mapped_mem2, 0, size);
+ 	msync(mapped_mem2, size, MS_SYNC);
+ 
+@@ -87,7 +87,7 @@
+ 		exit(1);
+ 	}
+ 
+-	printf("%s: expanding `%s' to size %Ld\n", argv[0], filename3, size);
++	printf("%s: expanding `%s' to size %lld\n", argv[0], filename3, (long long)size);
+ 	if (ftruncate(fd3, size) < 0) {
+ 		perror("ftruncate");
+ 		exit(1);
+@@ -97,7 +97,7 @@
+ 		perror("mmap");
+ 		exit(1);
+ 	}
+-	printf("dirtying %Ld bytes of memory\n", size);
++	printf("dirtying %lld bytes of memory\n", (long long)size);
+ 	memset(mapped_mem3, 0, size);
+ 	msync(mapped_mem3, size, MS_SYNC);
+ 
+diff -Naur ../ext3-tools.orig/odread.c ./odread.c
+--- ../ext3-tools.orig/odread.c	2004-05-17 08:49:53.000000000 +0100
++++ ./odread.c	2016-05-10 10:53:12.306136129 +0100
+@@ -153,11 +153,11 @@
+ 	ret = pread(fd, meg, size, offset);
+ 	if (ret != size) {
+ 		perror("pread");
+-		fprintf(stderr, "pread() returned %d, not %d\n", ret, size);
++		fprintf(stderr, "pread() returned %d, not %zd\n", ret, size);
+ 	}
+ 
+ 	for (i = 0; i < size; i += sizeof(long)) {
+-		unsigned long *p = (long *)(meg + i);
++		unsigned long *p = (unsigned long *)(meg + i);
+ 		unsigned long want = i + offset;
+ 
+ 		if (zeroness)
+diff -Naur ../ext3-tools.orig/owcmuowc.c ./owcmuowc.c
+--- ../ext3-tools.orig/owcmuowc.c	2004-05-17 08:49:53.000000000 +0100
++++ ./owcmuowc.c	2016-05-10 10:06:10.479332191 +0100
+@@ -29,7 +29,7 @@
+ 	dret *= drand48();
+ 	ret = dret;
+ 	if (ret < 0 || ret > 0x40000000)
+-		printf("I goofed: %Ld\n", ret);
++		printf("I goofed: %lld\n", (long long)ret);
+ 	return ret;
+ }
+ 
+@@ -101,7 +101,7 @@
+ 			amt = 65536;
+ 		ret = __akpm_write(filename, fd, amt);
+ 		if (ret != amt) {
+-			printf("%s: wrote %d, not %d\n", __FUNCTION__, ret, amt);
++			printf("%s: wrote %d, not %zd\n", __FUNCTION__, ret, amt);
+ 			return -1;
+ 		}
+ 		count -= amt;
+diff -Naur ../ext3-tools.orig/pwrite.c ./pwrite.c
+--- ../ext3-tools.orig/pwrite.c	2004-05-17 08:49:53.000000000 +0100
++++ ./pwrite.c	2016-05-10 10:14:00.826778163 +0100
+@@ -30,15 +30,15 @@
+ 		exit(1);
+ 	}
+ 
+-	sscanf(argv[2], "%Ld", &size);
+-	sscanf(argv[3], "%Ld", &offset);
++	sscanf(argv[2], "%lld", (long long *)&size);
++	sscanf(argv[3], "%lld", (long long *)&offset);
+ 	buf = malloc(size);
+ 	if (buf == 0) {
+ 		fprintf(stderr, "enomem\n");
+ 		exit(1);
+ 	}
+ 	memset(buf, 0, size);
+-	printf("pwrite(%Ld, %Ld)\n", size, offset);
++	printf("pwrite(%lld, %lld)\n", (long long)size, (long long)offset);
+ 	if (pwrite(fd, buf, size, offset) != size) {
+ 		perror("pwrite");
+ 		exit(1);
+diff -Naur ../ext3-tools.orig/randfiles.c ./randfiles.c
+--- ../ext3-tools.orig/randfiles.c	2004-05-17 08:49:53.000000000 +0100
++++ ./randfiles.c	2016-05-10 10:28:39.337593175 +0100
+@@ -38,7 +38,7 @@
+ 	{
+ 		snprintf(name, size, "%s%i", argv[1], choose[i]);
+ 		if (show) printf("create %s\n", name);
+-		close(open(name, 0100));
++		close(open(name, 0100, 0666));
+ 	}
+ 	return 0;
+ }
+diff -Naur ../ext3-tools.orig/randread.c ./randread.c
+--- ../ext3-tools.orig/randread.c	2004-05-17 08:49:53.000000000 +0100
++++ ./randread.c	2016-05-10 10:49:50.549844935 +0100
+@@ -13,8 +13,6 @@
+ #include <sys/stat.h>
+ #include "slacker.h"
+ 
+-#include "fadvise.h"
+-
+ char *progname;
+ size_t chunk;
+ loff_t maxoff;
+@@ -39,6 +37,7 @@
+ 	int i;
+ 	void *p;
+ 	loff_t off;
++	int ret;
+ 
+ 	progname = argv[0];
+ 	while ((c = getopt(argc, argv, "")) != -1) {
+@@ -85,13 +84,15 @@
+ 
+ 		if (amt > 0xffff0000)
+ 			amt = 0xffff0000;
+-		__posix_fadvise64(fd, off, amt, POSIX_FADV_DONTNEED);
++		ret = posix_fadvise(fd, off, amt, POSIX_FADV_DONTNEED);
++		(void)ret;
+ 		off += amt;
+ 	}
+ 
+ 	srand(0);
+ 
+-	posix_memalign(&p, getpagesize(), chunk);
++	ret = posix_memalign(&p, getpagesize(), chunk);
++	(void)ret;
+ 	for (i = 0; i < nr_operations; i++) {
+ 		loff_t offset;
+ 		int ret;
+diff -Naur ../ext3-tools.orig/randwrite.c ./randwrite.c
+--- ../ext3-tools.orig/randwrite.c	2004-05-17 08:49:53.000000000 +0100
++++ ./randwrite.c	2016-05-10 10:58:03.075069401 +0100
+@@ -12,8 +12,6 @@
+ #include <limits.h>
+ #include <sys/stat.h>
+ 
+-#include "fadvise.h"
+-
+ char *progname;
+ int o_sync;
+ 
+diff -Naur ../ext3-tools.orig/rawread.c ./rawread.c
+--- ../ext3-tools.orig/rawread.c	2004-05-17 08:49:53.000000000 +0100
++++ ./rawread.c	2016-05-10 11:57:05.728020141 +0100
+@@ -70,6 +70,7 @@
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ #include <string.h>
+ #include <errno.h>
+ #include <getopt.h>
+@@ -171,10 +172,11 @@
+ int parseparm (int argc, char *argv[]);
+ void * worker(void *);
+ void *shm_setup(int size);
+-static void sigcont(int sig);
++//static void sigcont(int sig);
+ char *alloc_read_buffer (int size);
+ char * get_device_name (int i);
+ 
++#if 0
+ static inline uint32_t __attribute__ ((unused))
+ exchange_and_add (volatile uint32_t *mem, uint32_t val)
+ {
+@@ -184,6 +186,13 @@
+ 			: "0" (val), "1" (*mem));
+   return result;
+ }
++#else
++static inline void
++exchange_and_add (volatile int *mem, int val)
++{
++	__sync_add_and_fetch(mem, val);
++}
++#endif
+ 
+ 
+ /* global variables */
+@@ -276,7 +285,6 @@
+ int main (int argc, char *argv[])
+ {
+ 	int rc, i, j, synccount;
+-	char *p;
+ 	FILE *bstat;	/* /proc/stat */
+ 	char str[8];
+ 	unsigned long buser, bnice, bsys, bidle, bidleio;
+@@ -320,9 +328,8 @@
+ 	pthread_mutex_lock((pthread_mutex_t*)&shared_lock->lock);
+ 
+ 	for (i=0 ; i < nprocs ; i++) {
+-		pid_t new_pid;
+ 		pthread_t thread;
+-		rc = pthread_create((pthread_t *)&thread, NULL, fn, (void*)i);
++		rc = pthread_create((pthread_t *)&thread, NULL, fn, (void*)(long)i);
+ 		if (rc) {
+ 			printf("Error creating thread rc = %d\n",rc);
+ 			_exit(0);
+@@ -347,7 +354,7 @@
+ 	}
+ //	printf ("all pids reported they are started...\n");
+ 
+-	num = fscanf(bstat,"%s %u %u %u %u %u",&str[0],&buser,&bnice,&bsys,&bidle,&bidleio);
++	num = fscanf(bstat,"%s %lu %lu %lu %lu %lu",&str[0],&buser,&bnice,&bsys,&bidle,&bidleio);
+ 	if ((num != 5 && num != 6) || str[0] != 'c' || str[1] != 'p' || str[2] != 'u' ) {
+ 		printf ("format error on /proc/stat\n");
+ 		return(1);
+@@ -377,14 +384,14 @@
+      		for (i = 0 ; i < nprocs; i++) {	/* wait for completion */
+      			if (pshared[i].busy != 1) {	  // someone didn't make progress
+      				printf("Doh! someone made no progress (thread %d) Time to quit\n",i);
+-     				return;
++     				return 1;
+      			} else {
+      				pshared[i].busy = 0;
+      			}
+ 			}
+ 		}
+ 	}
+-	num = fscanf(bstat,"%s %u %u %u %u %u",&str[0],&euser,&enice,&esys,&eidle,&eidleio);
++	num = fscanf(bstat,"%s %lu %lu %lu %lu %lu",&str[0],&euser,&enice,&esys,&eidle,&eidleio);
+ 	if ((num != 5 && num != 6) || str[0] != 'c' || str[1] != 'p' || str[2] != 'u' ) {
+ 		printf ("format error on /proc/stat\n");
+ 		return(1);
+@@ -395,7 +402,7 @@
+ 	for (i = 0 ; i < nprocs ; i++) {	/* make sure all threads have fully updated stats */
+ 		if (pshared[i].micro == 1) {
+ 			printf("A thread set erro code in micro, Aborting\n");
+-			return;
++			return 1;
+ 		}
+ 		if (pshared[i].micro == 0) {
+ 			sleep(1);
+@@ -453,7 +460,6 @@
+ 		unsigned long numreads;
+ 		unsigned long long micro;
+ 		unsigned long long bytes_read;
+-		double io_rate;
+ 		unsigned long count;
+ 
+ 		numreads = 0;
+@@ -480,7 +486,7 @@
+ 			bytes_read /= (micro*1024);
+ 			total_bytes_read += bytes_read;
+ 			device_name = get_device_name(i);
+-			printf ("%5d  %15s  %10u  %7llu  %14llu \n",
++			printf ("%5lu  %15s  %10lu  %7llu  %14llu \n",
+ 				count,
+ 				device_name,
+ 				numreads,
+@@ -489,7 +495,7 @@
+ 		}
+ 	}
+ 	printf ("-----  ---------------  ----------  -------  --------------\n");
+-	printf ("%5d  %15s  %10u  %7llu  %14llu \n",
++	printf ("%5lu  %15s  %10lu  %7llu  %14llu \n",
+ 		total_count,
+ 		"",
+ 		total_numreads,
+@@ -520,8 +526,8 @@
+ 
+ void * worker(void * idp)
+ {
+-	int id=(int)idp;
+-	int rc, i, numreads, j;
++	int id= (int)(long)idp;
++	int rc, i;
+ 	char *p;
+ 	char *device_name;
+ 	int _nreads;
+@@ -529,7 +535,6 @@
+ 	long long _offset;
+ 	int this_aiobatch = aiobatch;
+ 	int x;
+-	int y;
+ 	struct timeval  tv1;
+ 	struct timezone tz1;
+ 	struct timeval  tv2;
+@@ -540,10 +545,11 @@
+ 	struct iocb*    iocbp[MAXNREQ];		// pointer pool for iocbs
+ 	struct io_event events[MAXNREQ];	// event pool
+ 	struct myinfo dev_info[MAXNREQ];
+-	int fd;
++	int fd = -1;
+ 	int async_reads = 0;
+ 	int pall_done = 0;			// I/O finish flag
+ 	int minevent;
++	static void *nowt = NULL;
+ 
+ 	pshared[id].status = getpid();
+ 	/*
+@@ -553,7 +559,7 @@
+ 	//	printf("data buf = %p  size =%d\n",p,rsize);
+ 	if (!p) {
+ 		  pshared[id].micro = 1;
+-		  return;
++		  return nowt;
+ 	}
+ 	
+ 	if (aioread || aiowrite) {
+@@ -570,7 +576,7 @@
+ 				printf("%s\n", device_name);
+ 				perror("open failed on device");
+ 				pshared[id].micro = 1;
+-				return;
++				return nowt;
+ 			}
+ 			dev_info[i].fd = fd;
+ 			dev_info[i].disk_index = i;
+@@ -579,9 +585,9 @@
+ 
+ 		rc = io_queue_init(aiobatch, &ctx);
+ 		if (rc != 0) {
+-			printf("io_queue_init: aiobatch = %d, ctx 0x%x, res=%d [%s] on id=%d\n", aiobatch, &ctx, rc, strerror(-rc),id);
++			printf("io_queue_init: aiobatch = %d, ctx %p, res=%d [%s] on id=%d\n", aiobatch, &ctx, rc, strerror(-rc),id);
+ 			pshared[id].micro = 1;
+-			return;
++			return nowt;
+ 		}
+ 		// zero out memory
+ 		memset(events, 0, sizeof(events));
+@@ -599,7 +605,7 @@
+ 			printf("%s\n", device_name);
+ 			perror("open failed on device");
+ 			pshared[id].micro = 1;
+-			return;
++			return nowt;
+ 		}
+ 		//fd =fd;
+ 		//dev_info[0].fd = fd;
+@@ -622,14 +628,13 @@
+ 	if (rc) {
+ 		perror ("gettimeofday failed on tv1 ");
+ 		pshared[id].micro = 1;
+-		return;
++		return nowt;
+ 	}
+ 
+ 	//pthread_mutex_lock((pthread_mutex_t*)&shared_lock->lock);
+ 	if (frandom){
+ 		srand(id % numdevices);
+ 		x = rand();
+-		y = x % nreads;
+ 		_offset = ((x % nreads) * rsize * ((niovec==0) ? 1 : niovec)) + noffset;
+ 	} else {
+ 		_offset = 0;
+@@ -642,7 +647,7 @@
+    		if (rc == -1) {
+    			printf("lseek() failed rc=%d offset=%lld",rc,_offset);
+ 			pshared[id].micro = 1;
+-   			return;
++   			return nowt;
+    		}
+    	}
+ 
+@@ -701,7 +706,7 @@
+ 			if ((rc <= 0) || ((!minwait) && (rc != this_aiobatch))) {
+ 					printf("AIO getevents failed rc= %d id=%d\n",rc,id);
+ 					pshared[id].micro = 1;
+-					return;
++					return nowt;
+ 			}
+ 
+ 			if (minwait)
+@@ -719,10 +724,10 @@
+ 				idx = info->disk_index;
+ 
+ 				if ((long)events[i].res < 0) {
+-					printf("ERROR rc=%d on AIO operation,aborting. id=%d\n",
++					printf("ERROR rc=%lu on AIO operation,aborting. id=%d\n",
+ 							events[i].res,id);
+ 					pshared[id].micro = 1;
+-					return;
++					return nowt;
+ 				}
+ 				rc += (long)events[i].res;
+ 				if (aiobatch > 1) {
+@@ -735,7 +740,7 @@
+ 						pall_done = 1;
+ 						async_reads = 0; //reset
+ 						if (DEBUG)
+-							printf("async_reads=%d, aiobatch=%d,pshared[%d].numreads[0] = %d, numreads[1] = %d\n", async_reads, aiobatch,pshared[id].numreads[0],pshared[id].numreads[1]);
++							printf("async_reads=%d, aiobatch=%d, pshared[%d].numreads[0] = %lu, numreads[1] = %lu\n", async_reads, aiobatch, id, pshared[id].numreads[0], pshared[id].numreads[1]);
+ 					}
+ 					_nreads++;
+ 				}
+@@ -743,13 +748,13 @@
+ 
+ 		} else {
+ 			printf("Invalid test flag\n");
+-			return;
++			return nowt;
+ 		}
+ 
+ 		if (rc == -1) {
+ 			perror("raw read failed");
+ 			pshared[id].micro = 1;
+-			return;
++			return nowt;
+ 		}
+ 
+ 		pshared[id].busy=1;
+@@ -758,7 +763,7 @@
+ 		if (aiobatch <= 1) { 
+ 			_nreads = ++pshared[id].numreads[id % numdevices];
+ 			if (DEBUG)
+-				printf("psharedp%d].numreads[%d] =%d\n",
++				printf("pshared[%d].numreads[%d] = %lu\n",
+ 					id, id%numdevices, pshared[id].numreads[id% numdevices]);
+ 			if (_nreads == total_reads) 
+ 				pall_done = 1;
+@@ -779,7 +784,6 @@
+ 			//pthread_mutex_lock((pthread_mutex_t*)&shared_lock->lock);
+ 			if (frandom) {
+ 				x = rand();
+-				y = x % nreads;
+ 				_offset = ((x % nreads) * rsize * ((niovec==0) ? 1 : niovec)) + noffset;
+ 			} else if ((_nreads % nreads) == 0){
+ 				_offset = 0;
+@@ -801,7 +805,7 @@
+    			if (rc == -1) {
+    				printf("lseek() failed rc=%d offset=%lld\n",rc,_offset);
+ 				pshared[id].micro = 1;
+-   				return;
++   				return nowt;
+    			}
+ 			continue;
+    		}
+@@ -840,7 +844,6 @@
+ 			//pthread_mutex_lock((pthread_mutex_t*)&shared_lock->lock);
+ 			if (frandom) {
+ 				x = rand();
+-				y = x % nreads;
+ 				_offset = ((x % nreads) * rsize * ((niovec==0) ? 1 : niovec)) + noffset;
+ 			} else if ((nr % nreads) == 0) {
+ 				_offset = 0;
+@@ -854,7 +857,7 @@
+ 			dev_info[idx].offset = _offset;
+ 
+ 			if (DEBUG) 
+-				printf(" preapre for aio, iocb = 0x%x, "
++				printf(" preapre for aio, iocb = %p, "
+ 					"fd =%d, for %d\n", 
+ 					dev_info[idx].iocb, 
+ 					dev_info[idx].fd,
+@@ -886,7 +889,7 @@
+ 	if (rc) {
+ 		perror ("gettimeofday failed on tv2 ");
+ 		pshared[id].micro = 1;
+-		return;
++		return nowt;
+ 	}
+ 	timersub(&tv2, &tv1, &tvr); /* tvr now contains result of tv2-tv1 */
+ 	pshared[id].micro = ((unsigned long long)tvr.tv_sec * 1000000) + ((unsigned long long)tvr.tv_usec);
+@@ -1104,9 +1107,11 @@
+ 	return(0);
+ }
+ 
++/*
+ static void sigcont(int sig)
+ {
+ }
++*/
+ 
+ void *shm_setup(int size)
+ {
+diff -Naur ../ext3-tools.orig/remap_file_pages.c ./remap_file_pages.c
+--- ../ext3-tools.orig/remap_file_pages.c	2004-05-17 08:49:53.000000000 +0100
++++ ./remap_file_pages.c	2016-05-10 10:47:04.389939047 +0100
+@@ -66,7 +66,7 @@
+ 		exit(1);
+ 	}
+ 
+-	ret = sys_remap_file_pages(map, length / getpagesize(),
++	ret = remap_file_pages(map, length / getpagesize(),
+ 				PROT_READ, offset, 0);
+ 	if (ret) {
+ 		fprintf(stderr, "%s: remap_file_pages() failed: %s\n",
+diff -Naur ../ext3-tools.orig/remap-test.c ./remap-test.c
+--- ../ext3-tools.orig/remap-test.c	2004-05-17 08:49:53.000000000 +0100
++++ ./remap-test.c	2016-05-10 11:59:09.088585173 +0100
+@@ -14,20 +14,6 @@
+ #include <sys/ioctl.h>
+ #include <linux/unistd.h>
+ 
+-#ifdef __s390__
+-#define __NR_sys_remap_file_pages 265
+-#elif __ia64__
+-#define __NR_sys_remap_file_pages 1259
+-#elif __i386__
+-#define __NR_sys_remap_file_pages 280
+-#elif __powerpc__
+-#define __NR_sys_remap_file_pages 256
+-#else
+-#error "define __NR_sys_remap_file_pages for your architecture"
+-#endif
+-_syscall5(long, sys_remap_file_pages, unsigned long, start, unsigned long, len,
+-        unsigned long, prot, unsigned long, pgoff, int, flags);
+-
+ #define PAGE_SIZE 4096
+ #define PAGE_WORDS (PAGE_SIZE/sizeof(int))
+ 
+@@ -56,7 +42,7 @@
+ 	int i, j, fd, offset = 30;
+ 	char *ptr, filename[100];
+ 
+-	sys_remap_file_pages(-1, -1, -1, -1, -1);
++	remap_file_pages((void *)-1, -1, -1, -1, -1);
+ 	sprintf(filename, "/tmp/cache%d", getpid());
+ 	fd = open(filename, O_RDWR|O_CREAT|O_TRUNC,S_IRWXU);
+ 
+@@ -94,24 +80,25 @@
+ 		exit(1);
+ 	}
+ 
+-	sys_remap_file_pages((unsigned long)ptr, 0x1000, PROT2, 0, 0);
+-	data = (int *) ptr;
++	remap_file_pages(ptr, 0x1000, PROT2, 0, 0);
++	data = (unsigned int *) ptr;
+ 	printf("data mapping: %p\n", data);
+ 
+ 	printf("mapping pages in reverse order via remap_file_pages():\n");
+ 
+ again:
+ 	for (i = 0; i < WINDOW_PAGES; i += 2) {
+-		int *page = data + i*(PAGE_SIZE/sizeof(int));
++		unsigned int *page = data + i*(PAGE_SIZE/sizeof(int));
++		int ret;
+ 
+-		ptr = (char*)sys_remap_file_pages(
+-				(unsigned long)page,
++		ret = remap_file_pages(
++				page,
+ 				PAGE_SIZE * 2,
+ 				PROT3,
+ 				(WINDOW_PAGES-i+offset),
+ 				0);
+-		if (ptr) {
+-			printf("mmap() of page %d failed, ptr = %p!\n", i, ptr);
++		if (ret < 0) {
++			printf("mmap() of page %d failed, errno = %d!\n", i, errno);
+ 			exit(1);
+ 		}
+ 		printf("remapped page %d to %p.\n", i, page);
+@@ -153,24 +140,3 @@
+ 	return 0;
+ }
+ 
+-#if defined(__ia64__)
+-
+-asm(
+-"	.text\n"
+-"	.global __ia64_syscall#;\n"
+-"	.align	32;\n"
+-"	.proc	__ia64_syscall#;\n"
+-"__ia64_syscall#:\n"
+-"	.regstk 6,0,0,0\n"
+-"	mov r15=in5\n"
+-"	break 0x100000\n"
+-"	movl r2=errno\n"
+-"	cmp.eq p6,p7=-1,r10\n"
+-"	;;\n"
+-"(p6)	st4 [r2]=r8\n"
+-"(p6)	mov r8=-1\n"
+-"	br.ret.sptk.many rp\n"
+-"	.endp	__ia64_syscall#\n"
+-);
+-
+-#endif
+diff -Naur ../ext3-tools.orig/rmap-test.c ./rmap-test.c
+--- ../ext3-tools.orig/rmap-test.c	2004-05-17 08:49:53.000000000 +0100
++++ ./rmap-test.c	2016-05-10 11:02:35.360279370 +0100
+@@ -16,7 +16,6 @@
+ #include <sys/wait.h>
+ 
+ #include <asm/unistd.h>
+-#include "remap_file_pages.h"
+ 
+ char *progname;
+ char *filename;
+@@ -96,13 +95,13 @@
+ 			char *addr = &p[page * pagesize];
+ 
+ 			if (in_core_only) {
+-				char is_in_core;
++				unsigned char is_in_core[1];
+ 
+-				if (mincore(addr, 1, &is_in_core) < 0) {
++				if (mincore(addr, 1, is_in_core) < 0) {
+ 					perror("mincore");
+ 					exit(1);
+ 				}
+-				if (!(is_in_core & 1))
++				if (!(is_in_core[0] & 1))
+ 					continue;
+ 			}
+ 			(*addr)++;
+@@ -122,13 +121,13 @@
+ 			char *addr = &p[page * pagesize];
+ 
+ 			if (in_core_only) {
+-				char is_in_core;
++				unsigned char is_in_core[1];
+ 
+-				if (mincore(addr, 1, &is_in_core) < 0) {
++				if (mincore(addr, 1, is_in_core) < 0) {
+ 					perror("mincore");
+ 					exit(1);
+ 				}
+-				if (!(is_in_core & 1))
++				if (!(is_in_core[0] & 1))
+ 					continue;
+ 			}
+ 			(*addr)++;
+@@ -288,7 +287,7 @@
+ 	file_size *= pagesize;
+ 
+ 	printf("Total file size: %lldk, Total memory: %lldk\n",
+-		file_size / 1024,
++		(long long)file_size / 1024,
+ 		((long long)nvmas * vmasize * pagesize) / 1024);
+ 
+ 	if (ftruncate64(fd, file_size) < 0) {
+@@ -325,7 +324,7 @@
+ 		for (i = 0; i < nvmas; i++) {
+ 			int ret;
+ 
+-			ret = sys_remap_file_pages(
++			ret = remap_file_pages(
+ 					p,			/* start */
+ 					vmasize * pagesize,	/* size */
+ 					0,			/* prot */
+diff -Naur ../ext3-tools.orig/seek-then-straight.c ./seek-then-straight.c
+--- ../ext3-tools.orig/seek-then-straight.c	2004-05-17 08:49:53.000000000 +0100
++++ ./seek-then-straight.c	2016-05-10 10:52:10.738008935 +0100
+@@ -3,6 +3,7 @@
+  */
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <stdlib.h>
+@@ -10,10 +11,9 @@
+ #include <errno.h>
+ #include <time.h>
+ #include <limits.h>
++#include <malloc.h>
+ #include <sys/stat.h>
+ 
+-#include "fadvise.h"
+-
+ char *progname;
+ 
+ ssize_t pread(int fd, void *buf, size_t count, off_t offset);
+@@ -32,6 +32,7 @@
+ 	struct stat statbuf;
+ 	off_t size;
+ 	int i;
++	int ret;
+ 	char *p = memalign(4096, 4096);
+ 
+ 	progname = argv[0];
+@@ -64,20 +65,21 @@
+ 	}
+ 
+ 	fsync(fd);
+-	__posix_fadvise64(fd, 0, size, POSIX_FADV_DONTNEED);
++	posix_fadvise(fd, 0, size, POSIX_FADV_DONTNEED);
+ 
+ 	srand(getpid());
+ 	size /= 2;
+ 
+ 	/* Some linear reads to build up the readahead window */
+ 	lseek(fd, 0, SEEK_SET);
+-	for (i = 0; i < 128; i++)
+-		read(fd, p, 4096);
++	for (i = 0; i < 128; i++) {
++		ret = read(fd, p, 4096);
++		(void)ret;
++	}
+ 
+ 	/* Seeky reads to turn off readahead */
+ 	for (i = 0; i < 128; i++) {
+ 		off_t offset;
+-		int ret;
+ 
+ 		offset = rand() % size;
+ 		ret = pread(fd, p, 4096, offset & ~4095);
+@@ -91,18 +93,24 @@
+ 
+ 	/* Linear reads to build it up again */
+ 	lseek(fd, size, SEEK_SET);
+-	for (i = 0; i < 128; i++)
+-		read(fd, p, 4096);
++	for (i = 0; i < 128; i++) {
++		ret = read(fd, p, 4096);
++		(void)ret;
++	}
+ 
+ 	/* re-reads to turn off readahead */
+ 	lseek(fd, size, SEEK_SET);
+-	for (i = 0; i < 128; i++)
+-		read(fd, p, 4096);
++	for (i = 0; i < 128; i++) {
++		ret = read(fd, p, 4096);
++		(void)ret;
++	}
+ 
+ 	/* Uncached reads to start it again */
+ 	lseek(fd, size + 128 * 4096, SEEK_SET);
+-	for (i = 0; i < 128; i++)
+-		read(fd, p, 4096);
++	for (i = 0; i < 128; i++) {
++		ret = read(fd, p, 4096);
++		(void)ret;
++	}
+ 
+ 	exit(0);
+ }
+diff -Naur ../ext3-tools.orig/sync_file_range.c ./sync_file_range.c
+--- ../ext3-tools.orig/sync_file_range.c	2006-03-31 11:00:45.000000000 +0100
++++ ./sync_file_range.c	2016-05-10 12:03:39.421826251 +0100
+@@ -1,4 +1,4 @@
+-#define _GNU_SOURCE
++#define _GNU_SOURCE	1
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -19,51 +19,6 @@
+ #define SYNC_FILE_RANGE_WRITE           2
+ #define SYNC_FILE_RANGE_WAIT_AFTER      4
+ 
+-#ifdef __i386__
+-#define __NR_sync_file_range 314
+-
+-#define __syscall_return(type, res) \
+-do { \
+-	if ((unsigned long)(res) >= (unsigned long)(-(128 + 1))) { \
+-		errno = -(res); \
+-		res = -1; \
+-	} \
+-	return (type) (res); \
+-} while (0)
+-
+-#define _syscall6(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
+-	  type5,arg5,type6,arg6) \
+-type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,type6 arg6) \
+-{ \
+-long __res; \
+-  struct { long __a1; long __a6; } __s = { (long)arg1, (long)arg6 }; \
+-__asm__ volatile ("push %%ebp ; push %%ebx ; movl 4(%2),%%ebp ; " \
+-                  "movl 0(%2),%%ebx ; movl %1,%%eax ; int $0x80 ; " \
+-                  "pop %%ebx ;  pop %%ebp" \
+-	: "=a" (__res) \
+-	: "i" (__NR_##name),"0" ((long)(&__s)),"c" ((long)(arg2)), \
+-	  "d" ((long)(arg3)),"S" ((long)(arg4)),"D" ((long)(arg5)) \
+-	: "memory"); \
+-__syscall_return(type,__res); \
+-}
+-
+-_syscall6(int, sync_file_range,
+-		int, fd, 
+-		long, offset_lo,
+-		long, offset_hi,
+-		long, nbytes_lo,
+-		long, nbytes_hi,
+-		int, flags);
+-
+-int do_sync_file_range(int fd, loff_t offset, loff_t nbytes, int flags)
+-{
+-	return sync_file_range(fd,
+-				offset, offset >> 32,
+-				nbytes, nbytes >> 32,
+-				flags);
+-}
+-#endif
+-
+ char *progname;
+ int flags;
+ char *filename;
+@@ -80,7 +35,7 @@
+ 		perror("open");
+ 		exit(1);
+ 	}
+-	ret = do_sync_file_range(fd, offset, nbytes, flags);
++	ret = sync_file_range(fd, offset, nbytes, flags);
+ 	if (ret) {
+ 		perror("sync_file_range");
+ 		exit(1);
+@@ -124,15 +79,15 @@
+ 	if (optind == argc)
+ 		usage();
+ 	if (strncmp(argv[optind], "0x", 2) == 0)
+-		sscanf(argv[optind++], "0x%Lx", &offset);
++		sscanf(argv[optind++], "0x%llx", (unsigned long long *)&offset);
+ 	else
+-		sscanf(argv[optind++], "%Ld", &offset);
++		sscanf(argv[optind++], "%lld", (long long *)&offset);
+ 	if (optind == argc)
+ 		usage();
+ 	if (strncmp(argv[optind], "0x", 2) == 0)
+-		sscanf(argv[optind++], "0x%Lx", &nbytes);
++		sscanf(argv[optind++], "0x%llx", (unsigned long long *)&nbytes);
+ 	else
+-		sscanf(argv[optind++], "%Ld", &nbytes);
++		sscanf(argv[optind++], "%lld", (long long *)&nbytes);
+ 	if (optind != argc)
+ 		usage();
+ 
+diff -Naur ../ext3-tools.orig/sys_readahead.c ./sys_readahead.c
+--- ../ext3-tools.orig/sys_readahead.c	2004-05-17 08:49:53.000000000 +0100
++++ ./sys_readahead.c	2016-05-10 11:05:20.241109436 +0100
+@@ -3,21 +3,13 @@
+  */
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <linux/unistd.h>
+ 
+-#ifndef __NR_readahead
+-#define __NR_readahead	225		/* x86-specific */
+-#endif
+-
+-_syscall3(	ssize_t, readahead,
+-		int, fd,
+-		loff_t, offset,
+-		size_t, count)
+-
+ #define N (1024 * 1024)
+ 
+ int main(int argc, char *argv[])
+diff -Naur ../ext3-tools.orig/time-msync.c ./time-msync.c
+--- ../ext3-tools.orig/time-msync.c	2004-05-17 08:49:53.000000000 +0100
++++ ./time-msync.c	2016-05-10 10:14:33.647023508 +0100
+@@ -36,7 +36,7 @@
+ 		exit(1);
+ 	}
+ 
+-	printf("%s: expanding `%s' to size %Ld\n", argv[0], filename, size);
++	printf("%s: expanding `%s' to size %lld\n", argv[0], filename, (long long)size);
+ 	if (ftruncate(fd, size) < 0) {
+ 		perror("ftruncate");
+ 		exit(1);
+diff -Naur ../ext3-tools.orig/truncate-to.c ./truncate-to.c
+--- ../ext3-tools.orig/truncate-to.c	2004-05-17 08:49:53.000000000 +0100
++++ ./truncate-to.c	2016-05-10 09:55:44.813859907 +0100
+@@ -28,11 +28,11 @@
+ 		exit(1);
+ 	}
+ 
+-	sscanf(argv[2], "%Ld", &size);
+-	printf("%s: truncating `%s' to size %Ld\n", argv[0], filename, size);
++	sscanf(argv[2], "%lld", (long long *)&size);
++	printf("%s: truncating `%s' to size %lld\n", argv[0], filename, (long long)size);
+ 	if (ftruncate64(fd, size) < 0) {
+-		fprintf(stderr, "%s: error truncating `%s' to size %Ld: %s\n",
+-			argv[0], filename, size, strerror(errno));
++		fprintf(stderr, "%s: error truncating `%s' to size %lld: %s\n",
++			argv[0], filename, (long long)size, strerror(errno));
+ 		exit(1);
+ 	}
+ 	exit(0);
+diff -Naur ../ext3-tools.orig/usemem.c ./usemem.c
+--- ../ext3-tools.orig/usemem.c	2006-02-25 11:40:56.000000000 +0000
++++ ./usemem.c	2016-05-10 10:07:26.027949178 +0100
+@@ -64,7 +64,7 @@
+ 
+ void do_child(void)
+ {
+-	volatile long d;
++	volatile int d;
+ 
+ 	if (opt_randomise)
+ 		srand(time(0) ^ getpid());
+@@ -76,6 +76,8 @@
+ 			exit(1);
+ 		}
+ 	} else {
++		int ret;
++
+ 		p = mmap(NULL, megs, PROT_READ|PROT_WRITE, map_shared, fd, 0);
+ 		if (p == MAP_FAILED) {
+ 			fprintf(stderr, "%s: mmap failed: %s\n",
+@@ -85,7 +87,8 @@
+ 		p = (unsigned long *)ALIGN((unsigned long )p, pagesize - 1);
+ 
+ 		lseek(fd, megs - 1, SEEK_SET);
+-		write(fd, "", 1);
++		ret = write(fd, "", 1);
++		(void)ret;
+ 	}
+ 
+ 	if (do_mlock) {
+@@ -107,8 +110,10 @@
+ 		if (opt_randomise) {
+ 			for (i = 0; i < m; i += pagesize / sizeof(*p)) {
+ 				idx = randomise(m - 1);
+-				if (opt_readonly)
++				if (opt_readonly) {
+ 					d = p[idx];
++					(void)d;
++				}
+ 				else
+ 					p[idx] = idx;
+ 			}
+diff -Naur ../ext3-tools.orig/wbtest.c ./wbtest.c
+--- ../ext3-tools.orig/wbtest.c	2004-05-17 08:49:53.000000000 +0100
++++ ./wbtest.c	2016-05-10 11:11:29.215125513 +0100
+@@ -207,7 +207,7 @@
+ UINT_32 record_file(const size_t size, const UINT_32 rNum)
+ {
+ 
+-	fprintf(Ckpt_fp, "%08u:%08X\n", size, rNum);
++	fprintf(Ckpt_fp, "%08zu:%08X\n", size, rNum);
+ 
+ 	if (0 != fflush(Ckpt_fp)) {
+ 		fprintf(stderr, "fflush error: errno=%i\n", errno);
+@@ -270,7 +270,7 @@
+ 	UINT_32 rnum = (UINT_32) random();
+ 	size_t size_sv = size;
+ 
+-	sprintf(mem_p, "%s/%u-%u-%08X", Data_path, pid, size, rnum);
++	sprintf(mem_p, "%s/%u-%zu-%08X", Data_path, pid, size, rnum);
+ 
+ 	fill(d_p, rnum, MIN(size, DATA_BUF_LEN));
+ 
+@@ -285,7 +285,7 @@
+ 		wrote = write(fd, (const void *) d_p, DATA_BUF_LEN);
+ 		if (wrote != DATA_BUF_LEN) {
+ 			fprintf(stderr,
+-				"D write error (wrote %i/%u): errno=%i\n",
++				"D write error (wrote %zd/%u): errno=%i\n",
+ 				wrote, DATA_BUF_LEN, errno);
+ 		}
+ 		size -= DATA_BUF_LEN;
+@@ -295,7 +295,7 @@
+ 		wrote = write(fd, (const void *) d_p, size);
+ 		if (wrote != size) {
+ 			fprintf(stderr,
+-				"D write error (wrote %i/%u): errno=%i\n",
++				"D write error (wrote %zd/%zu): errno=%i\n",
+ 				wrote, size, errno);
+ 		}
+ 	}
+@@ -337,7 +337,7 @@
+ 	int mismatches = 0;
+ 	int err = 0;
+ 
+-	sprintf(mem_p, "%s/%u-%u-%08X", Data_path, pid, size, rnum);
++	sprintf(mem_p, "%s/%u-%zu-%08X", Data_path, pid, size, rnum);
+ 	fd = open(mem_p, O_RDONLY);
+ 	if (-1 == fd) {
+ 		fprintf(stderr,
+diff -Naur ../ext3-tools.orig/writev-speed.c ./writev-speed.c
+--- ../ext3-tools.orig/writev-speed.c	2004-07-04 11:44:16.000000000 +0100
++++ ./writev-speed.c	2016-05-10 10:59:08.003334962 +0100
+@@ -58,7 +58,10 @@
+ void write_out(int fd, struct line *line)
+ {
+ 	while (line) {
+-		write(fd, line->data, line->length);
++		int ret;
++
++		ret = write(fd, line->data, line->length);
++		(void)ret;
+ 		line = line->next;
+ 	}
+ }
+@@ -86,7 +89,10 @@
+ 
+ 	while (line) {
+ 		if (seg == MAX_IOVEC) {
+-			writev(fd, iov, seg);
++			int ret;
++
++			ret = writev(fd, iov, seg);
++			(void)ret;
+ 			seg = 0;
+ 		}
+ 		iov[seg].iov_base = line->data;
+@@ -94,8 +100,12 @@
+ 		seg++;
+ 		line = line->next;
+ 	}
+-	if (seg)
+-		writev(fd, iov, seg);
++	if (seg) {
++		int ret;
++
++		ret = writev(fd, iov, seg);
++		(void)ret;
++	}
+ }
+ 
+ void usage(void)

@@ -43,13 +43,24 @@ class libhugetlbfs(test.test):
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
         utils.system('patch -p1 < %s/elflink.patch' % self.bindir)
+        utils.system('patch -p1 < %s/build-fixes.patch' % self.bindir)
 
         # build for the underlying arch only (i.e. only 64 bit on 64 bit etc)
         utils.make('BUILDTYPE=NATIVEONLY')
 
     def run_once(self):
         os.chdir(self.srcdir)
-        utils.make('BUILDTYPE=NATIVEONLY check')
+        self.results = utils.system_output('BUILDTYPE=NATIVEONLY make check', retain_output=True)
+
+	print self.results
+
+        n = self.results.find('FAIL:')
+	if n > 0:
+            m = self.results[n:].find('\n')
+            if m > 0:
+                fails = sum([int(s) for s in self.results[n:n + m].split() if s.isdigit()])
+                if fails > 0:
+                    raise error.TestError(str(fails) + ' test(s) failed.')
 
     def cleanup(self):
         if self.hugetlbfs_dir:

@@ -4,7 +4,7 @@ from autotest.client.shared import error
 
 
 class ebizzy(test.test):
-    version = 3
+    version = 4
 
     def initialize(self):
         self.job.require_gcc()
@@ -15,6 +15,7 @@ class ebizzy(test.test):
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
 
+	utils.system('patch -p1 < %s/ebizzy-configure.patch' % self.bindir)
         utils.system('[ -x configure ] && ./configure')
         utils.make()
 
@@ -25,6 +26,10 @@ class ebizzy(test.test):
         # TODO: Write small functions which will choose many of the above
         # variables dynamicaly looking at guest's total resources
         logfile = os.path.join(self.resultsdir, 'ebizzy.log')
-        args2 = '-m -n %s -P -R -s %s -S %s -t %s' % (num_chunks, chunk_size,
+        args = '-m -n %s -P -R -s %s -S %s -t %s' % (num_chunks, chunk_size,
                                                       seconds, num_threads)
-        args = args + ' ' + args2
+        cmd = os.path.join(self.srcdir, 'ebizzy') + ' ' + args
+
+	self.results = utils.system_output(cmd, retain_output=True)
+
+	print self.results

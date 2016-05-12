@@ -1,0 +1,143 @@
+diff -Naur isic-0.06/esic.c isic-0.06.fixed/esic.c
+--- isic-0.06/esic.c	2016-05-12 16:56:24.051200151 +0100
++++ isic-0.06.fixed/esic.c	2016-05-12 17:28:48.261401658 +0100
+@@ -1,3 +1,5 @@
++#include <strings.h>
++#include <stdio.h>
+ 
+ /* Link Level scan */
+ 
+@@ -19,7 +21,7 @@
+ 
+ 
+ char *atoether( char * );
+-void usage( u_char * );
++void usage(char * );
+ 
+ int main(int argc, char **argv)
+ {
+@@ -170,6 +172,9 @@
+ 		printf("Ethernet protocols will be randomized.\n");
+ 	else	printf("Ethernet protocol will be %i.\n", ntohs(proto));
+ 
++#if (__GNUC__ == 4 && 3 <= __GNUC_MINOR__) || 4 < __GNUC__
++#pragma GCC diagnostic ignored "-Wstrict-aliasing"
++#endif
+ 
+ 	if ( !rand_dest )
+ 		printf("Sending to   MAC %.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",
+@@ -337,7 +342,7 @@
+ 
+ 
+ void
+-usage(u_char *name)
++usage(char *name)
+ {
+ 	printf(
+ "usage: %s -i interface [-s <source MAC>] [-d <dest MAC>]\n"
+@@ -350,8 +355,8 @@
+ "	examples:\n"
+ "		esic -i eth0 -d 02:de:ad:be:ef:40 -r123 -c10000\n"
+ "		esic -i ep0 -s 01:02:34:56:07:89 -p rand -m5000\n",
+-		(char *) (index(name, '/') == NULL)
+-			? (char *) name
+-			: (char *) (rindex(name, '/') + 1) );
++		(index(name, '/') == NULL)
++			? name
++			: (rindex(name, '/') + 1) );
+ }
+ 
+diff -Naur isic-0.06/icmpsic.c isic-0.06.fixed/icmpsic.c
+--- isic-0.06/icmpsic.c	2016-05-12 16:58:18.430350509 +0100
++++ isic-0.06.fixed/icmpsic.c	2016-05-12 17:04:44.748797535 +0100
+@@ -263,7 +263,7 @@
+ 		icmp->icmp_cksum= 0;
+ 
+ 
+-		payload = (short int *)((u_char *) icmp + 4);
++		payload = (u_short *)((u_char *) icmp + 4);
+ 		for(cx = 0; cx <= (payload_s >> 1); cx+=1)
+ //				(u_short) payload[cx] = rand() & 0xffff;
+ 				payload[cx] = rand() & 0xffff;
+@@ -339,7 +339,7 @@
+ }
+ 
+ 
+-void usage(u_char *name)
++void usage(char *name)
+ {
+    fprintf(stderr,
+ 	"usage: %s [-v] [-D] -s <sourceip>[,port] -d <destination ip>[,port]\n"
+diff -Naur isic-0.06/isic.c isic-0.06.fixed/isic.c
+--- isic-0.06/isic.c	2016-05-12 16:59:10.974033023 +0100
++++ isic-0.06.fixed/isic.c	2016-05-12 17:03:06.493045489 +0100
+@@ -227,7 +227,7 @@
+ 		ip_hdr->ip_src.s_addr = src_ip;
+ 		ip_hdr->ip_dst.s_addr = dst_ip;
+ 		
+-		payload = (short int *)(buf + IP_H);
++		payload = (u_short *)(buf + IP_H);
+ 		for(cx = 0; cx <= (payload_s >> 1); cx+=1)
+ /*				(u_int16_t) payload[cx] = rand() & 0xffff;
+ 		(u_int16_t) payload[payload_s] = rand() & 0xffff;*/
+@@ -301,7 +301,7 @@
+ 	return ( 0 );
+ }
+ 
+-void usage(u_char *name)
++void usage(char *name)
+ {
+    fprintf(stderr,
+ 	"usage: %s [-v] [-D] -s <source ip> -d <destination ip>\n"
+diff -Naur isic-0.06/isic.h isic-0.06.fixed/isic.h
+--- isic-0.06/isic.h	2004-11-06 08:02:57.000000000 +0000
++++ isic-0.06.fixed/isic.h	2016-05-12 16:47:53.350770726 +0100
+@@ -14,5 +14,5 @@
+ #define IP_H 20
+ #define UDP_H 8
+  
+-void usage(u_char *);
++void usage(char *);
+ void sighandler(int);
+diff -Naur isic-0.06/tcpsic.c isic-0.06.fixed/tcpsic.c
+--- isic-0.06/tcpsic.c	2016-05-12 16:59:55.153796948 +0100
++++ isic-0.06.fixed/tcpsic.c	2016-05-12 17:04:16.028861894 +0100
+@@ -315,7 +315,7 @@
+ 		else	tcp->th_urp = 0;
+ 
+ 
+-		payload = (short int *)((u_char *) tcp + 20);
++		payload = (u_short *)((u_char *) tcp + 20);
+ 		for(cx = 0; cx <= (payload_s >> 1); cx+=1)
+ //				(u_int16_t) payload[cx] = rand() & 0xffff;
+ 				payload[cx] = rand() & 0xffff;
+@@ -391,7 +391,7 @@
+ }
+ 
+ 
+-void usage(u_char *name)
++void usage(char *name)
+ {
+    fprintf(stderr,
+ 	"usage: %s [-v] [-D] -s <sourceip>[,port] -d <destination ip>[,port]\n"
+diff -Naur isic-0.06/udpsic.c isic-0.06.fixed/udpsic.c
+--- isic-0.06/udpsic.c	2016-05-12 17:00:21.889666717 +0100
++++ isic-0.06.fixed/udpsic.c	2016-05-12 17:04:31.100827329 +0100
+@@ -290,7 +290,7 @@
+ 		udp->uh_ulen	= htons(payload_s + UDP_H);
+ 		udp->uh_sum	= 0;
+ 
+-		payload = (short int *)((u_char *) udp + UDP_H);
++		payload = (u_short *)((u_char *) udp + UDP_H);
+ 		for(cx = 0; cx <= (payload_s >> 1); cx+=1)
+ //				(u_int16_t) payload[cx] = rand() & 0xffff;
+ 				payload[cx] = rand() & 0xffff;
+@@ -364,7 +364,7 @@
+ }
+ 
+ 
+-void usage(u_char *name)
++void usage(char *name)
+ {
+    fprintf(stderr,
+ 	"usage: %s [-v] [-D] -s <sourceip>[,port] -d <destination ip>[,port]\n"

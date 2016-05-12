@@ -18,6 +18,7 @@ class isic(test.test):
         os.chdir(self.srcdir)
 
         utils.system('patch -p1 < %s/build-fixes.patch' % self.bindir)
+        utils.system('patch -p1 < %s/isic-gcc5-fix.patch' % self.bindir)
         utils.system('PREFIX=%s/deps/libnet/libnet/ ./configure' % self.autodir)
         utils.system('make')
 

@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+#
+
+import platform
+
+if __name__ == '__main__':
+    arch   = platform.processor()
+    series = platform.dist()[2]
+
+    pkgs = [
+        'coreutils', 'apparmor', 'iproute2', 'openvswitch-switch',
+    ]
+    pkgs.append('linux-tools-%s' % platform.uname[2])
+
+    print(' '.join(pkgs))
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

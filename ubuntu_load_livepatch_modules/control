@@ -1,0 +1,18 @@
+AUTHOR = "Luis Henriques"
+NAME = "Ubuntu Livepatched Module Test"
+PURPOSE = "Manually insert every module patched by a livepatch module"
+CRITERIA = """
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CATEGORY = "Functional"
+TEST_CLASS = "regression"
+TEST_TYPE = "client"
+DOC = """
+This test needs to run after a livepatch module has been inserted. Then we can
+run this test to insert all modules patched by that livepatch.
+"""
+
+name = 'ubuntu_load_livepatch_modules'
+
+result = job.run_test_detail(name, tag=name)

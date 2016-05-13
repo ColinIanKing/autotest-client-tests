@@ -13,4 +13,5 @@ randomness
 More information about fsstress can be found at
 http://www.cs.duke.edu/ari/fstress/
 '''
-job.run_test('fsstress')
+for filesys in [ 'ext2', 'ext3', 'ext4', 'jfs', 'xfs' ]:
+    job.run_test('fsstress', fs=filesys, tag=filesys)

@@ -8,6 +8,7 @@ class rtc(test.test):
     preserve_srcdir = True
 
     def setup(self):
+        utils.system_output('apt-get install virt-what --assume-yes', retain_output=True)
         os.chdir(self.srcdir)
         utils.make('clobber')
         utils.make()
@@ -16,7 +17,11 @@ class rtc(test.test):
         self.job.require_gcc()
 
     def run_once(self, def_rtc="/dev/rtc0", maxfreq=64):
-        if not os.path.exists(def_rtc):
-            raise error.TestNAError("RTC device %s does not exist" % def_rtc)
-        os.chdir(self.srcdir)
-        utils.system('./rtctest %s %s' % (def_rtc, maxfreq))
+        virt = utils.system_output('virt-what', retain_output=True)
+        if virt != '':
+            print('Running inside ' + virt + ', not testing RTC')
+        else:
+            if not os.path.exists(def_rtc):
+                raise error.TestNAError("RTC device %s does not exist" % def_rtc)
+            os.chdir(self.srcdir)
+            utils.system('./rtctest %s %s' % (def_rtc, maxfreq))

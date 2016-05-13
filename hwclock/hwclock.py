@@ -13,16 +13,26 @@ class hwclock(test.test):
         Set hwclock back to a date in 1980 and verify if the changes took
         effect in the system.
         """
-        logging.info('Setting hwclock to 2/2/80 03:04:00')
-        utils.system('/sbin/hwclock --set --date "2/2/80 03:04:00"')
-        date = utils.system_output('LC_ALL=C /sbin/hwclock')
-        if not re.match('Sat *Feb *2 *03:04:.. 1980', date):
-            raise error.TestFail("Failed to set hwclock back to the eighties. "
-                                 "Output of hwclock is '%s'" % date)
+        utils.system_output('apt-get install virt-what --assume-yes', retain_output=True)
+        self.virt = utils.system_output('virt-what', retain_output=True)
+        #
+        #  Only run if on bare metal, if what is not empty we
+        #  are in some kind of VM or container
+        #
+        if self.virt != '':
+            logging.info('Running inside ' + self.virt + ', not testing ')
+        else:
+            logging.info('Setting hwclock to 2/2/80 03:04:00')
+            utils.system('/sbin/hwclock --set --date "2/2/80 03:04:00"')
+            date = utils.system_output('LC_ALL=C /sbin/hwclock')
+            if not re.match('Sat *Feb *2 *03:04:.. 1980', date):
+                raise error.TestFail("Failed to set hwclock back to the eighties. "
+                                     "Output of hwclock is '%s'" % date)
 
     def cleanup(self):
         """
         Restore hardware clock to current system time.
         """
-        logging.info('Restoring the hardware clock')
-        utils.system('/sbin/hwclock --systohc --noadjfile --utc')
+        if self.virt == '':
+            logging.info('Restoring the hardware clock')
+            utils.system('/sbin/hwclock --systohc --noadjfile --utc')

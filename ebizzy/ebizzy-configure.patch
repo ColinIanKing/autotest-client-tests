@@ -1,0 +1,12 @@
+diff -Naur ebizzy-0.3/configure ebizzy-0.3.fixed/configure
+--- ebizzy-0.3/configure	2007-10-02 03:49:45.000000000 +0100
++++ ebizzy-0.3.fixed/configure	2016-05-11 18:51:56.253848447 +0100
+@@ -31,7 +31,7 @@
+ all: ebizzy
+ 
+ ebizzy: ebizzy.c
+-	gcc -Wall -Wshadow ${LIBS} ${FLAGS} -o ebizzy ebizzy.c
++	gcc -Wall -Wshadow ${FLAGS} -o ebizzy ebizzy.c ${LIBS}
+ 
+ clean:
+ 	rm -f ebizzy Makefile 

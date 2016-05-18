@@ -4,13 +4,28 @@
 # NOTE - this should also have the ability to mount a filesystem,
 # run the tests, unmount it, then fsck the filesystem
 import os
+import platform
 from autotest.client import test, utils
 
 
 class fsx(test.test):
     version = 3
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self):
+        self.install_required_pkgs()
         self.job.require_gcc()
 
     # http://www.zip.com.au/~akpm/linux/patches/stuff/ext3-tools.tar.gz

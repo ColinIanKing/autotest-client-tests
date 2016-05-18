@@ -2,6 +2,7 @@ import os
 import shutil
 import glob
 import logging
+import platform
 from autotest.client import test, utils
 from autotest.client.shared import error
 
@@ -21,10 +22,24 @@ class connectathon(test.test):
     """
     version = 1
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self):
         """
         Sets the overall failure counter for the test.
         """
+        self.install_required_pkgs()
         self.nfail = 0
 
     def setup(self, tarball='connectathon.tar.bz2'):
@@ -54,8 +69,7 @@ class connectathon(test.test):
                 # run basic test
                 args = "-b -t"
 
-            self.results = utils.system_output('./runtests -N %s %s %s' %
-                                              (cthon_iterations, args, testdir))
+            self.results = utils.system_output('./runtests -N %s %s %s' % (cthon_iterations, args, testdir))
             utils.open_write_close(self.results_path, self.results)
 
         except error.CmdError, e:

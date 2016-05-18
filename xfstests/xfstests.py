@@ -1,4 +1,5 @@
 import os, re, glob, logging
+import platform
 from autotest.client.shared import error
 from autotest.client import test, utils, os_dep
 
@@ -20,6 +21,37 @@ class xfstests(test.test):
         tests_list.sort()
         return tests_list
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential',
+            'uuid-dev',
+            'xfslibs-dev',
+            'xfsdump',
+            'autoconf',
+            'kpartx',
+            'libtool',
+            'python-xattr',
+            'libacl1-dev',
+            'libaio-dev',
+            'quota',
+            'bc',
+            'btrfs-tools',
+            'attr',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        if series in ['xenial', 'wily', 'vivid']:
+            pkgs.append('libtool-bin')
+
+        if series in ['wily', 'vivid']:
+            pkgs.append('libdm0-dev')
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
 
     def _run_sub_test(self, test):
         os.chdir(self.srcdir)
@@ -88,10 +120,15 @@ class xfstests(test.test):
                                      ignore_status=True,
                                      retain_output=True)
 
+    def initialize(self):
+        self.install_required_pkgs()
+
     def setup(self, tarball='xfstests.tar.bz2'):
         '''
         Sets up the environment necessary for running xfstests
         '''
+
+
         # Anticipate failures due to missing devel tools, libraries, headers
         # and xfs commands
         #

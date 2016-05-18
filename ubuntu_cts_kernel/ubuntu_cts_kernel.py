@@ -1,13 +1,23 @@
-from autotest.client                        import test,utils
-from autotest.client.shared                 import error, software_manager
-
-DEPENDENCIES=['openvswitch-switch', 'iproute2', 'linux-tools-`uname -r`', 'coreutils', 'apparmor']
+import platform
+from autotest.client                        import test, utils
 
 class ubuntu_cts_kernel(test.test):
     version = 1
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'coreutils', 'apparmor', 'iproute2', 'openvswitch-switch',
+        ]
+        pkgs.append('linux-tools-%s' % platform.uname()[2])
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self):
-        pass
+        self.install_required_pkgs()
 
     def run_once(self, bug, exit_on_error=True, set_time=True, ifname='eth0'):
         print('*** %s ***' % bug)

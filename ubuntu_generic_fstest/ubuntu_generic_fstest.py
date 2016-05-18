@@ -22,7 +22,7 @@ class ubuntu_generic_fstest(test.test):
 	pkgs = [ 'btrfs-tools', 'xfsprogs', 'jfsutils' ]
 	for pkg in pkgs:
 		print "Installing package " + pkg
-		utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)
+		utils.system_output('apt-get install ' + pkg + ' --yes --force-yes ', retain_output=True)
 
 	print "Extracting fstest tarball.."
 	tarball = utils.unmap_url(self.bindir, 'fstest.tar.bz2', self.tmpdir)

@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import logging, os, re, string
+import platform
 
 from autotest.client import test, utils
 from autotest.client.shared import error
@@ -11,12 +12,26 @@ from autotest.client.ubuntu.wifi import WiFi
 class network_WiFiCaps(test.test):
     version = 1
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'iw', 'pkg-config', 'libnl-dev',
+        ]
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
+    def initialize(self):
+        self.install_required_pkgs()
+
     def setup(self):
+
         self.job.setup_dep(['iwcap'])
         # create a empty srcdir to prevent the error that checks .version
         if not os.path.exists(self.srcdir):
             os.mkdir(self.srcdir)
-
 
     def __parse_iwcap(self, lines):
         """Parse the iwcap output"""

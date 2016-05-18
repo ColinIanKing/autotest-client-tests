@@ -8,16 +8,9 @@ import platform
 class ubuntu_zfs(test.test):
     version = 4
 
-    def initialize(self):
-        self.job.require_gcc()
-
-    #
-    # if you change setup, be sure to increment version
-    #
-    def setup(self):
+    def install_required_pkgs(self):
+        arch   = platform.processor()
         series = platform.dist()[2]
-
-        utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
         pkgs = [
             'perl',
@@ -30,22 +23,36 @@ class ubuntu_zfs(test.test):
             'dump',
             'kpartx',
             'pax',
-            'nfs-kernel-server'
+            'nfs-kernel-server',
+            'xfsprogs',
+            'libattr1-dev'
         ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
 
-        if series == 'xenial':
-            pkgs.append('zfsutils-linux')
+        if series in ['precise', 'trusty']:
+            utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
+            utils.system_output('apt-get update || true', retain_output=True)
+            pkgs.append('ubuntu-zfs')
         elif series == 'wily':
             pkgs.append('zfs-dkms')
             pkgs.append('zfsutils-linux')
         else:
-            utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
-            utils.system_output('apt-get update || true', retain_output=True)
-            pkgs.append('ubuntu-zfs')
+            pkgs.append('zfsutils-linux')
 
-        for pkg in pkgs:
-                print "Installing package " + pkg
-                utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
+    def initialize(self):
+        self.install_required_pkgs()
+        self.job.require_gcc()
+
+    #
+    # if you change setup, be sure to increment version
+    #
+    def setup(self):
+
+        utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
         utils.system_output('useradd zfs-tests || true', retain_output=True)
         utils.system_output('echo \"zfs-tests    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
@@ -64,7 +71,6 @@ class ubuntu_zfs(test.test):
         utils.configure('')
         utils.system('SRCDIR=%s make' % self.srcdir)
         utils.system('modprobe zfs')
-
 
     def run_once(self, test_name):
         if test_name == 'setup':

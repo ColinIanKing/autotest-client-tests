@@ -1,13 +1,27 @@
 #
 #
 import os
+import platform
 from autotest.client                        import test, utils
-import multiprocessing
 
 class ubuntu_stress_btrfs_cmd(test.test):
     version = 1
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential', 'xfsprogs', 'btrfs-tools', 'git', 'acl', 'libattr1-dev',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self):
+        self.install_required_pkgs(self)
         self.job.require_gcc()
 
         self.valid_clients = ['gonzo', 'btrfs-scratch']
@@ -21,6 +35,7 @@ class ubuntu_stress_btrfs_cmd(test.test):
             self.dev = 'loop'
 
     def setup(self):
+
         utils.system('cp %s/ubuntu_stress_btrfs_cmd.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
         cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng 2>&1'

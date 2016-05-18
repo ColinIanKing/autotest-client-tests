@@ -1,5 +1,6 @@
 import re
 import os
+import platform
 from autotest.client import utils, test, os_dep
 from autotest.client.shared import error
 
@@ -7,7 +8,22 @@ from autotest.client.shared import error
 class libhugetlbfs(test.test):
     version = 7
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self, hugetlbfs_dir=None, pages_requested=20):
+        self.install_required_pkgs()
+
         self.hugetlbfs_dir = None
 
         # check if basic utilities are present
@@ -52,10 +68,10 @@ class libhugetlbfs(test.test):
         os.chdir(self.srcdir)
         self.results = utils.system_output('BUILDTYPE=NATIVEONLY make check', retain_output=True)
 
-	print self.results
+        print self.results
 
         n = self.results.find('FAIL:')
-	if n > 0:
+        if n > 0:
             m = self.results[n:].find('\n')
             if m > 0:
                 fails = sum([int(s) for s in self.results[n:n + m].split() if s.isdigit()])

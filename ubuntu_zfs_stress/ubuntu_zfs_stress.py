@@ -1,17 +1,53 @@
 #
 #
 import os
-from autotest.client                        import test, utils
 import platform
+from autotest.client                        import test, utils
 
 class ubuntu_zfs_stress(test.test):
     version = 1
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'perl',
+            'build-essential',
+            'gdb',
+            'git',
+            'ksh',
+            'autoconf',
+            'acl',
+            'dump',
+            'kpartx',
+            'pax',
+            'nfs-kernel-server',
+            'xfsprogs',
+            'libattr1-dev',
+            'libkeyutils-dev',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        if series in ['precise', 'trusty']:
+            utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
+            utils.system_output('apt-get update || true', retain_output=True)
+            pkgs.append('ubuntu-zfs')
+        elif series == 'wily':
+            pkgs.append('zfs-dkms')
+            pkgs.append('zfsutils-linux')
+        else:
+            pkgs.append('zfsutils-linux')
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self):
+        self.install_required_pkgs()
         self.job.require_gcc()
 
     def setup(self):
-        series = platform.dist()[2]
 
         utils.system('cp %s/ubuntu_zfs_stress.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
@@ -29,36 +65,7 @@ class ubuntu_zfs_stress(test.test):
 
         utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
 
-        pkgs = [
-            'perl',
-            'build-essential',
-            'gdb',
-            'git',
-            'ksh',
-            'autoconf',
-            'acl',
-            'dump',
-            'kpartx',
-            'pax',
-            'nfs-kernel-server'
-        ]
-
-        if series == 'xenial':
-            pkgs.append('zfsutils-linux')
-        elif series == 'wily':
-            pkgs.append('zfs-dkms')
-            pkgs.append('zfsutils-linux')
-        else:
-            utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
-            utils.system_output('apt-get update || true', retain_output=True)
-            pkgs.append('ubuntu-zfs')
-
-        for pkg in pkgs:
-                print "Installing package " + pkg
-                utils.system_output('apt-get install ' + pkg + ' --yes --force-yes', retain_output=True)
-
         utils.system('modprobe zfs')
-
 
     def run_once(self, test_name):
         self.job.require_gcc()

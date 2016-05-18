@@ -1,11 +1,26 @@
 import os
+import platform
 from autotest.client import test, utils
 
 
 class fsstress(test.test):
     version = 1
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self):
+        self.install_required_pkgs()
         self.job.require_gcc()
 
     # http://www.zip.com.au/~akpm/linux/patches/stuff/ext3-tools.tar.gz
@@ -13,7 +28,7 @@ class fsstress(test.test):
         self.tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(self.tarball, self.srcdir)
 
-	utils.system_output('apt-get install xfsprogs jfsutils --assume-yes', retain_output=True)
+        utils.system_output('apt-get install xfsprogs jfsutils --assume-yes', retain_output=True)
 
         os.chdir(self.srcdir)
         utils.system('patch -p1 < %s/fsstress-ltp.patch' % self.bindir)
@@ -25,7 +40,7 @@ class fsstress(test.test):
             testdir = self.tmpdir
         image = os.path.join(testdir, 'fs.img')
         mntpath = os.path.join(testdir, 'mnt')
-	tmppath = os.path.join(mntpath, 'tmp')
+        tmppath = os.path.join(mntpath, 'tmp')
         os.mkdir(mntpath)
 
         self.results = utils.system_output('truncate --size 1G ' + image, retain_output=True)
@@ -46,12 +61,12 @@ class fsstress(test.test):
             self.results += utils.system_output('mount -t jfs -o loop ' + image + ' ' + mntpath, retain_output=True)
 
         os.mkdir(tmppath)
-	os.chdir(tmppath)
+        os.chdir(tmppath)
         args = '-d %s -p %s -n %s %s' % (tmppath, nproc, nops, extra_args)
         cmd = self.srcdir + '/fsstress ' + args
         utils.system_output(cmd, retain_output=True)
-	os.chdir(self.tmpdir)
+        os.chdir(self.tmpdir)
         self.results += utils.system_output('umount ' + mntpath, retain_output=True)
-	print self.results
+        print self.results
         os.rmdir(mntpath)
         os.remove(image)

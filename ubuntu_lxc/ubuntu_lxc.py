@@ -1,12 +1,24 @@
 #
 #
 from autotest.client                        import test, utils
+import platform
 
 class ubuntu_lxc(test.test):
     version = 1
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'lxc-tests'
+        ]
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self):
-        pass
+        self.install_required_pkgs()
 
     def run_once(self, test_name):
         cmd = '/bin/sh %s/exercise' % self.bindir

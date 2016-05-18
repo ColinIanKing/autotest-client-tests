@@ -1,23 +1,30 @@
 #
 #
-import os
+import platform
 from autotest.client                        import test, utils
-import multiprocessing
 
 class ubuntu_aufs_smoke_test(test.test):
     version = 1
 
-    def initialize(self):
-	pass
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
 
-    def setup(self):
-	pass
+        pkgs = [
+            'build-essential',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
 
-    def run_once(self, test_name):
-        stress_ng = os.path.join(self.srcdir, 'stress-ng', 'stress-ng')
-        cmd = '%s/ubuntu_aufs_smoke_test.sh' % (self.bindir)
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
-        print self.results
+    def initialize(self):
+        self.install_required_pkgs()
+        self.job.require_gcc()
+
+    def run_once(self, test_name):
+        cmd = '%s/ubuntu_aufs_smoke_test.sh' % (self.bindir)
+        self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

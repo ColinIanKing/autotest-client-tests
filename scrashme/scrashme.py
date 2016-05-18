@@ -1,4 +1,5 @@
 import os
+import platform
 from autotest.client import test, utils
 
 
@@ -39,7 +40,24 @@ class scrashme(test.test):
     def initialize(self):
         self.job.require_gcc()
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
+    def initialize(self):
+        self.install_required_pkgs()
+
     def setup(self, tarball='scrashme-git-snapshot-03-18-2010.tar.bz2'):
+        self.install_required_pkgs(self)
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

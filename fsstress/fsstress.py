@@ -11,7 +11,7 @@ class fsstress(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential',
+            'build-essential', 'jfsutils',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -27,8 +27,6 @@ class fsstress(test.test):
     def setup(self, tarball='ext3-tools.tar.gz'):
         self.tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(self.tarball, self.srcdir)
-
-        utils.system_output('apt-get install xfsprogs jfsutils --assume-yes', retain_output=True)
 
         os.chdir(self.srcdir)
         utils.system('patch -p1 < %s/fsstress-ltp.patch' % self.bindir)
@@ -67,6 +65,5 @@ class fsstress(test.test):
         utils.system_output(cmd, retain_output=True)
         os.chdir(self.tmpdir)
         self.results += utils.system_output('umount ' + mntpath, retain_output=True)
-        print self.results
         os.rmdir(mntpath)
         os.remove(image)

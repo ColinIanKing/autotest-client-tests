@@ -13,7 +13,7 @@ class rtc(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential',
+            'build-essential', 'virt-what',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -26,7 +26,6 @@ class rtc(test.test):
         self.job.require_gcc()
 
     def setup(self):
-        utils.system_output('apt-get install virt-what --assume-yes', retain_output=True)
         os.chdir(self.srcdir)
         utils.make('clobber')
         utils.make()

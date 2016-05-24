@@ -12,7 +12,7 @@ class aiostress(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential',
+            'build-essential', 'libaio1',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
         pkgs.append(gcc)

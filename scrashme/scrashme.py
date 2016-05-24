@@ -37,9 +37,6 @@ class scrashme(test.test):
     """
     version = 2
 
-    def initialize(self):
-        self.job.require_gcc()
-
     def install_required_pkgs(self):
         arch   = platform.processor()
         series = platform.dist()[2]
@@ -55,9 +52,10 @@ class scrashme(test.test):
 
     def initialize(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
 
     def setup(self, tarball='scrashme-git-snapshot-03-18-2010.tar.bz2'):
-        self.install_required_pkgs(self)
+        self.install_required_pkgs()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

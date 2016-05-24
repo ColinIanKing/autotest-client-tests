@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # Copyright (C) 2016 Canonical
@@ -27,6 +27,26 @@ SRC=/bin
 IMG=/tmp/squashfs.sqsh
 MNT=/tmp/squashfs-mnt
 
+#
+# From 4.4 onwards let's test every compression method that
+# squashfs supports
+#
+read major minor rest < <(uname -r | tr '.' ' ')
+if (( $(echo "$major.$minor >= 4.4" | bc -l) )); then
+	COMP="gzip lzo xz"
+else
+	COMP="gzip lzo xz"
+fi
+
+#
+# 2.4 kernels upwards support lazy umount
+#
+if (( $(echo "$major.$minor >= 2.4" | bc -l) )); then
+	lazy="--lazy"
+else
+	lazy=""
+fi
+
 rm -rf $IMG $MNT
 
 which mksquashfs > /dev/null
@@ -35,49 +55,84 @@ if [ $? -ne 0 ]; then
 	exit 0
 fi
 
-mksquashfs $SRC $IMG -no-progress > /dev/null
-if [ $? -ne 0 ]; then
-	echo "SKIPPED: mksquashfs failed, aborting test"
-	exit 0
-fi
+for comp in $COMP
+do
+	echo "Testing with compression method $comp"
+	mksquashfs $SRC $IMG -no-progress -comp $comp > /dev/null
+	if [ $? -ne 0 ]; then
+		echo "SKIPPED: mksquashfs failed, aborting test"
+		exit 0
+	fi
 
-mkdir -p $MNT
-echo -n "Testing mount of squashfs: "
-mount $IMG $MNT -t squashfs -o loop
-if [ $? -ne 0 ]; then
-	echo "FAILED"
-	exit 1
-fi
-echo "PASSED"
+	mkdir -p $MNT
+	echo -n "Testing mount of squashfs: "
+	mount $IMG $MNT -t squashfs -o loop
+	if [ $? -ne 0 ]; then
+		echo "FAILED ($comp)"
+		exit 1
+	fi
+	echo "PASSED ($comp)"
 
-echo -n "Testing umount of squashfs: "
-umount $MNT
-if [ $? -ne 0 ]; then
-	echo "FAILED"
-	exit 1
-fi
-echo "PASSED"
+	echo -n "Testing umount of squashfs: "
+	#
+	#  Need to retry because sometimes
+	#  daemons try to scan newly mounted file
+	#  systems making it impossible to umount
+	#
+	retry=0
+	while [ $retry -lt 10 ]
+	do
+		umount $MNT $lazy
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			break
+		fi
+		retry=$((retry + 1))
+		sleep 1
+	done
+	if [ $ret -ne 0 ]; then
+		echo "FAILED (umount, $comp)"
+		exit 1
+	fi
+	echo "PASSED ($comp)"
 
-echo -n "Checking data integrity: "
-mount $IMG $MNT -t squashfs -o loop
-if [ $? -ne 0 ]; then
-	echo "FAILED (remount)"
-	exit 1
-fi
-HERE=$(pwd)
-cd $SRC
-diffs=$(find . -exec diff {} $MNT/{} \; 2>&1 | wc -l)
-cd $HERE
-umount $MNT
-if [ $? -ne 0 ]; then
-	echo "FAILED (umount)"
-	exit 1
-fi
-if [ $diffs -ne 0 ]; then
-	echo "FAILED (squashed $SRC different from original $SRC)"
-	exit 1
-fi
-echo "PASSED"
+	echo -n "Checking data integrity: "
+	mount $IMG $MNT -t squashfs -o loop
+	if [ $? -ne 0 ]; then
+		echo "FAILED (remount, $comp)"
+		exit 1
+	fi
+	HERE=$(pwd)
+	cd $SRC
+	diffs=$(find . -exec diff {} $MNT/{} \; 2>&1 | wc -l)
+	cd $HERE
+	#
+	#  Need to retry because sometimes
+	#  daemons try to scan newly mounted file
+	#  systems making it impossible to umount
+	#
+	retry=0
+	while [ $retry -lt 10 ]
+	do
+		umount $MNT $lazy
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			break
+		fi
+		retry=$((retry + 1))
+		sleep 1
+	done
+	if [ $ret -ne 0 ]; then
+		echo "FAILED (umount, $comp)"
+		exit 1
+	fi
 
-rm -rf $IMG $MNT
+	if [ $diffs -ne 0 ]; then
+		echo "FAILED (squashed $SRC different from original $SRC, $comp)"
+		exit 1
+	fi
+	echo "PASSED ($comp)"
+	rm -rf $IMG $MNT
+done
+
 exit 0

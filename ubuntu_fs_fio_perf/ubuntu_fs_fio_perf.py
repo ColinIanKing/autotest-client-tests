@@ -1,11 +1,37 @@
 import os
+import platform
 from autotest.client import test, utils
 import time
 
 class ubuntu_fs_fio_perf(test.test):
     version = 1
 
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential',
+            'git-core',
+            'fio',
+            'xfsprogs',
+            'btrfs-tools',
+            'libaio-dev',
+            'git-core',
+            'fio',
+            'libaio-dev',
+            'xfsdump',
+            'xfsprogs',
+            'btrfs-tools',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
     def initialize(self):
+        self.install_required_pkgs()
         self.job.require_gcc()
         self.valid_clients = ['gonzo', 'intel-uefi']
         self.hostname = os.uname()[1]
@@ -19,15 +45,8 @@ class ubuntu_fs_fio_perf(test.test):
         self.fio_tests_dir = os.path.join(self.srcdir, 'fs-test-proto', 'fio-tests')
 
     def setup(self):
-        #
-        # make the tools
-        #
-        tools = 'git-core fio xfsprogs btrfs-tools libaio-dev'
-
-        #
         # totally abusing things, but this works for me :-)
         #
-        utils.system('sudo apt-get -y -q install ' + tools)
         os.chdir(self.srcdir)
         utils.system('rm -rf fs-test-proto')
         utils.system('git clone git://kernel.ubuntu.com/cking/fs-test-proto.git')
@@ -63,7 +82,7 @@ class ubuntu_fs_fio_perf(test.test):
         #
         # Test 3 different I/O schedulers:
         #
-        for iosched in [ 'cfq', 'deadline', 'noop']:
+        for iosched in ['cfq', 'deadline', 'noop']:
             #
             # Test 5 different file systems, across 20+ tests..
             #

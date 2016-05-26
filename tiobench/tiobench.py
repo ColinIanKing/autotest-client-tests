@@ -1,10 +1,28 @@
 import os
 import logging
 from autotest.client import test, utils
+import platform
 
 
 class tiobench(test.test):
     version = 1
+
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential', 'gnuplot', 'xfsdump', 'xfsprogs', 'btrfs-tools',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
+    def initialize(self):
+        self.install_required_pkgs()
+        self.job.require_gcc()
 
     # http://prdownloads.sourceforge.net/tiobench/tiobench-0.3.3.tar.gz
     def setup(self, tarball='tiobench-0.3.3.tar.bz2'):
@@ -14,9 +32,6 @@ class tiobench(test.test):
         utils.system('patch -p1 < %s/makefile.patch' % self.bindir)
         utils.system('patch -p1 < %s/tiotest.patch' % self.bindir)
         utils.system('make')
-
-    def initialize(self):
-        self.job.require_gcc()
 
     def run_once(self, dir=None, args=None):
         if not dir:

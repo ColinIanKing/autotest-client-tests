@@ -1,6 +1,8 @@
-import os, re
+import os
+import re
 from autotest.client import test, utils
 import postprocessing
+import platform
 
 
 class iozone(test.test):
@@ -21,9 +23,22 @@ class iozone(test.test):
     """
     version = 6
 
-    def initialize(self):
-        self.job.require_gcc()
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
 
+        pkgs = [
+            'build-essential', 'gnuplot', 'xfsdump', 'xfsprogs',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
+    def initialize(self):
+        self.install_required_pkgs()
+        self.job.require_gcc()
 
     def setup(self, tarball='iozone3_420.tar'):
         """
@@ -46,7 +61,6 @@ class iozone(test.test):
             utils.make('linux-AMD64')
         else:
             utils.make('linux')
-
 
     def run_once(self, dir=None, args=None):
         """
@@ -73,10 +87,8 @@ class iozone(test.test):
 
         utils.open_write_close(self.results_path, self.results)
 
-
     def __get_section_name(self, desc):
         return desc.strip().replace(' ', '_')
-
 
     def generate_keyval(self):
         keylist = {}
@@ -155,7 +167,6 @@ class iozone(test.test):
                             keylist[key_name] = result
 
         self.write_perf_keyval(keylist)
-
 
     def postprocess_iteration(self):
         self.generate_keyval()

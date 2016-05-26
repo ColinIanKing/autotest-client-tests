@@ -1,4 +1,8 @@
-import os, re, socket, time, logging
+import os
+import re
+import socket
+import time
+import logging
 from autotest.client import test, utils
 from autotest.client.net import net_utils
 from autotest.client.shared import error
@@ -9,19 +13,17 @@ IPERF_IX = 1
 class iperf(test.test):
     version = 1
 
-    # http://downloads.sourceforge.net/iperf/iperf-2.0.4.tar.gz
-    def setup(self, tarball = 'iperf-2.0.4.tar.gz'):
-        self.job.require_gcc()
-        tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
-        utils.extract_tarball_to_dir(tarball, self.srcdir)
-        os.chdir(self.srcdir)
+    def install_required_pkgs(self):
 
-        utils.configure()
-        utils.make()
-        utils.system('sync')
+        pkgs = [
+            'sysstat'
+        ]
 
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        self.install_required_pkgs()
         self.SERVER_PORT = '5001'
 
         # The %%s is to add extra args later
@@ -38,6 +40,16 @@ class iperf(test.test):
         self.netif = ''
         self.network_utils = net_utils.network_utils()
 
+    # http://downloads.sourceforge.net/iperf/iperf-2.0.4.tar.gz
+    def setup(self, tarball='iperf-2.0.4.tar.gz'):
+        self.job.require_gcc()
+        tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
+        utils.extract_tarball_to_dir(tarball, self.srcdir)
+        os.chdir(self.srcdir)
+
+        utils.configure()
+        utils.make()
+        utils.system('sync')
 
     def run_once(self, server_ip, client_ip, role, udp=False,
                  bidirectional=False, test_time=10, dev='', stream_list=[1], barriers=True):
@@ -74,7 +86,7 @@ class iperf(test.test):
                     # Wait up to test_time + five minutes
                     if barriers:
                         self.job.barrier(server_tag, 'finish_%d' % num_streams,
-                                         test_time+300).rendezvous(*all)
+                                         test_time + 300).rendezvous(*all)
                 finally:
                     self.server_stop()
 
@@ -96,18 +108,15 @@ class iperf(test.test):
 
         self.restore_interface()
 
-
     def configure_interface(self, dev, ip_addr):
         self.netif = net_utils.netif(dev)
         self.netif.up()
         if self.netif.get_ipaddr() != ip_addr:
             self.netif.set_ipaddr(ip_addr)
 
-
     def restore_interface(self):
         if self.netif:
             self.netif.restore()
-
 
     def server_start(self):
         args = ''
@@ -118,10 +127,8 @@ class iperf(test.test):
         self.results.append(utils.system_output(self.server_path % args,
                                                 retain_output=True))
 
-
     def server_stop(self):
         utils.system('killall -9 iperf', ignore_status=True)
-
 
     def client(self, server_ip, test_time, num_streams):
         args = '-t %d -P %d ' % (test_time, num_streams)
@@ -143,13 +150,13 @@ class iperf(test.test):
             cmds.append(cmd)
 
             t0 = time.time()
-            out = utils.run_parallel(cmds, timeout = test_time + 60)
+            out = utils.run_parallel(cmds, timeout=test_time + 60)
             t1 = time.time()
 
             self.results.append(out)
             self.actual_times.append(t1 - t0)
 
-        except error.CmdError, e:
+        except error.CmdError as e:
             """ Catch errors due to timeout, but raise others
             The actual error string is:
               "Command did not complete within %d seconds"
@@ -163,7 +170,6 @@ class iperf(test.test):
                 self.actual_times.append(1)
             else:
                 raise
-
 
     def postprocess(self):
         """The following patterns parse the following outputs:

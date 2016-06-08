@@ -56,10 +56,10 @@ class dma_memtest(test.test):
 
         kernel_repo = 'http://www.kernel.org/pub/linux/kernel/v2.6'
         tarball_url = os.path.join(kernel_repo, tarball_base)
-        tarball_md5 = '296a6d150d260144639c3664d127d174'
+        tarball_url = 'https://launchpad.net/ubuntu/+archive/primary/+files/linux_2.6.38.orig.tar.gz'
+        tarball_md5 = 'cf0b587742611328f095da4b329e9fc7'
         logging.info('Downloading linux kernel tarball')
-        self.tarball = utils.unmap_url_cache(self.cachedir, tarball_url,
-                                             tarball_md5)
+        self.tarball = utils.unmap_url_cache(self.cachedir, tarball_url, tarball_md5)
         size_tarball = os.path.getsize(self.tarball) / 1024 / 1024
         # Estimation of the tarball size after uncompression
         compress_ratio = 5

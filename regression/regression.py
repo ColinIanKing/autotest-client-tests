@@ -17,18 +17,13 @@ class regression(test.test):
         kv_new = utils.read_keyval(new)
         failed = 0
         first_regression = None
-        logging.info('========= Comparison table for %30s '
-                     '=========' % self.tagged_testname)
-        logging.info("%20s | %10s | %10s | %10s | %10s | %s" %
-                    ('field name', 'old value', 'new value',
-                     'cmp res', 'status', 'cmp function'))
+        logging.info('========= Comparison table for %30s =========' % self.tagged_testname)
+        logging.info("%20s | %10s | %10s | %10s | %10s | %s" % ('field name', 'old value', 'new value', 'cmp res', 'status', 'cmp function'))
         for field, cmpfn in compare_list:
             if not field in kv_old:
-                raise error.TestError('Cant not find field:%s in %s'
-                                      % (field, old + '/keyval'))
+                raise error.TestError('Cant not find field:%s in %s' % (field, old + '/keyval'))
             if not field in kv_new:
-                raise error.TestError('Cant not find field:%s in %s'
-                                      % (field, new + '/keyval'))
+                raise error.TestError('Cant not find field:%s in %s' % (field, new + '/keyval'))
             res = cmpfn(kv_old[field], kv_new[field])
             if res:
                 failed += 1
@@ -37,15 +32,8 @@ class regression(test.test):
                     first_regression = field
             else:
                 msg = 'OK'
-            logging.info("%20s | %10s | %10s | %5s | %5s | %s" %
-                         (field, kv_old[field],
-                          kv_new[field], res, msg, cmpfn))
+            logging.info("%20s | %10s | %10s | %5s | %5s | %s" % (field, kv_old[field], kv_new[field], res, msg, cmpfn))
 
-        logging.info("========= RESULT: total:%10d failed:%10d "
-                     "==================" %
-                     (len(compare_list), failed))
+        logging.info("========= RESULT: total:%10d failed:%10d ==================" % (len(compare_list), failed))
         if failed:
-            raise error.TestError('Regression found at field:%s, old:%s, new:%s ' %
-                                  (first_regression,
-                                   kv_old[first_regression],
-                                   kv_new[first_regression]))
+            raise error.TestError('Regression found at field:%s, old:%s, new:%s ' % (first_regression, kv_old[first_regression], kv_new[first_regression]))

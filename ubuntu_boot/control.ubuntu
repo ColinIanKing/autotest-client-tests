@@ -1,0 +1,11 @@
+AUTHOR = 'brad.figg@canonical.com (Brad Figg)'
+TIME = 'MEDIUM'
+NAME = 'Perform a simple "boot" test'
+TEST_TYPE = 'client'
+TEST_CLASS = 'Kernel'
+TEST_CATEGORY = 'Stress'
+
+DOC = '''
+'''
+
+job.run_test_detail('ubuntu_boot', test_time=600)

@@ -9,7 +9,7 @@ class ubuntu_cve_kernel(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'git', 'libkeyutils-dev', 'libfuse-dev', 'pkg-config', 'expect'
+            'build-essential', 'git', 'libkeyutils-dev', 'libfuse-dev', 'pkg-config', 'expect', 'libecryptfs-dev', 'ecryptfs-utils'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
         pkgs.append(gcc)

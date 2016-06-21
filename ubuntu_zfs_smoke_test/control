@@ -29,12 +29,5 @@ tests = [
 import os
 import ctypes
 
-#
-# Only run if we are on a 64 bit system
-#
-if ctypes.sizeof(ctypes.c_voidp) == 8:
-	for t in tests:
-		results = job.run_test_detail('ubuntu_zfs_smoke_test', test_name=t, tag=t)
-else:
-	print "SKIPPED: Cannot run on non-64 bit architectures"
-
+for t in tests:
+    results = job.run_test_detail('ubuntu_zfs_smoke_test', test_name=t, tag=t)

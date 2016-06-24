@@ -183,7 +183,8 @@ if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
 
     mkdir /etc/systemd/system/docker.service.d
     echo -n "[Service]\nEnvironment=HTTP_PROXY=http://squid.internal:3128\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
-    service docker restart
+    systemctl daemon-reload
+    systemctl restart docker
 elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
     echo "Running in the Canonical enablement environment"
     export http_proxy="http://10.245.64.1:3128"
@@ -191,7 +192,8 @@ elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
 
     mkdir /etc/systemd/system/docker.service.d
     echo -n "[Service]\nEnvironment=HTTP_PROXY=http://10.245.64.1:3128\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
-    service docker restart
+    systemctl daemon-reload
+    systemctl restart docker
 elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
     echo "Running in the Canonical enablement environment"
     export http_proxy="http://91.189.89.216:3128"
@@ -199,7 +201,8 @@ elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
 
     mkdir /etc/systemd/system/docker.service.d
     echo -n "[Service]\nEnvironment=HTTP_PROXY=http://91.189.89.216:3128\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
-    service docker restart
+    systemctl daemon-reload
+    systemctl restart docker
 fi
 
 UNDERLAY=$(get_underlay)

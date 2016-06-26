@@ -34,7 +34,7 @@ class ubuntu_qrt_apparmor(test.test):
             'python3-all-dev',
             'python-libapparmor',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         if series == 'precise':

@@ -14,7 +14,7 @@ class tiobench(test.test):
         pkgs = [
             'build-essential', 'gnuplot', 'xfsdump', 'xfsprogs', 'btrfs-tools',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

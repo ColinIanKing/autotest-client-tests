@@ -27,7 +27,7 @@ class ubuntu_zfs_stress(test.test):
             'libattr1-dev',
             'libkeyutils-dev',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         if series in ['precise', 'trusty']:

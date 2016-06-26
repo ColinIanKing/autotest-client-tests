@@ -14,7 +14,7 @@ class ubuntu_qrt_kernel_aslr_collisions(test.test):
         pkgs = [
             'build-essential', 'libcap2-bin', 'gawk', 'execstack', 'exim4', 'libcap-dev',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

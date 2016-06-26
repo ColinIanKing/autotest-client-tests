@@ -13,7 +13,7 @@ class ubuntu_squashfs_smoke_test(test.test):
         pkgs = [
             'build-essential', 'xfsprogs', 'git', 'acl', 'libattr1-dev', 'squashfs-tools',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

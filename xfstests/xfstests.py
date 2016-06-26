@@ -41,7 +41,7 @@ class xfstests(test.test):
             'btrfs-tools',
             'attr',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         if series in ['xenial', 'wily', 'vivid']:

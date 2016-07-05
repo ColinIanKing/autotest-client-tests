@@ -16,12 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
+VDEV_PATH=$1
+echo "VDEVs in $VDEV_PATH"
 echo -n "kernel smoke test, ZFS send and receive: "
-TMP=/tmp
-VDEV0=${TMP}/pool0-$$.img
-VDEV1=${TMP}/pool1-$$.img
+VDEV0=${VDEV_PATH}/pool0-$$.img
+VDEV1=${VDEV_PATH}/pool1-$$.img
 POOL=pool-smoke-$$
-SNAP=${TMP}/snapshot-$$.zfs
+SNAP=${VDEV_PATH}/snapshot-$$.zfs
 DATA=/${POOL}/test/data
 
 dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
@@ -104,6 +105,8 @@ if [ $ret -ne 0 ]; then
 	exit 1
 fi
 
+dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV1} bs=1M count=512 > /dev/null 2>&1
 rm ${VDEV0} ${VDEV1}
 echo "PASSED"
 exit 0

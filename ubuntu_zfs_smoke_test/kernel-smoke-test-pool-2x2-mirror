@@ -16,12 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
+VDEV_PATH=$1
+echo "VDEVs in $VDEV_PATH"
 echo -n "kernel smoke test, create and destroy pool, 2x2 mirror: "
-TMP=/tmp
-VDEV0=${TMP}/pool0-$$.img
-VDEV1=${TMP}/pool1-$$.img
-VDEV2=${TMP}/pool2-$$.img
-VDEV3=${TMP}/pool3-$$.img
+VDEV0=${VDEV_PATH}/pool0-$$.img
+VDEV1=${VDEV_PATH}/pool1-$$.img
+VDEV2=${VDEV_PATH}/pool2-$$.img
+VDEV3=${VDEV_PATH}/pool3-$$.img
 VDEV_SZ=128
 POOL=pool-smoke-$$
 
@@ -50,6 +51,10 @@ if [ $ret -ne 0 ]; then
 	exit 1
 fi
 
+dd if=/dev/zero of=${VDEV0} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV1} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV2} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV3} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 echo "PASSED"
 exit 0

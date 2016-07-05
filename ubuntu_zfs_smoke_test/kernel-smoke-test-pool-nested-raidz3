@@ -16,16 +16,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
+VDEV_PATH=$1
+echo "VDEVs in $VDEV_PATH"
 echo -n "kernel smoke test, create and destroy pool, nested raidz3: "
-TMP=/tmp
-VDEV0=${TMP}/pool0-$$.img
-VDEV1=${TMP}/pool1-$$.img
-VDEV2=${TMP}/pool2-$$.img
-VDEV3=${TMP}/pool3-$$.img
-VDEV4=${TMP}/pool4-$$.img
-VDEV5=${TMP}/pool5-$$.img
-VDEV6=${TMP}/pool6-$$.img
-VDEV7=${TMP}/pool7-$$.img
+VDEV0=${VDEV_PATH}/pool0-$$.img
+VDEV1=${VDEV_PATH}/pool1-$$.img
+VDEV2=${VDEV_PATH}/pool2-$$.img
+VDEV3=${VDEV_PATH}/pool3-$$.img
+VDEV4=${VDEV_PATH}/pool4-$$.img
+VDEV5=${VDEV_PATH}/pool5-$$.img
+VDEV6=${VDEV_PATH}/pool6-$$.img
+VDEV7=${VDEV_PATH}/pool7-$$.img
 VDEV_SZ=64
 POOL=pool-smoke-$$
 
@@ -58,6 +59,14 @@ if [ $ret -ne 0 ]; then
 	exit 1
 fi
 
+dd if=/dev/zero of=${VDEV0} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV1} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV2} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV3} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV4} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV5} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV6} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+dd if=/dev/zero of=${VDEV7} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3} ${VDEV4} ${VDEV5} ${VDEV6} ${VDEV7}
 echo "PASSED"
 exit 0

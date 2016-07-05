@@ -4,7 +4,7 @@ from autotest.client                        import test, utils
 import platform
 
 class ubuntu_zfs_smoke_test(test.test):
-    version = 2
+    version = 3
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -37,7 +37,7 @@ class ubuntu_zfs_smoke_test(test.test):
         utils.system('modprobe zfs')
 
     def run_once(self, test_name):
-        cmd = '%s/%s' % (self.bindir, test_name)
+        cmd = '%s/%s %s' % (self.bindir, test_name, self.srcdir)
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

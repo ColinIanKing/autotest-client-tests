@@ -1,15 +1,15 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
-	echo "Need to pass test number into script"
+if [ $# -ne 2 ]; then
+	echo "Need to pass test number into script and srcpath"
 	exit 1
 fi
 TEST=$1
+VDEV_PATH=$2
 
 POOL=testpool
 TESTDIR=test
 SCRATCHDIR=scratch
-MYPWD=$(pwd)
 
 export TEST_DIR=/mnt/$TESTDIR
 export TEST_DEV=$POOL/$TESTDIR
@@ -17,11 +17,11 @@ export SCRATCH_MNT=/mnt/$SCRATCHDIR
 export SCRATCH_DEV=$POOL/$SCRATCHDIR
 export FSTYP=zfs
 
-vdev0=${MYPWD}/block-dev-0
-vdev1=${MYPWD}/block-dev-1
-vdev2=${MYPWD}/block-dev-2
-vdev3=${MYPWD}/block-dev-3
-vdev4=${MYPWD}/block-dev-4
+vdev0=${VDEV_PATH}/block-dev-0
+vdev1=${VDEV_PATH}/block-dev-1
+vdev2=${VDEV_PATH}/block-dev-2
+vdev3=${VDEV_PATH}/block-dev-3
+vdev4=${VDEV_PATH}/block-dev-4
 
 truncate -s 1G ${vdev0}
 truncate -s 1G ${vdev1}
@@ -46,6 +46,7 @@ zfs set mountpoint=legacy $POOL/$SCRATCHDIR
 
 zfs umount $POOL
 
+echo "VDEVs in ${VDEV_PATH}"
 mkdir /mnt/$TESTDIR /mnt/$SCRATCHDIR
 ./check -zfs "generic/$TEST"
 rc=$?
@@ -53,6 +54,16 @@ rmdir /mnt/$TESTDIR /mnt/$SCRATCHDIR
 
 echo "Destroying zfs pool $POOL"
 zpool destroy $POOL
-rm -rf $vdev0 $vdev1 $vdev2 $vdev3 $vdev4
+echo "Removing VDEVs in ${VDEV_PATH}"
+dd if=/dev/zero if=${vdev0} bs=1M count=1024 >& /dev/null
+rm -rf $vdev0
+dd if=/dev/zero if=${vdev1} bs=1M count=1024 >& /dev/null
+rm -rf $vdev1
+dd if=/dev/zero if=${vdev2} bs=1M count=1024 >& /dev/null
+rm -rf $vdev2
+dd if=/dev/zero if=${vdev3} bs=1M count=1024 >& /dev/null
+rm -rf $vdev3
+dd if=/dev/zero if=${vdev4} bs=1M count=1024 >& /dev/null
+rm -rf $vdev4
 
 exit $rc

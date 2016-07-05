@@ -4,7 +4,7 @@ POOL=testpool
 TESTDIR=test
 
 MNT=/$POOL/$TESTDIR
-MYPWD=$(pwd)
+VDEV_PATH=$1
 
 #
 # ZFS options
@@ -170,17 +170,17 @@ do_test()
 	dmesg -c > /dev/null
 	echo "TESTING: $*" > /dev/kmsg
 
-	truncate -s 1G ${MYPWD}/block-dev-0
-	truncate -s 1G ${MYPWD}/block-dev-1
-	truncate -s 1G ${MYPWD}/block-dev-2
-	truncate -s 1G ${MYPWD}/block-dev-3
-	truncate -s 1G ${MYPWD}/block-dev-4
+	truncate -s 1G ${VDEV_PATH}/block-dev-0
+	truncate -s 1G ${VDEV_PATH}/block-dev-1
+	truncate -s 1G ${VDEV_PATH}/block-dev-2
+	truncate -s 1G ${VDEV_PATH}/block-dev-3
+	truncate -s 1G ${VDEV_PATH}/block-dev-4
 
-	VDEV0=${MYPWD}/block-dev-0
-	VDEV1=${MYPWD}/block-dev-1
-	VDEV2=${MYPWD}/block-dev-2
-	VDEV3=${MYPWD}/block-dev-3
-	VDEV4=${MYPWD}/block-dev-4
+	VDEV0=${VDEV_PATH}/block-dev-0
+	VDEV1=${VDEV_PATH}/block-dev-1
+	VDEV2=${VDEV_PATH}/block-dev-2
+	VDEV3=${VDEV_PATH}/block-dev-3
+	VDEV4=${VDEV_PATH}/block-dev-4
 
 	zpool create $POOL mirror $VDEV0 $VDEV1 -f
 	zpool add $POOL mirror $VDEV2 $VDEV3 -f
@@ -207,6 +207,7 @@ do_test()
 	echo "--------------------------------------------------------------------------------"
 	echo "ZFS options:   $OPT"
 	echo "Stress test:   ${STRESS_NG} $*"
+	echo "VDEV path:     $VDEV_PATH"
 	echo "Mount point:   $MNT"
 	echo "Date:         " $(date)
 	echo "Host:         " $(hostname)
@@ -272,7 +273,18 @@ do_test()
 		exit 1
 	fi
 	echo "destroying VDEVs"
-	rm -f $VDEV0 $VDEV1 $VDEV2 $VDEV3 $VDEV4 $VDEV5
+	dd if=/dev/zero of=$VDEV0 bs=1M count=1024 >& /dev/null
+	rm -rf $VDEV0
+	dd if=/dev/zero of=$VDEV1 bs=1M count=1024 >& /dev/null
+	rm -rf $VDEV1
+	dd if=/dev/zero of=$VDEV2 bs=1M count=1024 >& /dev/null
+	rm -rf $VDEV2
+	dd if=/dev/zero of=$VDEV3 bs=1M count=1024 >& /dev/null
+	rm -rf $VDEV3
+	dd if=/dev/zero of=$VDEV4 bs=1M count=1024 >& /dev/null
+	rm -rf $VDEV4
+	dd if=/dev/zero of=$VDEV5 bs=1M count=1024 >& /dev/null
+	rm -rf $VDEV5
 	kill -TERM $pid &> /dev/null
 
 	echo "================================================================================"

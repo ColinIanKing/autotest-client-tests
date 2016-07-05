@@ -63,7 +63,7 @@ class ubuntu_zfs_stress(test.test):
 
         os.chdir(self.srcdir)
 
-        utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
+        utils.system_output('rm /etc/*/S99autotest -f || true', retain_output=True)
 
         utils.system('modprobe zfs')
 
@@ -79,7 +79,7 @@ class ubuntu_zfs_stress(test.test):
         #  stress-ng "quick fire" short life tests
         #
         dur = '5s'
-        cmd = 'LOG=%s STRESS_NG=%s DURATION=%s bash -c %s/ubuntu_zfs_stress.sh 2>&1' % (log, stress_ng, dur, self.bindir)
+        cmd = 'LOG=%s STRESS_NG=%s DURATION=%s bash -c %s/ubuntu_zfs_stress.sh %s 2>&1' % (log, stress_ng, dur, self.bindir, self.srcdir)
         self.results = utils.system_output(cmd, retain_output=True)
         #
         # FIXME: comment this out on production

@@ -71,8 +71,9 @@ class ubuntu_zfs_fstest(test.test):
                 return
 
         os.chdir(self.srcdir)
-        utils.system('truncate -s 128M /tmp/pool.img')
-        utils.system('zpool create pool /tmp/pool.img')
+	tmp_pool = os.path.join(self.srcdir, 'pool.img')
+        utils.system('truncate -s 128M ' + tmp_pool)
+        utils.system('zpool create pool ' + tmp_pool)
         utils.system('zfs create pool/test')
         os.chdir('/pool/test')
 
@@ -83,7 +84,8 @@ class ubuntu_zfs_fstest(test.test):
         os.chdir(self.srcdir)
         utils.system('zfs destroy pool/test')
         utils.system('zpool destroy pool')
-        utils.system('rm /tmp/pool.img')
+	utils.system('dd if=/dev/zero of=' + tmp_pool + ' bs=1M count=128 >& /dev/null')
+        utils.system('rm -f ' + tmp_pool)
         print "Done!"
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

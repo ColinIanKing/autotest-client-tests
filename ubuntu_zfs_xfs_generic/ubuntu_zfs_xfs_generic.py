@@ -41,19 +41,20 @@ class ubuntu_zfs_xfs_generic(test.test):
             'gawk',
             'fio',
             'dbench',
-            'libtool-bin'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if series in ['precise', 'trusty']:
+        if series in ['precise', 'trusty', 'utopic']:
             utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
             utils.system_output('apt-get update || true', retain_output=True)
             pkgs.append('ubuntu-zfs')
         elif series == 'wily':
             pkgs.append('zfs-dkms')
             pkgs.append('zfsutils-linux')
+            pkgs.append('libtool-bin')
         else:
+            pkgs.append('libtool-bin')
             pkgs.append('zfsutils-linux')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

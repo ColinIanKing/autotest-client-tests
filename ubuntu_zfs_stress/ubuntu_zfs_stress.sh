@@ -313,22 +313,27 @@ do
 	#
 	#  Single stressors..
 	#
-	do_test $INFO $IONICE $SCHED -t $DURATION --chdir $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --chmod $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --dentry $N --dentries 100000
-	do_test $INFO $IONICE $SCHED -t $DURATION --dir $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --fallocate $N  --fallocate-bytes 64M
-	do_test $INFO $IONICE $SCHED -t $DURATION --filename $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --flock $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --fstat $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd --hdd-bytes 64M --hdd-write-size 512
-	do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts wr-seq,rd-rnd --hdd-bytes 32M --hdd-write-size 32K
-	do_test $INFO $IONICE $SCHED -t $DURATION --lease $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --link $N --symlink $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --lockf $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --rename $N
-	do_test $INFO $IONICE $SCHED -t $DURATION --seek $N --seek-size 64M
-	do_test $INFO $IONICE $SCHED -t $DURATION --utime $N --utime-fsync
+	#  cking: commented these out as they take far too long
+	#  and we test this functionality with the "hammer it to death"
+	#  stressors.  We leave these in just in case we need them
+	#  at some point in the future.
+	#
+	#do_test $INFO $IONICE $SCHED -t $DURATION --chdir $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --chmod $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --dentry $N --dentries 100000
+	#do_test $INFO $IONICE $SCHED -t $DURATION --dir $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --fallocate $N  --fallocate-bytes 64M
+	#do_test $INFO $IONICE $SCHED -t $DURATION --filename $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --flock $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --fstat $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd --hdd-bytes 64M --hdd-write-size 512
+	#do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts wr-seq,rd-rnd --hdd-bytes 32M --hdd-write-size 32K
+	#do_test $INFO $IONICE $SCHED -t $DURATION --lease $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --link $N --symlink $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --lockf $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --rename $N
+	#do_test $INFO $IONICE $SCHED -t $DURATION --seek $N --seek-size 64M
+	#do_test $INFO $IONICE $SCHED -t $DURATION --utime $N --utime-fsync
 	#
 	#  And hammer it to death..
 	#

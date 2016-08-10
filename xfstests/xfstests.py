@@ -44,11 +44,8 @@ class xfstests(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if series in ['xenial', 'wily', 'vivid']:
+        if series not in ['precise']:
             pkgs.append('libtool-bin')
-
-        if series in ['wily', 'vivid']:
-            pkgs.append('libdm0-dev')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

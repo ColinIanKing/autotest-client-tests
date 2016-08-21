@@ -57,13 +57,13 @@ class ubuntu_qrt_apparmor(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
 
-    def setup(self, tarball='ubuntu-qrt-apparmor.tar.bz2'):
-        tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
-        utils.extract_tarball_to_dir(tarball, self.srcdir)
-        print(utils.system_output('head %s/scripts/bzr.log' % self.srcdir, retain_output=True))
+    def setup(self):
+        os.chdir(self.srcdir)
+        cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
+        self.results = utils.system_output(cmd, retain_output=True)
 
     def run_once(self, test_name):
-        scripts = os.path.join(self.srcdir, 'scripts')
+        scripts = os.path.join(self.srcdir, 'qa-regression-testing', 'scripts')
         os.chdir(scripts)
 
         if test_name == 'setup':

@@ -10,7 +10,7 @@ class ubuntu_qrt_kernel(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'libcap2-bin', 'gawk', 'execstack', 'exim4', 'libcap-dev',
+            'git', 'build-essential', 'libcap2-bin', 'gawk', 'execstack', 'exim4', 'libcap-dev',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

@@ -11,6 +11,7 @@ class ubuntu_qrt_apparmor(test.test):
         series = platform.dist()[2]
 
         pkgs = [
+            'git',
             'pyflakes',
             'libcap2-bin',
             'gawk',

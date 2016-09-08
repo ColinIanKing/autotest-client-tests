@@ -23,24 +23,19 @@ class ubuntu_zfs_xfs_generic(test.test):
             'dump',
             'kpartx',
             'pax',
-            'nfs-kernel-server',
-            'xfslibs-dev',
-            'uuid-dev',
             'libtool',
             'e2fsprogs',
             'automake',
-            'gcc',
-            'libuuid1',
             'quota',
             'attr',
-            'libattr1-dev',
-            'libacl1-dev',
-            'libaio-dev',
-            'xfsprogs',
-            'libgdbm-dev',
             'gawk',
             'fio',
             'dbench',
+            'libtool',
+            'libtool-bin',
+            'gettext',
+            'autopoint',
+            'pkg-config'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -72,19 +67,16 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system_output('useradd fsgqa || true', retain_output=True)
         utils.system_output('echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
         print "Extracting xfstests.tar.bz2 tarball.."
-        tarball = utils.unmap_url(self.bindir, 'xfstests.tar.bz2', self.tmpdir)
+        tarball = utils.unmap_url(self.bindir, 'xfstests-bld.tar.bz2', self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
 
-        os.chdir(self.srcdir)
+        os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
         print "Patching xfstests tarball.."
         utils.system('patch -p1 < %s/0001-xfstests-add-minimal-support-for-zfs.patch' % self.bindir)
-        utils.system('patch -p2 < %s/0002-Fix-build-warnings-and-errors-hit-with-Xenial-gcc-5.patch' % self.bindir)
-        utils.system('patch -p1 < %s/0003-xfstests-strip-out-single-quotes-to-enable-fuzzier-m.patch' % self.bindir)
+        os.chdir(self.srcdir)
 
-        print "Building xfstests tarball.."
-        #utils.make()
-        utils.system('make -j 8')
-        utils.system('make install')
+        print "Building xfstests"
+        utils.system('make')
         utils.system('modprobe zfs')
 
 
@@ -96,7 +88,9 @@ class ubuntu_zfs_xfs_generic(test.test):
         if test_name == 'setup':
                 return
 
-        os.chdir(self.srcdir)
+        #os.chdir(self.srcdir)
+	#print "chdir to " + os.path.join(self.srcdir, 'xfstests-dev')
+	os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
         cmd = '%s/ubuntu_zfs_xfs_generic.sh %s %s' % (self.bindir, test_name, self.srcdir)
         print "Running: " + cmd
         self.results = utils.system_output(cmd, retain_output=True)

@@ -1,6 +1,6 @@
-From 3e9e3d2a9e64f5abdec79fffaaf0076159ef6790 Mon Sep 17 00:00:00 2001
+From ece67be6f40932e2d59a930ecfb4c0e4b05538f0 Mon Sep 17 00:00:00 2001
 From: Colin Ian King <colin.king@canonical.com>
-Date: Wed, 27 May 2015 16:15:59 +0100
+Date: Thu, 8 Sep 2016 14:31:46 +0100
 Subject: [PATCH] xfstests: add minimal support for zfs
 
 Currently the following tests work:
@@ -154,32 +154,32 @@ Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
  check         |  2 ++
  common/attr   |  7 +++++--
- common/config | 23 +++++++++++++++--------
- common/rc     | 26 +++++++++++++++++++++++++-
- 4 files changed, 47 insertions(+), 11 deletions(-)
+ common/config |  7 ++++++-
+ common/rc     | 24 +++++++++++++++++++++++-
+ 4 files changed, 36 insertions(+), 4 deletions(-)
 
 diff --git a/check b/check
-index a300130..0038df6 100755
+index 69341d8..9223799 100755
 --- a/check
 +++ b/check
-@@ -69,6 +69,7 @@ check options
-     -nfs                test NFS
+@@ -65,6 +65,7 @@ check options
      -cifs               test CIFS
+     -overlay		test overlay
      -tmpfs              test TMPFS
-+    -zfs		test ZFS
++    -zfs                test ZFS
      -l			line mode diff
      -udiff		show unified diff (default)
      -n			show me, do not run tests
-@@ -207,6 +208,7 @@ while [ $# -gt 0 ]; do
- 	-nfs)	FSTYP=nfs ;;
- 	-cifs)	FSTYP=cifs ;;
- 	-tmpfs)	FSTYP=tmpfs ;;
-+	-zfs)	FSTYP=zfs ;;
+@@ -212,6 +213,7 @@ while [ $# -gt 0 ]; do
+ 	-cifs)		FSTYP=cifs ;;
+ 	-overlay)	FSTYP=overlay ;;
+ 	-tmpfs)		FSTYP=tmpfs ;;
++        -zfs)		FSTYP=zfs ;;
  
  	-g)	group=$2 ; shift ;
- 		GROUP_LIST="$GROUP_LIST $group"
+ 		GROUP_LIST="$GROUP_LIST ${group//,/ }"
 diff --git a/common/attr b/common/attr
-index 48c81cc..066ec70 100644
+index ce2d76a..2d72d05 100644
 --- a/common/attr
 +++ b/common/attr
 @@ -42,6 +42,9 @@ _acl_get_max()
@@ -189,10 +189,10 @@ index 48c81cc..066ec70 100644
 +	zfs)
 +		echo 1024
 +		;;
- 	*)
- 		echo 0
- 		;;
-@@ -246,7 +249,7 @@ _sort_getfattr_output()
+ 	f2fs)
+ 		_fs_options $TEST_DEV | grep "inline_xattr" >/dev/null 2>&1
+ 		if [ $? -eq 0 ]; then
+@@ -254,7 +257,7 @@ _sort_getfattr_output()
  }
  
  # set maximum total attr space based on fs type
@@ -201,108 +201,86 @@ index 48c81cc..066ec70 100644
  	MAX_ATTRS=1000
  else # Assume max ~1 block of attrs
  	BLOCK_SIZE=`get_block_size $TEST_DIR`
-@@ -257,7 +260,7 @@ fi
+@@ -265,7 +268,7 @@ fi
  export MAX_ATTRS
  
  # Set max attr value size based on fs type
 -if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "btrfs" ]; then
-+if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "btrfs"  -o "$FSTYPE" == "zfs" ]; then
++if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "btrfs" -o "$FSTYPE" == "zfs" ]; then
  	MAX_ATTRVAL_SIZE=64
  else # Assume max ~1 block of attrs
  	BLOCK_SIZE=`get_block_size $TEST_DIR`
 diff --git a/common/config b/common/config
-index 8e21c28..5ec3962 100644
+index 168f46c..b68c352 100644
 --- a/common/config
 +++ b/common/config
-@@ -288,6 +288,9 @@ _mount_opts()
- 		# We need to specify the size at mount, use 512 MB by default
- 		export MOUNT_OPTIONS="-o size=512M $TMPFS_MOUNT_OPTIONS"
+@@ -324,6 +324,9 @@ _mount_opts()
+ 		# We need to specify the size at mount, use 1G by default
+ 		export MOUNT_OPTIONS="-o size=1G $TMPFS_MOUNT_OPTIONS"
  		;;
-+	zfs)
++	zfz)
 +		export MOUNT_OPTIONS=""
 +		;;
  	*)
  		;;
  	esac
-@@ -465,10 +468,12 @@ get_next_config() {
- 		exit 1
- 	fi
+@@ -444,7 +447,9 @@ _check_device()
  
--	echo $TEST_DEV | grep -qE ":|//" > /dev/null 2>&1
--	if [ ! -b "$TEST_DEV" -a "$?" != "0" ]; then
--		echo "common/config: Error: \$TEST_DEV ($TEST_DEV) is not a block device or a network filesystem"
--		exit 1
-+	if [ "$FSTYP" != "zfs" ]; then
-+		echo $TEST_DEV | grep -qE ":|//" > /dev/null 2>&1
-+		if [ ! -b "$TEST_DEV" -a "$?" != "0" ]; then
-+			echo "common/config: Error: \$TEST_DEV ($TEST_DEV) is not a block device or a network filesystem"
-+			exit 1
-+		fi
- 	fi
- 
- 	if [ ! -d "$TEST_DIR" ]; then
-@@ -488,10 +493,12 @@ get_next_config() {
- 		export SCRATCH_DEV_NOT_SET=true
- 	fi
- 
--	echo $SCRATCH_DEV | grep -qE ":|//" > /dev/null 2>&1
--	if [ ! -z "$SCRATCH_DEV" -a ! -b "$SCRATCH_DEV" -a "$?" != "0" ]; then
--		echo "common/config: Error: \$SCRATCH_DEV ($SCRATCH_DEV) is not a block device or a network filesystem"
--		exit 1
-+	if [ "$FSTYP" != "zfs" ]; then
-+		echo $SCRATCH_DEV | grep -qE ":|//" > /dev/null 2>&1
-+		if [ ! -z "$SCRATCH_DEV" -a ! -b "$SCRATCH_DEV" -a "$?" != "0" ]; then
-+			echo "common/config: Error: \$SCRATCH_DEV ($SCRATCH_DEV) is not a block device or a network filesystem"
-+			exit 1
-+		fi
- 	fi
- 
- 	if [ ! -z "$SCRATCH_MNT" -a ! -d "$SCRATCH_MNT" ]; then
+ 	echo $dev | grep -qE ":|//" > /dev/null 2>&1
+ 	network_dev=$?
+-	if [ "$FSTYP" == "overlay" ]; then
++	if [ "$FSTYP" == "zfs" ]; then
++		:
++	elif [ "$FSTYP" == "overlay" ]; then
+ 		if [ ! -d "$dev" ]; then
+ 			_fatal "common/config: $name ($dev) is not a directory for overlay"
+ 		fi
 diff --git a/common/rc b/common/rc
-index 610045e..316f0c2 100644
+index 04039a4..87c1921 100644
 --- a/common/rc
 +++ b/common/rc
-@@ -128,6 +128,8 @@ case "$FSTYP" in
+@@ -152,6 +152,9 @@ case "$FSTYP" in
      reiser4)
  	 [ "$MKFS_REISER4_PROG" = "" ] && _fatal "mkfs.reiser4 not found"
  	 ;;
 +    zfs)
-+         ;;
++	 # do nothing for zfs
++	 ;;
  esac
  
  # make sure we have a standard umask
-@@ -544,6 +546,9 @@ _test_mkfs()
+@@ -708,6 +711,9 @@ _test_mkfs()
      ext2|ext3|ext4)
  	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* $TEST_DEV
  	;;
 +    zfs)
-+	# do nothing for zfs
-+	;;
++	 # do nothing for zfs
++	 ;;
      *)
  	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $TEST_DEV
  	;;
-@@ -566,7 +571,9 @@ _mkfs_dev()
+@@ -733,7 +739,9 @@ _mkfs_dev()
  	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* \
  		2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
  	;;
 -
 +    zfs)
-+	# do nothing for zfs
-+	;;
++	 # do nothing for zfs
++	 ;;
      *)
  	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* \
  		2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
-@@ -625,6 +632,9 @@ _scratch_mkfs()
+@@ -805,6 +813,9 @@ _scratch_mkfs()
      f2fs)
          $MKFS_F2FS_PROG $MKFS_OPTIONS $* $SCRATCH_DEV > /dev/null
  	;;
 +    zfs)
-+        _scratch_cleanup_files
++	_scratch_cleanup_files
 +	;;
      *)
  	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $SCRATCH_DEV
  	;;
-@@ -1112,6 +1122,8 @@ _require_scratch_nocheck()
+@@ -1508,6 +1519,8 @@ _require_scratch_nocheck()
  		    _notrun "this test requires a valid \$SCRATCH_MNT and unique $SCRATCH_DEV"
  		fi
  		;;
@@ -311,7 +289,7 @@ index 610045e..316f0c2 100644
  	*)
  		 if [ -z "$SCRATCH_DEV" -o "`_is_block_dev "$SCRATCH_DEV"`" = "" ]
  		 then
-@@ -1186,6 +1198,12 @@ _require_test()
+@@ -1593,6 +1606,12 @@ _require_test()
  		    _notrun "this test requires a valid \$TEST_DIR and unique $TEST_DEV"
  		fi
  		;;
@@ -324,7 +302,7 @@ index 610045e..316f0c2 100644
  	*)
  		 if [ -z "$TEST_DEV" ] || [ "`_is_block_dev "$TEST_DEV"`" = "" ]
  		 then
-@@ -2054,6 +2072,9 @@ _check_test_fs()
+@@ -2646,6 +2665,9 @@ _check_test_fs()
      tmpfs)
  	# no way to check consistency for tmpfs
  	;;
@@ -334,16 +312,6 @@ index 610045e..316f0c2 100644
      *)
  	_check_generic_filesystem $TEST_DEV
  	;;
-@@ -2092,6 +2113,9 @@ _check_scratch_fs()
-     tmpfs)
- 	# no way to check consistency for tmpfs
- 	;;
-+    zfs)
-+	# Don't know how to check an NFS filesystem, yet.
-+        ;;
-     *)
- 	_check_generic_filesystem $device
- 	;;
 -- 
-2.1.4
+2.9.3
 

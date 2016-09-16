@@ -27,19 +27,20 @@ class xfstests(test.test):
 
         pkgs = [
             'build-essential',
-            'uuid-dev',
-            'xfslibs-dev',
             'xfsdump',
             'autoconf',
             'kpartx',
             'libtool',
             'python-xattr',
-            'libacl1-dev',
-            'libaio-dev',
             'quota',
             'bc',
             'btrfs-tools',
             'attr',
+	    'texinfo',
+	    'texlive',
+	    'gettext',
+	    'autopoint',
+	    'pkg-config'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -47,11 +48,11 @@ class xfstests(test.test):
         if series not in ['precise']:
             pkgs.append('libtool-bin')
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'apt-get install --yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def _run_sub_test(self, test):
-        os.chdir(self.srcdir)
+        os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
         output = utils.system_output('./check %s' % test,
                                      ignore_status=True,
                                      retain_output=True)
@@ -120,12 +121,12 @@ class xfstests(test.test):
     def initialize(self):
         self.install_required_pkgs()
 
-    def setup(self, tarball='xfstests.tar.bz2'):
+    def setup(self, tarball='xfstests-bld.tar.bz2'):
         '''
         Sets up the environment necessary for running xfstests
         '''
 
-
+	#
         # Anticipate failures due to missing devel tools, libraries, headers
         # and xfs commands
         #
@@ -133,9 +134,9 @@ class xfstests(test.test):
         os_dep.command('autoheader')
         os_dep.command('libtool')
         os_dep.library('libuuid.so.1')
-        os_dep.header('xfs/xfs.h')
-        os_dep.header('attr/xattr.h')
-        os_dep.header('sys/acl.h')
+        #os_dep.header('xfs/xfs.h')
+        #os_dep.header('attr/xattr.h')
+        #os_dep.header('sys/acl.h')
         os_dep.command('mkfs.xfs')
         os_dep.command('xfs_db')
         os_dep.command('xfs_bmap')
@@ -147,8 +148,6 @@ class xfstests(test.test):
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
         utils.system('pwd')
-        utils.system('patch -p1 < %s/common_rc.patch' % self.bindir)
-	utils.system('patch -p1 < %s/Fix-build-warnings-and-errors-hit-with-Xenial-gcc-5.patch' % self.bindir)
         utils.make()
 
         logging.debug("Available tests in srcdir: %s" %

@@ -16,7 +16,7 @@ class iperf(test.test):
     def install_required_pkgs(self):
 
         pkgs = [
-            'sysstat'
+            'sysstat', 'iperf'
         ]
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
@@ -26,30 +26,14 @@ class iperf(test.test):
         self.install_required_pkgs()
         self.SERVER_PORT = '5001'
 
-        # The %%s is to add extra args later
-        # We cannot use daemon mode because it is unreliable with
-        # UDP transfers.
-        self.server_path = "%s %%s&" % os.path.join(self.srcdir,
-                                                    'src/iperf -s')
-        # Add the servername and arguments later
-        self.client_path = "%s %%s %%s" % os.path.join(self.srcdir,
-                                                       'src/iperf -y c -c')
-
         self.results = []
         self.actual_times = []
         self.netif = ''
         self.network_utils = net_utils.network_utils()
 
     # http://downloads.sourceforge.net/iperf/iperf-2.0.4.tar.gz
-    def setup(self, tarball='iperf-2.0.4.tar.gz'):
-        self.job.require_gcc()
-        tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
-        utils.extract_tarball_to_dir(tarball, self.srcdir)
-        os.chdir(self.srcdir)
-
-        utils.configure()
-        utils.make()
-        utils.system('sync')
+    def setup(self):
+        return
 
     def run_once(self, server_ip, client_ip, role, udp=False,
                  bidirectional=False, test_time=10, dev='', stream_list=[1], barriers=True):
@@ -123,9 +107,9 @@ class iperf(test.test):
         if self.udp:
             args += '-u '
 
+        iperf_cmd = "iperf -s %s&" % args
         utils.system('killall -9 iperf', ignore_status=True)
-        self.results.append(utils.system_output(self.server_path % args,
-                                                retain_output=True))
+        self.results.append(iperf_cmd, retain_output=True)
 
     def server_stop(self):
         utils.system('killall -9 iperf', ignore_status=True)
@@ -146,7 +130,7 @@ class iperf(test.test):
             cmds.append('mpstat -P ALL %s 5' % interval)
 
             # Add the iperf command
-            cmd = self.client_path % (server_ip, args)
+            cmd = "iperf -y c -c %s %s" % (server_ip, args)
             cmds.append(cmd)
 
             t0 = time.time()

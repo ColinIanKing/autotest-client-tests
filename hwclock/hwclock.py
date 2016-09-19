@@ -30,6 +30,7 @@ class hwclock(test.test):
         Set hwclock back to a date in 1980 and verify if the changes took
         effect in the system.
         """
+        series = platform.dist()[2]
         utils.system_output('apt-get install virt-what --assume-yes', retain_output=True)
         self.virt = utils.system_output('virt-what', retain_output=True)
         #
@@ -42,9 +43,11 @@ class hwclock(test.test):
             logging.info('Setting hwclock to 2/2/80 03:04:00')
             utils.system('/sbin/hwclock --set --date "2/2/80 03:04:00"')
             date = utils.system_output('LC_ALL=C /sbin/hwclock')
-            if not re.match('Sat *Feb *2 *03:04:.. 1980', date):
-                raise error.TestFail("Failed to set hwclock back to the eighties. "
-                                     "Output of hwclock is '%s'" % date)
+            if series in ['precise', 'trusty', 'xenial']:
+                if not re.match('Sat *Feb *2 *03:04:.. 1980', date):
+                    raise error.TestFail("Failed to set hwclock back to the eighties. Output of hwclock is '%s'" % date)
+            elif not re.match('1980-02-02 03:04:..*', date):
+                raise error.TestFail("Failed to set hwclock back to the eighties. Output of hwclock is '%s'" % date)
 
     def cleanup(self):
         """

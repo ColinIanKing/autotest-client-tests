@@ -53,13 +53,11 @@ class libhugetlbfs(test.test):
             utils.system('mount -t hugetlbfs none %s' % hugetlbfs_dir)
             self.hugetlbfs_dir = hugetlbfs_dir
 
-    def setup(self, tarball='libhugetlbfs-2.14.tar.gz'):
+    def setup(self, tarball='libhugetlbfs-2.20.tar.gz'):
         # get the sources
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
-        utils.system('patch -p1 < %s/elflink.patch' % self.bindir)
-        utils.system('patch -p1 < %s/build-fixes.patch' % self.bindir)
 
         # build for the underlying arch only (i.e. only 64 bit on 64 bit etc)
         utils.make('BUILDTYPE=NATIVEONLY')

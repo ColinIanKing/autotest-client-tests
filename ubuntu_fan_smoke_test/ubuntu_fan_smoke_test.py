@@ -1,6 +1,7 @@
 #
 #
 import platform
+import re
 from autotest.client                        import test, utils
 
 class ubuntu_fan_smoke_test(test.test):
@@ -25,8 +26,22 @@ class ubuntu_fan_smoke_test(test.test):
     def setup(self):
         pass
 
+    def determine_underlay(self):
+        underlay = 'bogus'
+        cmd = 'ip address'
+        output = utils.system_output(cmd, retain_output=False)
+        for line in output.split('\n'):
+            m = re.search('inet (\d+\.\d+)\.\d+\.\d+\/\d+ brd \d+\.\d+\.\d+\.\d+ scope', line)
+            if m:
+                underlay = '%s.0.0/16' % m.group(1)
+                break
+        return underlay
+
     def run_once(self, test_name):
-        cmd = '%s/ubuntu_fan_smoke_test.sh' % (self.bindir)
+
+        underlay = self.determine_underlay()
+
+        cmd = '%s/ubuntu_fan_smoke_test.sh %s' % (self.bindir, underlay)
         self.results = utils.system_output(cmd, retain_output=True)
 
         print(self.results)

@@ -25,23 +25,6 @@
 OVERLAY="250.0.0.0/8"
 TMP=/tmp/fan-$$.tmp
 
-get_underlay()
-{
-	local i
-	local interfaces=$(ifconfig | grep encap:Ethernet | grep -v lxc | grep -v docker | grep -v virbr | awk '{ print $1 }')
-	for i in $interfaces
-	do
-		local inet=$(ifconfig $i | grep 'inet addr:' | tr ':' ' ' | awk '{print $3}')
-		if [ "$inet" != "" ]; then
-			local a=$(echo $inet | tr '.' ' ' | awk '{print $1}')
-			local b=$(echo $inet | tr '.' ' ' | awk '{print $2}')
-                        echo "$a.$b.0.0/16"
-                        return
-                fi
-        done
-}
-
-
 enable_fan()
 {
 	fanatic enable-fan -u $UNDERLAY -o $OVERLAY > /dev/null
@@ -205,7 +188,7 @@ elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
     systemctl restart docker
 fi
 
-UNDERLAY=$(get_underlay)
+UNDERLAY=$1
 if [ "$UNDERLAY" = "" ]; then
 	echo "FAILED (could not determine an UNDERLAY address range)"
 	exit 1

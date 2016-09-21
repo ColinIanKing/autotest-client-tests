@@ -20,7 +20,7 @@ EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec spawn remap"
 #
 # Get built-in stressor names
 #
-STRESSORS=$(stress-ng --help | grep "\-ops " | awk '{print $1}' | sed 's/--//' | sed 's/-ops//g')
+STRESSORS=$(./stress-ng --help | grep "\-ops " | awk '{print $1}' | sed 's/--//' | sed 's/-ops//g')
 rc=0
 TMP_FILE=/tmp/stress-$$.log
 
@@ -54,7 +54,7 @@ do
 	then
 		count=$((count + 1))
 		dmesg -c >& /dev/null
-		stress-ng -v -t ${DURATION} --${s} ${INSTANCES} ${STRESS_OPTIONS} &> ${TMP_FILE}
+		./stress-ng -v -t ${DURATION} --${s} ${INSTANCES} ${STRESS_OPTIONS} &> ${TMP_FILE}
 		ret=$?
 
 		n=$(dmesg | grep "Oops" | wc -l)

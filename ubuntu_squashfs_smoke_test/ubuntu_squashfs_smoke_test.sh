@@ -42,7 +42,7 @@ fi
 # 2.4 kernels upwards support lazy umount
 #
 if (( $(echo "$major.$minor >= 2.4" | bc -l) )); then
-	lazy="--lazy"
+	lazy="-l"
 else
 	lazy=""
 fi

@@ -11,7 +11,7 @@ class ubuntu_squashfs_smoke_test(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'xfsprogs', 'git', 'acl', 'libattr1-dev', 'squashfs-tools',
+            'build-essential', 'xfsprogs', 'git', 'acl', 'libattr1-dev', 'squashfs-tools', 'bc',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

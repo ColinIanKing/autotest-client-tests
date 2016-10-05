@@ -16,7 +16,7 @@ STRESS_OPTIONS="--ignite-cpu --syslog --verbose --verify"
 #
 # Tests that can lock up some kernels or are CPU / arch specific, so exclude them for now
 #
-EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec spawn remap stack"
+EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec spawn remap stack oom-pipe"
 #
 # Get built-in stressor names
 #

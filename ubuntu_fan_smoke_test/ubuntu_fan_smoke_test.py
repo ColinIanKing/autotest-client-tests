@@ -1,5 +1,6 @@
 #
 #
+import os
 import platform
 import re
 from autotest.client                        import test, utils
@@ -41,7 +42,8 @@ class ubuntu_fan_smoke_test(test.test):
 
         underlay = self.determine_underlay()
 
-        cmd = '%s/ubuntu_fan_smoke_test.sh %s' % (self.bindir, underlay)
+        os.chdir(self.bindir)
+        cmd = './ubuntu_fan_smoke_test.sh %s' % (underlay)
         self.results = utils.system_output(cmd, retain_output=True)
 
         print(self.results)

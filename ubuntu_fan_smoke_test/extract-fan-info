@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+#
+
+import fileinput
+import re
+
+if __name__ == '__main__':
+    retval = -1
+
+    fan_name = 'invalid'
+    fan_addr = 'invalid'
+    extracting = False
+    for line in fileinput.input():
+        line = line.strip()
+
+        if extracting:
+            m = re.search('inet (\d+\.\d+\.\d+\.\d+)\/\d+ ', line)
+            if m:
+                fan_addr = m.group(1)
+                break
+
+        m = re.search('^\d+\: (fan-\S+)\: \<', line)
+        if m:
+            fan_name = m.group(1)
+            extracting = True
+
+    print('%s:%s' % (fan_name, fan_addr))
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

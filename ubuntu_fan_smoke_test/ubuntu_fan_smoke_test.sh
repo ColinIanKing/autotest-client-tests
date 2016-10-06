@@ -131,8 +131,9 @@ fanatic_docker_test()
 	echo -n "fanatic docker test: "
 	enable_fan
 
-	fan=$(ifconfig | grep ^fan- | awk '{print $1}')
-	fan_addr=$(ifconfig $fan | grep "inet addr:" | cut -d: -f2 | awk '{print $1}')
+	info=$(ip address | ./extract-fan-info)
+	fan=$(echo $info | cut -d: -f1)
+	fan_addr=$(echo $info | cut -d: -f2)
 	enable_docker
 	service docker restart
 	docker run $image sh -c "apt-get update && apt-get install iputils-ping -y && ping -c 10 $fan_addr" > $TMP

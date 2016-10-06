@@ -135,7 +135,7 @@ fanatic_docker_test()
 	fan_addr=$(ifconfig $fan | grep "inet addr:" | cut -d: -f2 | awk '{print $1}')
 	enable_docker
 	service docker restart
-	docker run ubuntu sh -c "apt-get update && apt-get install iputils-ping -y && ping -c 10 $fan_addr" > $TMP
+	docker run $image sh -c "apt-get update && apt-get install iputils-ping -y && ping -c 10 $fan_addr" > $TMP
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "FAILED: (docker run returned $ret)"
@@ -159,31 +159,22 @@ fanatic_docker_test()
 	echo "PASSED"
 }
 
+export http_proxy=""
 if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
     echo "Running in the Canonical CI environment"
     export http_proxy="http://squid.internal:3128"
-    export https_proxy="http://squid.internal:3128"
-
-    mkdir /etc/systemd/system/docker.service.d
-    echo -n "[Service]\nEnvironment=HTTP_PROXY=http://squid.internal:3128\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
-    systemctl daemon-reload
-    systemctl restart docker
 elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
     echo "Running in the Canonical enablement environment"
     export http_proxy="http://10.245.64.1:3128"
-    export https_proxy="http://10.245.64.1:3128"
-
-    mkdir /etc/systemd/system/docker.service.d
-    echo -n "[Service]\nEnvironment=HTTP_PROXY=http://10.245.64.1:3128\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
-    systemctl daemon-reload
-    systemctl restart docker
 elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
     echo "Running in the Canonical enablement environment"
     export http_proxy="http://91.189.89.216:3128"
-    export https_proxy="http://91.189.89.216:3128"
+fi
 
-    mkdir /etc/systemd/system/docker.service.d
-    echo -n "[Service]\nEnvironment=HTTP_PROXY=http://91.189.89.216:3128\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
+if [ -n "$http_proxy" ]; then
+    export https_proxy="$http_proxy"
+    [ ! -d /etc/systemd/system/docker.service.d ] && mkdir /etc/systemd/system/docker.service.d
+    echo -n "[Service]\nEnvironment=HTTP_PROXY=$http_proxy\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
     systemctl daemon-reload
     systemctl restart docker
 fi
@@ -194,8 +185,11 @@ if [ "$UNDERLAY" = "" ]; then
 	exit 1
 fi
 
-echo -n "docker pull ubuntu: "
-docker pull ubuntu > /dev/null
+image="`uname -m`/ubuntu"
+[ "`uname -m`" = "x86_64" ] && image="ubuntu"
+echo -n "docker pull $image: "
+
+docker pull $image > /dev/null
 ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED (docker pull returned $ret)"

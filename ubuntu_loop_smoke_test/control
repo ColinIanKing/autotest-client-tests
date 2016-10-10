@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_loop_smoke_test"
+CRITERIA = """
+Kernel Loopback Smoke Test
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_loop_smoke_test'
+
+results = job.run_test_detail('ubuntu_loop_smoke_test', test_name='loop-smoke-test', tag='loop-smoke-test')
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

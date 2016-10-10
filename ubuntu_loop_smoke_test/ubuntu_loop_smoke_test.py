@@ -1,6 +1,7 @@
 #
 #
-import os, shutil
+import os
+import shutil
 from autotest.client                        import test, utils
 import platform
 
@@ -9,11 +10,11 @@ class ubuntu_loop_smoke_test(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
-	series = platform.dist()[2]
+        series = platform.dist()[2]
 
         pkgs = [
-		'build-essential'
-	]
+            'build-essential'
+        ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
@@ -25,13 +26,13 @@ class ubuntu_loop_smoke_test(test.test):
         self.job.require_gcc()
 
     def setup(self):
-	shutil.copyfile(os.path.join(self.bindir, 'loop-test.c'),
-			os.path.join(self.srcdir, 'loop-test.c'))
-	shutil.copyfile(os.path.join(self.bindir, 'Makefile'),
-			os.path.join(self.srcdir, 'Makefile'))
+        shutil.copyfile(os.path.join(self.bindir, 'loop-test.c'),
+                        os.path.join(self.srcdir, 'loop-test.c'))
+        shutil.copyfile(os.path.join(self.bindir, 'Makefile'),
+                        os.path.join(self.srcdir, 'Makefile'))
 
         os.chdir(self.srcdir)
-	utils.make()
+        utils.make()
 
     def run_once(self, test_name):
         cmd = '%s/loop-test' % (self.srcdir)

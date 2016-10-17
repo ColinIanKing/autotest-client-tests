@@ -41,6 +41,12 @@ class ubuntu_kernel_selftests(test.test):
         if os.path.exists('linux') is False:
             cmd = 'git clone https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/%s linux' % series
             utils.system(cmd)
+            # tweak sleep wake alarm time to 30 seconds as 5 is a bit too small
+            #
+            fn = 'linux/tools/testing/selftests/breakpoints/step_after_suspend_test.c'
+            if os.path.exists(fn):
+               cmd = 'sed -i "s/tv_sec = 5;/tv_sec = 30;/" ' + fn
+               utils.system(cmd)
 
     def run_once(self, test_name):
         os.chdir(self.srcdir)

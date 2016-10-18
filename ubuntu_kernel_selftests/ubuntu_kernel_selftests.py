@@ -47,6 +47,12 @@ class ubuntu_kernel_selftests(test.test):
             if os.path.exists(fn):
                cmd = 'sed -i "s/tv_sec = 5;/tv_sec = 30;/" ' + fn
                utils.system(cmd)
+            # currently disable step_after_suspend_test as this breaks ssh'd login
+            # connections to the test VMs and real H/W
+            fn = 'linux/tools/testing/selftests/breakpoints/Makefile'
+            if os.path.exists(fn):
+                cmd = 'sed -i "s/TEST_PROGS += step_after_suspend_test/# TEST_PROGS += step_after_suspend_test/" ' + fn
+                utils.system(cmd)
 
     def run_once(self, test_name):
         os.chdir(self.srcdir)

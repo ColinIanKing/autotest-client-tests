@@ -68,7 +68,7 @@ do
 			passed="$passed $s"
 			;;
 		1)
-			echo "$s SKIPPED (stress-ng out of resources)"
+			echo "$s SKIPPED (test framework out of resources or test should not be run)"
 			skipped="$skipped $s"
 			;;
 		2)

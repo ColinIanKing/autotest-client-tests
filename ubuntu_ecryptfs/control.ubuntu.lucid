@@ -14,7 +14,6 @@ TEST_TYPE = 'client'
 BLACKLIST = [
     'lp-1009207.sh',   # Fails consistently
     'enospc.sh',       # Hangs forever on rizzo, amd64, quantal
-    'lp-994247.sh',    # Causes an oops on Precise. A fix is inbound and this should be enabled on 7/30/12.
     'file-concurrent.sh', # Lots of errors and never completes. On Lucid, Natty and Oneiric.
     'inode-race-stat.sh', # Known to not pass on Lucid, Natty, and Oneiric
 ]

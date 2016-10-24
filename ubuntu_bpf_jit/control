@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_bpf_jit"
+CRITERIA = """
+Berkeley Packet Filter JIT
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_bpf_jit'
+
+results = job.run_test_detail('ubuntu_bpf_jit', test_name='ubuntu-bpf-jit', tag='ubuntu-bjf-jit')
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

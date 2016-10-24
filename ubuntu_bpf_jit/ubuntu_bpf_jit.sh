@@ -19,6 +19,26 @@
 #
 MODULE=test_bpf
 
+parse_dmesg()
+{
+	dmesg | grep test_bpf
+	#
+	# Get stats, e.g.
+	# [ 2936.055026] test_bpf: Summary: 305 PASSED, 0 FAILED, [0/297 JIT'ed]
+	#
+	passed=$(dmesg | grep "test_bpf" | grep Summary | awk '{print $5}')
+	failed=$(dmesg | grep "test_bpf" | grep Summary | awk '{print $7}')
+
+	echo "PASSED: $passed"
+	echo "FAILED: $failed"
+
+	if [ $failed -gt 0 ]; then
+		exit 1
+	fi
+
+	exit 0
+}
+
 #
 #  Trival bpf jit module test
 #
@@ -40,29 +60,16 @@ fi
 dmesg -c > /dev/null
 modprobe ${MODULE}
 if [ $? -ne 0 ]; then
-	echo "Module ${MODULE} failed to be loaded"
+	echo "Module ${MODULE} load failure"
+	parse_dmesg
 	exit 1
 fi
 
-dmesg | grep test_bpf
 modprobe -r ${MODULE}
 if [ $? -ne 0 ]; then
 	echo "Module ${MODULE} could not be removed after test"
 	exit 1
 fi
 
-#
-# Get stats, e.g.
-# [ 2936.055026] test_bpf: Summary: 305 PASSED, 0 FAILED, [0/297 JIT'ed]
-#
-passed=$(dmesg | grep "test_bpf" | grep Summary | awk '{print $5}')
-failed=$(dmesg | grep "test_bpf" | grep Summary | awk '{print $7}')
+parse_dmesg
 
-echo "PASSED: $passed"
-echo "FAILED: $failed"
-
-if [ $failed -gt 0 ]; then
-	exit 1
-fi
-
-exit 0

@@ -43,7 +43,7 @@ class hwclock(test.test):
             logging.info('Setting hwclock to 2/2/80 03:04:00')
             utils.system('/sbin/hwclock --set --date "2/2/80 03:04:00"')
             date = utils.system_output('LC_ALL=C /sbin/hwclock')
-            if series in ['precise', 'trusty', 'xenial']:
+            if series in ['precise', 'trusty', 'vivid', 'xenial']:
                 if not re.match('Sat *Feb *2 *03:04:.. 1980', date):
                     raise error.TestFail("Failed to set hwclock back to the eighties. Output of hwclock is '%s'" % date)
             elif not re.match('1980-02-02 03:04:..*', date):

@@ -26,8 +26,8 @@ parse_dmesg()
 	# Get stats, e.g.
 	# [ 2936.055026] test_bpf: Summary: 305 PASSED, 0 FAILED, [0/297 JIT'ed]
 	#
-	passed=$(dmesg | grep "test_bpf" | grep Summary | awk '{print $5}')
-	failed=$(dmesg | grep "test_bpf" | grep Summary | awk '{print $7}')
+	passed=$(dmesg | cut -c16- | grep "test_bpf" | grep Summary | awk '{print $3}')
+	failed=$(dmesg | cut -c16- | grep "test_bpf" | grep Summary | awk '{print $5}')
 
 	echo "PASSED: $passed"
 	echo "FAILED: $failed"

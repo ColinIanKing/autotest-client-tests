@@ -31,7 +31,7 @@ class ubuntu_kvm_unit_tests(test.test):
         utils.make()
 
         # patch run_tests.sh to build our tests list
-        utils.system('patch -p1 < %s/run_tests_show.patch' % self.bindir)
+        utils.system('patch -p1 < %s/runtime_show.patch' % self.bindir)
         utils.system('./run_tests.sh -v > tests.txt')
 
     def run_once(self, test_name, cmd=''):

@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 from autotest.client            import test, utils, os_dep
 from autotest.client.shared     import error
@@ -24,10 +25,14 @@ class ubuntu_kvm_unit_tests(test.test):
         self.job.require_gcc()
 
     def setup(self, tarball='kvm-unit-tests.tar.bz2'):
+        arch = platform.processor()
+        opt = ''
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
-        utils.configure()
+        if arch == 'ppc64le':
+            opt='--endian={}'.format(sys.byteorder)
+        utils.configure(opt)
         utils.make()
 
         # patch run_tests.sh to build our tests list

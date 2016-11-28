@@ -1,0 +1,37 @@
+From 3dad48b87fd02a46ce98593589c426680d6ec428 Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Mon, 28 Nov 2016 14:01:05 +0000
+Subject: [PATCH] Fix incomplete type build error on struct rlimit by including
+ <sys/resource.h>, fixes:
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+test_lru_map.c:552:9: error: variable ‘r’ has initializer
+ but incomplete type
+  struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
+         ^
+test_lru_map.c:552:21: error: ‘RLIM_INFINITY’ undeclared
+ (first use in this function)
+  struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ tools/testing/selftests/bpf/test_lru_map.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/testing/selftests/bpf/test_lru_map.c b/tools/testing/selftests/bpf/test_lru_map.c
+index 627757e..fde54a2 100644
+--- a/tools/testing/selftests/bpf/test_lru_map.c
++++ b/tools/testing/selftests/bpf/test_lru_map.c
+@@ -13,6 +13,7 @@
+ #include <assert.h>
+ #include <sched.h>
+ #include <sys/wait.h>
++#include <sys/resource.h>
+ #include <stdlib.h>
+ #include <time.h>
+ #include "bpf_sys.h"
+-- 
+2.7.4
+

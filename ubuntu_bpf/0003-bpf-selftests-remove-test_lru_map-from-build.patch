@@ -1,0 +1,30 @@
+From fa9c788386bc7bf55110fff9d81cd5dc01807b9e Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Mon, 28 Nov 2016 15:03:57 +0000
+Subject: [PATCH] bpf: selftests: remove test_lru_map from build
+
+We don't need this test for now, so don't build it
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ tools/testing/selftests/bpf/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
+index 7a5f245..0590876 100644
+--- a/tools/testing/selftests/bpf/Makefile
++++ b/tools/testing/selftests/bpf/Makefile
+@@ -1,8 +1,8 @@
+ CFLAGS += -Wall -O2 -I../../../../usr/include
+ 
+-test_objs = test_verifier test_maps test_lru_map
++test_objs = test_verifier test_maps
+ 
+-TEST_PROGS := test_verifier test_maps test_lru_map test_kmod.sh
++TEST_PROGS := test_verifier test_maps test_kmod.sh
+ TEST_FILES := $(test_objs)
+ 
+ all: $(test_objs)
+-- 
+2.7.4
+

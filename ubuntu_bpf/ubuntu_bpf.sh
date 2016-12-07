@@ -23,11 +23,27 @@ rc=0
 BINDIR=$1
 SRCDIR=$2
 
+# FIXME: This should be done in default adt environment
+# Detect the ubuntu-ci setup
+if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
+    echo "Running in the Canonical CI environment"
+    export http_proxy="http://squid.internal:3128"
+    export https_proxy="http://squid.internal:3128"
+elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
+    echo "Running in the Canonical enablement environment"
+    export http_proxy="http://10.245.64.1:3128"
+    export https_proxy="http://10.245.64.1:3128"
+elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
+    echo "Running in the Canonical enablement environment"
+    export http_proxy="http://91.189.89.216:3128"
+    export https_proxy="http://91.189.89.216:3128"
+fi
+
 #
 #  Currently bpf tests are in linux-next, these probably won't land
 #  until Linux 4.10
 #
-git clone git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next
+git clone https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
 cd linux-next
 git reset --hard 02eb3c71e393a088746de13f67be69f3555b73a2
 git am ${SRCDIR}/0001-selftests-just-build-bpf.patch

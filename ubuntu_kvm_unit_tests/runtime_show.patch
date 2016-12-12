@@ -1,8 +1,23 @@
 diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 1bd87bc..2435684 100644
+index 1bd87bc..02f999c 100644
 --- a/scripts/runtime.bash
 +++ b/scripts/runtime.bash
-@@ -76,7 +76,7 @@ function run()
+@@ -29,7 +29,7 @@ premature_failure()
+ get_cmdline()
+ {
+     local kernel=$1
+-    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
++    echo "$RUNTIME_arch_run $kernel -smp $smp $opts"
+ }
+ 
+ skip_nodefault()
+@@ -71,12 +71,12 @@ function run()
+ 
+     if [ -z "$only_group" ] && grep -qw "nodefault" <<<$groups &&
+             skip_nodefault; then
+-        echo -e "`SKIP` $testname (test marked as manual run only)"
++    #    echo -e "`SKIP` $testname (test marked as manual run only)"
+         return;
      fi
  
      if [ -n "$arch" ] && [ "$arch" != "$ARCH" ]; then
@@ -11,7 +26,7 @@ index 1bd87bc..2435684 100644
          return 2
      fi
  
-@@ -87,7 +87,7 @@ function run()
+@@ -87,37 +87,37 @@ function run()
          path=${check_param%%=*}
          value=${check_param#*=}
          if [ "$path" ] && [ "$(cat $path)" != "$value" ]; then
@@ -20,12 +35,17 @@ index 1bd87bc..2435684 100644
              return 2
          fi
      done
-@@ -99,25 +99,25 @@ function run()
+ 
+     last_line=$(premature_failure) && {
+-        echo "`SKIP` $1 ($last_line)"
++    #    echo "`SKIP` $1 ($last_line)"
+         return 77
+     }
  
      cmdline=$(get_cmdline $kernel)
      if [ "$verbose" = "yes" ]; then
 -        echo $cmdline
-+        echo $testname $cmdline
++        echo $testname ":" $cmdline
      fi
  
      # extra_params in the config file may contain backticks that need to be

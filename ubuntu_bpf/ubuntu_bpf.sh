@@ -45,6 +45,8 @@ fi
 #
 git clone https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
 cd linux-next
+git config --local user.email "foo@bar"
+git config --local user.name "Canonical Kernel Testing"
 git reset --hard 02eb3c71e393a088746de13f67be69f3555b73a2
 git am ${SRCDIR}/0001-selftests-just-build-bpf.patch
 git am ${SRCDIR}/0002-Fix-incomplete-type-build-error-on-struct-rlimit-by-.patch

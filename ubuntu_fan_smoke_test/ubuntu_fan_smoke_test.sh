@@ -18,187 +18,54 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-#
-#  Trival "smoke test" fan tests just to see
-#  if basic functionality works
-#
-OVERLAY="250.0.0.0/8"
-TMP=/tmp/fan-$$.tmp
+FAN_VERSION="$(apt-cache policy ubuntu-fan|awk '/Installed:/{print $2}')"
+RUN_DIR="$(dirname $0)"
 
-enable_fan()
-{
-	fanatic enable-fan -u $UNDERLAY -o $OVERLAY > /dev/null
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "FAILED (fanatic enable-fan returned $ret)"
-		exit 1
-	fi
-}
-
-disable_fan()
-{
-	fanatic disable-fan -u $UNDERLAY -o $OVERLAY > /dev/null
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "FAILED (fanctl returned $ret)"
-		exit 1
-	fi
-}
-
-enable_docker()
-{
-	fanatic enable-docker -u $UNDERLAY -o $OVERLAY > /dev/null
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "FAILED (fanatic enable-docker returned $ret)"
-		exit 1
-	fi
-}
-
-disable_docker()
-{
-	fanatic disable-docker -u $UNDERLAY -o $OVERLAY > /dev/null
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "FAILED (fanatic enable-docker returned $ret)"
-		exit 1
-	fi
-}
-
-enable_disable_test()
-{
-	echo -n "enable disable fan test: "
-	enable_fan
-	disable_fan
-	echo "PASSED"
-}
-
-fanctl_show_simple_test()
-{
-	echo -n "fanctl show test: "
-	enable_fan
-	fanctl show > $TMP
-	ret=$?
-	disable_fan
-	rm -f $TMP
-	if [ $ret -ne 0 ]; then
-		echo "FAILED (fanctl show returned $ret)"
-		exit 1
-	fi
-	echo "PASSED"
-}
-
-fanctl_check_bridge_test()
-{
-	failed=""
-	echo -n "fanctl check bridge config test: "
-	enable_fan
-	fanctl show > $TMP
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "FAILED (fanctl show returned $ret)"
-		exit 1
-	fi
-
-	while read bridge underlay overlay flags
-	do
-		if [ x$bridge != xBridge ]; then
-			ifconfig $bridge > /dev/null
-			if [ $? -ne 0 ]; then
-				failed="$failed $bridge"
-			fi
-		fi
-	done < $TMP
-
-	disable_fan
-
-	if [ ! -z $failed ]; then
-		echo "FAILED (bridge:$failed)"
-		exit 1
-	fi
-
-	echo "PASSED"
-}
-
-fanatic_enable_docker_test()
-{
-	echo -n "fanatic enable docker test: "
-	fanatic enable-docker -o $
-}
-
-fanatic_docker_test()
-{
-	echo -n "fanatic docker test: "
-	enable_fan
-
-	info=$(ip address | ./extract-fan-info)
-	fan=$(echo $info | cut -d: -f1)
-	fan_addr=$(echo $info | cut -d: -f2)
-	enable_docker
-	service docker restart
-	docker run $image sh -c "apt-get update && apt-get install iputils-ping -y && ping -c 10 $fan_addr" > $TMP
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		echo "FAILED: (docker run returned $ret)"
-		disable_docker
-		disable_fan
-		rm $TMP
-		exit 1
-	fi
-	if [ $(grep "bytes from $fan_addr" $TMP | wc -l) -ne 10 ]; then
-		echo "FAILED: (ping from container to $fan_addr failed)"
-		disable_docker
-		disable_fan
-		rm $TMP
-		exit 1
-	fi
-
-	disable_docker
-	service docker restart
-	disable_fan
-	rm $TMP
-	echo "PASSED"
-}
-
-export http_proxy=""
+http_proxy=""
+https_proxy=""
 if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
-    echo "Running in the Canonical CI environment"
-    export http_proxy="http://squid.internal:3128"
+    INFO="Running in the Canonical CI environment"
+    http_proxy="http://squid.internal:3128"
+    https_proxy="https://squid.internal:3128"
 elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
-    echo "Running in the Canonical enablement environment"
-    export http_proxy="http://10.245.64.1:3128"
+    INFO="Running in the Canonical enablement environment"
+    http_proxy="http://10.245.64.1:3128"
+    https_proxy="https://10.245.64.1:3128"
 elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
-    echo "Running in the Canonical enablement environment"
-    export http_proxy="http://91.189.89.216:3128"
+    INFO="Running in the Canonical enablement environment"
+    http_proxy="http://91.189.89.216:3128"
+    https_proxy="https://91.189.89.216:3128"
+fi
+export http_proxy
+export https_proxy
+
+URI="http://index.docker.io/v1/repositories/library/ubuntu/images"
+if wget -q -O>/dev/null $URI; then
+    echo $INFO
+else
+    unset http_proxy
+    unset https_proxy
 fi
 
 if [ -n "$http_proxy" ]; then
-    export https_proxy="$http_proxy"
-    [ ! -d /etc/systemd/system/docker.service.d ] && mkdir /etc/systemd/system/docker.service.d
-    echo -n "[Service]\nEnvironment=HTTP_PROXY=$http_proxy\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
+    if [ ! -d /etc/systemd/system/docker.service.d ]; then
+        mkdir /etc/systemd/system/docker.service.d
+    fi
+    echo -ne "[Service]\nEnvironment=\"HTTP_PROXY=$http_proxy\"\n" \
+         > /etc/systemd/system/docker.service.d/http-proxy.conf
     systemctl daemon-reload
-    systemctl restart docker
+    systemctl restart docker.service
 fi
 
-UNDERLAY=$1
-if [ "$UNDERLAY" = "" ]; then
-	echo "FAILED (could not determine an UNDERLAY address range)"
-	exit 1
+if dpkg --compare-versions $FAN_VERSION lt 0.13; then
+	echo "Testing Fan Networking (pre-0.13.0 API)"
+	$RUN_DIR/smoke_test_old.sh "$@"
+	RC=$?
+else
+	echo "Testing Fan Networking (0.13.0+ API)"
+	$RUN_DIR/smoke_test-0.13.0.sh "$@"
+	RC=$?
 fi
 
-image="`uname -m`/ubuntu"
-[ "`uname -m`" = "x86_64" ] && image="ubuntu"
-echo -n "docker pull $image: "
+exit $RC
 
-docker pull $image > /dev/null
-ret=$?
-if [ $ret -ne 0 ]; then
-	echo "FAILED (docker pull returned $ret)"
-	exit 1
-fi
-echo "PASSED"
-
-enable_disable_test
-fanctl_show_simple_test
-fanctl_check_bridge_test
-fanatic_docker_test

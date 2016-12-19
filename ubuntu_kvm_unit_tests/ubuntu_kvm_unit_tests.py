@@ -46,7 +46,15 @@ class ubuntu_kvm_unit_tests(test.test):
         if test_name == 'setup':
             return
 
+        arch = platform.processor()
+        if arch == 'ppc64le':
+            # disable smt (simultaneous multithreading) on ppc for kvm
+            utils.system('ppc64_cpu --smt=off')
+
         self.results = utils.system_output(cmd, retain_output=True, timeout=60)
+        if arch == 'ppc64le':
+            # turn smt back on
+            utils.system('ppc64_cpu --smt=on')
 
 # vi:set ts=4 sw=4 expandtab:
 

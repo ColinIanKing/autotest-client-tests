@@ -11,7 +11,8 @@ class ubuntu_lxc(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'lxc-tests'
+            'lxc-tests',
+            'liblxc1'
         ]
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

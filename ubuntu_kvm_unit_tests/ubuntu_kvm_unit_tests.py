@@ -26,13 +26,13 @@ class ubuntu_kvm_unit_tests(test.test):
 
     def setup(self, tarball='kvm-unit-tests.tar.bz2'):
         arch = platform.processor()
-        opt = ''
+        opt = []
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
         if arch == 'ppc64le':
-            opt='--endian={}'.format(sys.byteorder)
-        utils.configure(opt)
+            opt.append('--endian={}'.format(sys.byteorder))
+        utils.configure(' '.join(opt))
         utils.make()
 
         # patch run_tests.sh to build our tests list

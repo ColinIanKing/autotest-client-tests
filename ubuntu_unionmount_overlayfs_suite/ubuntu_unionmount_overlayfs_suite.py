@@ -12,7 +12,7 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'git',
+            'build-essential', 'git', 'python3',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

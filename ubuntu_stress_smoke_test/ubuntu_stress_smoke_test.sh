@@ -20,7 +20,7 @@ EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec spawn remap s
 #
 # Get built-in stressor names
 #
-STRESSORS=$(./stress-ng --help | grep "\-ops " | awk '{print $1}' | sed 's/--//' | sed 's/-ops//g')
+STRESSORS=$(./stress-ng --stressors)
 rc=0
 TMP_FILE=/tmp/stress-$$.log
 
@@ -45,6 +45,7 @@ passed=""
 failed=""
 skipped=""
 oopsed=""
+badret=""
 
 count=0
 s1=$(secs_now)
@@ -54,8 +55,10 @@ do
 	then
 		count=$((count + 1))
 		dmesg -c >& /dev/null
+		echo "$s STARTING"
 		./stress-ng -v -t ${DURATION} --${s} ${INSTANCES} ${STRESS_OPTIONS} &> ${TMP_FILE}
 		ret=$?
+		echo "$s RETURNED $ret"
 
 		n=$(dmesg | grep "Oops" | wc -l)
 		if [ $n -gt 0 ]; then
@@ -82,11 +85,20 @@ do
 			echo "$s SKIPPED (stressor out of resources)"
 			skipped="$skipped $s"
 			;;
+		4)
+			echo "$s SKIPPED (stressor not implemented on this arch)"
+			skipped="$skipped $s"
+			;;
 		99)
 			echo "$s FAILED (kernel oopsed)"
 			oopsed="$oopsed $s"
 			dmesg
 			echo " "
+			rc=1
+			;;
+		*)
+			echo "$s BADRET (unknown return status $ret)"
+			badret="$badret $s"
 			;;
 		esac
 		rm -f ${TMP_FILE}
@@ -102,6 +114,7 @@ echo "  Skipped: $(echo $skipped | wc -w), $skipped"
 echo "  Failed:  $(echo $failed | wc -w), $failed"
 echo "  Oopsed:  $(echo $oopsed | wc -w), $oopsed"
 echo "  Passed:  $(echo $passed | wc -w), $passed"
+echo "  Badret:  $(echo $badret | wc -w), $badret"
 echo " "
 echo "Tests took $dur seconds to run"
 

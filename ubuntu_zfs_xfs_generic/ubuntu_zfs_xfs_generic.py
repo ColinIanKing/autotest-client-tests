@@ -13,29 +13,30 @@ class ubuntu_zfs_xfs_generic(test.test):
         series = platform.dist()[2]
 
         pkgs = [
+            'acl',
+            'attr',
+            'autoconf',
+            'automake',
+            'autopoint',
             'bc',
             'build-essential',
-            'gdb',
-            'git',
-            'ksh',
-            'autoconf',
-            'acl',
-            'dump',
-            'kpartx',
-            'pax',
-            'libtool',
-            'e2fsprogs',
-            'automake',
-            'quota',
-            'attr',
-            'gawk',
-            'fio',
             'dbench',
+            'dump',
+            'e2fsprogs',
+            'fio',
+            'gawk',
+            'gdb',
+            'gettext',
+            'git',
+            'kpartx',
+            'ksh',
             'libtool',
             'libtool-bin',
-            'gettext',
-            'autopoint',
-            'pkg-config'
+            'pax',
+            'pkg-config',
+            'texinfo',
+            'texlive',
+            'quota'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -47,9 +48,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         elif series == 'wily':
             pkgs.append('zfs-dkms')
             pkgs.append('zfsutils-linux')
-            pkgs.append('libtool-bin')
         else:
-            pkgs.append('libtool-bin')
             pkgs.append('zfsutils-linux')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

@@ -40,17 +40,18 @@ elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
 fi
 
 #
-#  Currently bpf tests are in linux-next, these probably won't land
-#  until Linux 4.10
+#  tests are mainline as of v4.10
 #
-git clone https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
-cd linux-next
+[ ! -d linux ] && git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+cd linux
+
+# Assist local testing by restoring the linux repo to vanilla.
+git checkout -f;git clean -f -d;git ls-files --others --directory |xargs rm -rvf;rm -rf .git/rebase*
+git fetch origin master;git reset --hard FETCH_HEAD
+
 git config --local user.email "foo@bar"
 git config --local user.name "Canonical Kernel Testing"
-git reset --hard 02eb3c71e393a088746de13f67be69f3555b73a2
 git am ${SRCDIR}/0001-selftests-just-build-bpf.patch
-git am ${SRCDIR}/0002-Fix-incomplete-type-build-error-on-struct-rlimit-by-.patch
-git am ${SRCDIR}/0003-bpf-selftests-remove-test_lru_map-from-build.patch
 
 cd tools/testing/selftests
 make clean

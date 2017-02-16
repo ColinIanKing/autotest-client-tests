@@ -28,6 +28,11 @@ TMPFILE=/tmp/lttng-kernel-trace-$$.tmp
 passed=0
 failed=0
 
+inc_failed()
+{
+	failed=$((failed + 1))
+}
+
 check()
 {
 	if [ $1 -eq 0 ]; then
@@ -37,7 +42,7 @@ check()
 	fi
 
 	echo "FAILED ($2)"
-	failed=$((failed + 1))
+	inc_failed
 	rc=1
 	return 1
 }
@@ -115,16 +120,19 @@ test_lttng_open_close()
 	procs=$(grep "/proc/cpuinfo" $TMPFILE | wc -l | cut -d' ' -f1)
 
 	if [ $opens -lt 1 ]; then
+		inc_failed
 		echo "FAILED (did not trace any open system calls)"
 		rc=1
 		return 1
 	fi
 	if [ $closes -lt 1 ]; then
+		inc_failed
 		echo "FAILED (did not trace any close system calls)"
 		rc=1
 		return 1
 	fi
 	if [ $procs -lt 1 ]; then
+		inc_failed
 		echo "FAILED (did not trace open on /proc/cpuinfo)"
 		rc=1
 		return 1
@@ -139,12 +147,14 @@ test_lttng_context_switch()
 	lttng create ${SESSION_NAME} --output=${SESSION}
 	check $? "lttng create"
 	if [ $? -ne 0 ]; then
+		inc_failed
 		return 1
 	fi
 
 	lttng enable-event --kernel sched_switch
 	check $? "lttng enable-event"
 	if [ $? -ne 0 ]; then
+		inc_failed
 		lttng destroy
 		return 1
 	fi
@@ -152,17 +162,19 @@ test_lttng_context_switch()
 	lttng start
 	check $? "lttng start"
 	if [ $? -ne 0 ]; then
+		inc_failed
 		lttng destroy
 		return 1
 	fi
 
-	sleep 1
-	(dd if=/dev/zero bs=4096 count=8192 | cat | cat | cat | dd bs=4096 > /dev/null) >& /dev/null
-	sleep 1
+	sleep 2
+	(dd if=/dev/zero bs=4096 count=100000 | cat | cat | cat | dd bs=4096 > /dev/null) >& /dev/null
+	sleep 2
 
 	lttng stop
 	check $? "lttng stop"
 	if [ $? -ne 0 ]; then
+		inc_failed
 		lttng destroy
 		return 1
 	fi
@@ -170,20 +182,24 @@ test_lttng_context_switch()
 	lttng destroy
 	check $? "lttng destroy"
 	if [ $? -ne 0 ]; then
+		inc_failed
 		return 1
 	fi
 
 	babeltrace ${SESSION}* > $TMPFILE
 	dds=$(grep prev_comm $TMPFILE | grep dd | wc -l | cut -d' ' -f1)
 	cats=$(grep prev_comm $TMPFILE | grep cat | wc -l | cut -d' ' -f1)
+	echo "Found $dds dd and $cats context switches"
 
-	if [ $dds -lt 256 ]; then
+	if [ $dds -lt 16 ]; then
 		echo "FAILED (did not trace any dd context switches)"
+		inc_failed
 		rc=1
 		return 1
 	fi
-	if [ $cats -lt 256 ]; then
+	if [ $cats -lt 16 ]; then
 		echo "FAILED (did not trace any cat context switches)"
+		inc_failed
 		rc=1
 		return 1
 	fi

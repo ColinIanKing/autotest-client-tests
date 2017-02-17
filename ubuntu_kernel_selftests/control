@@ -12,7 +12,7 @@ DOC = ""
 
 name = 'ubuntu_kernel_selftests'
 
-tests = [ 'breakpoints','cpu-hotplug','efivarfs','memfd','memory-hotplug','mount','net','ptrace','timers','powerpc','user','ftrace' ]
+tests = [ 'breakpoints','cpu-hotplug','efivarfs','memfd','memory-hotplug','mount','net','ptrace','seccomp','timers','powerpc','user','ftrace' ]
 
 
 for test in tests:

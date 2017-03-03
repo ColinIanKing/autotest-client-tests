@@ -22,6 +22,7 @@ set -e
 rc=0
 BINDIR=$1
 SRCDIR=$2
+ROOT_DIR=`pwd`
 
 # FIXME: This should be done in default adt environment
 # Detect the ubuntu-ci setup
@@ -118,5 +119,10 @@ if [ $rc -eq 0 ]; then
 else
 	echo "FAILED"
 fi
+
+# Cleanup the git repository, we don't want that copied into the testing artifacts.
+#
+cd $ROOT_DIR
+rm -rf linux
 exit $rc
 

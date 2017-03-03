@@ -10,6 +10,6 @@ class ubuntu_bpf(test.test):
         cmd = '%s/ubuntu_bpf.sh %s %s' % (self.bindir, self.srcdir, self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
 
-        print self.results
+        print(self.results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

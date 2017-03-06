@@ -54,6 +54,19 @@ class ubuntu_kernel_selftests(test.test):
                 cmd = 'sed -i "s/TEST_PROGS += step_after_suspend_test/# TEST_PROGS += step_after_suspend_test/" ' + fn
                 utils.system(cmd)
 
+            #
+            # disable rtctest, LP: #1659333
+            #   this hangs xenial host servers when running in a VM,
+            #   so for now disable this test. Urgh, dirty hack
+            #
+            fn = 'linux/tools/testing/selftests/timers/Makefile'
+            if os.path.exists(fn):
+                cmd = 'sed -i "s/threadtest rtctest/threadtest/" ' + fn
+                utils.system(cmd)
+
+                cmd = 'cat linux/tools/testing/selftests/timers/Makefile'
+                utils.system(cmd)
+
     def run_once(self, test_name):
         os.chdir(self.srcdir)
         cmd = "sudo make -C linux/tools/testing/selftests/%s all run_tests" % test_name

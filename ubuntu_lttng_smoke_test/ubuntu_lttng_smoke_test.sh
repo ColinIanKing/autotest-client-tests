@@ -85,7 +85,7 @@ test_lttng_open_close()
 		return 1
 	fi
 
-	lttng enable-event --kernel --syscall open,close
+	lttng enable-event --kernel --syscall open,openat,close
 	check $? "lttng enable-event"
 	if [ $? -ne 0 ]; then
 		lttng destroy

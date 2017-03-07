@@ -16,7 +16,18 @@ STRESS_OPTIONS="--ignite-cpu --syslog --verbose --verify"
 #
 # Tests that can lock up some kernels or are CPU / arch specific, so exclude them for now
 #
-EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec spawn remap stack oom-pipe resources opcode"
+EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec "
+EXCLUDE+="spawn remap stack oom-pipe resources opcode "
+#
+# Tests that are not kernel specific
+#
+EXCLUDE+="atomic bsearch heapsort hsearch longjmp lsearch matrix memcpy nop qsort "
+EXCLUDE+="rdrand str tsc vecmath wcs zlib "
+#
+# Tests that are know to cause breakage
+#
+EXCLUDE+="xattr "
+
 #
 # Get built-in stressor names
 #

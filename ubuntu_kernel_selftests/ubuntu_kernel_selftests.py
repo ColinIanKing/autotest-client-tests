@@ -12,7 +12,7 @@ class ubuntu_kernel_selftests(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'git',
+            'build-essential', 'git', 'libnuma-dev'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

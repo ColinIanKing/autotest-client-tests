@@ -26,7 +26,7 @@ TMPFILE=/tmp/sysdig-kernel-trace-$$.tmp
 passed=0
 failed=0
 
-THRESHOLD=500
+THRESHOLD=50
 
 inc_failed()
 {

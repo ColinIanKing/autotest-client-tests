@@ -66,7 +66,10 @@ test_lttng_list_kernel()
 		echo "FAILED (lttng list --kernel more output expected)"
 	fi
 	rm -f $TMPFILE
+}
 
+test_lttng_list_kernel_syscall()
+{
 	lttng list --kernel --syscall > $TMPFILE
 	check $? "lttng list --kernel --syscall"
 	n=$(wc -l < $TMPFILE | cut -d' ' -f1)
@@ -210,10 +213,30 @@ test_lttng_context_switch()
 rc=0
 test_lttng_session_create
 echo " "
+
 test_lttng_list_kernel
 echo " "
-test_lttng_open_close
+
+#
+# Disabled because of LP#1671063, https://bugs.lttng.org/issues/1091
+#   - vmalloc failure causes the kernel syscall list to fail on
+#     some architectures at the moment
+#
+#test_lttng_list_kernel_syscall
+#echo " "
+
+#
+# Disabled for s390x, this is broken because of syscall tracing vmalloc
+# issues (as above)
+#
+processor=$(uname -p)
+if [ "$processor" == "s390x" ]; then
+	echo "lttng smoke test trace open/close system calls SKIPPED for $processor"
+else
+	test_lttng_open_close
+fi
 echo " "
+
 test_lttng_context_switch
 echo " "
 

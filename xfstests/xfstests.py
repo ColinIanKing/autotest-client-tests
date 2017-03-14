@@ -113,7 +113,7 @@ class xfstests(test.test):
 
 
     def _run_suite(self):
-        os.chdir(self.srcdir)
+        os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
         output = utils.system_output('./check -g auto -x dangerous',
                                      ignore_status=True,
                                      retain_output=True)

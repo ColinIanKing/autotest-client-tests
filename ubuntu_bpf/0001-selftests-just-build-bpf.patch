@@ -1,21 +1,18 @@
-From 7a20801d7fca9bde219d85059fb748a56abf68a8 Mon Sep 17 00:00:00 2001
-From: Tim Gardner <tim.gardner@canonical.com>
-Date: Thu, 16 Feb 2017 06:40:56 -0700
-Subject: [PATCH 1/2] UBUNTU: selftests: just build bpf
+From 1fc37df7738c6aeaee6934a6c374a7ef3836cd0b Mon Sep 17 00:00:00 2001
+From: Brad Figg <brad.figg@canonical.com>
+Date: Wed, 15 Mar 2017 10:36:41 -0700
+Subject: [PATCH] UBUNTU: selftests: just build bpf
 
-Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
+Signed-off-by: Brad Figg <brad.figg@canonical.com>
 ---
- tools/testing/selftests/Makefile | 39 +++------------------------------------
- 1 file changed, 3 insertions(+), 36 deletions(-)
+ tools/testing/selftests/Makefile | 35 -----------------------------------
+ 1 file changed, 35 deletions(-)
 
 diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index 831022b..e4422ff 100644
+index 9135188..fd3ca00 100644
 --- a/tools/testing/selftests/Makefile
 +++ b/tools/testing/selftests/Makefile
-@@ -1,40 +1,7 @@
-+#
-+# We only are interested in bpf.
-+#
+@@ -1,39 +1,4 @@
  TARGETS =  bpf
 -TARGETS += breakpoints
 -TARGETS += capabilities
@@ -45,17 +42,16 @@ index 831022b..e4422ff 100644
 -TARGETS += static_keys
 -TARGETS += sync
 -TARGETS += sysctl
--ifneq (1, $(quicktest))
--TARGETS += timers
--endif
+-#ifneq (1, $(quicktest))
+-#TARGETS += timers
+-#endif
 -TARGETS += user
 -TARGETS += vm
 -TARGETS += x86
 -TARGETS += zram
--#Please keep the TARGETS list alphabetically sorted
+ #Please keep the TARGETS list alphabetically sorted
  # Run "make quicktest=1 run_tests" or
  # "make quicktest=1 kselftest from top level Makefile
- 
 -- 
 2.7.4
 

@@ -40,10 +40,7 @@ elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
     export https_proxy="http://91.189.89.216:3128"
 fi
 
-#
-#  tests are mainline as of v4.10
-#
-[ ! -d linux ] && git clone depth=1 https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git
+set -x
 cd linux
 
 # Assist local testing by restoring the linux repo to vanilla.

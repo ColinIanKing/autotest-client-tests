@@ -27,15 +27,15 @@ ROOT_DIR=`pwd`
 # FIXME: This should be done in default adt environment
 # Detect the ubuntu-ci setup
 if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
-    echo "Running in the Canonical CI environment"
+    echo "Connecting through squid.internal 3128"
     export http_proxy="http://squid.internal:3128"
     export https_proxy="http://squid.internal:3128"
 elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
-    echo "Running in the Canonical enablement environment"
+    echo "Connecting through 10.245.64.1 3128"
     export http_proxy="http://10.245.64.1:3128"
     export https_proxy="http://10.245.64.1:3128"
 elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
-    echo "Running in the Canonical enablement environment"
+    echo "Connecting through 91.189.89.216 3128"
     export http_proxy="http://91.189.89.216:3128"
     export https_proxy="http://91.189.89.216:3128"
 fi
@@ -43,7 +43,7 @@ fi
 #
 #  tests are mainline as of v4.10
 #
-[ ! -d linux ] && git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+[ ! -d linux ] && git clone depth=1 https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git
 cd linux
 
 # Assist local testing by restoring the linux repo to vanilla.

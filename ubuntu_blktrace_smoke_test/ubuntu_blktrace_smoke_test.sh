@@ -44,8 +44,12 @@ get_dev()
 	if [ -z "$DEV" ]; then
 		echo "SKIPPED cannot determine block device $1 is located on (skipping test)"
 		exit 0
-	else
+	fi
+	if [ -b "$DEV" ]; then
 		echo "Using block device $DEV for path $1"
+	else
+		echo "SKIPPED cannot determine block device $1 is located on (skipping test) (tried $DEV)"
+		exit 0
 	fi
 }
 

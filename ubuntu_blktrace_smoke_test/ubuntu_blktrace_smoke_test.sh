@@ -39,11 +39,11 @@ inc_passed()
 
 get_dev()
 {
-	DEV=$(df $1 | grep dev | head -1 | cut -d' ' -f1 | sed 's/[0-9]//g')
+	mount=$(stat -c '%m' $1 | tail -1)
+	DEV=$(df $mount | grep dev | head -1 | cut -d' ' -f1 | sed 's/[0-9]//g')
 	if [ -z "$DEV" ]; then
-		echo "FAILED cannot determine block device $1 is located on"
-		inc_failed
-		exit 1
+		echo "SKIPPED cannot determine block device $1 is located on (skipping test)"
+		exit 0
 	else
 		echo "Using block device $DEV for path $1"
 	fi
@@ -150,6 +150,13 @@ test_dd_trace()
 
 
 test_kernel_configs
+
+which blktrace >& /dev/null
+if [ $? -ne 0 ]; then
+	echo "FAILED cannot find blktrace tool, it is not installed"
+	exit 1
+fi
+
 mount_debugfs
 get_dev $(pwd)
 
@@ -157,7 +164,7 @@ get_dev $(pwd)
 # sys/kernel/debug/tracing should exist
 #
 if [ ! -d /sys/kernel/debug/tracing ]; then
-	echo "FAILED: /sys/kernel/debug/tracing does not exist"
+	echo "FAILED /sys/kernel/debug/tracing does not exist"
 	umount_debugfs
 	exit 1
 fi

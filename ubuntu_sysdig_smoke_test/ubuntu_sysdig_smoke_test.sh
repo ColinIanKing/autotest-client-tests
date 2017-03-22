@@ -26,7 +26,19 @@ TMPFILE=/tmp/sysdig-kernel-trace-$$.tmp
 passed=0
 failed=0
 
-THRESHOLD=50
+#
+#  Number of sysdig trace attempts before giving up
+#
+TRIES=10
+#
+#  Minimal number of events to capture
+#
+THRESHOLD=25
+
+#
+#  Minimal time to run dd for in seconds
+#
+DURATION=4
 
 inc_failed()
 {
@@ -35,7 +47,7 @@ inc_failed()
 
 check()
 {
-	if [ $1 -gt $THRESHOLD ]; then
+	if [ $1 -ge $THRESHOLD ]; then
 		echo "PASSED ($2)"
 		passed=$((passed + 1))
 		return 0
@@ -51,34 +63,63 @@ test_sysdig_context_switch()
 {
 	echo "== sysdig smoke test to trace dd, cat, read and writes =="
 
-	sysdig --unbuffered -w ${TMPFILE}.raw &
-	pid=$!
-	(dd if=/dev/zero bs=1024 count=250000 | cat | cat | dd bs=1024 of=/dev/null) >& /dev/null
-	kill -SIGINT $pid
-	wait $pid
+	#
+	#  We try this several times as we may not capture enough events
+	#  first time around
+	#
+	for i in $(seq $TRIES)
+	do
+		echo "Try $i of $TRIES"
+		sysdig --unbuffered -w ${TMPFILE}.raw &
+		pid=$!
+		start=$(date +%s)
+		#
+		#  Capture at least $DURATION sections of events
+		#
+		while true
+		do
+			(dd if=/dev/zero bs=1024 count=500000 | cat | cat | dd bs=1024 of=/dev/null) >& /dev/null
+			end=$(date +%s)
+			duration=$((end - $start))
+			if [ $duration -ge $DURATION ]; then
+				break
+			fi
+		done
+		kill -SIGINT $pid
+		wait $pid
 
-	echo "Converting raw events to human readable format.."
-	sysdig -r ${TMPFILE}.raw > ${TMPFILE}
+		sz=$(stat -c%s ${TMPFILE}.raw)
+		echo "Raw capture file is $((sz / 1048576)) Mbytes"
+		sysdig -r ${TMPFILE}.raw > ${TMPFILE}
+		sz=$(stat -c%s ${TMPFILE})
+		echo "Converted events file is $((sz / 1048576)) Mbytes"
 
+		events=$(wc -l ${TMPFILE} | cut -d' ' -f1)
+		switches_dd=$(grep switch ${TMPFILE} | grep dd | wc -l | cut -d' ' -f1)
+		switches_cat=$(grep switch ${TMPFILE} | grep cat | wc -l | cut -d' ' -f1)
+		ddrdzero=$(grep dd ${TMPFILE} | grep read | grep "/dev/zero" | wc -l | cut -d' ' -f1)
+		ddwrnull=$(grep dd ${TMPFILE} | grep write | grep "/dev/null" | wc -l | cut -d' ' -f1)
+
+		if [ $switches_dd -ge $THRESHOLD -a \
+		     $switches_cat -ge $THRESHOLD -a \
+		     $ddrdzero -ge $THRESHOLD -a \
+		     $ddwrnull -ge $THRESHOLD ]; then
+			break
+		fi
+		rm -f ${TMPFILE}.raw ${TMPFILE}
+	done
 
 	echo "Found:"
-	events=$(wc -l ${TMPFILE} | cut -d' ' -f1)
 	echo "   $events sysdig events"
-	switches_dd=$(grep switch ${TMPFILE} | grep dd | wc -l | cut -d' ' -f1)
 	echo "   $switches_dd dd context switches"
-	switches_cat=$(grep switch ${TMPFILE} | grep cat | wc -l | cut -d' ' -f1)
 	echo "   $switches_cat cat context switches"
-	ddrdzero=$(grep dd ${TMPFILE} | grep read | grep "/dev/zero" | wc -l | cut -d' ' -f1)
 	echo "   $ddrdzero reads from /dev/zero by dd"
-	ddwrnull=$(grep dd ${TMPFILE} | grep write | grep "/dev/null" | wc -l | cut -d' ' -f1)
 	echo "   $ddwrnull writes to /dev/null by dd"
 
 	check $switches_dd "trace at least $THRESHOLD context switches involving dd"
 	check $switches_cat "trace at least $THRESHOLD context switches involving cat"
 	check $ddrdzero "trace at least $THRESHOLD reads of /dev/zero by dd"
 	check $ddwrnull "trace at least $THRESHOLD writes to /dev/null by dd"
-
-	rm -f ${TMPFILE} ${TMPFILE}.raw
 }
 
 rc=0

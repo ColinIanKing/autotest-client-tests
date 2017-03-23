@@ -40,11 +40,19 @@ inc_passed()
 get_dev()
 {
 	mount=$(stat -c '%m' $1 | tail -1)
-	DEV=$(df $mount | grep dev | head -1 | cut -d' ' -f1 | sed 's/[0-9]//g')
-	if [ -z "$DEV" ]; then
-		echo "SKIPPED cannot determine block device $1 is located on (skipping test)"
-		exit 0
-	fi
+	DEV=$(df $mount | grep dev | head -1 | cut -d' ' -f1)
+	case $DEV in
+		/dev/disk/by-*)
+		;;
+		/dev/*[0-9])
+			DEV=$(echo $DEV | sed 's/[0-9]//g')
+		;;
+		*)
+			echo "SKIPPED cannot determine block device $1 is located on (skipping test)"
+			exit 0
+		;;
+	esac
+
 	if [ -b "$DEV" ]; then
 		echo "Using block device $DEV for path $1"
 	else

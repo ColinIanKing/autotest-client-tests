@@ -17,7 +17,7 @@ class ubuntu_generic_fstest(test.test):
     # if you change setup, be sure to increment version
     #
     def setup(self):
-	utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
+	utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
 	pkgs = [ 'btrfs-tools', 'xfsprogs', 'jfsutils' ]
 	for pkg in pkgs:
@@ -70,7 +70,7 @@ class ubuntu_generic_fstest(test.test):
 	os.chdir(self.srcdir)
 	utils.system('truncate -s 128M /tmp/fstest.img')
 	utils.system('losetup --find --show /tmp/fstest.img > loopname.tmp')
-	utils.system('rm /tmp/fstest.img')
+	utils.system('rm -f /tmp/fstest.img')
         loopdev = ''
 	with open('loopname.tmp', 'r') as f:
 		lines = f.readlines()

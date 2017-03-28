@@ -35,7 +35,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	echo "mkfs.btrfs -f -draid5 $DEV0 $DEV1 $DEV2 failed"
 	exit 1
 fi
@@ -51,7 +51,7 @@ if [ $? -eq 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	echo "expecting mount $DEV $MNT to fail and it did not"
 	exit 1
 fi
@@ -64,7 +64,7 @@ if [ $n -gt 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	rc=1
 fi
 
@@ -72,5 +72,5 @@ umount $MNT
 losetup -d $DEV0
 losetup -d $DEV1
 losetup -d $DEV2
-rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 exit $rc

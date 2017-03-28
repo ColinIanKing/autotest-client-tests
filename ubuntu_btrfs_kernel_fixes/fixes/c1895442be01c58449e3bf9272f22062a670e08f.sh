@@ -38,14 +38,14 @@ mkfs.btrfs -f "$DEV" >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs on $DEV failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 mount "$DEV" "$MNT" -o commit=999
 if [ $? -ne 0 ]; then
 	echo "mount $DEV $MNT failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 
@@ -55,7 +55,7 @@ if [ $? -ne 0 ]; then
 	echo "btrfs subvolume snapshot -r $MNT $MNT/mysnap1 failed"
 	umount $DEV
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 
@@ -65,7 +65,7 @@ if [ $? -ne 0 ]; then
 	echo "btrfs subvolume delete $MNT/first_subvol failed"
 	umount $DEV
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 btrfs subvolume snapshot -r $MNT $MNT/mysnap2
@@ -73,7 +73,7 @@ if [ $? -ne 0 ]; then
 	echo "btrfs subvolume snapshot -r $MNT $MNT/mysnap1 failed"
 	umount $DEV
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 btrfs send -p $MNT/mysnap1 $MNT/mysnap2 -f /tmp/send.data
@@ -87,5 +87,5 @@ fi
 
 umount $DEV
 losetup -d $DEV
-rm $TMPIMG /tmp/send.data
+rm -f $TMPIMG /tmp/send.data
 exit 0

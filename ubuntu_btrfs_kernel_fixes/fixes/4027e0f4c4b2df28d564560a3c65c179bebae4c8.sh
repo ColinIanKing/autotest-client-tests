@@ -21,7 +21,7 @@ mkfs.btrfs -f $DEV >/dev/null
 mount $DEV $MNT -o compress-force=lzo
 if [ $? -ne 0 ]; then
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	echo "mount $DEV $MNT failed"
 	exit 1
 fi
@@ -30,7 +30,7 @@ mount $DEV $MNT -o remount,compress=zlib
 if [ $? -ne 0 ]; then
 	umount $DEV
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	echo "mount $DEV $MNT failed"
 	exit 1
 fi
@@ -39,7 +39,7 @@ n=$(cat /proc/mounts | grep $DEV | grep "compress-force=zlib" | wc -l)
 
 umount $DEV
 losetup -d $DEV
-rm $TMPIMG
+rm -f $TMPIMG
 
 if [ $n -eq 0 ]; then
 	echo "compress-force=zlib cleared in remount"

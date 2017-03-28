@@ -52,7 +52,7 @@ class ubuntu_zfs(test.test):
     #
     def setup(self):
 
-        utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
+        utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
         utils.system_output('useradd zfs-tests || true', retain_output=True)
         utils.system_output('echo \"zfs-tests    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)

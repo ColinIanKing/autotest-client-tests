@@ -40,14 +40,14 @@ losetup $DEV $TMPIMG
 mkfs.btrfs -f "$DEV" >& /dev/null
 if [ $? -ne 0 ]; then
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	echo "mkfs.btrfs on $DEV failed"
 	exit 1
 fi
 mount "$DEV" "$MNT" -o compress=lzo
 if [ $? -ne 0 ]; then
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	echo "mount $DEV $MNT failed"
 	exit 1
 fi
@@ -65,5 +65,5 @@ sleep 1
 
 umount $DEV
 losetup -d $DEV
-rm $TMPIMG ${FIX}.out
+rm -f $TMPIMG ${FIX}.out
 exit $links

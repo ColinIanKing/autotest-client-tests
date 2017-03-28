@@ -61,7 +61,7 @@ class ubuntu_zfs_xfs_generic(test.test):
     # if you change setup, be sure to increment version
     #
     def setup(self):
-        utils.system_output('rm /etc/*/S99autotest || true', retain_output=True)
+        utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
         utils.system_output('useradd fsgqa || true', retain_output=True)
         utils.system_output('echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)

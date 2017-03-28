@@ -25,7 +25,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	echo "mkfs.btrfs on $DEV failed"
 	exit 1
 fi
@@ -35,7 +35,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	echo "mount $DEV $MNT failed"
 	exit 1
 fi
@@ -57,5 +57,5 @@ rc=$(dmesg | grep "WARNING" | grep "__btrfs_close_devices" | wc -l)
 losetup -d $DEV0
 losetup -d $DEV1
 losetup -d $DEV2
-rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 exit $rc

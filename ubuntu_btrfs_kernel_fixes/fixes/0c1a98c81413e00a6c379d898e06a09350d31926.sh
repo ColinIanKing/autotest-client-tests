@@ -32,7 +32,7 @@ mkfs.btrfs -f $DEV0 >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f $DEV0 failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -49,10 +49,10 @@ errors=$(btrfsck $DEV0 | grep "errors" | wc -l)
 if [ $errors -ne -0 ]; then
 	echo "btrfsck found some unexpected errors"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
 losetup -d $DEV0
-rm $TMPIMG0
+rm -f $TMPIMG0
 exit 0

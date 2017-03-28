@@ -31,7 +31,7 @@ mkfs.btrfs -f "$DEV0" >& /dev/null
 if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	rmdir -p $MNT0 $MNT1
 	echo "mkfs.btrfs on $DEV0 failed"
 	exit 1
@@ -40,7 +40,7 @@ mount "$DEV0" "$MNT0"
 if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	rmdir -p $MNT0 $MNT1
 	echo "mount $DEV0 $MNT0 failed"
 	exit 1
@@ -50,7 +50,7 @@ mkfs.btrfs -f "$DEV1" >& /dev/null
 if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	rmdir -p $MNT0 $MNT1
 	echo "mkfs.btrfs on $DEV1 failed"
 	exit 1
@@ -59,7 +59,7 @@ mount "$DEV1" "$MNT1" -o compress=lzo
 if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	rmdir -p $MNT0 $MNT1
 	echo "mount $DEV1 $MNT1 failed"
 	exit 1
@@ -92,6 +92,6 @@ umount $DEV0
 losetup -d $DEV1
 losetup -d $DEV0
 
-rm $TMPIMG0 $TMPIMG1
+rm -f $TMPIMG0 $TMPIMG1
 rm -rf $MNT0 $MNT1
 exit $rc

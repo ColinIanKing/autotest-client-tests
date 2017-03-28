@@ -21,7 +21,7 @@ mkfs.btrfs -f $DEV0 >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs $DEV0 failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -29,7 +29,7 @@ mount $DEV0 $MNT -o rw,relatime,compress=lzo,space_cache,inode_cache >& /dev/nul
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT -o rw,relatime,compress=lzo,space_cache,inode_cache failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -44,13 +44,13 @@ btrfs subv snap $MNT/s1 $MNT/s2
 dmesg -c > /dev/null
 FILENAME=$(find $MNT/s1/ -inum 4085 | sed 's|^.*/\([^/]*\)$|\1|')
 
-rm $MNT/s2/$FILENAME
+rm -f $MNT/s2/$FILENAME
 touch $MNT/s2/$FILENAME
 # the following steps can be repeated to reproduce the issue again and again
 [ -e $MNT/s3 ] && btrfs subv del $MNT/s3
-[ -e $TMP/failed ] && rm $TMP/failed
+[ -e $TMP/failed ] && rm -f $TMP/failed
 btrfs subv snap $MNT/s2 $MNT/s3
-rm $MNT/s3/$FILENAME
+rm -f $MNT/s3/$FILENAME
 for i in `seq 3 34027`
 do
 	touch $MNT/s3/__${i} || touch $TMP/failed
@@ -64,5 +64,5 @@ fi
 
 umount $MNT >& /dev/null
 losetup -d $DEV0
-rm $TMPIMG0
+rm -f $TMPIMG0
 exit $rc

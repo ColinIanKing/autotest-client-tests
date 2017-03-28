@@ -45,7 +45,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	echo "mkfs.btrfs -f $DEV0 $DEV1 failed"
 	exit 1
 fi
@@ -55,7 +55,7 @@ modprobe -r btrfs && modprobe btrfs
 
 mount -o degraded $DEV0 $MNT
 if [ $? -ne 0 ]; then
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	echo "mount $DEV $MNT failed"
 	exit 1
 fi
@@ -70,7 +70,7 @@ if [ $n -gt 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	rc=1
 fi
 
@@ -78,5 +78,5 @@ umount $MNT
 losetup -d $DEV0
 losetup -d $DEV1
 losetup -d $DEV2
-rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 exit $rc

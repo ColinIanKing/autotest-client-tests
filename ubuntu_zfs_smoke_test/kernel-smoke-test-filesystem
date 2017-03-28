@@ -31,7 +31,7 @@ zpool create ${POOL} ${VDEV0} ${VDEV1}
 ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zpool create failed, exit code=$ret"
-	rm ${VDEV0} ${VDEV1}
+	rm -f ${VDEV0} ${VDEV1}
 	exit 1
 fi
 
@@ -45,7 +45,7 @@ do
 	if [ $ret -ne 0 ]; then
 		echo "FAILED: zfs create filesystem $fs failed, exit code=$ret"
 		zpool destroy ${POOL}
-		rm ${VDEV0} ${VDEV1}
+		rm -f ${VDEV0} ${VDEV1}
 		exit 1
 	fi
 
@@ -54,7 +54,7 @@ do
 	if [ $ret -ne 0 ]; then
 		echo "FAILED: zfs set quota on $fs failed, exit code=$ret"
 		zpool destroy ${POOL}
-		rm ${VDEV0} ${VDEV1}
+		rm -f ${VDEV0} ${VDEV1}
 		exit 1
 	fi
 
@@ -63,7 +63,7 @@ do
 	if [ $ret -ne 0 ]; then
 		echo "FAILED: zfs set compression on $fs failed, exit code=$ret"
 		zpool destroy ${POOL}
-		rm ${VDEV0} ${VDEV1}
+		rm -f ${VDEV0} ${VDEV1}
 		exit 1
 	fi
 done
@@ -78,7 +78,7 @@ do
 	if [ $ret -ne 0 ]; then
 		echo "FAILED: zfs destroy filesystem $fs failed, exit code=$ret"
 		zpool destroy ${POOL}
-		rm ${VDEV0} ${VDEV1}
+		rm -f ${VDEV0} ${VDEV1}
 		exit 1
 	fi
 done
@@ -91,12 +91,12 @@ if [ $ret -ne 0 ]; then
 	# destroy failed, try to clean up, but this
 	# wil probably fail
 	#
-	rm ${VDEV0} ${VDEV1}
+	rm -f ${VDEV0} ${VDEV1}
 	exit 1
 fi
 
 dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
 dd if=/dev/zero of=${VDEV1} bs=1M count=512 > /dev/null 2>&1
-rm ${VDEV0} ${VDEV1}
+rm -f ${VDEV0} ${VDEV1}
 echo "PASSED"
 exit 0

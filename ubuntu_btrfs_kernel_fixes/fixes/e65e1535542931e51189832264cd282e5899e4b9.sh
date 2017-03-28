@@ -35,7 +35,7 @@ mkfs.btrfs -f $DEV0 $DEV1 >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f $DEV0 failed"
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
@@ -43,7 +43,7 @@ mount $DEV0 $MNT >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT failed"
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
@@ -53,7 +53,7 @@ if [ $? -ne 0 ]; then
 	echo "direct I/O dd if=/dev/zero of=$MNT/tmpfile bs=100K count=1 oflag=direct failed"
 	umount $MNT >& /dev/null
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 n=$(dmesg | grep "BUG" | wc -l)
@@ -62,10 +62,10 @@ if [ $n -gt 0 ]; then
 	dmesg
 	umount $MNT >& /dev/null
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 fi
 umount $MNT >& /dev/null
 losetup -d $DEV0 $DEV1
-rm $TMPIMG0 $TMPIMG1
+rm -f $TMPIMG0 $TMPIMG1
 
 exit 0

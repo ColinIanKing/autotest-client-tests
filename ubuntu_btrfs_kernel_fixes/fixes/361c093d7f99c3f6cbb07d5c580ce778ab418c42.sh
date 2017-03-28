@@ -25,7 +25,7 @@ mkfs.btrfs -f $DEV0 >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f $DEV0 failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -33,7 +33,7 @@ mount $DEV0 $MNT >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -45,7 +45,7 @@ do
 		echo "OOM killer kicked in, aborting test!"
 		umount $DEV0 >& /dev/null
 		losetup -d $DEV0
-		rm $TMPIMG0
+		rm -f $TMPIMG0
 		exit 1
 	fi
 done
@@ -55,7 +55,7 @@ mount $DEV0 $MNT -o rescan_uuid_tree >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT -o rescan_uuid_tree failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 sleep 1
@@ -71,5 +71,5 @@ fi
 
 umount $DEV0 >& /dev/null
 losetup -d $DEV0
-rm $TMPIMG0
+rm -f $TMPIMG0
 exit $rc

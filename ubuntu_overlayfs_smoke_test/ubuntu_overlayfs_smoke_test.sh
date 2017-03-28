@@ -157,7 +157,7 @@ test_files_checksum()
 		rc=1
 	fi
 
-	rm $DIR1/file1 $DIR2/file2 $DIR3/file3
+	rm -f $DIR1/file1 $DIR2/file2 $DIR3/file3
 }
 
 #
@@ -181,9 +181,9 @@ test_files_rm()
 
 	for i in $(seq 100)
 	do
-		rm $ROOT/dir1-$i
-		rm $ROOT/dir2-$i
-		rm $ROOT/dir3-$i
+		rm -f $ROOT/dir1-$i
+		rm -f $ROOT/dir2-$i
+		rm -f $ROOT/dir3-$i
 	done
 
 	#
@@ -269,7 +269,7 @@ test_files_stacked()
 	fi
 
 	do_umount
-	rm $DIR3/test
+	rm -f $DIR3/test
 	do_mount
 
 	if [ $(cat $ROOT/test) != "test2" ]; then
@@ -277,7 +277,7 @@ test_files_stacked()
 	fi
 
 	do_umount
-	rm $DIR2/test
+	rm -f $DIR2/test
 	do_mount
 
 	if [ $(cat $ROOT/test) != "test1" ]; then
@@ -285,7 +285,7 @@ test_files_stacked()
 	fi
 
 	do_umount
-	rm $DIR1/test
+	rm -f $DIR1/test
 	do_mount
 
 	if [ -e $ROOT/test ]; then
@@ -350,7 +350,7 @@ test_files_modify()
 	fi
 
 	do_umount
-	rm $DIR1/file1
+	rm -f $DIR1/file1
 	do_mount
 
 	if [ $fail -eq 0 ]; then
@@ -424,7 +424,7 @@ test_files_hardlink()
 	fi
 
 	do_umount
-	rm $DIR3/file3
+	rm -f $DIR3/file3
 	do_mount
 	echo -n "$FS: check hardlink count in root after 1 link removed: "
 	if [ $(hardlinks $ROOT/file1) -ne 2 ]; then
@@ -435,7 +435,7 @@ test_files_hardlink()
 	fi
 
 	do_umount
-	rm $DIR2/file2
+	rm -f $DIR2/file2
 	do_mount
 	echo -n "$FS: check hardlink count in root after 1 more link removed: "
 	if [ $(hardlinks $ROOT/file1) -ne 1 ]; then
@@ -460,7 +460,7 @@ test_files_hardlink()
 
 	# remove root view of file1 (should whiteout original)
 	echo -n "$FS: remove root view of original file: "
-	rm $ROOT/file1
+	rm -f $ROOT/file1
 	if [ -e $ROOT/file1 ]; then
 		echo "FAILED"
 		rc=1

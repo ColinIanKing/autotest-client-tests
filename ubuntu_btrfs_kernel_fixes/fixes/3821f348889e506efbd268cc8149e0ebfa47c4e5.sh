@@ -47,14 +47,14 @@ mkfs.btrfs -f "$DEV" >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs on $DEV failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 mount "$DEV" "$MNT" -o commit=999
 if [ $? -ne 0 ]; then
 	echo "mount $DEV $MNT failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 
@@ -69,7 +69,7 @@ if [ $? -ne 0 ]; then
 	wait $pid
 	umount $DEV
 	losetup -d $DEV
-	rm $TMPIMG ${FIX}.out
+	rm -f $TMPIMG ${FIX}.out
 	exit 1
 fi
 btrfs send $MNT/snap1 -f /tmp/send.data
@@ -79,7 +79,7 @@ if [ $? -ne 0 ]; then
 	wait $pid
 	umount $DEV
 	losetup -d $DEV
-	rm $TMPIMG ${FIX}.out /tmp/send.data
+	rm -f $TMPIMG ${FIX}.out /tmp/send.data
 	exit 1
 fi
 
@@ -87,5 +87,5 @@ kill -SIGUSR1 $pid
 wait $pid
 umount $DEV
 losetup -d $DEV
-rm $TMPIMG ${FIX}.out /tmp/send.data
+rm -f $TMPIMG ${FIX}.out /tmp/send.data
 exit $rc

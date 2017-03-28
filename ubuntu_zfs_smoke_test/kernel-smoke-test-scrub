@@ -37,7 +37,7 @@ zpool create ${POOL} mirror ${VDEV0} ${VDEV1} mirror ${VDEV2} ${VDEV3}
 ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zpool create failed, exit code=$ret"
-	rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
+	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 	exit 1
 fi
 
@@ -61,7 +61,7 @@ ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zpool detach failed, exit code=$ret"
 	zpool destroy ${POOL}
-	rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
+	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 	exit 1
 fi
 
@@ -74,7 +74,7 @@ ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zpool attach failed, exit code=$ret"
 	zpool destroy ${POOL}
-	rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
+	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 	exit 1
 fi
 
@@ -83,7 +83,7 @@ ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zpool scrub failed, exit code=$ret"
 	zpool destroy ${POOL}
-	rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
+	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 	exit 1
 fi
 
@@ -94,7 +94,7 @@ sum2=$(md5sum ${DATA} | awk '{print $1}')
 if [ x"$sum1" != x"$sum2" ]; then
 	echo "FAILED: corrupted data on scrubbed pool"
 	zpool destroy ${POOL}
-	rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
+	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 	exit 1
 fi
 
@@ -106,7 +106,7 @@ if [ $ret -ne 0 ]; then
 	# destroy failed, try to clean up, but this
 	# wil probably fail
 	#
-	rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
+	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 	exit 1
 fi
 
@@ -114,6 +114,6 @@ dd if=/dev/zero of=${VDEV0} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 dd if=/dev/zero of=${VDEV1} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 dd if=/dev/zero of=${VDEV2} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 dd if=/dev/zero of=${VDEV3} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
-rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
+rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 echo "PASSED"
 exit 0

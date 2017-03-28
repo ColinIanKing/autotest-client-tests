@@ -32,7 +32,7 @@ echo "mkfs $DEV"
 mkfs.btrfs -f "$DEV" >/dev/null
 if [ $? -ne 0 ]; then
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	echo "mkfs.btrfs on $DEV failed"
 	exit 1
 fi
@@ -40,7 +40,7 @@ echo "mount $DEV $MNT"
 mount "$DEV" "$MNT"
 if [ $? -ne 0 ]; then
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	echo "mount $DEV $MNT failed"
 	exit 1
 fi
@@ -57,7 +57,7 @@ for ((loop_i = 0; loop_i < 20; loop_i++)); do
 		echo "dd failed: error: $?"
 		umount $DEV
 		losetup -d $DEV
-		rm $TMPIMG
+		rm -f $TMPIMG
 		exit 1
 	fi
 
@@ -66,7 +66,7 @@ for ((loop_i = 0; loop_i < 20; loop_i++)); do
 	if [ $? -ne 0 ]; then
 		umount $DEV
 		losetup -d $DEV
-		rm $TMPIMG
+		rm -f $TMPIMG
 		exit 1
 	fi
 
@@ -78,5 +78,5 @@ done
 
 umount $DEV
 losetup -d $DEV
-rm $TMPIMG
+rm -f $TMPIMG
 exit 0

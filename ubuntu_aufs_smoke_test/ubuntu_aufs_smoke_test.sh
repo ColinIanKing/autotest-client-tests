@@ -140,7 +140,7 @@ test_files_checksum()
 		rc=1
 	fi
 
-	rm $DIR1/file1 $DIR2/file2 $DIR3/file3
+	rm -f $DIR1/file1 $DIR2/file2 $DIR3/file3
 }
 
 #
@@ -160,9 +160,9 @@ test_files_rm()
 
 	for i in $(seq 100)
 	do
-		rm $DIR1/dir1-$i
-		rm $DIR2/dir2-$i
-		rm $DIR3/dir3-$i
+		rm -f $DIR1/dir1-$i
+		rm -f $DIR2/dir2-$i
+		rm -f $DIR3/dir3-$i
 	done
 
 	#
@@ -235,17 +235,17 @@ test_files_stacked()
 		fail=1
 	fi
 
-	rm $DIR1/test
+	rm -f $DIR1/test
 	if [ $(cat $ROOT/test) != "test2" ]; then
 		fail=1
 	fi
 
-	rm $DIR2/test
+	rm -f $DIR2/test
 	if [ $(cat $ROOT/test) != "test3" ]; then
 		fail=1
 	fi
 
-	rm $DIR3/test
+	rm -f $DIR3/test
 	if [ -e $ROOT/test ]; then
 		fail=1
 	fi
@@ -298,7 +298,7 @@ test_files_modify()
 		fail=1
 	fi
 
-	rm $DIR1/file1
+	rm -f $DIR1/file1
 
 	if [ $fail -eq 0 ]; then
 		echo "PASSED"
@@ -391,7 +391,7 @@ test_files_hardlink()
 		echo "PASSED"
 	fi
 
-	rm $DIR3/file3
+	rm -f $DIR3/file3
 	echo -n "$FS: check hardlink count in root after 1 link removed: "
 	if [ $(hardlinks $ROOT/file1) -ne 2 ]; then
 		echo "FAILED"
@@ -400,7 +400,7 @@ test_files_hardlink()
 		echo "PASSED"
 	fi
 
-	rm $DIR2/file2
+	rm -f $DIR2/file2
 	echo -n "$FS: check hardlink count in root after 1 more link removed: "
 	if [ $(hardlinks $ROOT/file1) -ne 1 ]; then
 		echo "FAILED"
@@ -421,7 +421,7 @@ test_files_hardlink()
 
 	# remove root view of file1 (should whiteout original)
 	echo -n "$FS: remove root view of original file: "
-	rm $ROOT/file1
+	rm -f $ROOT/file1
 	if [ -e $ROOT/file1 ]; then
 		echo "FAILED"
 		rc=1

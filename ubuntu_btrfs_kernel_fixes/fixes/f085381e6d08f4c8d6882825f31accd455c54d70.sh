@@ -48,7 +48,7 @@ mkfs.btrfs -f -draid1 -mraid1 $DEV0 $DEV1 >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f -draid1 -mraid1 $DEV0 $DEV1 failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -68,11 +68,11 @@ if [ $dumped -gt 0 ]; then
 	echo "found a kernel stack dump"
 	dmesg
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
 umount $MNT >& /dev/null
 losetup -d $DEV1
-rm $TMPIMG0 $TMPIMG1
+rm -f $TMPIMG0 $TMPIMG1
 exit $rc

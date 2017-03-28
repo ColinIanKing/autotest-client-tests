@@ -39,7 +39,7 @@ if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f -d single -m single $DEV0 $DEV1 failed"
 	losetup -d $DEV0
 	losetup -d $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
@@ -51,7 +51,7 @@ if [ $? -ne 0 ]; then
 	echo "mount -o ro $DEV0 $MNT/mnt0 failed"
 	losetup -d $DEV0
 	losetup -d $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	rmdir $MNT/mnt0 $MNT/mnt1
 	exit 1
 fi
@@ -61,7 +61,7 @@ if [ $? -ne 0 ]; then
 	echo "mount -o ro $DEV0 $MNT/mnt1 failed"
 	losetup -d $DEV0
 	losetup -d $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	rmdir $MNT/mnt0 $MNT/mnt1
 	exit 1
 fi
@@ -80,6 +80,6 @@ fi
 
 umount $MNT/mnt1 >& /dev/null
 losetup -d $DEV0
-rm $TMPIMG0
+rm -f $TMPIMG0
 rmdir $MNT/mnt0 $MNT/mnt1
 exit $rc

@@ -52,7 +52,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV2
 	losetup -d $DEV3
 	losetup -d $DEV4
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3 $TMPIMG4
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3 $TMPIMG4
 	exit 1
 fi
 
@@ -64,7 +64,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV2
 	losetup -d $DEV3
 	losetup -d $DEV4
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3 $TMPIMG4
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3 $TMPIMG4
 	exit 1
 fi
 
@@ -84,5 +84,5 @@ losetup -d $DEV1
 losetup -d $DEV2
 losetup -d $DEV3
 losetup -d $DEV4
-rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3 $TMPIMG4
+rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3 $TMPIMG4
 exit $rc

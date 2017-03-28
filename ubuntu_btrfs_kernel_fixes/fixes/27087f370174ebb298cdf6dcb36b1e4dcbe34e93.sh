@@ -37,7 +37,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	exit 1
 fi
 
@@ -47,7 +47,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
 	losetup -d $DEV2
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 	exit 1
 fi
 
@@ -69,5 +69,5 @@ umount $MNT
 losetup -d $DEV0
 losetup -d $DEV1
 losetup -d $DEV2
-rm $TMPIMG0 $TMPIMG1 $TMPIMG2
+rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2
 exit $rc

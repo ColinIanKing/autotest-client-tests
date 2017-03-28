@@ -63,7 +63,7 @@ class ubuntu_zfs_stress(test.test):
 
         os.chdir(self.srcdir)
 
-        utils.system_output('rm /etc/*/S99autotest -f || true', retain_output=True)
+        utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
         utils.system('modprobe zfs')
 

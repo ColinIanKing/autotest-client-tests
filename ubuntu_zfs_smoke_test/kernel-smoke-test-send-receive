@@ -32,7 +32,7 @@ zpool create ${POOL} ${VDEV0} ${VDEV1}
 ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zpool create failed, exit code=$ret"
-	rm ${VDEV0} ${VDEV1}
+	rm -f ${VDEV0} ${VDEV1}
 	exit 1
 fi
 
@@ -41,7 +41,7 @@ ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zfs create failed, exit code=$ret"
 	zpool destroy ${POOL}
-	rm ${VDEV0} ${VDEV1}
+	rm -f ${VDEV0} ${VDEV1}
 	exit 1
 fi
 
@@ -60,7 +60,7 @@ ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zfs snapshot failed, exit code=$ret"
 	zpool destroy ${POOL}
-	rm ${VDEV0} ${VDEV1}
+	rm -f ${VDEV0} ${VDEV1}
 	exit 1
 fi
 
@@ -76,7 +76,7 @@ ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zfs destroy snapshot failed, exit code=$ret"
 	zpool destroy ${POOL}
-	rm ${VDEV0} ${VDEV1}
+	rm -f ${VDEV0} ${VDEV1}
 	exit 1
 fi
 
@@ -89,7 +89,7 @@ sum2=$(md5sum ${DATA} | awk '{print $1}')
 if [ x"$sum1" != x"$sum2" ]; then
         echo "FAILED: received data different from original"
         zpool destroy ${POOL}
-        rm ${VDEV0} ${VDEV1}
+        rm -f ${VDEV0} ${VDEV1}
         exit 1
 fi
 
@@ -101,12 +101,12 @@ if [ $ret -ne 0 ]; then
 	# destroy failed, try to clean up, but this
 	# wil probably fail
 	#
-	rm ${VDEV0} ${VDEV1}
+	rm -f ${VDEV0} ${VDEV1}
 	exit 1
 fi
 
 dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
 dd if=/dev/zero of=${VDEV1} bs=1M count=512 > /dev/null 2>&1
-rm ${VDEV0} ${VDEV1}
+rm -f ${VDEV0} ${VDEV1}
 echo "PASSED"
 exit 0

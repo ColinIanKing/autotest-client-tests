@@ -43,7 +43,7 @@ zpool create ${POOL} raidz3 ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3} raidz3 ${VDEV4} 
 ret=$?
 if [ $ret -ne 0 ]; then
 	echo "FAILED: zpool create failed, exit code=$ret"
-	rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3} ${VDEV4} ${VDEV5} ${VDEV6} ${VDEV7}
+	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3} ${VDEV4} ${VDEV5} ${VDEV6} ${VDEV7}
 	exit 1
 fi
 
@@ -55,7 +55,7 @@ if [ $ret -ne 0 ]; then
 	# destroy failed, try to clean up, but this
 	# wil probably fail
 	#
-	rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3} ${VDEV4} ${VDEV5} ${VDEV6} ${VDEV7}
+	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3} ${VDEV4} ${VDEV5} ${VDEV6} ${VDEV7}
 	exit 1
 fi
 
@@ -67,6 +67,6 @@ dd if=/dev/zero of=${VDEV4} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 dd if=/dev/zero of=${VDEV5} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 dd if=/dev/zero of=${VDEV6} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 dd if=/dev/zero of=${VDEV7} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
-rm ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3} ${VDEV4} ${VDEV5} ${VDEV6} ${VDEV7}
+rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3} ${VDEV4} ${VDEV5} ${VDEV6} ${VDEV7}
 echo "PASSED"
 exit 0

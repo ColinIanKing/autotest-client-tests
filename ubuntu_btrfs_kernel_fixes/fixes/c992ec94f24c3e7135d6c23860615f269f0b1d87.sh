@@ -49,14 +49,14 @@ mkfs.btrfs -f "$DEV" >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs on $DEV failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 mount "$DEV" "$MNT" -o commit=999
 if [ $? -ne 0 ]; then
 	echo "mount $DEV $MNT failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 
@@ -71,7 +71,7 @@ if [ $? -ne 0 ]; then
 	echo "btrfs subvolume snapshot -r $MNT $MNT/mysnap1 failed"
 	umount $DEV
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 	echo "btrfs send $MNT/mysnap1 -f /tmp/base.send failed"
 fi

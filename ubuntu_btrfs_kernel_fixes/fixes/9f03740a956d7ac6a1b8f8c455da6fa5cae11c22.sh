@@ -38,7 +38,7 @@ mkfs.btrfs -f $DEV  >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f $DEV  >& /dev/null failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 
@@ -47,7 +47,7 @@ mount $DEV $MNT/btrfs
 if [ $? -ne 0 ]; then
 	echo "mount $DEV $MNT failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 
@@ -61,5 +61,5 @@ btrfs send -p $MNT/btrfs/snap1 $MNT/btrfs/snap2 > /tmp/incremental.send
 
 umount $MNT/btrfs
 losetup -d $DEV
-rm $TMPIMG /tmp/incremental.send
+rm -f $TMPIMG /tmp/incremental.send
 exit $rc

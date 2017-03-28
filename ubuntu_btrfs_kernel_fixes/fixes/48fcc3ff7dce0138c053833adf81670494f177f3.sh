@@ -26,7 +26,7 @@ UUID=$(btrfs fi show $DEV | head -1 | sed -e 's/.*uuid: \([-0-9a-z]*\)$/\1/')
 echo "mount $DEV $MNT"
 mount "$DEV" "$MNT"
 if [ $? -ne 0 ]; then
-	rm $TMPIMG
+	rm -f $TMPIMG
 	losetup -d $DEV
 	echo "mount $DEV $MNT failed"
 	exit 1
@@ -38,7 +38,7 @@ if [ ! -e $LABELFILE ]; then
 	echo "Cannot test, $LABELFILE does not exist"
 	umount $DEV
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 2
 fi
 
@@ -67,5 +67,5 @@ fi
 
 umount $DEV
 losetup -d $DEV
-rm $TMPIMG
+rm -f $TMPIMG
 exit $RET

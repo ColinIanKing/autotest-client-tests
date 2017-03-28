@@ -31,7 +31,7 @@ mkfs.btrfs -f $DEV0 >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs $DEV0 failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -39,7 +39,7 @@ mount $DEV0 $MNT >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -63,5 +63,5 @@ else
 fi
 
 losetup -d $DEV0
-rm $TMPIMG0
+rm -f $TMPIMG0
 exit $rc

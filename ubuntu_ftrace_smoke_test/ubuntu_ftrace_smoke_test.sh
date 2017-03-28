@@ -187,7 +187,7 @@ test_function_graph_tracer()
 	fi
 	check $fail "vfs_write traces found must be > $threshold, got $n"
 
-	rm $TMPFILE ${TMPFILE}.log
+	rm -f $TMPFILE ${TMPFILE}.log
 	timer_stop
 }
 
@@ -216,7 +216,7 @@ test_function_tracer()
 	fi
 	check $fail "SyS_write traces found must be > $threshold, got $n"
 
-	rm $TMPFILE ${TMPFILE}.log
+	rm -f $TMPFILE ${TMPFILE}.log
 	timer_stop
 }
 

@@ -39,7 +39,7 @@ mkfs.btrfs -f -m raid1 $DEV0 $DEV1
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f -m raid 1 $DEV0 $DEV1 failed"
 	losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 	exit 1
 fi
 
@@ -47,7 +47,7 @@ btrfstune -S 1 $DEV0
 if [ $? -ne 0 ]; then
 	echo "btrfstune -S 1 $DEV0 failed"
 	losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 	exit 1
 fi
 
@@ -55,7 +55,7 @@ mount $DEV0 $MNT >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT failed"
 	losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 	exit 1
 fi
 
@@ -63,7 +63,7 @@ btrfs device add $DEV2 $DEV3 $MNT
 if [ $? -ne 0 ]; then
 	echo "btrfs device add $DEV2 $DEV3 $MNT failed"
 	losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 	exit 1
 fi
 
@@ -71,12 +71,12 @@ mount -o remount,rw $MNT >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount -o remount,rw $MNT >& /dev/null failed"
 	losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 	exit 1
 fi
 dd if=/dev/zero of=$MNT/tmpfile bs=1M count=1 >& /dev/null
 
 umount $MNT
 losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 exit $rc

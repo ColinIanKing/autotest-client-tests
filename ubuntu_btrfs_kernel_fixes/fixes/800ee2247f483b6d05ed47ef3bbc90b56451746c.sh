@@ -39,7 +39,7 @@ mkfs.btrfs -f $DEV >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs on $DEV failed"
 	losetup -d $DEV
-	rm $TMPIMG
+	rm -f $TMPIMG
 	exit 1
 fi
 
@@ -49,7 +49,7 @@ do
 	if [ $? -ne 0 ]; then
 		echo "mount $DEV $MNT failed"
 		losetup -d $DEV
-		rm $TMPIMG
+		rm -f $TMPIMG
 		exit 1
 	fi
 
@@ -58,12 +58,12 @@ do
 		echo "mount -oremount,thread_pool=42 /mnt failed"
 		umount $DEV
 		losetup -d $DEV
-		rm $TMPIMG
+		rm -f $TMPIMG
 		exit 1
 	fi
 	umount $DEV
 done
 
 losetup -d $DEV
-rm $TMPIMG
+rm -f $TMPIMG
 exit 0

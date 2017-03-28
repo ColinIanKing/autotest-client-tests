@@ -36,7 +36,7 @@ mkfs.btrfs -f $DEV0 >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f $DEV0 >& /dev/null failed"
 	losetup -d $DEV0
-	rm $TMPIMG0
+	rm -f $TMPIMG0
 	exit 1
 fi
 
@@ -44,7 +44,7 @@ mount $DEV0 $MNT >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT failed"
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
@@ -52,7 +52,7 @@ btrfs dev add -f $DEV1 $MNT
 if [ $? -ne 0 ]; then
 	echo "btrfs dev add -f $DEV1 $MNT failed"
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
@@ -61,7 +61,7 @@ if [ $? -ne 0 ]; then
 	echo "umount $MNT failed"
 	umount $MNT
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
@@ -75,7 +75,7 @@ if [ $? -eq 0 ]; then
 	echo "mount -o degraded $DEV0 $MNT was expected to fail"
 	umount $MNT
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
@@ -87,7 +87,7 @@ mount -o degraded,ro $DEV0 $MNT
 if [ $? -ne 0 ]; then
 	echo "mount -o degraded,ro $DEV0 $MNT failed"
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 umount $MNT
@@ -97,7 +97,7 @@ if [ $dumped -gt 0 ]; then
 	echo "found a kernel stack dump"
 	dmesg
 	losetup -d $DEV0 $DEV1
-	rm $TMPIMG0 $TMPIMG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 
@@ -108,5 +108,5 @@ modprobe -s btrfs
 modprobe btrfs
 
 losetup -d $DEV0 $DEV1
-rm $TMPIMG0 $TMPIMG1
+rm -f $TMPIMG0 $TMPIMG1
 exit $rc

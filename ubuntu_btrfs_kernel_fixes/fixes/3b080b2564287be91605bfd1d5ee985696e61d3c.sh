@@ -44,7 +44,7 @@ mkfs.btrfs -f $DEV0 $DEV1 $DEV2 $DEV3 -m raid5 -d raid5 >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f $DEV0 $DEV1 $DEV2 $DEV3 -m raid5 -d raid5 failed"
 	losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 	exit 1
 fi
 
@@ -52,7 +52,7 @@ mount $DEV0 $MNT
 if [ $? -ne 0 ]; then
 	echo "mount $DEV0 $MNT failed"
 	losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-	rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 	exit 1
 fi
 
@@ -64,5 +64,5 @@ fi
 
 umount $DEV0
 losetup -d $DEV0 $DEV1 $DEV2 $DEV3
-rm $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
+rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3
 exit $rc

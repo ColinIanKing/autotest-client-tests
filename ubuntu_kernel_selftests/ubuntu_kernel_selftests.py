@@ -39,7 +39,7 @@ class ubuntu_kernel_selftests(test.test):
         # No local repository, so clone from the master repo.
         #
         if os.path.exists('linux') is False:
-            cmd = 'git clone https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/%s linux' % series
+            cmd = 'git clone --depth 1 https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/%s linux' % series
             utils.system(cmd)
             # tweak sleep wake alarm time to 30 seconds as 5 is a bit too small
             #

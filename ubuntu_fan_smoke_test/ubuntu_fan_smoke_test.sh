@@ -27,20 +27,20 @@ if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
     INFO="Running in the Canonical CI environment"
     http_proxy="http://squid.internal:3128"
     https_proxy="https://squid.internal:3128"
-elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
-    INFO="Running in the Canonical enablement environment"
-    http_proxy="http://10.245.64.1:3128"
-    https_proxy="https://10.245.64.1:3128"
 elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
-    INFO="Running in the Canonical enablement environment"
+    INFO="Running in the Canonical enablement environment (proxy1)"
     http_proxy="http://91.189.89.216:3128"
     https_proxy="https://91.189.89.216:3128"
+elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
+    INFO="Running in the Canonical enablement environment (proxy2"
+    http_proxy="http://10.245.64.1:3128"
+    https_proxy="https://10.245.64.1:3128"
 fi
 export http_proxy
 export https_proxy
 
 URI="http://index.docker.io/v1/repositories/library/ubuntu/images"
-if wget -q -O>/dev/null $URI; then
+if wget -q -O/dev/null $URI; then
     echo $INFO
 else
     unset http_proxy
@@ -51,7 +51,16 @@ if [ -n "$http_proxy" ]; then
     if [ ! -d /etc/systemd/system/docker.service.d ]; then
         mkdir /etc/systemd/system/docker.service.d
     fi
-    echo -ne "[Service]\nEnvironment=\"HTTP_PROXY=$http_proxy\"\n" \
+    case $(readlink /bin/sh) in
+        dash)
+            EOPTS="-n"
+            ;;
+        *)
+            EOPTS="-ne"
+            ;;
+    esac
+
+    echo $EOPTS "[Service]\nEnvironment=\"HTTP_PROXY=$http_proxy\"\n" \
          > /etc/systemd/system/docker.service.d/http-proxy.conf
     systemctl daemon-reload
     systemctl restart docker.service

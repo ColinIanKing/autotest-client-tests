@@ -12,7 +12,7 @@ INSTANCES=4
 # Generic stress-ng options
 #
 #STRESS_OPTIONS="--ignite-cpu --maximize --syslog --verbose --verify"
-STRESS_OPTIONS="--ignite-cpu --syslog --verbose --verify"
+STRESS_OPTIONS="--ignite-cpu --syslog --verbose --verify --oomable"
 #
 # Tests that can lock up some kernels or are CPU / arch specific, so exclude them for now
 #
@@ -52,11 +52,25 @@ not_exclude()
 	return 0
 }
 
+#
+#  Try an ensure that this script won't be oom'd
+#
+set_max_oom_level()
+{
+	if [ -d /proc/self/oom_score_adj ]; then
+		echo 1000 > /proc/self/oom_score_adj
+	elif [ -d /proc/self/oom_adj ]; then
+		echo 15 > /proc/self/oom_adj
+	fi
+}
+
 passed=""
 failed=""
 skipped=""
 oopsed=""
 badret=""
+
+set_max_oom_level
 
 count=0
 s1=$(secs_now)

@@ -57,10 +57,17 @@ not_exclude()
 #
 set_max_oom_level()
 {
-	if [ -d /proc/self/oom_score_adj ]; then
-		echo 1000 > /proc/self/oom_score_adj
-	elif [ -d /proc/self/oom_adj ]; then
-		echo 15 > /proc/self/oom_adj
+	if [ -e /proc/self/oom_score_adj ]; then
+		echo -500 > /proc/self/oom_score_adj
+	elif [ -e /proc/self/oom_adj ]; then
+		echo -10 > /proc/self/oom_adj
+	fi
+	#
+	# Ensure oom killer kills the stressor hogs rather
+	# than the wrong random process (e.g. autotest!)
+	#
+	if [ -e /proc/sys/vm/oom_kill_allocating_task ]; then
+		echo 1 > /proc/sys/vm/oom_kill_allocating_task
 	fi
 }
 

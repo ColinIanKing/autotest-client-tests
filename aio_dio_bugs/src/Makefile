@@ -22,3 +22,6 @@ aio-io-setup-with-nonwritable-context-pointer: aio-io-setup-with-nonwritable-con
 
 aio-dio-extend-stat: aio-dio-extend-stat.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lpthread
+
+aio-cve-2016-10044: aio-cve-2016-10044.c
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)

@@ -77,6 +77,18 @@ skipped=""
 oopsed=""
 badret=""
 
+echo " "
+echo "Machine Configuration"
+echo "Physical Pages:  $(getconf _PHYS_PAGES)"
+echo "Pages available: $(getconf _AVPHYS_PAGES)"
+echo "Page Size:       $(getconf PAGE_SIZE)"
+echo " "
+echo "Free memory:"
+free
+echo " "
+echo "Number of CPUs: $(getconf _NPROCESSORS_CONF)"
+echo "Number of CPUs Online: $(getconf _NPROCESSORS_ONLN)"
+echo " "
 set_max_oom_level
 
 count=0

@@ -27,6 +27,8 @@ class xfstests(test.test):
 
         pkgs = [
             'build-essential',
+            'dump',
+            'fio',
             'xfsdump',
             'autoconf',
             'kpartx',

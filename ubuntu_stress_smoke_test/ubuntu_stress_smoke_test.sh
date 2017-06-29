@@ -77,6 +77,16 @@ skipped=""
 oopsed=""
 badret=""
 
+#
+#  Always add 1GB of swap to ensure swapping is exercised
+#
+SWPIMG=$PWD/swap.img
+
+dd if=/dev/zero of=${SWPIMG} bs=1M count=1024
+chmod 0600 ${SWPIMG}
+mkswap ${SWPIMG}
+swapon -a ${SWPIMG}
+
 echo " "
 echo "Machine Configuration"
 echo "Physical Pages:  $(getconf _PHYS_PAGES)"
@@ -161,5 +171,8 @@ echo "  Passed:  $(echo $passed | wc -w), $passed"
 echo "  Badret:  $(echo $badret | wc -w), $badret"
 echo " "
 echo "Tests took $dur seconds to run"
+
+swapoff -a ${SWPIMG}
+rm ${SWPIMG}
 
 exit $rc

@@ -3,7 +3,7 @@
 #
 # Stress test duration in seconds
 #
-DURATION=10
+DURATION=5
 #
 # Number of stress-ng instances per stressor
 #

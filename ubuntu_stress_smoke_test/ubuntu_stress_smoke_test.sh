@@ -17,7 +17,7 @@ STRESS_OPTIONS="--ignite-cpu --syslog --verbose --verify --oomable"
 # Tests that can lock up some kernels or are CPU / arch specific, so exclude them for now
 #
 EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec "
-EXCLUDE+="spawn remap stack oom-pipe resources opcode sockfd vforkmany sockpair"
+EXCLUDE+="spawn remap stack oom-pipe resources opcode sockfd vforkmany sockpair "
 #
 # Tests that are not kernel specific
 #

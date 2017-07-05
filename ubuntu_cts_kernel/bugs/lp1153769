@@ -4,4 +4,4 @@
 
 set -e # Exit with a non-zero exit code if any errors occure
 
-perf stat -e cycles ls > /dev/null 2>&1
+perf stat -e cycles ls

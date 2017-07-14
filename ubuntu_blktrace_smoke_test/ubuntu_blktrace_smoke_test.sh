@@ -23,6 +23,22 @@
 #
 TMPFILE=/tmp/blktrace-kernel-trace-$$.tmp
 
+#
+#  Time to wait for blktrace to gather final samples (seconds)
+#
+DURATION=10
+
+#
+#  Number of arbitary events to wait for, don't make this too
+#  large
+#
+EVENTS=1024
+
+#
+#  Count of blocks to dd, should be much larger then $EVENTS
+#
+COUNT=$((EVENTS * 64))
+
 passed=0
 failed=0
 
@@ -53,6 +69,7 @@ get_dev()
 		;;
 	esac
 
+	echo ""
 	if [ -b "$DEV" ]; then
 		echo "Using block device $DEV for path $1"
 	else
@@ -103,19 +120,73 @@ test_kernel_configs()
 	done
 }
 
+#
+#  This test just performs a simple sanity check to see if
+#  blktrace and blkparse can gather and parse the event data.
+#  It does not sanity check the events.  Also, we have a very
+#  low threshold of the number of events to check for as we
+#  are just interested in the fact that *some* event data is
+#  available.
+#
 test_dd_trace()
 {
+	echo ""
+	echo "Test regime:"
+	echo "  dd performing ${COUNT} 1K block writes"
+	echo "  looking for at least ${EVENTS} blktrace events"
+	#
+	# flush out cache so we don't interfere with test
+	#
+	sync
+	echo 3 > /proc/sys/vm/drop_caches
+
+	#
+	# kick off blktrace
+	#
+	echo ""
+	echo "$(date): blktrace starting"
 	blktrace -d $DEV -o - > $TMPFILE &
 	pid=$!
-	dd if=/dev/urandom of=test.dat bs=1024 conv=sync oflag=direct count=2048 >& /dev/null
+	echo "$(date): dd starting"
+	dd if=/dev/urandom of=test.dat bs=1024 conv=sync oflag=direct count=${COUNT} >& /dev/null
 	sync
 	echo 3 > /proc/sys/vm/drop_caches
 	dd if=test.dat iflag=direct of=/dev/null bs=1024 >& /dev/null
 	sync
 	echo 3 > /proc/sys/vm/drop_caches
-	sleep 1
-	kill -SIGINT $pid
+	ticks=0
+	echo "$(date): dd stopped"
+
+	#
+	# Wait for blktrace to do it's thing.. Zzzz
+	#
+	echo "$(date): waiting for $DURATION seconds"
+	while [ $ticks -lt $DURATION ]
+	do
+		sleep 1
+		if [ ! -d /proc/$pid ];
+		then
+			break
+		fi
+		ticks=$((ticks + 1))
+	done
+
+	#
+	# most of the time blktrace should still be running
+	# so terminate and wait
+	#
+	if [ -d /proc/$pid ]; then
+		echo "$(date): blktrace being terminated"
+		kill -SIGINT $pid
+		wait $pid
+		echo "$(date): blktrace terminated"
+	else
+		echo "$(date): blktrace terminated prematurely"
+	fi
+
 	cat $TMPFILE | blkparse -i - > ${TMPFILE}.parsed
+	echo "$(date): blktrace data parsed"
+	echo ""
 
 	dd_count=$(grep "dd" ${TMPFILE}.parsed | wc -l)
 	rd=$(grep "Reads Completed:" ${TMPFILE}.parsed | tail -1 | awk '{ print $3 + 0 }')
@@ -128,34 +199,34 @@ test_dd_trace()
 	if [ -z "$dd_count" ]; then
 		dd_count=0
 	fi
-	if [ $dd_count -lt 1024 ]; then
+	if [ $dd_count -lt ${EVENTS} ]; then
 		inc_failed
-		echo "FAILED expecting at least 1024 block traces events from the dd process, got $dd_count"
+		echo "FAILED (expecting at least ${EVENTS} block traces events from the dd process, got $dd_count)"
 	else
 		inc_passed
-		echo "PASSED got $dd_count block trace events"
+		echo "PASSED (got $dd_count block trace events)"
 	fi
 
 	if [ -z "$rd" ]; then
 		rd=0
 	fi
-	if [ $rd -lt 1024 ]; then
+	if [ $rd -lt ${EVENTS} ]; then
 		inc_failed
-		echo "FAILED expecting at least 1024 block read traces events, got $rd"
+		echo "FAILED (expecting at least ${EVENTS} block read traces events, got $rd)"
 	else
 		inc_passed
-		echo "PASSED got $rd block read trace events"
+		echo "PASSED (got $rd block read trace events)"
 	fi
 
 	if [ -z "$wr" ]; then
 		wr=0
 	fi
-	if [ $wr -lt 1024 ]; then
+	if [ $wr -lt ${EVENTS} ]; then
 		inc_failed
-		echo "FAILED expecting at least 1024 block write traces events, got $wr"
+		echo "FAILED (expecting at least ${EVENTS} block write traces events, got $wr)"
 	else
 		inc_passed
-		echo "PASSED got $wr block write trace events"
+		echo "PASSED (got $wr block write trace events)"
 	fi
 	rm -rf $TMPFILE ${TMPFILE}.parsed
 }
@@ -165,7 +236,7 @@ test_kernel_configs
 
 which blktrace >& /dev/null
 if [ $? -ne 0 ]; then
-	echo "FAILED cannot find blktrace tool, it is not installed"
+	echo "FAILED (cannot find blktrace tool, it is not installed)"
 	exit 1
 fi
 
@@ -176,7 +247,7 @@ get_dev $(pwd)
 # sys/kernel/debug/tracing should exist
 #
 if [ ! -d /sys/kernel/debug/tracing ]; then
-	echo "FAILED /sys/kernel/debug/tracing does not exist"
+	echo "FAILED (/sys/kernel/debug/tracing does not exist)"
 	umount_debugfs
 	exit 1
 fi
@@ -184,7 +255,9 @@ fi
 rc=0
 test_dd_trace
 
+echo ""
 echo "Summary: $passed passed, $failed failed"
+echo ""
 
 umount_debugfs
 

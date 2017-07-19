@@ -1,0 +1,21 @@
+AUTHOR = "Ubuntu"
+NAME = "selftests"
+CRITERIA = """
+Uses built-in kernel repository self tests.
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_kernel_selftests'
+
+tests = [ 'breakpoints','cpu-hotplug','efivarfs','memory-hotplug','mount','net','ptrace','powerpc','seccomp','user' ]
+
+
+for test in tests:
+    results = job.run_test_detail('ubuntu_kernel_selftests', test_name=test, tag=test)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

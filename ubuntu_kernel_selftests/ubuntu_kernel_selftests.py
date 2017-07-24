@@ -16,6 +16,7 @@ class ubuntu_kernel_selftests(test.test):
         ]
         if not (arch == 's390x' and series in ['precise', 'trusty', 'vivid', 'xenial']):
             pkgs.append('libnuma-dev')
+            pkgs.append('libfuse-dev')
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 

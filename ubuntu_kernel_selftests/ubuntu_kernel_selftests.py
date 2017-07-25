@@ -54,7 +54,7 @@ class ubuntu_kernel_selftests(test.test):
             # connections to the test VMs and real H/W
             fn = 'linux/tools/testing/selftests/breakpoints/Makefile'
             if os.path.exists(fn):
-                cmd = 'sed -i "s/TEST_PROGS += step_after_suspend_test/# TEST_PROGS += step_after_suspend_test/" ' + fn
+                cmd = 'sed -i "s/\(.* += step_after_suspend_test\)/#\\1/" ' + fn
                 utils.system(cmd)
 
             #

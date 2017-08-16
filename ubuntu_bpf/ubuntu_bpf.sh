@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 #
 # Copyright (C) 2016 Canonical
@@ -21,7 +21,6 @@
 set -e
 rc=0
 BINDIR=$1
-SRCDIR=$2
 ROOT_DIR=`pwd`
 
 # FIXME: This should be done in default adt environment
@@ -49,7 +48,7 @@ git fetch origin master;git reset --hard FETCH_HEAD
 
 git config --local user.email "foo@bar"
 git config --local user.name "Canonical Kernel Testing"
-git am ${SRCDIR}/0001-selftests-just-build-bpf.patch
+git am ${BINDIR}/0001-selftests-just-build-bpf.patch
 
 cd tools/testing/selftests
 make clean

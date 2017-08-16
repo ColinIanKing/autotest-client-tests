@@ -35,7 +35,7 @@ class ubuntu_bpf(test.test):
             cmd = 'git clone --depth=1 https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/%s linux' % series
             utils.system(cmd)
 
-        cmd = '%s/ubuntu_bpf.sh %s %s' % (self.bindir, self.srcdir, self.bindir)
+        cmd = '%s/ubuntu_bpf.sh %s %s' % (self.bindir, self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
 
         print(self.results)

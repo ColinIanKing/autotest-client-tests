@@ -64,16 +64,15 @@ if [ $EUID -eq 0 ]; then
 	#
 	# Drop priviledges
 	#
-	capsh --user=nobody -- -c bpf/test_verifier > ${TMP}
+	capsh --user=nobody -- -c bpf/test_verifier | tee ${TMP}
 else
 	#
 	# We're OK as joe user
 	#
-	bpf/test_verifier > ${TMP}
+	bpf/test_verifier | tee ${TMP}
 fi
 failed=$(grep FAILED ${TMP} | awk '{print $4}')
 
-cat ${TMP}
 rm -f ${TMP}
 
 echo -n "test_verifier: "

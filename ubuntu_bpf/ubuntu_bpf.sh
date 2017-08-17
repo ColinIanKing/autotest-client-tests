@@ -60,17 +60,7 @@ make
 PID=$$
 TMP=/tmp/test_verifier_${PID}.log
 echo "Running test_verifier bpf test.."
-if [ $EUID -eq 0 ]; then
-	#
-	# Drop priviledges
-	#
-	capsh --user=nobody -- -c bpf/test_verifier | tee ${TMP}
-else
-	#
-	# We're OK as joe user
-	#
-	bpf/test_verifier | tee ${TMP}
-fi
+bpf/test_verifier | tee ${TMP}
 failed=$(grep FAILED ${TMP} | awk '{print $4}')
 
 rm -f ${TMP}

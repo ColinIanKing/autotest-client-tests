@@ -13,6 +13,7 @@ class ubuntu_bpf(test.test):
 
         pkgs = [
             'build-essential',
+            'clang',
             'git',
             'libcap-dev',
             'libelf-dev',

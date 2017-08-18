@@ -46,9 +46,7 @@ cd linux
 git checkout -f;git clean -f -d;git ls-files --others --directory |xargs rm -rvf;rm -rf .git/rebase*
 git fetch origin master;git reset --hard FETCH_HEAD
 
-git config --local user.email "foo@bar"
-git config --local user.name "Canonical Kernel Testing"
-git am ${BINDIR}/0001-selftests-just-build-bpf.patch
+patch -p1 < ${BINDIR}/0001-selftests-just-build-bpf.patch
 
 cd tools/testing/selftests
 make clean

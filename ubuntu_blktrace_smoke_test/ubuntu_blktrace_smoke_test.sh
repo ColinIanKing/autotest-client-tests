@@ -42,6 +42,15 @@ COUNT=$((EVENTS * 64))
 passed=0
 failed=0
 
+#
+#  Loopback image and mount point, image is 33% larger than
+#  file to be dd'd.
+#
+START_DIR=$(pwd)
+IMG_COUNT=$((COUNT * 133 / 100))
+IMG=${START_DIR}/loop.img
+MNT=${START_DIR}/mnt
+
 inc_failed()
 {
 	failed=$((failed + 1))
@@ -58,6 +67,8 @@ get_dev()
 	mount=$(stat -c '%m' $1 | tail -1)
 	DEV=$(df $mount | grep dev | head -1 | cut -d' ' -f1)
 	case $DEV in
+		/dev/loop*)
+		;;
 		/dev/disk/by-*)
 		;;
 		/dev/*[0-9])
@@ -97,6 +108,32 @@ umount_debugfs()
 	if [ $unmount -eq 1 ]; then
 		umount /sys/kernel/debug
 	fi
+}
+
+mount_loopback()
+{
+	mkdir -p ${MNT}
+	dd if=/dev/zero of=${START_DIR}/loop.img bs=1K count=${IMG_COUNT} >& /dev/null
+	mkfs.ext4 ${IMG} >& /dev/null
+	if [ $? -ne 0 ]; then
+		echo "FAILED (cannot mkfs test loop image)"
+		exit 1
+	fi
+	mount -o loop ${IMG} ${MNT}
+	if [ $? -ne 0 ]; then
+		echo "FAILED (cannot mount test loop image)"
+		rmdir ${MNT}
+		rm -f ${IMG}
+		exit 1
+	fi
+}
+
+umount_loopback()
+{
+	cd ${START_DIR}
+	umount -f ${MNT}
+	rmdir ${MNT}
+	rm -f ${IMG}
 }
 
 check()
@@ -241,6 +278,9 @@ if [ $? -ne 0 ]; then
 fi
 
 mount_debugfs
+mount_loopback
+
+cd ${MNT}
 get_dev $(pwd)
 
 #
@@ -249,16 +289,21 @@ get_dev $(pwd)
 if [ ! -d /sys/kernel/debug/tracing ]; then
 	echo "FAILED (/sys/kernel/debug/tracing does not exist)"
 	umount_debugfs
+	cd ${START_DIR}
+	umount_loopback
 	exit 1
 fi
 
 rc=0
 test_dd_trace
 
+cd ${START_DIR}
+
 echo ""
 echo "Summary: $passed passed, $failed failed"
 echo ""
 
+umount_loopback
 umount_debugfs
 
 exit $rc

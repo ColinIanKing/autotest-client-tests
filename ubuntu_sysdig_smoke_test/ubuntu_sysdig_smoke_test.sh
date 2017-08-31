@@ -21,7 +21,12 @@
 #  Trival "smoke test" sysdig tests just to see
 #  if basic functionality works
 #
-TMPFILE=/tmp/sysdig-kernel-trace-$$.tmp
+TMPFILE=${PWD}sysdig-kernel-trace-$$.tmp
+#
+#  Number of blocks in sysdig trace file
+#  For non-POSIX mode, this is 1K blocks
+#
+BLK_LIMIT=16384
 
 passed=0
 failed=0
@@ -47,7 +52,7 @@ inc_failed()
 
 check()
 {
-	if [ $1 -ge $THRESHOLD ]; then
+	if [ $1 -ge ${THRESHOLD} ]; then
 		echo "PASSED ($2)"
 		passed=$((passed + 1))
 		return 0
@@ -63,14 +68,17 @@ test_sysdig_context_switch()
 {
 	echo "== sysdig smoke test to trace dd, cat, read and writes =="
 
+	echo "Limiting raw capture file to ${BLK_LIMIT} blocks"
+
 	#
 	#  We try this several times as we may not capture enough events
 	#  first time around
 	#
-	for i in $(seq $TRIES)
+	for i in $(seq ${TRIES})
 	do
-		echo "Try $i of $TRIES"
-		sysdig --unbuffered -w ${TMPFILE}.raw &
+		echo "Try $i of ${TRIES}"
+		ulimit -Sf ${BLK_LIMIT}
+		sysdig --unbuffered -w ${TMPFILE}.raw >& /dev/null &
 		pid=$!
 		start=$(date +%s)
 		#
@@ -81,16 +89,35 @@ test_sysdig_context_switch()
 			(dd if=/dev/zero bs=1024 count=500000 | cat | cat | dd bs=1024 of=/dev/null) >& /dev/null
 			end=$(date +%s)
 			duration=$((end - $start))
-			if [ $duration -ge $DURATION ]; then
+			if [ $duration -ge ${DURATION} ]; then
 				break
 			fi
+			#
+			#  Has sysdig terminated?
+			#
+			if [ ! -d /proc/$pid ]; then
+				break;
+			fi
 		done
-		kill -SIGINT $pid
-		wait $pid
+
+		#
+		#  restore file limit
+		#
+		ulimit -f hard
+
+		#
+		#  Timed out? then kill sysdig
+		#
+		if [ -d  /proc/$pid ]; then
+			kill -SIGINT $pid
+			sleep 1
+			kill -SIGKILL $pid
+			wait $pid
+		fi
 
 		sz=$(stat -c%s ${TMPFILE}.raw)
 		echo "Raw capture file is $((sz / 1048576)) Mbytes"
-		sysdig -r ${TMPFILE}.raw > ${TMPFILE}
+		(sysdig -r ${TMPFILE}.raw > ${TMPFILE}) >& /dev/null
 		sz=$(stat -c%s ${TMPFILE})
 		echo "Converted events file is $((sz / 1048576)) Mbytes"
 
@@ -100,34 +127,34 @@ test_sysdig_context_switch()
 		ddrdzero=$(grep dd ${TMPFILE} | grep read | grep "/dev/zero" | wc -l | cut -d' ' -f1)
 		ddwrnull=$(grep dd ${TMPFILE} | grep write | grep "/dev/null" | wc -l | cut -d' ' -f1)
 
-		if [ $switches_dd -ge $THRESHOLD -a \
-		     $switches_cat -ge $THRESHOLD -a \
-		     $ddrdzero -ge $THRESHOLD -a \
-		     $ddwrnull -ge $THRESHOLD ]; then
+		if [ $switches_dd -ge ${THRESHOLD} -a \
+		     $switches_cat -ge ${THRESHOLD} -a \
+		     $ddrdzero -ge ${THRESHOLD} -a \
+		     $ddwrnull -ge ${THRESHOLD} ]; then
 			break
 		fi
 		rm -f ${TMPFILE}.raw ${TMPFILE}
 	done
 
 	echo "Found:"
-	echo "   $events sysdig events"
-	echo "   $switches_dd dd context switches"
-	echo "   $switches_cat cat context switches"
-	echo "   $ddrdzero reads from /dev/zero by dd"
-	echo "   $ddwrnull writes to /dev/null by dd"
+	echo "   ${events} sysdig events"
+	echo "   ${switches_dd} dd context switches"
+	echo "   ${switches_cat} cat context switches"
+	echo "   ${ddrdzero} reads from /dev/zero by dd"
+	echo "   ${ddwrnull} writes to /dev/null by dd"
 
-	check $switches_dd "trace at least $THRESHOLD context switches involving dd"
-	check $switches_cat "trace at least $THRESHOLD context switches involving cat"
-	check $ddrdzero "trace at least $THRESHOLD reads of /dev/zero by dd"
-	check $ddwrnull "trace at least $THRESHOLD writes to /dev/null by dd"
+	check ${switches_dd} "trace at least ${THRESHOLD} context switches involving dd"
+	check ${switches_cat} "trace at least ${THRESHOLD} context switches involving cat"
+	check ${ddrdzero} "trace at least ${THRESHOLD} reads of /dev/zero by dd"
+	check ${ddwrnull} "trace at least ${THRESHOLD} writes to /dev/null by dd"
 }
 
 rc=0
 test_sysdig_context_switch
 echo " "
 
-rm -rf $TMPFILE
+rm -rf ${TMPFILE}
 
-echo "Summary: $passed passed, $failed failed"
+echo "Summary: ${passed} passed, ${failed} failed"
 
-exit $rc
+exit ${rc}

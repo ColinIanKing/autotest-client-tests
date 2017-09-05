@@ -114,7 +114,7 @@ mount_loopback()
 {
 	mkdir -p ${MNT}
 	dd if=/dev/zero of=${START_DIR}/loop.img bs=1K count=${IMG_COUNT} >& /dev/null
-	mkfs.ext4 ${IMG} >& /dev/null
+	mkfs.ext4 -F ${IMG} >& /dev/null
 	if [ $? -ne 0 ]; then
 		echo "FAILED (cannot mkfs test loop image)"
 		exit 1

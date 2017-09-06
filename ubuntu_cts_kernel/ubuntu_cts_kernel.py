@@ -19,8 +19,9 @@ class ubuntu_cts_kernel(test.test):
     def initialize(self):
         self.install_required_pkgs()
 
-    def run_once(self, bug, exit_on_error=True, set_time=True, ifname='eth0'):
+    def run_once(self, bug, exit_on_error=True, set_time=True, ifname=None):
         print('*** %s ***' % bug)
+        ifname = utils.system_output("ip route | grep default | grep -oP 'dev\s+\K\w+'", retain_output=True)
         cmd = '%s/bugs/%s %s' % (self.bindir, bug, ifname)
         self.results = utils.system_output(cmd, retain_output=True)
 

@@ -41,7 +41,7 @@ class hwclock(test.test):
             logging.info('Running inside ' + self.virt + ', not testing ')
         else:
             logging.info('Setting hwclock to 2/2/80 03:04:00')
-            utils.system('/sbin/hwclock --set --date "2/2/80 03:04:00"')
+            utils.system_output('/sbin/hwclock --set --date "2/2/80 03:04:00"', retain_output=True)
             date = utils.system_output('LC_ALL=C /sbin/hwclock')
             if series in ['precise', 'trusty', 'vivid', 'xenial']:
                 if not re.match('Sat *Feb *2 *03:04:.. 1980', date):

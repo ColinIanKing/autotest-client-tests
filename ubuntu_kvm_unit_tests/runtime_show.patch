@@ -1,5 +1,5 @@
 diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 1bd87bc..02f999c 100644
+index a31ae91..e82ab48 100644
 --- a/scripts/runtime.bash
 +++ b/scripts/runtime.bash
 @@ -29,7 +29,7 @@ premature_failure()
@@ -11,7 +11,7 @@ index 1bd87bc..02f999c 100644
  }
  
  skip_nodefault()
-@@ -71,12 +71,12 @@ function run()
+@@ -72,12 +72,12 @@ function run()
  
      if [ -z "$only_group" ] && grep -qw "nodefault" <<<$groups &&
              skip_nodefault; then
@@ -26,7 +26,7 @@ index 1bd87bc..02f999c 100644
          return 2
      fi
  
-@@ -87,37 +87,37 @@ function run()
+@@ -88,13 +88,13 @@ function run()
          path=${check_param%%=*}
          value=${check_param#*=}
          if [ "$path" ] && [ "$(cat $path)" != "$value" ]; then
@@ -36,13 +36,15 @@ index 1bd87bc..02f999c 100644
          fi
      done
  
-     last_line=$(premature_failure) && {
+     last_line=$(premature_failure > >(tail -1)) && {
 -        echo "`SKIP` $1 ($last_line)"
 +    #    echo "`SKIP` $1 ($last_line)"
          return 77
      }
  
-     cmdline=$(get_cmdline $kernel)
+@@ -103,28 +103,28 @@ function run()
+         cmdline="MIGRATION=yes $cmdline"
+     fi
      if [ "$verbose" = "yes" ]; then
 -        echo $cmdline
 +        echo $testname ":" $cmdline
@@ -54,6 +56,7 @@ index 1bd87bc..02f999c 100644
 -    summary=$(eval $cmdline 2> >(RUNTIME_log_stderr) \
 -                             > >(tee >(RUNTIME_log_stdout $kernel) | extract_summary))
 -    ret=$?
+-    [ "$STANDALONE" != "yes" ] && echo > >(RUNTIME_log_stdout $kernel)
 -
 -    if [ $ret -eq 0 ]; then
 -        echo "`PASS` $1 $summary"
@@ -61,12 +64,15 @@ index 1bd87bc..02f999c 100644
 -        echo "`SKIP` $1 $summary"
 -    elif [ $ret -eq 124 ]; then
 -        echo "`FAIL` $1 (timeout; duration=$timeout)"
+-    elif [ $ret -gt 127 ]; then
+-        echo "`FAIL` $1 (terminated on SIG$(kill -l $(($ret - 128))))"
 -    else
 -        echo "`FAIL` $1 $summary"
 -    fi
 +    #summary=$(eval $cmdline 2> >(RUNTIME_log_stderr) \
 +    #                         > >(tee >(RUNTIME_log_stdout $kernel) | extract_summary))
 +    #ret=$?
++    #[ "$STANDALONE" != "yes" ] && echo > >(RUNTIME_log_stdout $kernel)
 +
 +    #if [ $ret -eq 0 ]; then
 +    #    echo "`PASS` $1 $summary"
@@ -74,6 +80,8 @@ index 1bd87bc..02f999c 100644
 +    #    echo "`SKIP` $1 $summary"
 +    #elif [ $ret -eq 124 ]; then
 +    #    echo "`FAIL` $1 (timeout; duration=$timeout)"
++    #elif [ $ret -gt 127 ]; then
++    #    echo "`FAIL` $1 (terminated on SIG$(kill -l $(($ret - 128))))"
 +    #else
 +    #    echo "`FAIL` $1 $summary"
 +    #fi

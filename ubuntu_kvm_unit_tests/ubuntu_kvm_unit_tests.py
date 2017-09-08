@@ -32,8 +32,6 @@ class ubuntu_kvm_unit_tests(test.test):
         os.chdir(self.srcdir)
         if arch == 'ppc64le':
             opt.append('--endian={}'.format(sys.byteorder))
-        # patch makefile to build for newer gcc
-        utils.system('patch -p1 < %s/makefile.patch' % self.bindir)
         utils.configure(' '.join(opt))
         utils.make()
 

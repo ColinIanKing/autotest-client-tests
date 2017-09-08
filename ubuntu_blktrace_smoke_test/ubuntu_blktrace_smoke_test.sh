@@ -230,6 +230,18 @@ test_dd_trace()
 	wr=$(grep "Writes Completed:" ${TMPFILE}.parsed | tail -1 | awk '{ print $7 + 0 }')
 
 	#
+	#  older kernels can't trace read events on loop back, so fall back
+	#  and count queued events as a way of testing trace events are
+	#  being captured
+	#
+	if [ $rd -eq 0 ]; then
+		rd=$(grep "Reads Queued:" ${TMPFILE}.parsed | tail -1 | awk '{ print $3 + 0 }')
+	fi
+	if [ $wr -eq 0 ]; then
+		wr=$(grep "Writes Queued:" ${TMPFILE}.parsed | tail -1 | awk '{ print $7 + 0 }')
+	fi
+
+	#
 	# really simple sanity checks on blktrace output, the format may
 	# change so I don't want to perform too many complex sanity checks
 	#

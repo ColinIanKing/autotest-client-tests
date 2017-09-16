@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "ltp"
+CRITERIA = """
+Use the upstream LTP repository
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_ltp'
+
+results = job.run_test_detail('ubuntu_ltp', test_name='ltp', tag='ltp', timeout=60*60*8) # 8hr. timeout?
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

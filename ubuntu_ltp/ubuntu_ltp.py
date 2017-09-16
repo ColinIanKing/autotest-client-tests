@@ -48,9 +48,9 @@ class ubuntu_ltp(test.test):
     #    Driven by the control file for each individual test.
     #
     def run_once(self, test_name):
-        os.chdir(os.path.join(self.srcdir, 'seccomp', 'tests'))
+        os.chdir('/opt/ltp')
 
-        cmd = 'make run_tests'
+        cmd = './runltp'
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

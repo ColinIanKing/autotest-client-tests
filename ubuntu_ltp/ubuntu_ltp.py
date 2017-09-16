@@ -34,6 +34,8 @@ class ubuntu_ltp(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'ltp'))
+        cmd = 'make autotools'
+        self.results = utils.system_output(cmd, retain_output=True)
         cmd = './configure'
         self.results = utils.system_output(cmd, retain_output=True)
         cmd = 'make'

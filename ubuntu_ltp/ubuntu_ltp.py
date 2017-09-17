@@ -50,7 +50,7 @@ class ubuntu_ltp(test.test):
     def run_once(self, test_name):
         os.chdir('/opt/ltp')
 
-        cmd = './runltp'
+        cmd = './runltp -S %s' % os.path.join(self.bindir, 'skip')
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -76,10 +76,27 @@ test_sysdig_context_switch()
 	#
 	for i in $(seq ${TRIES})
 	do
+		dmesg -c > /dev/null
 		echo "Try $i of ${TRIES}"
 		ulimit -Sf ${BLK_LIMIT}
 		sysdig --unbuffered -w ${TMPFILE}.raw >& /dev/null &
 		pid=$!
+
+		count=0
+		while true
+		do
+			n=$(dmesg | grep "starting capture" | wc -l)
+			if [ $n -gt 0 ]; then
+				echo "Sysdig capture started after $count seconds wait"
+				break
+			fi
+			sleep 1
+			count=$((count + 1))
+			if [ $count -gt 45 ]; then
+				echo "Could not find start of capture message, maybe sysdig didn't start?"
+				break
+			fi
+		done
 		start=$(date +%s)
 		#
 		#  Capture at least $DURATION sections of events

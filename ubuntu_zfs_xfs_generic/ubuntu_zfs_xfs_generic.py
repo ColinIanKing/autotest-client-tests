@@ -89,7 +89,7 @@ class ubuntu_zfs_xfs_generic(test.test):
 
         #os.chdir(self.srcdir)
 	#print "chdir to " + os.path.join(self.srcdir, 'xfstests-dev')
-	os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
+        os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
         cmd = '%s/ubuntu_zfs_xfs_generic.sh %s %s' % (self.bindir, test_name, self.srcdir)
         print "Running: " + cmd
         self.results = utils.system_output(cmd, retain_output=True)

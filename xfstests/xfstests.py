@@ -38,11 +38,11 @@ class xfstests(test.test):
             'bc',
             'btrfs-tools',
             'attr',
-	    'texinfo',
-	    'texlive',
-	    'gettext',
-	    'autopoint',
-	    'pkg-config'
+            'texinfo',
+            'texlive',
+            'gettext',
+            'autopoint',
+            'pkg-config'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

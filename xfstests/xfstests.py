@@ -127,6 +127,8 @@ class xfstests(test.test):
         '''
         Sets up the environment necessary for running xfstests
         '''
+        utils.system_output('useradd fsgqa || true', retain_output=True)
+        utils.system_output('grep -q fsgqa /etc/sudoers || echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
 
 	#
         # Anticipate failures due to missing devel tools, libraries, headers

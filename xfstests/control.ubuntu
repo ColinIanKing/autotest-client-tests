@@ -77,7 +77,7 @@ os.environ['SCRATCH_LOGDEV'] = '/dev/sdb3'
 # Choose the filesystem types you want the tests to run on
 #
 #FS_TYPES = ['ext2', 'ext3', 'ext4', 'xfs', 'btrfs']
-FS_TYPES = ['ext4', 'btrfs', 'xfs']
+FS_TYPES = ['ext4', 'xfs', 'btrfs']
 
 # Finally, run the tests
 #

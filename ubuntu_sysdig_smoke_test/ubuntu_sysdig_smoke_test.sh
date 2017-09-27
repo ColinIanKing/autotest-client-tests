@@ -139,13 +139,11 @@ test_sysdig_context_switch()
 		echo "Converted events file is $((sz / 1048576)) Mbytes"
 
 		events=$(wc -l ${TMPFILE} | cut -d' ' -f1)
-		switches_dd=$(grep switch ${TMPFILE} | grep dd | wc -l | cut -d' ' -f1)
-		switches_cat=$(grep switch ${TMPFILE} | grep cat | wc -l | cut -d' ' -f1)
-		ddrdzero=$(grep dd ${TMPFILE} | grep read | grep "/dev/zero" | wc -l | cut -d' ' -f1)
-		ddwrnull=$(grep dd ${TMPFILE} | grep write | grep "/dev/null" | wc -l | cut -d' ' -f1)
+		switches=$(grep switch ${TMPFILE} | wc -l | cut -d' ' -f1)
+		ddrdzero=$(grep read ${TMPFILE} | grep "/dev/zero" | wc -l | cut -d' ' -f1)
+		ddwrnull=$(grep write ${TMPFILE} | grep "/dev/null" | wc -l | cut -d' ' -f1)
 
-		if [ $switches_dd -ge ${THRESHOLD} -a \
-		     $switches_cat -ge ${THRESHOLD} -a \
+		if [ $switches -ge ${THRESHOLD} -a \
 		     $ddrdzero -ge ${THRESHOLD} -a \
 		     $ddwrnull -ge ${THRESHOLD} ]; then
 			break
@@ -155,13 +153,11 @@ test_sysdig_context_switch()
 
 	echo "Found:"
 	echo "   ${events} sysdig events"
-	echo "   ${switches_dd} dd context switches"
-	echo "   ${switches_cat} cat context switches"
+	echo "   ${switches} context switches"
 	echo "   ${ddrdzero} reads from /dev/zero by dd"
 	echo "   ${ddwrnull} writes to /dev/null by dd"
 
-	check ${switches_dd} "trace at least ${THRESHOLD} context switches involving dd"
-	check ${switches_cat} "trace at least ${THRESHOLD} context switches involving cat"
+	check ${switches} "trace at least ${THRESHOLD} context switches"
 	check ${ddrdzero} "trace at least ${THRESHOLD} reads of /dev/zero by dd"
 	check ${ddwrnull} "trace at least ${THRESHOLD} writes to /dev/null by dd"
 }

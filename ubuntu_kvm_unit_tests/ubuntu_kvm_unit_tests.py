@@ -10,6 +10,10 @@ class ubuntu_kvm_unit_tests(test.test):
     def install_required_pkgs(self):
         arch   = platform.processor()
         series = platform.dist()[2]
+        cloud  = os.environ['CLOUD']
+
+        if cloud in ['gcp', 'gke', 'aws', 'azure']:
+            raise error.TestError('This test suite does not run correctly on any of these clouds and needs to be investigated.')
 
         pkgs = [
             'build-essential', 'qemu-kvm',
@@ -55,4 +59,3 @@ class ubuntu_kvm_unit_tests(test.test):
             utils.system('ppc64_cpu --smt=on')
 
 # vi:set ts=4 sw=4 expandtab:
-

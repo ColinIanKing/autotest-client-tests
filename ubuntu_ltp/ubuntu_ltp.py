@@ -3,6 +3,7 @@
 import os
 import platform
 from autotest.client                        import test, utils
+from autotest.client.shared     import error
 
 class ubuntu_ltp(test.test):
     version = 1
@@ -10,6 +11,10 @@ class ubuntu_ltp(test.test):
     def install_required_pkgs(self):
         arch   = platform.processor()
         series = platform.dist()[2]
+        cloud  = os.environ['CLOUD']
+
+        if cloud in ['gcp', 'gke', 'aws', 'azure']:
+            raise error.TestError('This test suite does not run correctly on any of these clouds and needs to be investigated.')
 
         pkgs = [
             'build-essential', 'git', 'flex', 'automake',

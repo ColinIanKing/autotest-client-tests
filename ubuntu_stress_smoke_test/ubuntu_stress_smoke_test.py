@@ -38,6 +38,6 @@ class ubuntu_stress_smoke_test(test.test):
         cmd = '%s/ubuntu_stress_smoke_test.sh' % (self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
 
-	print self.results
+        print(self.results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

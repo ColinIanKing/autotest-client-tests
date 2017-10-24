@@ -1,0 +1,65 @@
+From 9fce5008dc0b652564dd2e214a59958aa28bbeb3 Mon Sep 17 00:00:00 2001
+From: Po-Hsu Lin <po-hs...@canonical.com>
+Date: Thu, 14 Sep 2017 11:15:16 +0800
+Subject: [PATCH] Tests: mark fallocate test as XFAIL before kernel 4.3.0
+
+This test will fail for kernel before 4.3.0
+
+As there is no return code for SKIP, I think it's reasonable to mark it as an
+expected failure for kernel before 4.3.0
+
+Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
+---
+ tests/fallocate_align.sh  | 4 ++--
+ tests/fallocate_basic.sh  | 4 ++--
+ tests/fallocate_stress.sh | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/tests/fallocate_align.sh b/tests/fallocate_align.sh
+index 5105151..40061b8 100755
+--- a/tests/fallocate_align.sh
++++ b/tests/fallocate_align.sh
+@@ -7,8 +7,8 @@
+ #
+ compare_kvers `uname -r` "4.3.0"
+ if [ $? -eq 1 ]; then
+-	echo "FAIL no fallocate support in kernels before 4.3.0"
+-	exit $RC_FAIL
++	echo "XFAIL no fallocate support in kernels before 4.3.0"
++	exit $RC_XFAIL
+ else
+ 	EXP_RC=$RC_PASS
+ 	exec_and_check $EXP_RC fallocate_align "$@"
+diff --git a/tests/fallocate_basic.sh b/tests/fallocate_basic.sh
+index 904dfd6..4ef25ca 100755
+--- a/tests/fallocate_basic.sh
++++ b/tests/fallocate_basic.sh
+@@ -7,8 +7,8 @@
+ #
+ compare_kvers `uname -r` "4.3.0"
+ if [ $? -eq 1 ]; then
+-	echo "FAIL no fallocate support in kernels before 4.3.0"
+-	exit $RC_FAIL
++	echo "XFAIL no fallocate support in kernels before 4.3.0"
++	exit $RC_XFAIL
+ else
+ 	EXP_RC=$RC_PASS
+ 	exec_and_check $EXP_RC fallocate_basic "$@"
+diff --git a/tests/fallocate_stress.sh b/tests/fallocate_stress.sh
+index 622084f..3d6c86c 100755
+--- a/tests/fallocate_stress.sh
++++ b/tests/fallocate_stress.sh
+@@ -7,8 +7,8 @@
+ #
+ compare_kvers `uname -r` "4.3.0"
+ if [ $? -eq 1 ]; then
+-	echo "FAIL no fallocate support in kernels before 4.3.0"
+-	exit $RC_FAIL
++	echo "XFAIL no fallocate support in kernels before 4.3.0"
++	exit $RC_XFAIL
+ else
+ 	EXP_RC=$RC_PASS
+ 	exec_and_check $EXP_RC fallocate_stress "$@"
+-- 
+2.7.4
+

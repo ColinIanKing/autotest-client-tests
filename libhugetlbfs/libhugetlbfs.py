@@ -60,7 +60,10 @@ class libhugetlbfs(test.test):
         cmd = 'git clone --depth=1 -b next https://github.com/libhugetlbfs/libhugetlbfs.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
+        # apply SAUCE patches
         os.chdir(os.path.join(self.srcdir, 'libhugetlbfs'))
+        utils.system('patch -p1 < %s/001-fix-fallocate-test-before-kernel-4.3.patch' % self.bindir)
+
         # build for the underlying arch only (i.e. only 64 bit on 64 bit etc)
         utils.make('BUILDTYPE=NATIVEONLY')
         os.chdir(self.srcdir)

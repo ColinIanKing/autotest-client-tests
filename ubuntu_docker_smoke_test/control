@@ -1,0 +1,16 @@
+AUTHOR = "Ubuntu"
+NAME = "docker_smoke_test"
+CRITERIA = """
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_docker_smoke_test'
+
+results = job.run_test_detail('ubuntu_docker_smoke_test', test_name='docker_smoke_test', tag='docker_smoke_test', timeout=60*60*8) # 8hr. timeout?
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

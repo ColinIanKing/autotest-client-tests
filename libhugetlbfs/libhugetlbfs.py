@@ -14,6 +14,7 @@ class libhugetlbfs(test.test):
 
         pkgs = [
             'build-essential',
+            'git',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -53,17 +54,19 @@ class libhugetlbfs(test.test):
             utils.system('mount -t hugetlbfs none %s' % hugetlbfs_dir)
             self.hugetlbfs_dir = hugetlbfs_dir
 
-    def setup(self, tarball='libhugetlbfs-2.20.tar.gz'):
+    def setup(self):
         # get the sources
-        tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
-        utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
+        cmd = 'git clone --depth=1 -b next https://github.com/libhugetlbfs/libhugetlbfs.git'
+        self.results = utils.system_output(cmd, retain_output=True)
 
+        os.chdir(os.path.join(self.srcdir, 'libhugetlbfs'))
         # build for the underlying arch only (i.e. only 64 bit on 64 bit etc)
         utils.make('BUILDTYPE=NATIVEONLY')
+        os.chdir(self.srcdir)
 
     def run_once(self):
-        os.chdir(self.srcdir)
+        os.chdir(os.path.join(self.srcdir, 'libhugetlbfs'))
         self.results = utils.system_output('BUILDTYPE=NATIVEONLY make check', retain_output=True)
 
         print self.results

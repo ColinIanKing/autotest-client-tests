@@ -30,7 +30,17 @@ class ubuntu_kvm_smoke_test(test.test):
     #    Driven by the control file for each individual test.
     #
     def run_once(self, test_name):
-        cmd = 'sudo -u ubuntu %s/the-test' % (self.bindir)
+        arch = platform.processor()
+        if arch in 'x86_64':
+            arch = 'amd64'
+        elif arch in ['i686']:
+            arch = 'i386'
+        elif arch in 'aarch64':
+            arch = 'arm64'
+        elif arch in ['ppc64le']:
+            arch = 'ppc64el'
+
+        cmd = 'sudo -u ubuntu %s/the-test %s' % (self.bindir, arch)
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

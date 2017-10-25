@@ -8,6 +8,12 @@ set -x
 SUT=bjf-test
 SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"
 DISTRO="xenial"
+ARCHITECTURE="$1"
+
+if [ -z "$ARCHITECTURE" ]; then
+    echo "** Architecture not specified, please run this script with a given arch."
+    exit 1
+fi
 
 # Generate an ssh key so we can run commands on the KVM instance that we
 # create.
@@ -16,9 +22,9 @@ ssh-keygen -f /home/ubuntu/.ssh/id_rsa -t rsa -N ''
 
 # Download a release image that can be used to create the KVM instance.
 #
-uvt-simplestreams-libvirt sync release=$DISTRO arch=amd64
+uvt-simplestreams-libvirt sync release=$DISTRO arch=$ARCHITECTURE
 
-uvt-kvm create $SUT release=$DISTRO arch=amd64
+uvt-kvm create $SUT release=$DISTRO arch=$ARCHITECTURE
 uvt-kvm wait $SUT --insecure
 ssh $SSH_OPTIONS ubuntu@`uvt-kvm ip $SUT` uname -a
 RESULT=`ssh $SSH_OPTIONS ubuntu@\`uvt-kvm ip $SUT\` lsb_release -c | cut -d$'\t' -f 2`

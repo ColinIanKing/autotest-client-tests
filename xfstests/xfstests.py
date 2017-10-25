@@ -150,6 +150,8 @@ class xfstests(test.test):
 
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
+        os.chdir(self.srcdir + '/xfstests-dev/')
+        utils.system('patch -N -p1 < %s/UBUNTU-SAUCE-xfstests-disable-the-broken-btrfs-130-test.patch' % self.bindir)
         os.chdir(self.srcdir)
         utils.system('pwd')
         utils.make()

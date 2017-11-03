@@ -22,12 +22,13 @@ if [ -z $FS ]; then
     exit
 fi
 
-sudo parted $DEVICE rm -s 1
-sudo parted $DEVICE rm -s 2
-sudo parted $DEVICE rm -s 3
-sudo parted $DEVICE rm -s 4
-sudo parted $DEVICE rm -s 5
-sudo parted $DEVICE rm -s 6
+# remove partition only if it exists to avoid error messages
+partitions=`sudo partprobe -d -s $DEVICE | grep -oP 'partitions \K.*'`
+for i in $partitions
+do
+    sudo parted $DEVICE rm -s $i
+done
+
 set -e
 sudo parted $DEVICE mklabel -s gpt
 sudo parted $DEVICE mkpart -s p1 $FS 1MiB 20000MiB
@@ -47,10 +48,9 @@ fi
 
 sleep 60 # Give things a minute to settle before creating new partitions
 
-sudo mkfs.$FS $FS_OPT ${DEVICE}1
-sudo mkfs.$FS $FS_OPT ${DEVICE}2
-sudo mkfs.$FS $FS_OPT ${DEVICE}3
-sudo mkfs.$FS $FS_OPT ${DEVICE}4
-sudo mkfs.$FS $FS_OPT ${DEVICE}5
+for i in `seq 1 5`
+do
+    sudo mkfs.$FS $FS_OPT ${DEVICE}$i
+done
 sudo parted $DEVICE print
 

@@ -6,7 +6,7 @@ from autotest.client                        import test, utils
 import platform
 
 class ubuntu_zfs_xfs_generic(test.test):
-    version = 2
+    version = 3
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -36,7 +36,8 @@ class ubuntu_zfs_xfs_generic(test.test):
             'pkg-config',
             'texinfo',
             'texlive',
-            'quota'
+            'quota',
+            'git'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -64,20 +65,23 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
         utils.system_output('useradd fsgqa || true', retain_output=True)
-        utils.system_output('grep -q fsgqa /etc/sudoers || echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
-        print "Extracting xfstests.tar.bz2 tarball.."
-        tarball = utils.unmap_url(self.bindir, 'xfstests-bld.tar.bz2', self.tmpdir)
-        utils.extract_tarball_to_dir(tarball, self.srcdir)
-
-        os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
-        print "Patching xfstests tarball.."
-        utils.system('patch -p1 < %s/0001-xfstests-add-minimal-support-for-zfs.patch' % self.bindir)
+        utils.system_output('echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
+        print "Fetching xfstests.."
         os.chdir(self.srcdir)
-
+        utils.system('git clone https://github.com/tytso/xfstests-bld')
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
+        print "Fetching all repos.."
+        utils.system('./get-all')
+        commit = "68d2ebf90d94da7d619d7556f4a5663bcca8c8f6"
+        print "Using xfs from known stable commit point " + commit
+        os.chdir('xfstests-dev')
+        utils.system('git reset --hard ' + commit)
+        print "Patching xfstests.."
+        utils.system('patch -p1 < %s/0001-xfstests-add-minimal-support-for-zfs.patch' % self.bindir)
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "Building xfstests"
         utils.system('make')
         utils.system('modprobe zfs')
-
 
     def run_once(self, test_name):
         #
@@ -86,10 +90,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         #
         if test_name == 'setup':
                 return
-
-        #os.chdir(self.srcdir)
-	#print "chdir to " + os.path.join(self.srcdir, 'xfstests-dev')
-        os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfstests-dev'))
         cmd = '%s/ubuntu_zfs_xfs_generic.sh %s %s' % (self.bindir, test_name, self.srcdir)
         print "Running: " + cmd
         self.results = utils.system_output(cmd, retain_output=True)

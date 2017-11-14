@@ -65,7 +65,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
         utils.system_output('useradd fsgqa || true', retain_output=True)
-        utils.system_output('echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
+        utils.system_output('grep -q fsgqa /etc/sudoers || echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
         print "Fetching xfstests.."
         os.chdir(self.srcdir)
         utils.system('git clone https://github.com/tytso/xfstests-bld')

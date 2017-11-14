@@ -68,7 +68,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system_output('grep -q fsgqa /etc/sudoers || echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
         print "Fetching xfstests.."
         os.chdir(self.srcdir)
-        utils.system('git clone https://github.com/tytso/xfstests-bld')
+        utils.system('git clone --depth=1 https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "Patching git repo sources for xfstests-bld"
         utils.system('patch -p1 < %s/0002-config-use-http-https-protocol-for-firewall.patch' % self.bindir)

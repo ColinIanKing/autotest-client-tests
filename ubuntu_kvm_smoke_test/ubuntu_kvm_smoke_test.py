@@ -9,6 +9,7 @@ class ubuntu_kvm_smoke_test(test.test):
 
     def install_required_pkgs(self):
         pkgs = [
+            'cpu-checker',
             'uvtool',
         ]
 
@@ -17,6 +18,9 @@ class ubuntu_kvm_smoke_test(test.test):
 
     def initialize(self):
         self.install_required_pkgs()
+        cmd = 'kvm-ok'
+        utils.system_output(cmd, retain_output=True)
+
 
     # setup
     #

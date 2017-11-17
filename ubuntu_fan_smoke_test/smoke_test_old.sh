@@ -128,7 +128,7 @@ fanatic_enable_docker_test()
 
 fanatic_docker_test()
 {
-	echo -n "fanatic docker test: "
+	echo -n "fanatic docker test"
 	enable_fan
 
 	info=$(ip address | ./extract-fan-info)
@@ -136,7 +136,22 @@ fanatic_docker_test()
 	fan_addr=$(echo $info | cut -d: -f2)
 	enable_docker
 	service docker restart
-	docker run $image sh -c "apt-get update && apt-get install iputils-ping -y && ping -c 10 $fan_addr" > $TMP
+
+	# Docker needs DNS hinting if systemd-resolvd is in charge
+	dns_opt=""
+	dns1=$(awk '$1=="nameserver"{print $2; exit}' /etc/resolv.conf)
+	if [ "$dns1" = "127.0.0.53" ]; then
+		dns_opt="--dns=$(systemd-resolve --status |
+			awk '/DNS Servers:/{
+				sub(/.*DNS Servers: */, "")
+				sub(/,.*/, "")
+				print
+				exit}')"
+		echo -n "($dns_opt): "
+	else
+		echo -n ": "
+	fi
+	docker run $dns_opt $image sh -c "apt-get update && apt-get install iputils-ping -y && ping -c 10 $fan_addr" > $TMP
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "FAILED: (docker run returned $ret)"

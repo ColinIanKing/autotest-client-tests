@@ -15,11 +15,15 @@ These test regressions of specific kernel bugs.
 # Try to figure out the name of the network device. With biosdevname it could
 # be other than 'eth0'.
 #
+from autotest.client import utils
+
 ifname = 'eth0'
-content = open('/etc/network/interfaces').readlines()
-for line in content:
-    if 'dhcp' in line:
-        ifname = line.split()[1]
+cmd = 'ip route | grep default | grep -oP "dev \K\w+"'
+
+try:
+    ifname = utils.system_output(cmd, retain_output=False)
+except:
+    pass
 
 name = 'ubuntu_cts_kernel'
 

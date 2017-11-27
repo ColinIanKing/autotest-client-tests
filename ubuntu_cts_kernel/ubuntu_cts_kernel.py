@@ -21,7 +21,6 @@ class ubuntu_cts_kernel(test.test):
 
     def run_once(self, bug, exit_on_error=True, set_time=True, ifname=None):
         print('*** %s ***' % bug)
-        ifname = utils.system_output("ip route | grep default | grep -oP 'dev\s+\K\w+'", retain_output=True)
         cmd = '%s/bugs/%s %s' % (self.bindir, bug, ifname)
         self.results = utils.system_output(cmd, retain_output=True)
 

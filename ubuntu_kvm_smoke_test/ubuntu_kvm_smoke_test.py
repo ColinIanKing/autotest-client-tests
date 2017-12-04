@@ -48,7 +48,7 @@ class ubuntu_kvm_smoke_test(test.test):
         elif arch in ['ppc64le']:
             arch = 'ppc64el'
 
-        cmd = 'sudo -u ubuntu %s/the-test %s' % (self.bindir, arch)
+        cmd = 'sudo -u %s %s/the-test %s' % (os.getlogin(), self.bindir, arch)
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

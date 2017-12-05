@@ -18,15 +18,14 @@ elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
 fi
 
 if [ -n "$http_proxy" ]; then
-    export https_proxy="$http_proxy"
-    [ ! -d /etc/systemd/system/docker.service.d ] && mkdir /etc/systemd/system/docker.service.d
-    echo -e "[Service]\nEnvironment=HTTP_PROXY=$http_proxy\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
-
     command -v systemctl &> /dev/null
     if [ $? -eq 0 ]; then
+        [ ! -d /etc/systemd/system/docker.service.d ] && mkdir /etc/systemd/system/docker.service.d
+        echo -e "[Service]\nEnvironment=HTTP_PROXY=$http_proxy\n" > /etc/systemd/system/docker.service.d/http-proxy.conf
         systemctl daemon-reload
         systemctl restart docker
     else
+        echo "export http_proxy=\"$http_proxy\"" >> /etc/default/docker
         service docker restart
     fi
 fi

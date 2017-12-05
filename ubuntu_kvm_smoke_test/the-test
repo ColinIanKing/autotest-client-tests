@@ -18,7 +18,7 @@ fi
 # Generate an ssh key so we can run commands on the KVM instance that we
 # create.
 #
-[ ! -f /home/ubuntu/.ssh/id_rsa ] && ssh-keygen -f /home/ubuntu/.ssh/id_rsa -t rsa -N ''
+[ ! -f ~/.ssh/id_rsa ] && ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 
 # Download a release image that can be used to create the KVM instance.
 #

@@ -12,7 +12,7 @@ class ubuntu_kvm_unit_tests(test.test):
         series = platform.dist()[2]
         try:
             cloud  = os.environ['CLOUD']
-            if cloud in ['gcp', 'gke', 'aws', 'azure']:
+            if cloud in ['gcp', 'gke', 'aws']:
                 raise error.TestError('This test suite does not run correctly on any of these clouds and needs to be investigated.')
         except KeyError:
             pass
@@ -30,20 +30,21 @@ class ubuntu_kvm_unit_tests(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
 
-    def setup(self, tarball='kvm-unit-tests.tar.bz2'):
+    def setup(self):
         arch = platform.processor()
         opt = []
-        tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
-        utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
+        cmd = 'git clone --depth=1 git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git'
+        self.results = utils.system_output(cmd, retain_output=True)
+        os.chdir('kvm-unit-tests')
         if arch == 'ppc64le':
             opt.append('--endian={}'.format(sys.byteorder))
         utils.configure(' '.join(opt))
         utils.make()
 
         # patch run_tests.sh to build our tests list
-        utils.system('patch -p1 < %s/runtime_show.patch' % self.bindir)
-        utils.system('./run_tests.sh -v > tests.txt')
+        utils.system('git am %s/runtime_show.patch' % self.bindir)
+        utils.system('./run_tests.sh -v')
 
     def run_once(self, test_name, cmd=''):
         os.chdir(self.srcdir)

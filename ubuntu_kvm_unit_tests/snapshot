@@ -1,7 +1,0 @@
-#!/bin/sh
-#
-
-rm -rf kvm-unit-tests
-git clone --depth=1 git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
-tar -jcf kvm-unit-tests.tar.bz2 kvm-unit-tests
-rm -rf kvm-unit-tests

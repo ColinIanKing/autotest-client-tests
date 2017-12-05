@@ -15,6 +15,14 @@ if [ -z "$ARCHITECTURE" ]; then
     exit 1
 fi
 
+# Assume that if kvm-ok fails, we are not suppring kvm on this instance type
+#
+kvm-ok
+if [ $? != 0 ]; then
+    echo "** kvm-ok failed. Assuming kvm is not supported on this instance type."
+    exit 0
+fi
+
 # Generate an ssh key so we can run commands on the KVM instance that we
 # create.
 #

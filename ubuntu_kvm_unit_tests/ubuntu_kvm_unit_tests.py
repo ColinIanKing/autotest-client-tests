@@ -78,7 +78,7 @@ class ubuntu_kvm_unit_tests(test.test):
             # turn smt back on
             utils.system('ppc64_cpu --smt=on')
 
-        if 'unexpected failures' in output:
+        if 'FAIL' in output:
             raise error.TestError('Test error, check debug logs for complete test output')
 
 # vi:set ts=4 sw=4 expandtab:

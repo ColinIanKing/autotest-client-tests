@@ -13,20 +13,6 @@ http://git.kernel.org/cgit/virt/kvm/kvm-unit-tests.git
 #
 BLACKLIST = []
 
-job.run_test_detail(NAME, test_name='setup', tag='setup.all')
-
-tests_rc = os.path.join(job.bindir, 'tmp', NAME, 'src', 'tests.txt')
-if os.path.exists(tests_rc):
-    content = open(tests_rc).readlines()
-    tests = [ line.split(':') for line in content ]
-
-    for test in tests:
-        test_name = test[0].strip() # The name of the test we want to run
-        if test_name in BLACKLIST:
-            print("BLACKLISTED: " + test_name)
-            continue
-        # constuct test command, append return polarity switch
-        test_cmd = test[1].strip() + "; [ $? -le 1 ]"
-        job.run_test_detail(NAME, test_name=test_name, tag=test_name, cmd=test_cmd)
+job.run_test_detail(NAME, test_name='setup', tag='all')
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -30,7 +30,11 @@ if [ -n "$http_proxy" ]; then
     fi
 fi
 
-RESULT=`sudo docker run ubuntu /bin/sh -c "cat /etc/lsb-release | grep CODENAME | cut -d '=' -f 2"`
+image="`uname -m`/ubuntu"
+[ "`uname -m`" = "x86_64" ] && image="ubuntu"
+# i386 is an official repository on docker.io, i686 is not
+[ "`uname -m`" = "i686" ] && image="i386/ubuntu"
+RESULT=`sudo docker run $image /bin/sh -c "cat /etc/lsb-release | grep CODENAME | cut -d '=' -f 2"`
 if [ "$RESULT" != "xenial" ]; then
     echo "** ERROR: The codename returned from lsb_release -c was (" $RESULT ") and we were expecting 'xenial'"
     exit 1

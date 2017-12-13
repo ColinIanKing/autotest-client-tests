@@ -2,6 +2,7 @@
 #
 import os
 import platform
+import sys
 from autotest.client                        import test, utils
 
 class ubuntu_docker_smoke_test(test.test):
@@ -11,7 +12,11 @@ class ubuntu_docker_smoke_test(test.test):
         pkgs = [
             'docker.io',
         ]
-
+        # Exception for arm64 and ppc64le on Trusty
+        if platform.linux_distribution()[2] == 'trusty':
+            if platform.machine() in ['aarch64', 'ppc64le']:
+                print("Package docker.io is not available for this arch on Trusty.")
+                sys.exit(0)
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 

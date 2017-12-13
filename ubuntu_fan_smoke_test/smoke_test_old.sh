@@ -183,6 +183,8 @@ fi
 
 image="`uname -m`/ubuntu"
 [ "`uname -m`" = "x86_64" ] && image="ubuntu"
+# i386 is an official repository on docker.io, i686 is not
+[ "`uname -m`" = "i686" ] && image="i386/ubuntu"
 echo -n "docker pull $image: "
 
 docker pull $image > /dev/null

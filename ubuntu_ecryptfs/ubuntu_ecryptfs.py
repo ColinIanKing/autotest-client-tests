@@ -10,7 +10,7 @@ class ubuntu_ecryptfs(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'libglib2.0-dev', 'intltool', 'keyutils', 'libkeyutils-dev', 'libpam0g-dev', 'libnss3-dev', 'libtool', 'acl', 'xfsprogs', 'btrfs-tools', 'libattr1-dev'
+            'bzr', 'build-essential', 'libglib2.0-dev', 'intltool', 'keyutils', 'libkeyutils-dev', 'libpam0g-dev', 'libnss3-dev', 'libtool', 'acl', 'xfsprogs', 'btrfs-tools', 'libattr1-dev'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -22,10 +22,9 @@ class ubuntu_ecryptfs(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
 
-    def setup(self, tarball='ubuntu_ecryptfs.tar.bz2'):
-        tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
-        utils.extract_tarball_to_dir(tarball, self.srcdir)
-        print(utils.system_output('head %s/bzr.log' % self.srcdir, retain_output=True))
+    def setup(self):
+        utils.system('bzr branch --use-existing-dir lp:ecryptfs %s' % self.srcdir)
+        print(utils.system_output('bzr log %s | head' % self.srcdir, retain_output=True))
 
         os.chdir(self.srcdir)
         utils.system('patch -p1 < %s/run_one.patch' % self.bindir)

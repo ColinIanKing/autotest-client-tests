@@ -19,7 +19,7 @@ class ubuntu_kvm_unit_tests(test.test):
             pass
 
         pkgs = [
-            'build-essential', 'qemu-kvm',
+            'build-essential', 'qemu-kvm', 'git',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

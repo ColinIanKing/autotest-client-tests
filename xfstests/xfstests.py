@@ -54,7 +54,7 @@ class xfstests(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def _run_sub_test(self, test):
-        os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfstests-dev'))
         output = utils.system_output('./check %s' % test,
                                      ignore_status=True,
                                      retain_output=True)
@@ -115,7 +115,7 @@ class xfstests(test.test):
 
 
     def _run_suite(self):
-        os.chdir(os.path.join(self.srcdir, 'xfstests-dev'))
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfstests-dev'))
         output = utils.system_output('./check -g auto -x dangerous',
                                      ignore_status=True,
                                      retain_output=True)
@@ -123,7 +123,7 @@ class xfstests(test.test):
     def initialize(self):
         self.install_required_pkgs()
 
-    def setup(self, tarball='xfstests-bld.tar.bz2'):
+    def setup(self):
         '''
         Sets up the environment necessary for running xfstests
         '''
@@ -148,11 +148,41 @@ class xfstests(test.test):
 
         self.job.require_gcc()
 
-        tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
-        utils.extract_tarball_to_dir(tarball, self.srcdir)
-        os.chdir(self.srcdir + '/xfstests-dev/')
-        utils.system('patch -N -p1 < %s/UBUNTU-SAUCE-xfstests-disable-the-broken-btrfs-130-test.patch' % self.bindir)
+        # Hacky way to use proxy settings, ideally this should be done on deployment stage
+        #
+        print "Setup the http/https proxy"
+        proxysets = [{'addr': 'squid.internal', 'desc': 'Running in the Canonical CI environment'},
+                  {'addr': '91.189.89.216', 'desc': 'Running in the Canonical enablement environment'},
+                  {'addr': '10.245.64.1', 'desc': 'Running in the Canonical enablement environment'}]
+        for proxy in proxysets:
+            cmd = 'nc -w 2 ' + proxy['addr'] + ' 3128'
+            try:
+                utils.system_output(cmd, retain_output=False)
+                print proxy['desc']
+                os.environ['http_proxy'] = 'http://' + proxy['addr'] + ':3128'
+                os.environ['https_proxy'] = 'https://' + proxy['addr'] + ':3128'
+                break
+            except:
+                pass
+
+        print "Fetching xfstests.."
         os.chdir(self.srcdir)
+        utils.system('git clone --depth=1 https://github.com/tytso/xfstests-bld')
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
+        print "Patching git repo sources for xfstests-bld"
+        utils.system('patch -p1 < %s/0002-config-use-http-https-protocol-for-firewall.patch' % self.bindir)
+        print "Patching xfsprogs release version for lp:1753987"
+        utils.system('patch -p1 < %s/0003-config-use-the-latest-xfsprogs-release.patch' % self.bindir)
+        print "Fetching all repos.."
+        utils.system('./get-all')
+        commit = "204860fa5c454e2b3b75fb3c8fc15dd9b6115a70"
+        print "Using xfs from known stable commit point " + commit
+        os.chdir('xfstests-dev')
+        utils.system('git reset --hard ' + commit)
+        print "Patching xfstests.."
+        utils.system('patch -N -p1 < %s/0001-xfstests-disable-the-broken-btrfs-130-test.patch' % self.bindir)
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
+        print "Building xfstests"
         utils.system('pwd')
         utils.make()
 

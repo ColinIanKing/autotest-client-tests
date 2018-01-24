@@ -27,6 +27,7 @@ class ubuntu_ecryptfs(test.test):
         print(utils.system_output('bzr log %s | head' % self.srcdir, retain_output=True))
 
         os.chdir(self.srcdir)
+        utils.system('patch -p1 < %s/fix-mkfs-for-older-xfs.patch' % self.bindir)
         utils.system('patch -p1 < %s/run_one.patch' % self.bindir)
         utils.system('chmod +x tests/run_one.sh')
         utils.system('autoreconf -ivf')

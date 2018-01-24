@@ -1,0 +1,26 @@
+=== modified file 'ecryptfs/tests/lib/etl_funcs.sh'
+--- ecryptfs/tests/lib/etl_funcs.sh	2014-07-10 14:47:25 +0000
++++ ecryptfs-new/tests/lib/etl_funcs.sh	2018-01-24 12:23:54 +0000
+@@ -248,17 +248,17 @@
+ 
+ 	case $lfs in
+ 	ext2|ext3|ext4)
+-		mkfs_force='-F'
++		mkfs_opts="-F $img"
+ 		;;
+ 	xfs)
+-		mkfs_force='-f'
++		mkfs_opts="-f -d file=1,name=$img,size=$((1024 * $1))"
+ 		;;
+ 	*)
+-		mkfs_force=''
++		mkfs_opts="$img"
+ 		;;
+ 	esac
+ 
+-	mkfs -t $lfs $mkfs_force $img &>/dev/null
++	mkfs -t $lfs $mkfs_opts &>/dev/null
+ 	if [ $? -ne 0 ]; then
+ 		rm $img &>/dev/null
+ 		return 1
+

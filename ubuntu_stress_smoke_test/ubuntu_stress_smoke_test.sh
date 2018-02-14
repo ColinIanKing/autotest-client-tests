@@ -75,6 +75,7 @@ passed=""
 failed=""
 skipped=""
 oopsed=""
+oomed=""
 badret=""
 
 #
@@ -114,6 +115,11 @@ do
 		ret=$?
 		echo "$s RETURNED $ret"
 
+		n=$(dmesg | grep "Out of memory:" | wc -l)
+		if [ $ret -ne 0 -a $n -gt 0 ]; then
+			ret=88
+		fi
+
 		n=$(dmesg | grep "Oops" | wc -l)
 		if [ $n -gt 0 ]; then
 			ret=99
@@ -143,6 +149,10 @@ do
 			echo "$s SKIPPED (stressor not implemented on this arch)"
 			skipped="$skipped $s"
 			;;
+		88)
+			echo "$s OOMED (out of memory kills detected)"
+			oomed="$oomed $s"
+			;;
 		99)
 			echo "$s FAILED (kernel oopsed)"
 			oopsed="$oopsed $s"
@@ -167,6 +177,7 @@ echo "  Stressors run: $count"
 echo "  Skipped: $(echo $skipped | wc -w), $skipped"
 echo "  Failed:  $(echo $failed | wc -w), $failed"
 echo "  Oopsed:  $(echo $oopsed | wc -w), $oopsed"
+echo "  Oomed:   $(echo $oomed | wc -w), $oomed"
 echo "  Passed:  $(echo $passed | wc -w), $passed"
 echo "  Badret:  $(echo $badret | wc -w), $badret"
 echo " "

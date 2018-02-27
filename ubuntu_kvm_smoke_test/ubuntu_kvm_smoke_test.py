@@ -8,10 +8,16 @@ class ubuntu_kvm_smoke_test(test.test):
     version = 1
 
     def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
         pkgs = [
             'cpu-checker',
             'uvtool',
         ]
+        # qemu-efi-aarch64 is needed for ARM64 Bionic, which is only
+        # available since Artful
+        if arch == 'aarch64' and series not in ['trusty', 'xenial']:
+            pkgs.append('qemu-efi-aarch64')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

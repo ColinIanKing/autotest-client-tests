@@ -17,6 +17,7 @@ class ubuntu_bpf(test.test):
             'git',
             'libcap-dev',
             'libelf-dev',
+            'llvm',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

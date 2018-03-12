@@ -56,6 +56,9 @@ class ubuntu_kernel_selftests(test.test):
             if os.path.exists(fn):
                 cmd = 'sed -i "s/\(.* += step_after_suspend_test\)/#\\1/" ' + fn
                 utils.system(cmd)
+                # LP #1680507
+                cmd = 'sed -i /breakpoint_test_arm64/d ' + fn
+                utils.system(cmd)
 
             #
             # disable rtctest, LP: #1659333

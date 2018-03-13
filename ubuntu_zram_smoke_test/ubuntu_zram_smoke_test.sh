@@ -170,6 +170,12 @@ zram_test_ext4()
 	rm -rf $mnt
 }
 
+kern_version=$(uname -r | tr '.' ' ' | awk '{print ($1 * 1000) + $2}')
+if [ $kern_version -lt 4000 ]; then
+	echo "ZRAM test ignored for kernels older than 4.0 (got $(uname -r))"
+	exit 0
+fi
+
 zram_load
 zram_test_compression_streams
 zram_test_compression_algorithms

@@ -44,7 +44,6 @@ zfs set dedup=on $POOL/$TESTDIR
 zfs set mountpoint=legacy $POOL/$TESTDIR
 zfs set mountpoint=legacy $POOL/$SCRATCHDIR
 
-zfs umount $POOL
 
 echo "VDEVs in ${VDEV_PATH}"
 mkdir /mnt/$TESTDIR /mnt/$SCRATCHDIR
@@ -52,6 +51,7 @@ mkdir /mnt/$TESTDIR /mnt/$SCRATCHDIR
 rc=$?
 rmdir /mnt/$TESTDIR /mnt/$SCRATCHDIR
 
+#zfs umount $POOL
 echo "Destroying zfs pool $POOL"
 zpool destroy $POOL
 echo "Removing VDEVs in ${VDEV_PATH}"

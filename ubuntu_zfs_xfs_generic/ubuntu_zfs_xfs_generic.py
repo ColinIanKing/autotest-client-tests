@@ -92,6 +92,8 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system('patch -p1 < %s/0002-config-use-http-https-protocol-for-firewall.patch' % self.bindir)
         print "Patching xfsprogs release version for lp:1753987"
         utils.system('patch -p1 < %s/0003-config-use-the-latest-xfsprogs-release.patch' % self.bindir)
+        print "Patching xfstests-bld to add ARM64 xattr syscall support"
+        utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
         print "Fetching all repos.."
         utils.system('./get-all')
         commit = "68d2ebf90d94da7d619d7556f4a5663bcca8c8f6"

@@ -22,6 +22,7 @@ class ubuntu_qrt_apparmor(test.test):
             'gawk',
             'git',
             'libapparmor-dev',
+            'libapparmor-perl',
             'libcap2-bin',
             'libcap-dev',
             'libdbus-1-dev',

@@ -11,21 +11,20 @@ class ubuntu_kvm_unit_tests(test.test):
     def install_required_pkgs(self):
         arch   = platform.processor()
         series = platform.dist()[2]
-        try:
-            cloud  = os.environ['CLOUD']
-            if cloud in ['gcp', 'gke', 'aws']:
-                raise error.TestError('This test suite does not run correctly on any of these clouds and needs to be investigated.')
-        except KeyError:
-            pass
 
         pkgs = [
-            'build-essential', 'qemu-kvm', 'git',
+            'build-essential', 'cpu-checker', 'qemu-kvm', 'git',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
+
+        try:
+            utils.system('kvm-ok')
+        except error.CmdError:
+            raise error.TestError('Test skipped, this systems does not have KVM extension support')
 
     def initialize(self):
         self.install_required_pkgs()

@@ -167,8 +167,10 @@ class xfstests(test.test):
 
         print "Fetching xfstests.."
         os.chdir(self.srcdir)
-        utils.system('git clone --depth=1 https://github.com/tytso/xfstests-bld')
+        utils.system('git clone https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
+        print "Using head commit d6e3c3559cf05b5ef078f91a97e9639c3688ead0"
+        utils.system('git reset --hard d6e3c3559cf05b5ef078f91a97e9639c3688ead0')
         print "Patching git repo sources for xfstests-bld"
         utils.system('patch -p1 < %s/0002-config-use-http-https-protocol-for-firewall.patch' % self.bindir)
         print "Patching xfsprogs release version for lp:1753987"

@@ -173,6 +173,8 @@ class xfstests(test.test):
         utils.system('patch -p1 < %s/0002-config-use-http-https-protocol-for-firewall.patch' % self.bindir)
         print "Patching xfsprogs release version for lp:1753987"
         utils.system('patch -p1 < %s/0003-config-use-the-latest-xfsprogs-release.patch' % self.bindir)
+        print "Patching xfstests-bld to add ARM64 xattr syscall support"
+        utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
         print "Fetching all repos.."
         utils.system('./get-all')
         commit = "204860fa5c454e2b3b75fb3c8fc15dd9b6115a70"

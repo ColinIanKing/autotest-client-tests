@@ -26,15 +26,15 @@ https_proxy=""
 if echo "" | nc -w 2 squid.internal 3128 >/dev/null 2>&1; then
     INFO="Running in the Canonical CI environment"
     http_proxy="http://squid.internal:3128"
-    https_proxy="https://squid.internal:3128"
+    https_proxy="http://squid.internal:3128"
 elif echo "" | nc -w 2 91.189.89.216 3128 >/dev/null 2>&1; then
     INFO="Running in the Canonical enablement environment (proxy1)"
     http_proxy="http://91.189.89.216:3128"
-    https_proxy="https://91.189.89.216:3128"
+    https_proxy="http://91.189.89.216:3128"
 elif echo "" | nc -w 2 10.245.64.1 3128 >/dev/null 2>&1; then
     INFO="Running in the Canonical enablement environment (proxy2"
     http_proxy="http://10.245.64.1:3128"
-    https_proxy="https://10.245.64.1:3128"
+    https_proxy="http://10.245.64.1:3128"
 fi
 export http_proxy
 export https_proxy

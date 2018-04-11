@@ -44,7 +44,7 @@ class ubuntu_kvm_unit_tests(test.test):
                 utils.system_output(cmd, retain_output=False)
                 print proxy['desc']
                 os.environ['http_proxy'] = 'http://' + proxy['addr'] + ':3128'
-                os.environ['https_proxy'] = 'https://' + proxy['addr'] + ':3128'
+                os.environ['https_proxy'] = 'http://' + proxy['addr'] + ':3128'
                 break
             except:
                 pass

@@ -1,0 +1,131 @@
+#!/bin/sh
+#
+# Copyright (C) 2016-2018 Canonical
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+
+#
+# Check ZVOLs get created by udev, checks for regressions such as
+# https://bugs.launchpad.net/ubuntu/+source/zfs-linux/+bug/1763067
+#
+VDEV_PATH=$1
+echo "VDEVs in $VDEV_PATH"
+VDEV0=${VDEV_PATH}/pool0-$$.img
+POOL=pool-smoke-$$
+VOLS=8
+
+tidy()
+{
+	zpool destroy ${POOL}
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "FAILED: zpool destroy failed, exit code=$ret"
+		#
+		# destroy failed, try to clean up, but this
+		# wil probably fail
+		#
+		rm -f ${VDEV0}
+		exit 1
+	fi
+
+	dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
+	rm -f ${VDEV0}
+}
+
+echo -n "kernel smoke test, create ZFS zvols: "
+
+dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
+
+zpool create ${POOL} ${VDEV0}
+ret=$?
+if [ $ret -ne 0 ]; then
+	echo "FAILED: zpool create failed, exit code=$ret"
+	rm -f ${VDEV0}
+	exit 1
+fi
+
+sync
+
+#
+# Create a bunch of ZVOLS
+#
+n=0
+for vols in $(seq ${VOLS})
+do
+	zfs create -V 8M ${POOL}/testvol-${vols} > /dev/null 2>&1
+	if [ $? -eq 0 ]; then
+		n=$((n + 1))
+	fi
+done
+if [ $n -ne ${VOLS} ]; then
+	echo "FAILED: did not create ${VOLS} zvols, only $n were created"
+	tidy
+	exit 1
+fi
+
+#
+# Wait a few secs for udev to create last ZVOL
+#
+n=0
+while true
+do
+	sleep 1
+	if [ -h /dev/zvol/${POOL}/testvol-${VOLS} ]; then
+		break
+	fi
+	n=$((n + 1))
+	if [ $n -gt 10 ]; then
+		break;
+	fi
+done
+
+#
+# Check all ZVOLS have been created in /dev/zvol/..
+#
+n=0
+for vols in $(seq ${VOLS})
+do
+	if [ -h /dev/zvol/${POOL}/testvol-${vols} ]; then
+		n=$((n + 1))
+	fi
+done
+if [ $n -ne ${VOLS} ]; then
+	echo "FAILED: did not detect ${VOLS} zvols, only $n were created"
+	tidy
+	exit 1
+fi
+
+#
+# Check that they symlink to real block devices
+#
+n=0
+for vols in $(seq ${VOLS})
+do
+	dev=$(realpath /dev/zvol/${POOL}/testvol-${vols})
+	if [ -b $dev ]; then
+		n=$((n + 1))
+	fi
+
+done
+if [ $n -ne ${VOLS} ]; then
+	echo "FAILED: did not find ${VOLS} zvol symlinked block devices, only $n were created"
+	tidy
+	exit 1
+fi
+
+tidy
+echo "PASSED"
+exit 0

@@ -98,7 +98,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
         print "Fetching all repos.."
         utils.system('./get-all')
-        commit = "68d2ebf90d94da7d619d7556f4a5663bcca8c8f6"
+        commit = "4cabd42a78d242650b1053520af308011061343e"
         print "Using xfs from known stable commit point " + commit
         os.chdir('xfstests-dev')
         utils.system('git reset --hard ' + commit)

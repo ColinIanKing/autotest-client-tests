@@ -2,6 +2,7 @@
 #
 import os
 import platform
+import pwd
 from autotest.client                        import test, utils
 
 class ubuntu_kvm_smoke_test(test.test):
@@ -51,7 +52,7 @@ class ubuntu_kvm_smoke_test(test.test):
         elif arch in ['ppc64le']:
             arch = 'ppc64el'
 
-        cmd = 'sudo -u %s %s/the-test %s' % (os.getlogin(), self.bindir, arch)
+        cmd = 'sudo -u %s %s/the-test %s' % (pwd.getpwuid(os.getuid())[0], self.bindir, arch)
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

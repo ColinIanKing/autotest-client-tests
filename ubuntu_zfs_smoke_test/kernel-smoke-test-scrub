@@ -44,7 +44,8 @@ fi
 #
 # Create a file
 #
-dd if=/dev/urandom of=$DATA bs=1M count=64 > /dev/null 2>&1
+data=$(dd if=/dev/urandom bs=16K count=1 | od -t x1 | cut -b9- | tr '\n' ' ' | sed 's/ //g') 2> /dev/null
+yes $data > $DATA  2> /dev/null
 sum1=$(md5sum ${DATA} | awk '{print $1}')
 
 #
@@ -69,6 +70,7 @@ fi
 # Zero corrupted VDEV and re-attach
 #
 dd if=/dev/zero of=${VDEV0} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
+sync
 zpool attach ${POOL} ${VDEV1} ${VDEV0} -f
 ret=$?
 if [ $ret -ne 0 ]; then
@@ -77,6 +79,24 @@ if [ $ret -ne 0 ]; then
 	rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 	exit 1
 fi
+
+#
+#  Wait 60 seconds for resilver to complete
+#
+i=0
+while true
+do
+	n=$(zpool status | grep "resilvered" | wc -l)
+	if [ $n -gt 0 ]; then
+		break
+	fi
+	i=$((i + 1))
+	echo $i
+	sleep 1
+	if [ $i -gt 60 ]; then
+		break
+	fi
+done
 
 zpool scrub ${POOL}
 ret=$?
@@ -110,10 +130,6 @@ if [ $ret -ne 0 ]; then
 	exit 1
 fi
 
-dd if=/dev/zero of=${VDEV0} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
-dd if=/dev/zero of=${VDEV1} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
-dd if=/dev/zero of=${VDEV2} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
-dd if=/dev/zero of=${VDEV3} bs=1M count=${VDEV_SZ} > /dev/null 2>&1
 rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 echo "PASSED"
 exit 0

@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_nbd_smoke_test"
+CRITERIA = """
+Smoke test Network Block Device driver"
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_nbd_smoke_test'
+
+results = job.run_test_detail('ubuntu_nbd_smoke_test', test_name='nbd-smoke-test', tag='nbd-smoke-test', timeout=600) # 10 min. timeout
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

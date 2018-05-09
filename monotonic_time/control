@@ -27,9 +27,6 @@ Based on time-warp-test.c by Ingo Molnar.
 #   TSC                            - CPU clock cycles
 #
 #
-job.run_test('monotonic_time', tag='gtod',  test_type='gtod',
-             duration=300, threshold=0)
-
 job.run_test('monotonic_time', tag='clock', test_type='clock',
              duration=300, threshold=0)
 

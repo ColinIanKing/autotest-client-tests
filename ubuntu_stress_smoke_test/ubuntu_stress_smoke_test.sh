@@ -26,7 +26,7 @@ EXCLUDE+="rdrand str tsc vecmath wcs zlib "
 #
 # Tests that are know to cause breakage
 #
-EXCLUDE+="xattr "
+EXCLUDE+="xattr efivar"
 
 #
 # Get built-in stressor names

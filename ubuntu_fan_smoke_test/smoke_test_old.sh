@@ -60,7 +60,7 @@ disable_docker()
 	fanatic disable-docker -u $UNDERLAY -o $OVERLAY > /dev/null
 	ret=$?
 	if [ $ret -ne 0 ]; then
-		echo "FAILED (fanatic enable-docker returned $ret)"
+		echo "FAILED (fanatic disable-docker returned $ret)"
 		exit 1
 	fi
 }

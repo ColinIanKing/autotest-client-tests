@@ -80,7 +80,8 @@ else
 	TMP=/tmp/test_maps_${PID}.log
 	echo ""
 	echo "Running test_maps bpf test.."
-	bpf/test_maps > ${TMP}
+    cd bpf
+	./test_maps > ${TMP}
 	ok=$(grep OK ${TMP} | wc -l)
 	echo -n "test_maps: "
 	if [ $ok -ne 0 ]; then

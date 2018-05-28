@@ -134,6 +134,7 @@ fanatic_docker_test()
 	info=$(ip address | ./extract-fan-info)
 	fan=$(echo $info | cut -d: -f1)
 	fan_addr=$(echo $info | cut -d: -f2)
+	sleep 60
 	enable_docker
 	service docker restart
 
@@ -168,6 +169,7 @@ fanatic_docker_test()
 		exit 1
 	fi
 
+	sleep 60
 	disable_docker
 	service docker restart
 	disable_fan

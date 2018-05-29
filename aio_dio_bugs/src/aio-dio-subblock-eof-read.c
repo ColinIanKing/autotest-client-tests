@@ -30,7 +30,7 @@ do {				\
 	exit(1);		\
 } while (0)
 
-static unsigned char buffer[4096] __attribute((aligned (512)));
+static unsigned char buffer[4096] __attribute((aligned (4096)));
 
 int
 main(int argc, char **argv)

@@ -118,6 +118,24 @@ do_test()
 		N=$((N+1))
 	done
 
+	#
+	# Wait for server to be available
+	#
+	while true
+	N=0
+	do
+		if netstat -A inet6 -lnp | grep 9999.*nbd-server; then
+			break;
+		fi
+		if [ $N -gt 20 ]; then
+			echo "server is not listening"
+			do_tidy
+			exit 1
+		fi
+		sleep 0.5
+		N=$((N+1))
+	done
+
 	nbd-client -t 30 localhost ${NBD_PORT} ${NBD_DEV}
 	if [ $? -ne 0 ]; then
 		echo "nbd-client failed to start"

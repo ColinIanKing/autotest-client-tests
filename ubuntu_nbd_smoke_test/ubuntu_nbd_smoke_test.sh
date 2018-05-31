@@ -118,7 +118,7 @@ do_test()
 		N=$((N+1))
 	done
 
-	nbd-client localhost ${NBD_PORT} ${NBD_DEV}
+	nbd-client -t 30 localhost ${NBD_PORT} ${NBD_DEV}
 	if [ $? -ne 0 ]; then
 		echo "nbd-client failed to start"
 		do_tidy

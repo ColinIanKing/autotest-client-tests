@@ -17,7 +17,23 @@ class ubuntu_ltp(test.test):
             raise error.TestError('This test suite does not run correctly on any of these clouds and needs to be investigated.')
 
         pkgs = [
-            'build-essential', 'git', 'flex', 'automake',
+            'automake',
+            'bison',
+            'build-essential',
+            'byacc',
+            'flex',
+            'git',
+            'libacl1-dev',
+            'libaio-dev',
+            'libcap-dev',
+            'libmm-dev',
+            'libnuma-dev',
+            'libsctp-dev',
+            'libselinux1-dev',
+            'libssl-dev',
+            'libtirpc-dev',
+            'xfslibs-dev',
+            'xfsprogs',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

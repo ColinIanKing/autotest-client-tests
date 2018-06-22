@@ -12,7 +12,23 @@ class ubuntu_ltp_syscalls(test.test):
         arch   = platform.processor()
 
         pkgs = [
-            'build-essential', 'git', 'flex', 'automake',
+            'automake',
+            'bison',
+            'build-essential',
+            'byacc',
+            'flex',
+            'git',
+            'libacl1-dev',
+            'libaio-dev',
+            'libcap-dev',
+            'libmm-dev',
+            'libnuma-dev',
+            'libsctp-dev',
+            'libselinux1-dev',
+            'libssl-dev',
+            'libtirpc-dev',
+            'xfslibs-dev',
+            'xfsprogs',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

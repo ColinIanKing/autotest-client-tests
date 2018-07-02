@@ -32,6 +32,8 @@ fi
 
 release="bionic"
 image="ubuntu:$release"
+# i386 is an official repository on docker.io, i686 is not
+[ "`uname -m`" = "i686" ] && image="i386/$image"
 RESULT=`sudo docker run $image /bin/sh -c "cat /etc/lsb-release | grep CODENAME | cut -d '=' -f 2"`
 if [ "$RESULT" != "$release" ]; then
     echo "** ERROR: The codename returned from lsb_release -c was (" $RESULT ") and we were expecting $release"

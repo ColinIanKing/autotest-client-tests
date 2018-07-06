@@ -9,8 +9,10 @@ class kernbench(test.test):
     version = 5
 
     def initialize(self):
-        self.job.require_gcc()
         self.job.drop_caches_between_iterations = False
+
+    def setup(self):
+        self.job.require_gcc()
 
     def __init_tree(self, version=None):
         #

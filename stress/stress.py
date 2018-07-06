@@ -16,10 +16,11 @@ class stress(test.test):
     version = 2
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     # http://weather.ou.edu/~apw/projects/stress/stress-1.0.4.tar.gz
     def setup(self, tarball='stress-1.0.4.tar.gz'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

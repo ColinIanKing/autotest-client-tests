@@ -8,7 +8,7 @@ class lmbench(test.test):
     version = 4
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self, tarball='lmbench3.tar.bz2', fsdir=None, file=None):
         """
@@ -24,6 +24,7 @@ class lmbench(test.test):
         @see: http://www.bitmover.com/lm/lmbench/lmbench3.tar.gz
                 (original tarball, shipped as is in autotest).
         """
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

@@ -25,11 +25,12 @@ class posixtest(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     # http://ufpr.dl.sourceforge.net/sourceforge/posixtest/posixtestsuite-1.5.2.tar.gz
     def setup(self, tarball='posixtestsuite-1.5.2.tar.gz'):
         self.install_required_pkgs()
+        self.job.require_gcc()
         self.posix_tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(self.posix_tarball, self.srcdir)
         os.chdir(self.srcdir)

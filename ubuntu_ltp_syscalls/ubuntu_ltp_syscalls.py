@@ -37,7 +37,7 @@ class ubuntu_ltp_syscalls(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     # setup
     #
@@ -45,6 +45,7 @@ class ubuntu_ltp_syscalls(test.test):
     #
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         cmd = 'git clone --depth=1 https://github.com/linux-test-project/ltp.git'
         self.results = utils.system_output(cmd, retain_output=True)

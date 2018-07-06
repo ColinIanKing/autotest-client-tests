@@ -11,6 +11,7 @@ class netpipe(test.test):
 
     # http://www.scl.ameslab.gov/netpipe/code/NetPIPE-3.7.1.tar.gz
     def setup(self, tarball='NetPIPE-3.7.1.tar.gz'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
@@ -18,8 +19,6 @@ class netpipe(test.test):
         utils.make()
 
     def initialize(self):
-        self.job.require_gcc()
-
         # Add arguments later
         self.server_path = '%s %%s' % os.path.join(self.srcdir, 'NPtcp')
         # Add server_ip and arguments later

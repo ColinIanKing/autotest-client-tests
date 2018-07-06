@@ -19,10 +19,11 @@ class ubuntu_ecryptfs(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
         utils.system('bzr branch --use-existing-dir lp:ecryptfs %s' % self.srcdir)
         print(utils.system_output('bzr log %s | head' % self.srcdir, retain_output=True))
 

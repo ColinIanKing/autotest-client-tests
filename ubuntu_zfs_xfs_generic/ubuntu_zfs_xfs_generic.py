@@ -56,12 +56,13 @@ class ubuntu_zfs_xfs_generic(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     # if you change setup, be sure to increment version
     #
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
         utils.system_output('useradd fsgqa || true', retain_output=True)

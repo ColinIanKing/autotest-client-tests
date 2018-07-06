@@ -22,11 +22,12 @@ class signaltest(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     # git://git.kernel.org/pub/scm/linux/kernel/git/tglx/rt-tests.git
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         utils.make()
 

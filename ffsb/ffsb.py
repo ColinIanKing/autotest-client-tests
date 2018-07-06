@@ -37,7 +37,6 @@ class ffsb(test.test):
              'T': 1099511627776, 't': 1099511627776}
 
     def initialize(self):
-        self.job.require_gcc()
         self.results = []
         self.nfail = 0
 
@@ -159,6 +158,7 @@ class ffsb(test.test):
         :param tarball: FFSB tarball. Could be either a path relative to
                 self.srcdir or a URL.
         """
+        self.job.require_gcc()
         self.update_config('profile.cfg.sample')
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)

@@ -9,6 +9,7 @@ class btreplay(test.test):
 
     # http://brick.kernel.dk/snaps/blktrace-git-latest.tar.gz
     def setup(self, tarball='blktrace-git-latest.tar.gz'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
 
@@ -25,7 +26,6 @@ class btreplay(test.test):
         utils.system(self.make_flags + ' make')
 
     def initialize(self):
-        self.job.require_gcc()
         self.ldlib = 'LD_LIBRARY_PATH=%s/deps/libaio/lib' % (self.autodir)
         self.results = []
 

@@ -10,11 +10,11 @@ class sysbench(test.test):
     version = 1
 
     def initialize(self):
-        self.job.require_gcc()
         self.results = []
 
     # http://osdn.dl.sourceforge.net/sourceforge/sysbench/sysbench-0.4.8.tar.gz
     def setup(self, tarball='sysbench-0.4.8.tar.bz2'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         self.job.setup_dep(['pgsql', 'mysql'])

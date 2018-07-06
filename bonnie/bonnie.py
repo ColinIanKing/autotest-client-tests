@@ -28,11 +28,11 @@ class bonnie(test.test):
     version = 1
 
     def initialize(self):
-        self.job.require_gcc()
         self.results = []
 
     # http://www.coker.com.au/bonnie++/experimental/bonnie++-1.96.tgz
     def setup(self, tarball='bonnie++-1.96.tgz'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

@@ -16,6 +16,7 @@ class hackbench(test.test):
     preserve_srcdir = True
 
     def setup(self):
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         if 'CC' in os.environ:
             cc = '$CC'
@@ -24,7 +25,6 @@ class hackbench(test.test):
         utils.system('%s -pthread hackbench.c -o hackbench' % cc)
 
     def initialize(self):
-        self.job.require_gcc()
         self.results = None
 
     def run_once(self, num_groups=90):

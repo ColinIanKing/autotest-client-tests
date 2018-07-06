@@ -21,8 +21,6 @@ class ubuntu_stress_btrfs_cmd(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
-
         self.valid_clients = ['gonzo', 'btrfs-scratch']
         self.hostname = os.uname()[1]
         if self.hostname == 'gonzo':
@@ -35,6 +33,7 @@ class ubuntu_stress_btrfs_cmd(test.test):
 
     def setup(self):
         self.install_required_pkgs(self)
+        self.job.require_gcc()
 
         utils.system('cp %s/ubuntu_stress_btrfs_cmd.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
@@ -51,8 +50,6 @@ class ubuntu_stress_btrfs_cmd(test.test):
         os.chdir(self.srcdir)
 
     def run_once(self, test_name):
-        self.job.require_gcc()
-
         stress_ng = os.path.join(self.srcdir, 'stress-ng', 'stress-ng')
         #
         #  device to use for btrfs

@@ -10,13 +10,14 @@ class ubuntu_generic_fstest(test.test):
     version = 1
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
 
     #
     # if you change setup, be sure to increment version
     #
     def setup(self):
+        self.job.require_gcc()
 	utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
 	pkgs = [ 'btrfs-tools', 'xfsprogs', 'jfsutils' ]

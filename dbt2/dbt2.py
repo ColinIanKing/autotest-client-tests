@@ -10,10 +10,11 @@ class dbt2(test.test):
     version = 2
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     # http://osdn.dl.sourceforge.net/sourceforge/osdldbt/dbt2-0.39.tar.gz
     def setup(self, tarball='dbt2-0.39.tar.bz2'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         profile_src = os.path.join(self.bindir, 'pgpool.conf')

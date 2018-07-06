@@ -21,10 +21,11 @@ class ubuntu_qrt_kernel_aslr_collisions(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
         self.results = utils.system_output(cmd, retain_output=True)

@@ -9,6 +9,7 @@ class reaim(test.test):
 
     # http://prdownloads.sourceforge.net/re-aim-7/osdl-aim-7.0.1.13.tar.gz
     def setup(self, tarball='osdl-aim-7.0.1.13.tar.gz'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
 
@@ -33,7 +34,6 @@ class reaim(test.test):
         os.rename('src/reaim', 'reaim')
 
     def initialize(self):
-        self.job.require_gcc()
         self.ldlib = 'LD_LIBRARY_PATH=%s/deps/libaio/lib' % (self.autodir)
 
     def execute(self, iterations=1, workfile='workfile.short',

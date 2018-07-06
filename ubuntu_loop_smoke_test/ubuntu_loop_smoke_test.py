@@ -22,10 +22,11 @@ class ubuntu_loop_smoke_test(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
         shutil.copyfile(os.path.join(self.bindir, 'loop-test.c'),
                         os.path.join(self.srcdir, 'loop-test.c'))
         shutil.copyfile(os.path.join(self.bindir, 'Makefile'),

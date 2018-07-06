@@ -51,10 +51,11 @@ class scrashme(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self, tarball='scrashme-git-snapshot-03-18-2010.tar.bz2'):
         self.install_required_pkgs()
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

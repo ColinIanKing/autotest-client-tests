@@ -9,6 +9,7 @@ class dbench(test.test):
 
     # http://samba.org/ftp/tridge/dbench/dbench-3.04.tar.gz
     def setup(self, tarball='dbench-3.04.tar.gz'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
@@ -22,7 +23,6 @@ class dbench(test.test):
         utils.make()
 
     def initialize(self):
-        self.job.require_gcc()
         self.results = []
         self.dbench = os.path.join(self.srcdir, 'dbench')
 

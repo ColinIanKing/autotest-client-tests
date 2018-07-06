@@ -20,10 +20,11 @@ class ubuntu_leap_seconds(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
         shutil.copyfile(os.path.join(self.bindir, 'leap_seconds.c'),
                         os.path.join(self.srcdir, 'leap_seconds.c'))
         os.chdir(self.bindir)

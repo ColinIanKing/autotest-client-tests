@@ -11,11 +11,12 @@ class tsc(test.test):
     preserve_srcdir = True
 
     def setup(self):
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         utils.make()
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def run_once(self, args='-t 650'):
         result = utils.run(self.srcdir + '/checktsc ' + args,

@@ -12,11 +12,11 @@ class tracing_microbenchmark(test.test):
     preserve_srcdir = True
 
     def setup(self):
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         utils.system('make CROSS_COMPILE=""')
 
     def initialize(self, tracer='ftrace', calls=100000, **kwargs):
-        self.job.require_gcc()
         tracer_class = getattr(tracers, tracer)
         if not issubclass(tracer_class, base_tracer.Tracer):
             raise TypeError

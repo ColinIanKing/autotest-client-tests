@@ -28,10 +28,11 @@ class rmaptest(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         utils.system(utils.get_cc() + ' -Wall -o rmaptest rmap-test.c')
 

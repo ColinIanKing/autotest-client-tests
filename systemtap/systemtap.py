@@ -16,8 +16,6 @@ class systemtap(test.test):
     version = 1
 
     def initialize(self, local=False):
-        self.job.require_gcc()
-
         self.systemtap_dir = ''
         if not local:
             self.systemtap_dir = os.path.join(self.autodir,
@@ -25,6 +23,7 @@ class systemtap(test.test):
 
     def setup(self, local=False, tarball_systemtap='systemtap-1.8.tar.gz',
               tarball_elfutils='elfutils-0.155.tar.bz2'):
+        self.job.require_gcc()
         depdir = os.path.join(self.autodir, 'deps/systemtap')
         tarball_systemtap = utils.unmap_url(depdir, tarball_systemtap, self.tmpdir)
         tarball_elfutils = utils.unmap_url(depdir, tarball_elfutils, self.tmpdir)

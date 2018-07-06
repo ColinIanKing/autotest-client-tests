@@ -7,9 +7,10 @@ class wakeup_events(test.test):
     version = 1
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self, instrument_lib_tarball = 'eventstat.tar.bz2'):
+        self.job.require_gcc()
         instrument_lib_tarball = utils.unmap_url(self.bindir, instrument_lib_tarball, self.tmpdir)
         utils.extract_tarball_to_dir(instrument_lib_tarball, self.srcdir)
 

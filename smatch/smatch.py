@@ -11,9 +11,10 @@ class smatch(test.test):
     version = 1
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self, tarball='smatch-b0e645.tar.bz2'):
+        self.job.require_gcc()
         self.tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(self.tarball, self.srcdir)
 

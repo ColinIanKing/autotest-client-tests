@@ -25,7 +25,6 @@ class unixbench5(test.test):
     version = 1
 
     def initialize(self):
-        self.job.require_gcc()
         self.err = []
 
     def setup(self, tarball='unixbench-5.1.3.tgz'):
@@ -35,6 +34,7 @@ class unixbench5(test.test):
         @tarball: Path or URL to a unixbench tarball
         @see: http://byte-unixbench.googlecode.com/files/unixbench-5.1.3.tgz
         """
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

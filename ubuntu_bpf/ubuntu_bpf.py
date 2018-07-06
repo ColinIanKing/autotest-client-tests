@@ -26,10 +26,11 @@ class ubuntu_bpf(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
 
     def run_once(self, test_name):
         series = platform.dist()[2]

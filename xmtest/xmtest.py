@@ -26,7 +26,7 @@ class xmtest(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     # This test expects just the xm-test directory, as a tarball
     # from the Xen source tree
@@ -36,6 +36,7 @@ class xmtest(test.test):
     # tar -czf xm-test.tgz xm-test
     def setup(self, tarball='xm-test.tar.bz2'):
         self.install_required_pkgs()
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

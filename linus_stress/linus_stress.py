@@ -8,13 +8,14 @@ class linus_stress(test.test):
     version = 1
 
     def setup(self):
+        self.job.require_gcc()
         shutil.copyfile(os.path.join(self.bindir, 'linus_stress.c'),
                         os.path.join(self.srcdir, 'linus_stress.c'))
         os.chdir(self.srcdir)
         utils.system(utils.get_cc() + ' linus_stress.c -D_POSIX_C_SOURCE=200112 -o linus_stress')
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def run_the_test(self, iterations):
         utils.write_one_line('/proc/sys/vm/dirty_ratio', '4')

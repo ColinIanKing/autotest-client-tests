@@ -11,6 +11,7 @@ class memory_api(test.test):
     version = 1
 
     def setup(self):
+        self.job.require_gcc()
         utils.system("%s %s -o %s" %
                     (utils.get_cc(),
                      os.path.join(self.bindir, "memory_api.c"),
@@ -21,7 +22,7 @@ class memory_api(test.test):
                      os.path.join(self.tmpdir, "mremaps")))
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def run_once(self, memsize="1000000000", args=''):
 

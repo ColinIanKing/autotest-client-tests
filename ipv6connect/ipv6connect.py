@@ -14,6 +14,7 @@ class ipv6connect(test.test):
 
     def setup(self, src='ipv6connect.c'):
         self.install_required_pkgs()
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         utils.system('gcc ipv6connect.c -o ipv6connect -lpthread -static -s')
 
@@ -31,7 +32,6 @@ class ipv6connect(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
         self.results = []
 
     def run_once(self, dir=None, nprocs=None, args=''):

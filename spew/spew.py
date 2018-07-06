@@ -6,10 +6,11 @@ class spew(test.test):
     version = 1
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     # ftp://ftp.berlios.de/pub/spew/1.0.5/spew-1.0.5.tgz
     def setup(self, tarball='spew-1.0.5.tgz'):
+        self.job.require_gcc()
         self.tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(self.tarball, self.srcdir)
 

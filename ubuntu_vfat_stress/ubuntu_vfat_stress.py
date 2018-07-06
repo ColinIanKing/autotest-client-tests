@@ -34,10 +34,11 @@ class ubuntu_vfat_stress(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self):
         self.install_required_pkgs()
+        self.job.require_gcc()
 
         utils.system('cp %s/ubuntu_vfat_stress.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
@@ -56,8 +57,6 @@ class ubuntu_vfat_stress(test.test):
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
     def run_once(self, test_name):
-        self.job.require_gcc()
-
         stress_ng = os.path.join(self.srcdir, 'stress-ng', 'stress-ng')
         #
         #  temp logfile

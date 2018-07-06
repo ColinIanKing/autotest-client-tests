@@ -12,6 +12,7 @@ class perfmon(test.test):
 
     def setup(self, tarball='perfmon-tests-0.3.tar.gz'):
         self.install_required_pkgs()
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)
@@ -31,7 +32,6 @@ class perfmon(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.require_gcc()
         self.results = []
 
     def run_once(self, dir=None, nprocs=None, args=''):

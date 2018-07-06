@@ -5,9 +5,10 @@ class qrt(test.test):
     version = 1
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self, tarball = 'qrt.tar.bz2'):
+        self.job.require_gcc()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
 

@@ -9,6 +9,7 @@ class bash_shared_mapping(test.test):
 
     # http://www.zip.com.au/~akpm/linux/patches/stuff/ext3-tools.tar.gz
     def setup(self, tarball='ext3-tools.tar.gz'):
+        self.job.require_gcc()
         self.tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(self.tarball, self.srcdir)
 
@@ -17,7 +18,7 @@ class bash_shared_mapping(test.test):
         utils.make('bash-shared-mapping usemem')
 
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def execute(self, testdir=None, iterations=10000):
         if not testdir:

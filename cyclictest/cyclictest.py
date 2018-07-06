@@ -9,9 +9,10 @@ class cyclictest(test.test):
 
     # git://git.kernel.org/pub/scm/linux/kernel/git/tglx/rt-tests.git
     def initialize(self):
-        self.job.require_gcc()
+        pass
 
     def setup(self):
+        self.job.require_gcc()
         os.chdir(self.srcdir)
         utils.make()
 

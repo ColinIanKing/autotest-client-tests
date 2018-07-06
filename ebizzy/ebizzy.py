@@ -20,11 +20,11 @@ class ebizzy(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # http://sourceforge.net/project/downloading.php?group_id=202378&filename=ebizzy-0.3.tar.gz
     def setup(self, tarball='ebizzy-0.3.tar.gz'):
+        self.install_required_pkgs()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

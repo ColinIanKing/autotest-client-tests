@@ -37,7 +37,6 @@ class iozone(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     def setup(self, tarball='iozone3_420.tar'):
@@ -46,6 +45,7 @@ class iozone(test.test):
         @param tarball: Tarball with IOzone
         @see: http://www.iozone.org/src/current/iozone3_414.tar
         """
+        self.install_required_pkgs()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(os.path.join(self.srcdir, 'src/current'))

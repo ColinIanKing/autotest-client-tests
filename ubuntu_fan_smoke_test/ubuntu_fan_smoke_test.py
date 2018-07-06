@@ -22,10 +22,10 @@ class ubuntu_fan_smoke_test(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
+        pass
 
     def setup(self):
-        pass
+        self.install_required_pkgs()
 
     def determine_underlay(self):
         underlay = 'bogus'

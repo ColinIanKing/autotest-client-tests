@@ -21,7 +21,6 @@ class ubuntu_stress_btrfs_cmd(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs(self)
         self.job.require_gcc()
 
         self.valid_clients = ['gonzo', 'btrfs-scratch']
@@ -35,6 +34,7 @@ class ubuntu_stress_btrfs_cmd(test.test):
             self.dev = 'loop'
 
     def setup(self):
+        self.install_required_pkgs(self)
 
         utils.system('cp %s/ubuntu_stress_btrfs_cmd.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)

@@ -44,12 +44,12 @@ class ubuntu_zfs_fstest(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # if you change setup, be sure to increment version
     #
     def setup(self):
+        self.install_required_pkgs()
         series = platform.dist()[2]
 
         print "Extracting fstest tarball.."

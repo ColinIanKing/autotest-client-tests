@@ -121,12 +121,14 @@ class xfstests(test.test):
                                      retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
+        pass
 
     def setup(self):
         '''
         Sets up the environment necessary for running xfstests
         '''
+        self.install_required_pkgs()
+
         utils.system_output('useradd fsgqa || true', retain_output=True)
         utils.system_output('grep -q fsgqa /etc/sudoers || echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
 

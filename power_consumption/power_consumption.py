@@ -20,10 +20,10 @@ class power_consumption(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     def setup(self, instrument_lib_tarball='instrument-lib.tar.bz2'):
+        self.install_required_pkgs()
         instrument_lib_tarball = utils.unmap_url(self.bindir, instrument_lib_tarball, self.tmpdir)
         instrument_lib_srcpath = os.path.join(self.srcdir, 'instrument-lib')
         utils.extract_tarball_to_dir(instrument_lib_tarball, instrument_lib_srcpath)

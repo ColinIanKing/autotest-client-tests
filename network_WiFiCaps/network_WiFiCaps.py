@@ -24,9 +24,10 @@ class network_WiFiCaps(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
+        pass
 
     def setup(self):
+        self.install_required_pkgs()
 
         self.job.setup_dep(['iwcap'])
         # create a empty srcdir to prevent the error that checks .version

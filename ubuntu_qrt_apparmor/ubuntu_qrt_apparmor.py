@@ -51,16 +51,16 @@ class ubuntu_qrt_apparmor(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        pass
+
+    def setup(self):
         # Yes, the following is a horrible hack.
         #
         utils.system_output('apt-get update', retain_output=True)
         time.sleep(60)
         utils.system_output('apt-get update', retain_output=True)
-
         self.install_required_pkgs()
-        self.job.require_gcc()
 
-    def setup(self):
         os.chdir(self.srcdir)
         cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
         self.results = utils.system_output(cmd, retain_output=True)

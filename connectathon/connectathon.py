@@ -39,10 +39,10 @@ class connectathon(test.test):
         """
         Sets the overall failure counter for the test.
         """
-        self.install_required_pkgs()
         self.nfail = 0
 
     def setup(self, tarball='connectathon.tar.bz2'):
+        self.install_required_pkgs()
         connectathon_tarball = utils.unmap_url(self.bindir, tarball,
                                                self.tmpdir)
         utils.extract_tarball_to_dir(connectathon_tarball, self.srcdir)

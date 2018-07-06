@@ -42,7 +42,6 @@ class ubuntu_btrfs_kernel_fixes(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
         if self.which('sysbench') is None:
             utils.system_output('sudo apt-get install sysbench --yes --force-yes', retain_output=True)
@@ -51,6 +50,7 @@ class ubuntu_btrfs_kernel_fixes(test.test):
     # if you change setup, be sure to increment version
     #
     def setup(self):
+        self.install_required_pkgs()
         # print "test names in: " + (os.path.join(self.srcdir, 'tests.txt'))
         f = open(os.path.join(self.srcdir, 'tests.txt'), 'w')
         test_files = sorted(glob.glob(os.path.join(self.bindir, 'fixes', '*.sh')))

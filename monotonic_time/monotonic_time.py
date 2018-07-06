@@ -12,6 +12,7 @@ class monotonic_time(test.test):
     preserve_srcdir = True
 
     def setup(self):
+        self.install_required_pkgs()
         os.chdir(self.srcdir)
         utils.make()
 
@@ -29,7 +30,6 @@ class monotonic_time(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     def run_once(self, test_type=None, duration=300, threshold=None):

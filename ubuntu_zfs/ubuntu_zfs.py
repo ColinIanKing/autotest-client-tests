@@ -44,13 +44,13 @@ class ubuntu_zfs(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     #
     # if you change setup, be sure to increment version
     #
     def setup(self):
+        self.install_required_pkgs()
 
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 

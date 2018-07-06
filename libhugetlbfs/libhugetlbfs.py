@@ -23,8 +23,6 @@ class libhugetlbfs(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self, hugetlbfs_dir=None, pages_requested=20):
-        self.install_required_pkgs()
-
         self.hugetlbfs_dir = None
 
         # check if basic utilities are present
@@ -55,6 +53,7 @@ class libhugetlbfs(test.test):
             self.hugetlbfs_dir = hugetlbfs_dir
 
     def setup(self):
+        self.install_required_pkgs()
         # get the sources
         os.chdir(self.srcdir)
         cmd = 'git clone --depth=1 -b next https://github.com/libhugetlbfs/libhugetlbfs.git'

@@ -31,7 +31,6 @@ class ubuntu_fs_fio_perf(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
         self.valid_clients = ['gonzo', 'intel-uefi']
         self.hostname = os.uname()[1]
@@ -47,6 +46,7 @@ class ubuntu_fs_fio_perf(test.test):
     def setup(self):
         # totally abusing things, but this works for me :-)
         #
+        self.install_required_pkgs()
         os.chdir(self.srcdir)
         utils.system('rm -rf fs-test-proto')
         utils.system('git clone git://kernel.ubuntu.com/cking/fs-test-proto.git')

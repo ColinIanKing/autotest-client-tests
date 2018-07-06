@@ -21,7 +21,6 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # setup
@@ -29,7 +28,7 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
     #    Automatically run when there is no autotest/client/tmp/<test-suite> directory
     #
     def setup(self):
-
+        self.install_required_pkgs()
         if not os.path.exists('/lower'):
             os.mkdir('/lower')
         if not os.path.exists('/upper'):

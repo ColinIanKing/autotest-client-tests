@@ -21,7 +21,6 @@ class ubuntu_stress_btrfs(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
         self.valid_clients = ['gonzo', 'btrfs-scratch']
@@ -35,6 +34,7 @@ class ubuntu_stress_btrfs(test.test):
             self.dev = 'loop'
 
     def setup(self):
+        self.install_required_pkgs()
         utils.system('cp %s/ubuntu_stress_btrfs.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
         cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng 2>&1'

@@ -42,7 +42,6 @@ class ubuntu_ltp(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # setup
@@ -50,6 +49,7 @@ class ubuntu_ltp(test.test):
     #    Automatically run when there is no autotest/client/tmp/<test-suite> directory
     #
     def setup(self):
+        self.install_required_pkgs()
         os.chdir(self.srcdir)
         cmd = 'git clone https://github.com/linux-test-project/ltp.git'
         self.results = utils.system_output(cmd, retain_output=True)

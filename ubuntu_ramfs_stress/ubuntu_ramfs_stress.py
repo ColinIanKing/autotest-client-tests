@@ -34,10 +34,10 @@ class ubuntu_ramfs_stress(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     def setup(self):
+        self.install_required_pkgs()
 
         utils.system('cp %s/ubuntu_ramfs_stress.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)

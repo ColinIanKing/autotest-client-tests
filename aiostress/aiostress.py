@@ -21,7 +21,6 @@ class aiostress(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
         self.job.setup_dep(['libaio'])
         ldflags = '-L ' + self.autodir + '/deps/libaio/lib'
@@ -30,6 +29,7 @@ class aiostress(test.test):
 
     # ftp://ftp.suse.com/pub/people/mason/utils/aio-stress.c
     def setup(self, tarball=None):
+        self.install_required_pkgs()
         if not os.path.exists(self.srcdir):
             os.mkdir(self.srcdir)
         os.chdir(self.srcdir)

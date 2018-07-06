@@ -35,7 +35,6 @@ class dma_memtest(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.cachedir = os.path.join(os.path.dirname(self.srcdir), 'cache')
         self.nfail = 0
 
@@ -50,6 +49,7 @@ class dma_memtest(test.test):
             :param parallel: If we are going to uncompress the copies of the
             kernel in parallel or not
         """
+        self.install_required_pkgs()
         if not os.path.isdir(self.cachedir):
             os.makedirs(self.cachedir)
         self.parallel = parallel

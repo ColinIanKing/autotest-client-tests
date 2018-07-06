@@ -26,7 +26,6 @@ class xmtest(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # This test expects just the xm-test directory, as a tarball
@@ -36,6 +35,7 @@ class xmtest(test.test):
     # cd tools
     # tar -czf xm-test.tgz xm-test
     def setup(self, tarball='xm-test.tar.bz2'):
+        self.install_required_pkgs()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

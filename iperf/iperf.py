@@ -23,7 +23,6 @@ class iperf(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.SERVER_PORT = '5001'
 
         self.results = []
@@ -33,7 +32,7 @@ class iperf(test.test):
 
     # http://downloads.sourceforge.net/iperf/iperf-2.0.4.tar.gz
     def setup(self):
-        return
+        self.install_required_pkgs()
 
     def run_once(self, server_ip, client_ip, role, udp=False,
                  bidirectional=False, test_time=10, dev='', stream_list=[1], barriers=True):

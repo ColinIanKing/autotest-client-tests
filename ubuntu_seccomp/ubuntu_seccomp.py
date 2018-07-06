@@ -21,7 +21,6 @@ class ubuntu_seccomp(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # setup
@@ -29,6 +28,7 @@ class ubuntu_seccomp(test.test):
     #    Automatically run when there is no autotest/client/tmp/<test-suite> directory
     #
     def setup(self):
+        self.install_required_pkgs()
         os.chdir(self.srcdir)
         cmd = 'git clone https://github.com/redpig/seccomp.git'
         self.results = utils.system_output(cmd, retain_output=True)

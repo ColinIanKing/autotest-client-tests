@@ -20,11 +20,11 @@ class fsstress(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # http://www.zip.com.au/~akpm/linux/patches/stuff/ext3-tools.tar.gz
     def setup(self, tarball='ext3-tools.tar.gz'):
+        self.install_required_pkgs()
         self.tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(self.tarball, self.srcdir)
 

@@ -35,9 +35,10 @@ class ubuntu_nbd_smoke_test(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
+        pass
 
     def setup(self):
+        self.install_required_pkgs()
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
         os.chdir(self.srcdir)
 

@@ -22,10 +22,10 @@ class synctest(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     def setup(self):
+        self.install_required_pkgs()
         os.chdir(self.srcdir)
         utils.make()
 

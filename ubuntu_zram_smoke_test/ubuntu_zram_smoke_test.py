@@ -19,8 +19,10 @@ class ubuntu_zram_smoke_test(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
+
+    def setup(self):
+        self.install_required_pkgs()
 
     def run_once(self, test_name):
         cmd = '%s/ubuntu_zram_smoke_test.sh' % (self.bindir)

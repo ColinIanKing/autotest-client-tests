@@ -21,14 +21,14 @@ class ubuntu_docker_smoke_test(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
+        pass
 
     # setup
     #
     #    Automatically run when there is no autotest/client/tmp/<test-suite> directory
     #
     def setup(self):
-        pass
+        self.install_required_pkgs()
 
     # run_once
     #

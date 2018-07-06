@@ -17,6 +17,9 @@ class ubuntu_cts_kernel(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        pass
+
+    def setup(self):
         self.install_required_pkgs()
 
     def run_once(self, bug, exit_on_error=True, set_time=True, ifname=None):

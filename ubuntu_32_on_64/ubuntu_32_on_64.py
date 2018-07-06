@@ -20,10 +20,10 @@ class ubuntu_32_on_64(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     def setup(self):
+        self.install_required_pkgs()
         shutil.copyfile(os.path.join(self.bindir, 'forkexec.c'),
                         os.path.join(self.srcdir, 'forkexec.c'))
         os.chdir(self.bindir)

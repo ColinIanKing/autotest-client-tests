@@ -21,11 +21,11 @@ class tiobench(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # http://prdownloads.sourceforge.net/tiobench/tiobench-0.3.3.tar.gz
     def setup(self, tarball='tiobench-0.3.3.tar.bz2'):
+        self.install_required_pkgs()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

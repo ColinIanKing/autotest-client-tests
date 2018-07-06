@@ -20,11 +20,11 @@ class fs_mark(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.install_required_pkgs()
         self.job.require_gcc()
 
     # http://developer.osdl.org/dev/doubt/fs_mark/archive/fs_mark-3.2.tgz
     def setup(self, tarball='fs_mark-3.2.tgz'):
+        self.install_required_pkgs()
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

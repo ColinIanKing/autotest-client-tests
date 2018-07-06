@@ -21,14 +21,15 @@ class aio_dio_bugs(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.setup_dep(['libaio'])
-        ldflags = '-L ' + self.autodir + '/deps/libaio/lib'
-        cflags = '-I ' + self.autodir + '/deps/libaio/include'
-        self.gcc_flags = ldflags + ' ' + cflags
+        pass
 
     def setup(self):
         self.install_required_pkgs()
         self.job.require_gcc()
+        self.job.setup_dep(['libaio'])
+        ldflags = '-L ' + self.autodir + '/deps/libaio/lib'
+        cflags = '-I ' + self.autodir + '/deps/libaio/include'
+        self.gcc_flags = ldflags + ' ' + cflags
         os.chdir(self.srcdir)
         utils.make('"CFLAGS=' + self.gcc_flags + '"')
 

@@ -23,11 +23,12 @@ class isic(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.job.setup_dep(['libnet'])
+        pass
 
     def setup(self, tarball='isic-0.06.tar.bz2'):
         self.install_required_pkgs()
         self.job.require_gcc()
+        self.job.setup_dep(['libnet'])
         tarball = utils.unmap_url(self.bindir, tarball, self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         os.chdir(self.srcdir)

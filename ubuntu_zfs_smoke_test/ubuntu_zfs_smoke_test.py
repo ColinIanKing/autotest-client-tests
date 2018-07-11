@@ -11,10 +11,8 @@ class ubuntu_zfs_smoke_test(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'xfsprogs', 'git', 'acl', 'libattr1-dev',
+            'xfsprogs', 'git', 'acl', 'libattr1-dev',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
-        pkgs.append(gcc)
 
         if series in ['precise', 'trusty']:
             utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
@@ -34,7 +32,6 @@ class ubuntu_zfs_smoke_test(test.test):
 
     def setup(self):
         self.install_required_pkgs()
-        self.job.require_gcc()
         utils.system('modprobe zfs')
 
     def run_once(self, test_name):

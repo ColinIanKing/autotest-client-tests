@@ -12,10 +12,8 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'git', 'python3',
+            'git', 'python3',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
-        pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
@@ -29,7 +27,6 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
     #
     def setup(self):
         self.install_required_pkgs()
-        self.job.require_gcc()
         if not os.path.exists('/lower'):
             os.mkdir('/lower')
         if not os.path.exists('/upper'):

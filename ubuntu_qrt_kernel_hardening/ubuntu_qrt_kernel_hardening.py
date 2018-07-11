@@ -10,10 +10,8 @@ class ubuntu_qrt_kernel_hardening(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'git', 'build-essential', 'libcap2-bin', 'gawk', 'execstack', 'exim4', 'libcap-dev',
+            'git', 'libcap2-bin', 'gawk', 'execstack', 'exim4', 'libcap-dev',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
-        pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
@@ -23,7 +21,6 @@ class ubuntu_qrt_kernel_hardening(test.test):
 
     def setup(self):
         self.install_required_pkgs()
-        self.job.require_gcc()
         os.chdir(self.srcdir)
         cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
         self.results = utils.system_output(cmd, retain_output=True)

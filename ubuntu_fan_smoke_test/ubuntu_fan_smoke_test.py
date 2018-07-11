@@ -13,10 +13,8 @@ class ubuntu_fan_smoke_test(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'gdb', 'git', 'docker.io', 'ubuntu-fan',
+            'gdb', 'git', 'docker.io', 'ubuntu-fan',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
-        pkgs.append(gcc)
 
         cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

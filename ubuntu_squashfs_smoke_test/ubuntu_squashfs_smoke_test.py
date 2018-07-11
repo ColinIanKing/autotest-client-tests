@@ -11,10 +11,8 @@ class ubuntu_squashfs_smoke_test(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'xfsprogs', 'git', 'acl', 'libattr1-dev', 'squashfs-tools', 'bc',
+            'xfsprogs', 'git', 'acl', 'libattr1-dev', 'squashfs-tools', 'bc',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
-        pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
@@ -24,7 +22,6 @@ class ubuntu_squashfs_smoke_test(test.test):
 
     def setup(self):
         self.install_required_pkgs()
-        self.job.require_gcc()
 
     def run_once(self, test_name):
         cmd = '%s/ubuntu_squashfs_smoke_test.sh' % (self.bindir)

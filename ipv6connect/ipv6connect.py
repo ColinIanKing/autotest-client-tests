@@ -29,7 +29,7 @@ class ipv6connect(test.test):
         pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
-        self.results = utils.system_output(cmd, retain_output=True)
+        utils.system(cmd)
 
     def initialize(self):
         self.results = []

@@ -20,7 +20,7 @@ class iperf(test.test):
         ]
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
-        self.results = utils.system_output(cmd, retain_output=True)
+        utils.system(cmd)
 
     def initialize(self):
         self.SERVER_PORT = '5001'

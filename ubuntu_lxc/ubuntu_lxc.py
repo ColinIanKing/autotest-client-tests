@@ -1,37 +1,51 @@
 #
 #
 from autotest.client                        import test, utils
+import os
 import platform
 
 class ubuntu_lxc(test.test):
     version = 1
 
     def install_required_pkgs(self):
-        series = platform.dist()[2]
-
-        pkgs = [
-            'liblxc1'
-        ]
-
-        if series in ['precise', 'trusty', 'xenial', 'artful']:
-            pkgs.append('lxc-tests')
+        arch  = platform.processor()
+        if self.series in ['precise', 'trusty', 'xenial', 'artful']:
+            pkgs = [
+                'lxc-tests'
+            ]
         else:
-            pkgs.append('lxc-utils')
+            pkgs = [
+                'automake',
+                'autopkgtest',
+                'build-essential',
+                'cloud-image-utils',
+                'dh-autoreconf',
+                'lxc',
+                'texinfo',
+            ]
+            gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
+            pkgs.append(gcc)
 
+        pkgs.append('liblxc1')
         cmd = 'apt-get install --yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        series = platform.dist()[2]
-        if series not in ['precise', 'trusty', 'xenial', 'artful']:
-            self.results = utils.system_output('git clone https://github.com/lxc/lxc.git', retain_output=True)
-            self.results = utils.system_output('sudo find lxc/src/tests -type f -name "lxc-test-*" -executable -exec cp {} /usr/bin/ \;', retain_output=True)
+        self.series = platform.dist()[2]
+        pass
 
     def setup(self):
         self.install_required_pkgs()
 
     def run_once(self, test_name):
-        cmd = '/bin/sh %s/exercise' % self.bindir
+        if self.series in ['precise', 'trusty', 'xenial', 'artful']:
+            cmd = '/bin/sh %s/exercise' % self.bindir
+        else:
+            proxy = ''
+            if os.environ.get('http_proxy'):
+                proxy = 'http_proxy=%s' % os.environ.get('http_proxy')
+            cmd = '%s autopkgtest lxc -- null' % proxy
+
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

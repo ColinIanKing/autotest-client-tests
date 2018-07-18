@@ -26,9 +26,7 @@ class libhugetlbfs(test.test):
         self.hugetlbfs_dir = None
 
         # check if basic utilities are present
-        self.job.require_gcc()
         utils.check_kernel_ver("2.6.16")
-        os_dep.library('libpthread.a')
 
         # Check huge page number
         pages_available = 0
@@ -54,6 +52,8 @@ class libhugetlbfs(test.test):
 
     def setup(self):
         self.install_required_pkgs()
+        os_dep.library('libpthread.a')
+        self.job.require_gcc()
         # get the sources
         os.chdir(self.srcdir)
         cmd = 'git clone --depth=1 -b next https://github.com/libhugetlbfs/libhugetlbfs.git'

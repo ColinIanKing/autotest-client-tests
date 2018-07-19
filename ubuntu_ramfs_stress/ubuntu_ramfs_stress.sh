@@ -35,7 +35,6 @@ do_tidy()
 	killall -9 stress-ng &> /dev/null
 	cd
 	umount $MNT
-	rm -f $VFAT_IMAGE0
 	exit 1
 }
 
@@ -74,8 +73,11 @@ do_test()
 	dmesg -c > /dev/null
 	echo "TESTING: $*" > /dev/kmsg
 
+	echo "Making ram disk of ${memK}K"
+	memB=$((memK * 1024))
+
 	mkdir -p ${MNT}
-	mount -t ramfs none ${MNT} -o maxsize=128000
+	mount -t ramfs none ${MNT} -o maxsize=${memB}
 
 	#
 	# Ensure clean state
@@ -131,7 +133,6 @@ do_test()
 	sleep 1
 	echo "umounting ramfs"
 	umount ${MNT}
-	dd if=/dev/zero of=$VFAT_IMAGE0 bs=1M count=1024 >& /dev/null
 	kill -TERM $pid &> /dev/null
 
 	echo "================================================================================"
@@ -149,15 +150,37 @@ if [ $(grep "$MNT" /proc/mounts | wc -l) -gt 0 ]; then
 	exit 1
 fi
 
+#
+# Figure out how much memory we can safely use without
+# causing OOM pain
+#
+pagesize=$(getconf PAGESIZE)
+pages=$(getconf _AVPHYS_PAGES)
+pagesK=$((pages / 1024))
+memK=$((pagesize * pagesK))
+echo "Total of ${memK} KB free memory"
+memK=$((memK / 3))
+#
+#  Ensure we don't underflow the size
+#
+if [ $memK -lt 128 ]; then
+	memK=128
+	echo "WARNING: Forcing zram to be at least ${memMB}K"
+fi
+#
+#  256K is more than plenty for a smoke test
+#
+if [ $memK -gt 256 ]; then
+	memK=256
+fi
+
 rm -f $LOG
 touch $LOG
 
-do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd \
-	--link $N --symlink $N --lockf $N --seek $N --aio $N --aio-requests 32 --dentry $N --dir $N \
-	--dentry-order stride --fallocate $N --fstat $N --dentries 65536 --io 1 --lease $N --mmap 0 \
-	--mmap-file --mmap-async --open $N --rename $N --hdd-bytes 32M --fallocate-bytes 32M \
-	--chdir $N --chmod $N --filename $N --rename $N \
-	--mmap-bytes 32M --hdd-write-size 512
+do_test $INFO $IONICE $SCHED -t $DURATION --link $N --symlink $N --lockf $N --seek $N --aio $N \
+	--aio-requests 32 --dentry $N --dir $N --fstat $N --io $N --dentries $N --lease $N \
+	--mmap-file --mmap-async --open $N --rename $N --chdir $N --chmod $N --filename $N --rename $N
+	--hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd --hdd-write-size 512
 
 echo " "
 echo "Completed"

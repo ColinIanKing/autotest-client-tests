@@ -100,7 +100,27 @@ zram_test_ext4()
 	if [ "$1" != "default" ]; then
 		echo $1 > /sys/block/zram0/comp_algorithm
 	fi
-	echo 128M > /sys/block/zram0/disksize
+	#
+	# Figure out how much memory we can safely use without
+	# causing OOM pain
+	#
+	pagesize=$(getconf PAGESIZE)
+	pagesizeK=$((pagesize / 1024))
+	pages=$(getconf _AVPHYS_PAGES)
+	pagesK=$((pages / 1024))
+	memMB=$((pagesizeK * pagesK))
+	echo "Total of ${memMB} MB free memory"
+	memMB=$((memMB / 3))
+	#
+	#  Ensure we don't underflow the size
+	#
+	if [ $memMB -lt 8 ]; then
+		memMB=8
+		echo "WARNING: Forcing zram to be at least ${memMB}"
+	fi
+	echo "Making zram disk of ${memMB} MB"
+
+	echo ${memMB}M > /sys/block/zram0/disksize
 	mnt=$(pwd)/mnt
 	mkdir -p $mnt
 
@@ -119,10 +139,11 @@ zram_test_ext4()
 		exit 1
 	fi
 
-	dd if=/dev/urandom of=$mnt/test bs=1M count=40 >& /dev/null
+	ddMB=$((memMB / 2))
+	dd if=/dev/urandom of=$mnt/test bs=1M count=${ddMB} >& /dev/null
 	sync
 	if [ $? -ne 0 ]; then
-		echo "FAILED: dd of 40MB to 128MB ZRAM ext4 filesystem unsuccessful ($1)"
+		echo "FAILED: dd of ${ddmB}MB to ${memMB}MB ZRAM ext4 filesystem unsuccessful ($1)"
 		zram_unload
 		exit 1
 	fi
@@ -137,7 +158,7 @@ zram_test_ext4()
 	fi
 	rm $mnt/test
 	sync
-	dd if=/dev/zero of=$mnt/test bs=1M count=40 >& /dev/null
+	dd if=/dev/zero of=$mnt/test bs=1M count=${ddMB} >& /dev/null
 	sync
 
 	#

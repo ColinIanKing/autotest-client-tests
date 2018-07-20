@@ -1,0 +1,50 @@
+From e19b161d30d648cf0ac5bd68df84b82322de7451 Mon Sep 17 00:00:00 2001
+From: Kleber Sacilotto de Souza <kleber.souza@canonical.com>
+Date: Thu, 31 May 2018 13:52:30 +0200
+Subject: [PATCH][unionmount-testsuite] Fix check for file on overlayfs
+
+BugLink: https://bugs.launchpad.net/bugs/1751243
+
+After kernel 4.15, the unmodified files do not have the same st_dev as
+the lower filesystem anymore, but they are assigned an anonymous bdev
+instead. So checking if a file which is expected to be unmodified has
+the same st_dev as the lower filesystem doesn't work anymore, we need to
+check if they do not have the same st_dev as the overlay filesystem.
+
+Signed-off-by: Kleber Sacilotto de Souza <kleber.souza@canonical.com>
+Acked-by: Colin Ian King <colin.king@canonical.com>
+---
+ context.py | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/context.py b/context.py
+index 18ae977..873a8a7 100644
+--- a/context.py
++++ b/context.py
+@@ -481,18 +481,15 @@ class test_context:
+         #self.output("- check_layer ", dentry.filename(), " -", dentry.layer(), " # ", dev, "\n")
+         if self.skip_layer_test():
+             pass
+-        elif dev == self.lower_fs():
+-            if dentry.is_dir():
+-                raise TestError(name + ": Directory unexpectedly on lower filesystem")
+-            if dentry.on_upper():
+-                raise TestError(name + ": Test file not on upper filesystem")
+         elif dentry.is_dir():
++            # Directories have always the same st_dev as the overlay fs
+             if dev != self.upper_dir_fs():
+                 raise TestError(name + ": Directory not on union layer")
+-        elif dev != self.upper_fs() and self.upper_fs() != self.upper_dir_fs():
++        elif dev == self.upper_dir_fs():
+             raise TestError(name + ": File unexpectedly on union layer")
+-        elif not dentry.on_upper():
+-            raise TestError(name + ": File unexpectedly on upper layer")
++        elif dev == self.upper_fs():
++            if not dentry.on_upper():
++                raise TestError(name + ": File unexpectedly on upper layer")
+ 
+         if dentry.is_sym() and dentry not in symlinks:
+             symlinks.add(dentry)
+-- 
+2.17.0
+

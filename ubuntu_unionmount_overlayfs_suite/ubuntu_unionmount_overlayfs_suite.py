@@ -37,6 +37,9 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
         os.chdir(self.srcdir)
         cmd = 'git clone http://kernel.ubuntu.com/git-repos/kernel-ppa/unionmount-testsuite.git'
         self.results = utils.system_output(cmd, retain_output=True)
+        os.chdir(os.path.join(self.srcdir, 'unionmount-testsuite'))
+        cmd = 'patch -p1 < %s/0001-Fix-check-for-file-on-overlayfs.patch' % self.bindir
+        utils.system(cmd)
 
     # run_once
     #

@@ -75,6 +75,9 @@ class ubuntu_kernel_selftests(test.test):
                 utils.system(cmd)
 
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
+
         os.chdir(self.srcdir)
         cmd = "sudo make -C linux/tools/testing/selftests/%s all run_tests" % test_name
         utils.system(cmd)

@@ -13,6 +13,7 @@ http://git.kernel.org/cgit/virt/kvm/kvm-unit-tests.git
 #
 BLACKLIST = []
 
-job.run_test_detail(NAME, test_name='setup', tag='all', timeout=60*60*1)
+job.run_test_detail(NAME, test_name='setup', tag='setup')
+job.run_test_detail(NAME, test_name=NAME, tag='all', timeout=60*60*1)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

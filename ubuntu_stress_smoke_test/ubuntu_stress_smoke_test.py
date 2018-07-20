@@ -35,6 +35,9 @@ class ubuntu_stress_smoke_test(test.test):
         self.results = utils.system_output('make', retain_output=True)
 
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
+
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
         cmd = '%s/ubuntu_stress_smoke_test.sh' % (self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)

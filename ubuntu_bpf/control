@@ -12,6 +12,7 @@ DOC = ""
 
 name = 'ubuntu_bpf'
 
+results = job.run_test_detail('ubuntu_bpf', test_name='setup', tag='setup')
 results = job.run_test_detail('ubuntu_bpf', test_name='ubuntu-bpf', tag='ubuntu-bjf')
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

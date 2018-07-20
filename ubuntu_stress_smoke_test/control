@@ -12,6 +12,7 @@ DOC = ""
 
 name = 'ubuntu_stress_smoke_test'
 
+results = job.run_test_detail('ubuntu_stress_smoke_test', test_name='setup', tag='setup')
 results = job.run_test_detail('ubuntu_stress_smoke_test', test_name='stress-smoke-test', tag='stress-smoke-test')
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

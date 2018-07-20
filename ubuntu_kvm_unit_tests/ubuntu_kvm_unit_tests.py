@@ -65,6 +65,8 @@ class ubuntu_kvm_unit_tests(test.test):
         utils.system('patch -p1 < %s/runtime_show.patch' % self.bindir)
 
     def run_once(self, test_name, cmd=''):
+        if test_name == 'setup':
+            return
         os.chdir(self.srcdir + '/kvm-unit-tests')
 
         arch = platform.processor()

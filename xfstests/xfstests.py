@@ -203,7 +203,10 @@ class xfstests(test.test):
         for mnt_point in [ os.environ['SCRATCH_MNT'], os.environ['TEST_DIR'] ]:
             utils.system('umount %s' % mnt_point, ignore_status=True)
 
-    def run_once(self, filesystem='ext4', test_number='000', single=False, skip_dangerous=True):
+    def run_once(self, test_name, filesystem='ext4', test_number='000', single=False, skip_dangerous=True):
+        if test_name == 'setup':
+            return
+
         os.chdir(self.srcdir)
         if single:
             if test_number == '000':

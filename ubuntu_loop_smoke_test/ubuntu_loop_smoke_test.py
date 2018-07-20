@@ -36,6 +36,9 @@ class ubuntu_loop_smoke_test(test.test):
         utils.make()
 
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
+
         cmd = '%s/loop-test' % (self.srcdir)
         self.results = utils.system_output(cmd, retain_output=True)
 

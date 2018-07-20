@@ -11,7 +11,7 @@ TEST_TYPE = "client"
 DOC = ""
 
 name = 'ubuntu_blktrace_smoke_test'
-
+results = job.run_test_detail('ubuntu_blktrace_smoke_test', test_name='setup', tag='setup')
 results = job.run_test_detail('ubuntu_blktrace_smoke_test', test_name='blktrace-smoke-test', tag='blktrace-smoke-test')
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -11,6 +11,7 @@ TEST_TYPE = "client"
 DOC = ""
 
 tests = [
+	'setup',
 	'kernel-smoke-test-pool-2x2-mirror',
 	'kernel-smoke-test-pool-4x1-mirror',
 	'kernel-smoke-test-pool-nested-raidz3',

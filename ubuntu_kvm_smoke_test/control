@@ -11,6 +11,7 @@ DOC = ""
 
 name = 'ubuntu_kvm_smoke_test'
 
+results = job.run_test_detail('ubuntu_kvm_smoke_test', test_name='setup', tag='setup')
 results = job.run_test_detail('ubuntu_kvm_smoke_test', test_name='kvm_smoke_test', tag='kvm_smoke_test', timeout=60*60*1)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

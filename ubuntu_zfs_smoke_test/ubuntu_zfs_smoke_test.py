@@ -35,6 +35,8 @@ class ubuntu_zfs_smoke_test(test.test):
         utils.system('modprobe zfs')
 
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
         cmd = '%s/%s %s' % (self.bindir, test_name, self.srcdir)
         self.results = utils.system_output(cmd, retain_output=True)
 

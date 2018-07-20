@@ -12,6 +12,7 @@ DOC = ""
 
 name = 'ubuntu_ramfs_stress'
 
+results = job.run_test_detail('ubuntu_ramfs_stress', test_name='setup', tag='setup')
 results = job.run_test_detail('ubuntu_ramfs_stress', test_name='ramfs-stress', tag='ramfs-stress', timeout=60*60*5) # 5hr. timeout
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

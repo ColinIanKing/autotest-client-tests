@@ -38,6 +38,8 @@ class ubuntu_lxc(test.test):
         self.install_required_pkgs()
 
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
         if self.series in ['precise', 'trusty', 'xenial', 'artful']:
             cmd = '/bin/sh %s/exercise' % self.bindir
         else:

@@ -37,6 +37,8 @@ class ubuntu_kvm_smoke_test(test.test):
     #    Driven by the control file for each individual test.
     #
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
         if platform.processor() == 'athlon':
             arch = platform.machine()
         else:

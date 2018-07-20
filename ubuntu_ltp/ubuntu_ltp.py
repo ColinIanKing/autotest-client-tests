@@ -70,6 +70,9 @@ class ubuntu_ltp(test.test):
     #    Driven by the control file for each individual test.
     #
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
+
         os.chdir('/opt/ltp')
 
         cmd = 'cat /opt/ltp/runtest/syscalls > /tmp/skip'

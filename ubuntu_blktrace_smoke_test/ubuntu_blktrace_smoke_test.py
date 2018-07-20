@@ -23,6 +23,8 @@ class ubuntu_blktrace_smoke_test(test.test):
         self.install_required_pkgs()
 
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
         cmd = '%s/ubuntu_blktrace_smoke_test.sh' % (self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
 	print self.results

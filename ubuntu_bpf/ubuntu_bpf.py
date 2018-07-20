@@ -66,6 +66,8 @@ class ubuntu_bpf(test.test):
         utils.make()
 
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
         os.chdir(os.path.join(self.srcdir, 'linux/tools/testing/selftests'))
         cmd = '%s/ubuntu_bpf.sh' % self.bindir
         self.results = utils.system_output(cmd, retain_output=True)

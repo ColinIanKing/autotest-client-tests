@@ -57,6 +57,8 @@ class ubuntu_ramfs_stress(test.test):
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
         stress_ng = os.path.join(self.srcdir, 'stress-ng', 'stress-ng')
         #
         #  temp logfile

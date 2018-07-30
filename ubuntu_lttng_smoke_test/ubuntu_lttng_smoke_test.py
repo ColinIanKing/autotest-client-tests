@@ -2,6 +2,7 @@
 #
 import platform
 from autotest.client                        import test, utils
+from autotest.client.shared                 import error
 
 class ubuntu_lttng_smoke_test(test.test):
     version = 99
@@ -29,6 +30,13 @@ class ubuntu_lttng_smoke_test(test.test):
     def setup(self):
         self.install_required_pkgs()
         self.job.require_gcc()
+        cmd = 'dkms status -m lttng-modules | grep installed'
+        try:
+            utils.system(cmd)
+        except error.CmdError:
+            cmd = 'cat /var/lib/dkms/lttng-modules/*/build/make.log'
+            utils.system(cmd)
+            raise error.TestError('DKMS failed to install')
 
     def run_once(self, test_name):
         cmd = '%s/ubuntu_lttng_smoke_test.sh' % (self.bindir)

@@ -1,5 +1,6 @@
 #
 #
+import os
 import platform
 from autotest.client                        import test, utils
 
@@ -13,6 +14,13 @@ class ubuntu_quota_smoke_test(test.test):
         pkgs = [
             'quota',
         ]
+        try:
+            cloud  = os.environ['CLOUD']
+            if cloud in ['azure', 'gcp']:
+                 pkgs.append('linux-modules-extra-' + cloud + '*')
+        except KeyError:
+            pass
+
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 

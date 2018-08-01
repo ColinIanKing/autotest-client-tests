@@ -1,6 +1,7 @@
 #
 #
 from autotest.client                        import test, utils
+import os
 import platform
 
 class ubuntu_zram_smoke_test(test.test):
@@ -12,6 +13,13 @@ class ubuntu_zram_smoke_test(test.test):
 
         pkgs = [
         ]
+
+        try:
+            cloud  = os.environ['CLOUD']
+            if cloud in ['azure', 'gcp']:
+                 pkgs.append('linux-modules-extra-' + cloud + '*')
+        except KeyError:
+            pass
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

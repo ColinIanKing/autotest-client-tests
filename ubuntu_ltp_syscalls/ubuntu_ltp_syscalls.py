@@ -52,6 +52,8 @@ class ubuntu_ltp_syscalls(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'ltp'))
+        print("Patching utimensat_tests for Xenial...")
+        utils.system('patch -N -p1 < %s/0001-utimensat_tests-fix-for-xenial.patch' % self.bindir)
         cmd = 'make autotools'
         self.results = utils.system_output(cmd, retain_output=True)
         cmd = './configure'

@@ -1,0 +1,36 @@
+From 0da6a3b3a5cdffa3249a535ad4b2076feed997d3 Mon Sep 17 00:00:00 2001
+From: Po-Hsu Lin <po-hsu.lin@canonical.com>
+Date: Tue, 7 Aug 2018 05:03:52 -0400
+Subject: [PATCH] UBUNTU: SAUCE: utimensat_tests.sh: workaround for xenial
+ version check
+
+BugLink: https://bugs.launchpad.net/bugs/1785765
+
+Since 4.4.0-48.69, Ubuntu Xenial kernel already contains the vfs patch:
+    vfs: move permission checking into notify_change() for utimes(NULL)
+
+Modify the version check to 4.4.0 as it only support two digits check.
+
+Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
+---
+ testcases/kernel/syscalls/utimensat/utimensat_tests.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/utimensat/utimensat_tests.sh b/testcases/kernel/syscalls/utimensat/utimensat_tests.sh
+index 46a0cc6..be2072f 100755
+--- a/testcases/kernel/syscalls/utimensat/utimensat_tests.sh
++++ b/testcases/kernel/syscalls/utimensat/utimensat_tests.sh
+@@ -34,9 +34,9 @@ fi
+ # EACCES.
+ # This patch has also been merged to stable 4.4 with
+ # b3b4283 ("vfs: move permission checking into notify_change() for utimes(NULL)")
+-if tst_kvcmp -ge "4.4.27" -a -lt "4.5.0"; then
++if tst_kvcmp -ge "4.4.0" -a -lt "4.5.0"; then
+ 	imaccess=EPERM
+-elif tst_kvcmp -lt "4.4.27"; then
++elif tst_kvcmp -lt "4.4.0"; then
+ 	imaccess=EACCES
+ else
+ 	imaccess=EPERM
+--
+2.7.4

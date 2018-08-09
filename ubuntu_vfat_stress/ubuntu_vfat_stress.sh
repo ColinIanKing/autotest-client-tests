@@ -176,10 +176,9 @@ do
 	#
 	do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd \
 		--lockf $N --seek $N --aio $N --aio-requests 32 --dentry $N --dir $N \
-		--dentry-order stride --fallocate $N --fstat $N --dentries 100 --lease $N --mmap 0 \
-		--mmap-file --mmap-async --open $N --rename $N --hdd-bytes 4M --fallocate-bytes 4M \
-		--chdir $N --rename $N \
-		--mmap-bytes 4M --hdd-write-size 512
+		--dentry-order stride --fallocate $N --fstat $N --dentries 100 --lease $N \
+		--open $N --rename $N --hdd-bytes 4M --fallocate-bytes 4M \
+		--chdir $N --rename $N --hdd-write-size 512
 done
 
 echo " "

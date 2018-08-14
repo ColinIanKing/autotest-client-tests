@@ -67,7 +67,7 @@ class ubuntu_vfat_stress(test.test):
         #
         #  stress-ng "quick fire" short life tests
         #
-        dur = '4s'
+        dur = '10s'
         cmd = 'LOG=%s STRESS_NG=%s DURATION=%s bash -c %s/ubuntu_vfat_stress.sh %s 2>&1' % (log, stress_ng, dur, self.bindir, self.srcdir)
         self.results = utils.system_output(cmd, retain_output=True)
         #

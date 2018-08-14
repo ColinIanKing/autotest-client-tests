@@ -3,7 +3,7 @@
 TESTDIR=vfat-test-$$
 
 MNT=/mnt/$TESTDIR
-VFAT_IMAGE_PATH=$1
+VFAT_IMAGE_PATH=/mnt/${TESTDIR}
 
 #
 #  Various vfat mount options
@@ -80,12 +80,18 @@ do_test()
 	dmesg -c > /dev/null
 	echo "TESTING: $*" > /dev/kmsg
 
-	VFAT_IMAGE0=${VFAT_IMAGE_PATH}/block-dev-0
-	truncate -s 2G ${VFAT_IMAGE0}
+	mount -t tmpfs -o size=1050M tmpfs ${VFAT_IMAGE_PATH}
+	echo "Mounted tmpfs ${VFAT_IMAGE_PATH}"
+
+	VFAT_IMAGE0=${VFAT_IMAGE_PATH}/vfat-loop-data
+	truncate -s 1G ${VFAT_IMAGE0}
+	echo "Created loop image ${VFAT_IMAGE0}"
 
 	mkfs.vfat ${VFAT_IMAGE0}
 	mkdir -p ${MNT}
 	mount ${VFAT_IMAGE0} ${MNT} -o ${OPT}
+	echo "Mounted:"
+	mount
 
 	#
 	# Ensure clean state
@@ -139,13 +145,11 @@ do_test()
 
 	cd - > /dev/null
 	killall -9 stress-ng &> /dev/null
-	sync
 	sleep 1
-	echo "umounting vfat"
+	echo "umounting vfat ${MNT}"
 	umount ${MNT}
-	echo "destroying VFAT_IMAGEs"
-	dd if=/dev/zero of=$VFAT_IMAGE0 bs=1M count=1024 >& /dev/null
-	rm -rf $VFAT_IMAGE0
+	echo "umounting tmpfs ${VFAT_IMAGE_PATH}"
+	umount ${VFAT_IMAGE_PATH}
 	kill -TERM $pid &> /dev/null
 
 	echo "================================================================================"

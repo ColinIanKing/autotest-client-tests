@@ -90,8 +90,8 @@ do_test()
 	mkfs.vfat ${VFAT_IMAGE0}
 	mkdir -p ${MNT}
 	mount ${VFAT_IMAGE0} ${MNT} -o ${OPT}
-	echo "Mounted:"
-	mount
+	#echo "Mounted:"
+	#mount
 
 	#
 	# Ensure clean state

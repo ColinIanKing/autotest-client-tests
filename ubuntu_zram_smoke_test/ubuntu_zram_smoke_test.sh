@@ -53,6 +53,15 @@ zram_unload()
 	fi
 }
 
+zram_cleanup()
+{
+	echo "Killed during run!"
+	if [ $z $mnt ]; then
+		umount -f /dev/zram0
+	fi
+	modprobe -r zram
+}
+
 zram_test_compression_streams()
 {
 	#
@@ -139,7 +148,14 @@ zram_test_ext4()
 		exit 1
 	fi
 
-	ddMB=$((memMB / 2))
+	ddMB=$((memMB / 16))
+	if [ $ddMB -gt 4096 ]; then
+		ddMB=4096
+	fi
+	if [ $ddMB -lt 7 ]; then
+                ddMB=7
+        fi
+
 	dd if=/dev/urandom of=$mnt/test bs=1M count=${ddMB} >& /dev/null
 	sync
 	if [ $? -ne 0 ]; then
@@ -187,7 +203,7 @@ zram_test_ext4()
 		exit 1
 	fi
 	sleep 1
-	echo "PASSED: ext4 on ZRAM ($1), memory used: $used1 $used2"
+	echo "PASSED: ext4 on ZRAM ($1), memory used: $used1 $used2, file size: $ddMB MB"
 	rm -rf $mnt
 }
 
@@ -198,6 +214,9 @@ if [ $kern_version -lt 4000 ]; then
 fi
 
 zram_load
+
+trap zram_cleanup SIGHUP SIGINT SIGTERM
+
 zram_test_compression_streams
 zram_test_compression_algorithms
 

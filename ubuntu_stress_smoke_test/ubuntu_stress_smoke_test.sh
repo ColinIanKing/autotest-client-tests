@@ -26,7 +26,11 @@ EXCLUDE+="rdrand str tsc vecmath wcs zlib "
 #
 # Tests that are know to cause breakage
 #
-EXCLUDE+="xattr efivar"
+EXCLUDE+="xattr efivar "
+#
+# Tests that should be skipped on KVM kernels
+#
+[ "$(uname -r | awk -F'-' '{print $NF}')" == "kvm" ] && EXCLUDE+="dnotify "
 
 #
 # Get built-in stressor names

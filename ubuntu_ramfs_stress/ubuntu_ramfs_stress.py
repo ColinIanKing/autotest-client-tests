@@ -22,7 +22,6 @@ class ubuntu_ramfs_stress(test.test):
             'dump',
             'kpartx',
             'pax',
-            'nfs-kernel-server',
             'xfsprogs',
             'libattr1-dev',
             'libkeyutils-dev',

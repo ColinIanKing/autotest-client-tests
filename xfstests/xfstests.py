@@ -42,7 +42,8 @@ class xfstests(test.test):
             'texlive',
             'gettext',
             'autopoint',
-            'pkg-config'
+            'pkg-config',
+            'libblkid-dev'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

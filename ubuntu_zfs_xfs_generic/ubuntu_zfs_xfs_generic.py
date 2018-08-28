@@ -37,7 +37,8 @@ class ubuntu_zfs_xfs_generic(test.test):
             'texinfo',
             'texlive',
             'quota',
-            'git'
+            'git',
+            'libblkid-dev'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

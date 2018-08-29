@@ -4,7 +4,7 @@
 
 set -e # Exit with a non-zero exit code if any errors occure
 
-ip link add $1 type veth peer name testveth0
+ip link add type veth peer $1 name testveth0
 ovs-vsctl add-br integbr
 ifconfig testveth0 192.168.234.21 netmask 255.255.255.0
 ovs-vsctl add-port integbr gre0 -- set interface gre0 type=gre options:remote_ip=192.168.234.20

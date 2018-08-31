@@ -159,7 +159,7 @@ pages=$(getconf _AVPHYS_PAGES)
 pagesK=$((pages / 1024))
 memK=$((pagesize * pagesK))
 echo "Total of ${memK} KB free memory"
-memK=$((memK / 3))
+memK=$((memK / 4))
 #
 #  Ensure we don't underflow the size
 #
@@ -180,7 +180,7 @@ touch $LOG
 do_test $INFO $IONICE $SCHED -t $DURATION --link $N --symlink $N --lockf $N --seek $N --aio $N \
 	--aio-requests 32 --dentry $N --dir $N --fstat $N --io $N --dentries $N --lease $N \
 	--mmap-file --mmap-async --open $N --rename $N --chdir $N --chmod $N --filename $N --rename $N \
-	--hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd --hdd-write-size 512
+	--hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd --hdd-write-size 512 --oomable
 
 echo " "
 echo "Completed"

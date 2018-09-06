@@ -25,7 +25,7 @@ class ubuntu_qrt_kernel_security(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
-        cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
+        cmd = 'GIT_CURL_VERBOSE=1 GIT_TRACE=1 git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
         self.results = utils.system_output(cmd, retain_output=True)
 
     def run_once(self, test_name):

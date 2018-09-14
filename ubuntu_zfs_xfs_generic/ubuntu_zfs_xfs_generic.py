@@ -6,7 +6,7 @@ from autotest.client                        import test, utils
 import platform
 
 class ubuntu_zfs_xfs_generic(test.test):
-    version = 4
+    version = 5
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -89,6 +89,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         print "Fetching xfstests.."
         os.chdir(self.srcdir)
         utils.system('git clone https://github.com/tytso/xfstests-bld')
+
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "Using head commit d6e3c3559cf05b5ef078f91a97e9639c3688ead0"
         utils.system('git reset --hard d6e3c3559cf05b5ef078f91a97e9639c3688ead0')
@@ -100,15 +101,27 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
         print "Fetching all repos.."
         utils.system('./get-all')
+
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfstests-dev'))
         commit = "4cabd42a78d242650b1053520af308011061343e"
         print "Using xfs from known stable commit point " + commit
-        os.chdir('xfstests-dev')
         utils.system('git reset --hard ' + commit)
-        print "Patching xfstests.."
+        print "Patching xfstests-dev to add minimal support for ZFS"
         utils.system('patch -p1 < %s/0001-xfstests-add-minimal-support-for-zfs.patch' % self.bindir)
+        print "Patching xfstests-dev to ensure xfstests_statx is defined"
+        utils.system('patch -p1 < %s/0006-xfstests-dev-ensure-xfstests_statx-is-defined.patch' % self.bindir)
+
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
+        print "getting xfs tests source"
+        utils.system('./get-all')
+
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfsprogs-dev'))
+        print "Patching xfsprogs-dev to disable blkid"
+        utils.system('patch -p1 < %s/0005-Disable-blkid-by-setting-enable_blkid-no.patch' % self.bindir)
+
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "Building xfstests"
-        utils.system('make')
+        utils.system('./build-all')
         utils.system('modprobe zfs')
 
     def run_once(self, test_name):

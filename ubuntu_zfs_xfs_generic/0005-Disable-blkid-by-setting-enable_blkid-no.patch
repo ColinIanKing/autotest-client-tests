@@ -1,0 +1,31 @@
+From f549f7196a3c8e78fed25284ef0fa09b9b052e21 Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Fri, 14 Sep 2018 10:23:02 +0100
+Subject: [PATCH] Disable blkid by setting enable_blkid=no
+
+We don't need this and it breaks later builds from Cosmic onwards,
+so force it to default to be disabled
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3a0ab184..ed2ba414 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -38,8 +38,8 @@ AC_ARG_ENABLE(gettext,
+ AC_SUBST(enable_gettext)
+ 
+ AC_ARG_ENABLE(blkid,
+-[ --enable-blkid=[yes/no] Enable use of block device id library [default=yes]],,
+-	enable_blkid=yes)
++[ --enable-blkid=[yes/no] Enable use of block device id library [default=no]],,
++	enable_blkid=no)
+ AC_SUBST(enable_blkid)
+ 
+ AC_ARG_ENABLE(readline,
+-- 
+2.17.1
+

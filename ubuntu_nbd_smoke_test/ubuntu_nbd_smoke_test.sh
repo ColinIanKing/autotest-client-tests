@@ -67,7 +67,9 @@ do_test()
 	dmesg -c > /dev/null
 	echo "TESTING: $*" > /dev/kmsg
 
-	truncate -s 256M ${NBD_IMAGE_PATH}
+	dd if=/dev/zero of=${NBD_IMAGE_PATH} bs=1M count=128 >& /dev/null
+	echo done
+	sync
 
 	#
 	# And away we go!
@@ -93,7 +95,7 @@ do_test()
 
 	#nbd-server -V
 
-	nbd-server ${NBD_PORT} ${NBD_IMAGE_PATH} -C ${NBD_DUMMY_CONFIG}
+	nbd-server ${NBD_PORT} ${NBD_IMAGE_PATH} -C ${NBD_DUMMY_CONFIG} >& /dev/null
 	if [ $? -ne 0 ]; then
 		echo "nbd-server failed to start"
 		do_tidy
@@ -103,8 +105,8 @@ do_test()
 	#
 	#  Wait for udev to settle
 	#
-	while true
 	N=0
+	while true
 	do
 		if [ -b ${NBD_DEV} ]; then
 			break;
@@ -114,15 +116,15 @@ do_test()
 			do_tidy
 			exit 1
 		fi
-		sleep 0.5
+		sleep 1
 		N=$((N+1))
 	done
 
 	#
 	# Wait for server to be available
 	#
-	while true
 	N=0
+	while true
 	do
 		if netstat -A inet6 -lnp | grep 9999.*nbd-server; then
 			break;
@@ -132,11 +134,12 @@ do_test()
 			do_tidy
 			exit 1
 		fi
-		sleep 0.5
+		sleep 1
 		N=$((N+1))
 	done
+	sleep 5
 
-	nbd-client -t 30 localhost ${NBD_PORT} ${NBD_DEV}
+	nbd-client -t 30 localhost ${NBD_PORT} ${NBD_DEV} >& /dev/null
 	if [ $? -ne 0 ]; then
 		echo "nbd-client failed to start"
 		do_tidy
@@ -144,15 +147,25 @@ do_test()
 	fi
 
 	mkfs.ext4 -F ${NBD_DEV} &> /dev/null
+	sync
+	sleep 5
 
 	mkdir -p ${MNT}
-	mount ${NBD_DEV} ${MNT}
-
-	if [ $? -ne 0 ]; then
-		echo "mount on ${NBD_DEV} failed"
-		do_tidy
-		exit 1
-	fi
+	N=0
+	while true
+	do
+		mount ${NBD_DEV} ${MNT}
+		if [ $? -eq 0 ]; then
+			break;
+		fi
+		if [ $N -gt 20 ]; then
+			echo "mount on ${NBD_DEV} failed"
+			do_tidy
+			exit 1
+		fi
+		sleep 1
+		N=$((N+1))
+	done
 
 	echo "Mount: "
 	mount | grep ${NBD_DEV}
@@ -168,9 +181,9 @@ do_test()
 	df ${MNT}
 	echo ""
 
-	dd if=/dev/zero of=${MNT}/largefile bs=1M count=200 &> /dev/null
+	(dd if=/dev/zero of=${MNT}/largefile bs=1M count=100) >& /dev/null
 	if [ $? -ne 0 ]; then
-		echo "failed to write 200MB to nbd mounted file system"
+		echo "failed to write 100MB to nbd mounted file system"
 		do_tidy
 		exit 1
 	fi
@@ -179,7 +192,7 @@ do_test()
 	sync
 	rm -f {MNT}/largefile
 	if [ $? -ne 0 ]; then
-		echo "failed to remove 200MB file from nbd mounted file system"
+		echo "failed to remove 100MB file from nbd mounted file system"
 		do_tidy
 		exit 1
 	fi

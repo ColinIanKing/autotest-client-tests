@@ -71,9 +71,19 @@ class ubuntu_ltp_syscalls(test.test):
         if test_name == 'setup':
             return
 
+        log_failed = '/tmp/ubuntu_ltp_syscalls.failed'
         os.chdir('/opt/ltp')
+        cmd = './runltp -f %s -C %s' % (test_name, log_failed)
+        self.results = utils.system_output(cmd, ignore_status=True, retain_output=True)
 
-        cmd = './runltp -f %s' % test_name
-        self.results = utils.system_output(cmd, retain_output=True)
+        num_failed = sum(1 for line in open(log_failed))
+        print("== Test Suite Summary ==")
+        print("{} test cases failed").format(num_failed)
+
+        if num_failed > 0:
+            cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"
+            failed_list = utils.system_output(cmd, retain_output=False, verbose=False)
+            print("Failed test cases : %s" % failed_list)
+            raise error.TestFail()
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

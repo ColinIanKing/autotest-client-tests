@@ -1,0 +1,15 @@
+[global]
+ioengine=libaio
+thread=1
+norandommap=1
+randrepeat=0
+size=SIZE
+ramp_time=30
+directory=DIRECTORY
+[read-4k-rand]
+stonewall
+group_reporting
+bs=4
+rw=read
+numjobs=1
+iodepth=32

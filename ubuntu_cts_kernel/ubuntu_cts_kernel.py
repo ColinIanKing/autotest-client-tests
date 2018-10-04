@@ -7,11 +7,20 @@ class ubuntu_cts_kernel(test.test):
     def install_required_pkgs(self):
         arch   = platform.processor()
         series = platform.dist()[2]
+        major_kernel_version = platform.uname()[2].split('-')[0]
 
         pkgs = [
-            'coreutils', 'apparmor', 'iproute2', 'openvswitch-switch',
+            'coreutils', 'apparmor', 'openvswitch-switch',
         ]
-        pkgs.append('linux-tools-%s' % platform.uname()[2])
+        if series == 'precise':
+            pkgs.append('iproute')
+        else:
+            pkgs.append('iproute2')
+
+        if major_kernel_version == '3.2.0':
+            pkgs.append('linux-tools')
+        else:
+            pkgs.append('linux-tools-%s' % platform.uname()[2])
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

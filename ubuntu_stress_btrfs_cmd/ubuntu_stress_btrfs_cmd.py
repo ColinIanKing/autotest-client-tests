@@ -32,12 +32,12 @@ class ubuntu_stress_btrfs_cmd(test.test):
             self.dev = 'loop'
 
     def setup(self):
-        self.install_required_pkgs(self)
+        self.install_required_pkgs()
         self.job.require_gcc()
 
         utils.system('cp %s/ubuntu_stress_btrfs_cmd.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
-        cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng 2>&1'
+        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/cking/stress-ng 2>&1'
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))

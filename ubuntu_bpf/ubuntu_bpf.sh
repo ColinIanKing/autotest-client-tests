@@ -21,6 +21,7 @@
 set -e
 rc=0
 
+set -o pipefail
 set -x
 
 #
@@ -52,7 +53,7 @@ else
 	echo ""
 	echo "Running test_maps bpf test.."
     cd bpf
-	./test_maps > ${TMP}
+	./test_maps | tee ${TMP}
 	ok=$(grep OK ${TMP} | wc -l)
 	echo -n "test_maps: "
 	if [ $ok -ne 0 ]; then

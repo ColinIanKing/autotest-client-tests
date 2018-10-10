@@ -1,0 +1,18 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_blkdev_directio"
+CRITERIA = """
+Test for blkdev direct io silent corruption"
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_blkdev_directio'
+
+results = job.run_test_detail('ubuntu_blkdev_directio', test_name='setup', tag='setup')
+results = job.run_test_detail('ubuntu_blkdev_directio', test_name='blkdev-directio', tag='blkdev-directio', timeout=60*30)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

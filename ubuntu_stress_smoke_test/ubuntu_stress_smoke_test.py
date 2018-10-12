@@ -26,7 +26,7 @@ class ubuntu_stress_smoke_test(test.test):
     def setup(self):
         self.install_required_pkgs()
         self.job.require_gcc()
-        cmd = 'apt-get install zlib1g-dev libbsd-dev libattr1-dev libkeyutils-dev libapparmor-dev apparmor libaio-dev --assume-yes --allow-downgrades --allow-change-held-packages'
+        cmd = 'apt-get install zlib1g-dev libbsd-dev libattr1-dev libkeyutils-dev libapparmor-dev apparmor libaio-dev --assume-yes'
         utils.system_output(cmd, retain_output=True)
         os.chdir(self.srcdir)
         cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng'

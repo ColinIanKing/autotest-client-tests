@@ -1,0 +1,68 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_stress_ng"
+CRITERIA = """
+Performace Regression Tests using stress-ng
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_stress_ng'
+
+tests = {
+    'itimer' : 0.01,
+    'clock' : 0.04,
+    'vm-addr': 0.06,
+    'vecmath': 0.15,
+    'stream': 0.22,
+    'icmp-flood': 0.38,
+    'mcontend': 0.38,
+    'udp-flood': 0.39,
+    'shm': 0.42,
+    'remap': 0.43,
+    'getdent': 0.45,
+    'matrix': 0.50,
+    'madvise': 0.53,
+    'mincore': 0.53,
+    'mremap': 0.56,
+    'sigsegv': 0.57,
+    'timer': 0.57,
+    'tmpfs': 0.58,
+    'mmapfork': 0.59,
+    'kill': 0.62,
+    'vm': 0.62,
+    'udp': 0.64,
+    'tlb-shootdown': 0.65,
+    'icache': 0.70,
+    'memfd': 0.70,
+    'mmapfixed': 0.76,
+    'mmapaddr': 0.77,
+    'unshare': 0.77,
+    'link': 0.79,
+    'af-alg': 0.81,
+    'flock': 0.81,
+    'sigpipe': 0.81,
+    'malloc': 0.84,
+    'timerfd': 0.85,
+    'sockfd': 0.86,
+    'mmapmany': 0.87,
+    'mmap': 0.88,
+    'fork': 0.89,
+    'sem': 0.89,
+    'vm-rw': 0.92,
+    'dup': 0.93,
+    'clone': 1.19,
+    'pipe': 1.21
+}
+
+results = job.run_test_detail(name, test_name='setup', tag='setup', threshold=0.0)
+print "Estimated run time: %.0f minutes for %d benchmarks." % ((5 + (len(tests) * 5.05)), len(tests))
+
+for test in sorted(tests):
+    print test
+    results = job.run_test_detail(name, test_name=test, tag=test, threshold=tests[test], timeout=600)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

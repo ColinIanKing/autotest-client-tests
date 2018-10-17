@@ -13,6 +13,7 @@ class ubuntu_stress_smoke_test(test.test):
 
         pkgs = [
             'build-essential',
+            'git',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

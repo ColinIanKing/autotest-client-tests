@@ -41,6 +41,7 @@ class xfstests(test.test):
             'texinfo',
             'texlive',
             'gettext',
+            'git',
             'autopoint',
             'pkg-config',
             'libblkid-dev'
@@ -48,7 +49,7 @@ class xfstests(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if series not in ['precise']:
+        if series not in ['precise', 'trusty']:
             pkgs.append('libtool-bin')
 
         cmd = 'apt-get install --yes ' + ' '.join(pkgs)

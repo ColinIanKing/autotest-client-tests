@@ -27,6 +27,16 @@ class ubuntu_bpf(test.test):
     def initialize(self):
         pass
 
+    def download(self):
+        kv = platform.release()
+        cmd = "dpkg -S /lib/modules/" + kv + "/kernel | cut -d: -f 1 | cut -d, -f 1"
+        pkg = os.popen(cmd).readlines()[0].strip()
+        utils.system("apt-get source --download-only " + pkg)
+
+    def extract(self):
+        os.system("rm -rf linux/")
+        utils.system("dpkg-source -x linux*dsc linux")
+
     def setup(self):
         self.install_required_pkgs()
         self.job.require_gcc()
@@ -51,14 +61,10 @@ class ubuntu_bpf(test.test):
 
         os.chdir(self.srcdir)
         if not os.path.exists('linux'):
-            cmd = 'git clone --depth=1 https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/%s linux' % series
-            utils.system(cmd)
-        os.chdir(os.path.join(self.srcdir, 'linux'))
+            self.download()
         # Assist local testing by restoring the linux repo to vanilla.
-        cmd = 'git checkout -f;git clean -f -d;git ls-files --others --directory |xargs rm -rvf;rm -rf .git/rebase*'
-        utils.system(cmd)
-        cmd = 'git fetch origin master;git reset --hard FETCH_HEAD'
-        utils.system(cmd)
+        self.extract()
+        os.chdir(os.path.join(self.srcdir, 'linux'))
         cmd = 'patch -p1 < %s/0001-selftests-just-build-bpf.patch' % self.bindir
         utils.system(cmd)
         os.chdir(os.path.join(self.srcdir, 'linux/tools/testing/selftests'))

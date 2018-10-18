@@ -25,6 +25,22 @@
 #  if very basic functionality work
 #
 
+#
+#  Some systems have multipath that kicks in and grabs zram, so
+#  forcefully kill it so that the test can work without any
+#  interference.  LP: #1798291
+#
+zram_remove_multipath()
+{
+	sleep 1
+	pid=$(lsof /dev/zram0 | grep multipath | head -1 | awk '{print $2}')
+	if [ ! -z "$pid" ]; then
+		echo "removing multipath ${pid}.."
+		kill -9 ${pid}
+		sleep 1
+	fi
+}
+
 zram_load()
 {
 	LOADED=0
@@ -38,6 +54,8 @@ zram_load()
 		echo "PASSED: zram module loaded"
 		LOADED=1
 	fi
+
+	zram_remove_multipath
 }
 
 zram_unload()
@@ -100,14 +118,17 @@ zram_test_compression_algorithms()
 
 zram_test_ext4()
 {
+	zram_remove_multipath
 	sleep 1
 	echo 1 > /sys/block/zram0/reset
 	sleep 1
+	zram_remove_multipath
 	#
 	# Older kernels don't support the comp_algorithm feature
 	#
 	if [ "$1" != "default" ]; then
 		echo $1 > /sys/block/zram0/comp_algorithm
+		zram_remove_multipath
 	fi
 	#
 	# Figure out how much memory we can safely use without
@@ -129,6 +150,7 @@ zram_test_ext4()
 	fi
 	echo "Making zram disk of ${memMB} MB"
 
+	zram_remove_multipath
 	echo ${memMB}M > /sys/block/zram0/disksize
 	mnt=$(pwd)/mnt
 	mkdir -p $mnt
@@ -140,6 +162,7 @@ zram_test_ext4()
 		exit 1
 	fi
 	echo "PASSED: mkfs.ext4 on ZRAM successful"
+	zram_remove_multipath
 
 	mount /dev/zram0 $mnt
 	if [ $? -ne 0 ]; then

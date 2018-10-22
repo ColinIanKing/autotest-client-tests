@@ -23,6 +23,10 @@ class ubuntu_sysdig_smoke_test(test.test):
     def run_once(self, test_name):
         cmd = '%s/ubuntu_sysdig_smoke_test.sh' % (self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
-	print self.results
+        print self.results
+
+    def cleanup(self):
+        cmd = 'modprobe -r sysdig_probe'
+        self.results = utils.system_output(cmd, retain_output=False)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

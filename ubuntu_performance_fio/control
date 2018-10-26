@@ -1,0 +1,23 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_fio"
+CRITERIA = """
+Uses FIO for various performance metrics"
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_fio'
+
+results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup')
+results += job.run_test_detail('ubuntu_performance_fio', test_name='read-4k-rand', tag='ubuntu-performance-fio-read-4k-rand', timeout=120*60)
+results += job.run_test_detail('ubuntu_performance_fio', test_name='write-4k-rand', tag='ubuntu-performance-fio-write-4k-rand', timeout=120*60)
+results += job.run_test_detail('ubuntu_performance_fio', test_name='read-4k-sequential', tag='ubuntu-performance-fio-read-4k-sequential', timeout=120*60)
+results += job.run_test_detail('ubuntu_performance_fio', test_name='write-4k-sequential', tag='ubuntu-performance-fio-write-4k-sequential', timeout=120*60)
+
+# print results
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

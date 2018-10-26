@@ -8,7 +8,7 @@ from autotest.client import test, utils
 
 file_size_mb=2048
 
-class ubuntu_performance_fio_aws(test.test):
+class ubuntu_performance_fio(test.test):
     version = 0
 
     def install_required_pkgs(self):

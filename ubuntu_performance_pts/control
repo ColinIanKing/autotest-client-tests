@@ -1,0 +1,24 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_pts"
+CRITERIA = """
+Uses the Phoronix Test Suite for various performance metrics"
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_pts'
+
+results = job.run_test_detail('ubuntu_performance_pts', test_name='setup', tag='setup')
+results += job.run_test_detail('ubuntu_performance_pts', test_name='john-the-ripper-blowfish', tag='ubuntu-performance-pts-john-the-ripper-blowfish', timeout=60*30)
+results += job.run_test_detail('ubuntu_performance_pts', test_name='john-the-ripper-des', tag='ubuntu-performance-pts-john-the-ripper-blowfish-des', timeout=60*30)
+results += job.run_test_detail('ubuntu_performance_pts', test_name='openssl', tag='ubuntu-performance-pts-openssl', timeout=30*60)
+results += job.run_test_detail('ubuntu_performance_pts', test_name='povray', tag='ubuntu-performance-pts-povray', timeout=80*60)
+results += job.run_test_detail('ubuntu_performance_pts', test_name='ttsiod-renderer', tag='ubuntu-performance-pts-ttsiod-renderer', timeout=30*60)
+
+# print results
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

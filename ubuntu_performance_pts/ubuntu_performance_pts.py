@@ -8,7 +8,7 @@ from autotest.client import test, utils
 
 force_times_to_run = 8
 
-class ubuntu_performance_pts_aws(test.test):
+class ubuntu_performance_pts(test.test):
     version = 1
 
     def install_required_pkgs(self):

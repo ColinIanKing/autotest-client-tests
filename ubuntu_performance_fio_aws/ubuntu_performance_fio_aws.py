@@ -16,6 +16,7 @@ class ubuntu_performance_fio_aws(test.test):
         series = platform.dist()[2]
 
         pkgs = [
+            'build-essential',
             'libaio-dev',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'

@@ -6,10 +6,21 @@ import time
 import re
 from autotest.client import test, utils
 
-force_times_to_run = 8
+#
+#  Number of times to run specific test
+#
+test_iterations = 3
+
+#
+#  Number of times to run in Phoronix Test Suite to
+#  get some sane stats. Normally this is 3, but we
+#  can override this. For now, keep the default.
+#
+#force_times_to_run = "export FORCE_TIMES_TO_RUN=5; "
+force_times_to_run = ""
 
 class ubuntu_performance_pts(test.test):
-    version = 1
+    version = 2
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -47,13 +58,15 @@ class ubuntu_performance_pts(test.test):
         print 'date_ctime "' + time.ctime() + '"'
         print 'date_ns %-30.0f' % (time.time() * 1000000000)
         print 'kernel_version ' + platform.uname()[2]
+        print 'hostname ' + platform.node()
+        print 'virtualization ' + utils.system_output('systemd-detect-virt', retain_output=True)
         print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
         print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
         print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
         print 'pages_availble ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
         print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
 
-    def print_stats(self, benchmark, results, fields):
+    def get_stats(self, results, fields):
         values = {}
 
         for line in results.splitlines():
@@ -73,29 +86,65 @@ class ubuntu_performance_pts(test.test):
                         else:
                             values[field] = 0
 
+        return values
+
+    def print_stats(self, benchmark, command):
+        fields = [ 'Average', 'Deviation' ]
+        values = {}
+        test_pass = True
+
+        for i in range(test_iterations):
+            results = utils.system_output(command)
+            values[i] = self.get_stats(results, fields)
+
+            print
+            print "Test %d of %d:" % (i + 1, test_iterations)
+            for field in fields:
+                print benchmark + "_" + field.lower() + "[%d] %s" % (i, values[i][field])
+
+        #
+        #  Compute min/max/average:
+        #
+        field = 'Average'
+        v = [ float(values[i][field]) for i in values ]
+        maximum = max(v)
+        minimum = min(v)
+        average = sum(v) / float(len(v))
+        max_err = (maximum - minimum) / average * 100.0
+
         print
-        for field in fields:
-            print benchmark + "_" + field.lower(), values[field]
+        print benchmark + "_" + field.lower() + "_minimum", minimum
+        print benchmark + "_" + field.lower() + "_maximum", maximum
+        print benchmark + "_" + field.lower() + "_average", average
+        print benchmark + "_" + field.lower() + "_maximum_error %.2f%%" % (max_err)
+        print
+
+        if max_err > 5.0:
+            print "FAIL: maximum error is greater than 5%"
+            test_pass = False
+
+        if test_pass:
+            print "PASS: test passes specified performance thresholds"
 
     def run_john_the_ripper_blowfish(self):
-        results = utils.system_output('export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; export FORCE_TIMES_TO_RUN=%d; phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run)
-        self.print_stats('john_the_ripper_blowfish', results, [ 'Average', 'Deviation' ])
+        cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; %s phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run
+        self.print_stats('john_the_ripper_blowfish', cmd)
 
     def run_john_the_ripper_des(self):
-        results = utils.system_output('export PRESET_OPTIONS="john-the-ripper.run-test=Traditional DES"; export FORCE_TIMES_TO_RUN=%d; phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run)
-        self.print_stats('john_the_ripper_des', results, [ 'Average', 'Deviation' ])
+        cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Traditional DES"; %s phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run
+        self.print_stats('john_the_ripper_des', cmd)
 
     def run_openssl(self):
-        results = utils.system_output('export FORCE_TIMES_TO_RUN=%d; phoronix-test-suite batch-benchmark openssl' % force_times_to_run)
-        self.print_stats('openssl', results, [ 'Average', 'Deviation' ])
+        cmd = '%s phoronix-test-suite batch-benchmark openssl' % force_times_to_run
+        self.print_stats('openssl', cmd)
 
     def run_povray(self):
-        results = utils.system_output('export FORCE_TIMES_TO_RUN=%d; phoronix-test-suite batch-benchmark povray' % force_times_to_run)
-        self.print_stats('povray', results, [ 'Average', 'Deviation' ])
+        cmd = '%s phoronix-test-suite batch-benchmark povray' % force_times_to_run
+        self.print_stats('povray', cmd)
 
     def run_ttsiod_renderer(self):
-        results = utils.system_output('export FORCE_TIMES_TO_RUN=%d; phoronix-test-suite batch-benchmark ttsiod-renderer' % force_times_to_run)
-        self.print_stats('ttsiod_renderer', results, [ 'Average', 'Deviation' ])
+        cmd = '%s phoronix-test-suite batch-benchmark ttsiod-renderer' % force_times_to_run
+        self.print_stats('ttsiod_renderer', cmd)
 
 
     def run_once(self, test_name):

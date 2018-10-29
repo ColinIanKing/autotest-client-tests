@@ -10,7 +10,15 @@ class ubuntu_qrt_kernel_panic(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'git', 'build-essential', 'libcap2-bin', 'gawk', 'execstack', 'exim4', 'libcap-dev', 'libkeyutils-dev',
+            'build-essential',
+            'execstack',
+            'exim4',
+            'gawk',
+            'git',
+            'keyutils',
+            'libcap2-bin',
+            'libcap-dev',
+            'libkeyutils-dev',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

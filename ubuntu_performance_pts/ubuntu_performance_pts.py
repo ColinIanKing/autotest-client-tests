@@ -4,6 +4,8 @@ import os
 import platform
 import time
 import re
+import getpass
+import pwd
 from autotest.client import test, utils
 
 #
@@ -44,11 +46,22 @@ class ubuntu_performance_pts(test.test):
     def initialize(self):
         pass
 
+    def setup_config(self, home_dir):
+        pts_dir = os.path.join(home_dir, '.phoronix-test-suite')
+        self.results = utils.system_output('mkdir -p %s' % pts_dir)
+        self.results += utils.system_output('cp %s %s' % (os.path.join(self.bindir, 'user-config.xml'), pts_dir))
+        return self.results
+
     def setup(self):
         self.install_required_pkgs()
         self.job.require_gcc()
 
-        self.results = utils.system_output('dpkg -i %s' % os.path.join(self.bindir, 'phoronix-test-suite_7.8.0_all.deb'), retain_output=True)
+        username = getpass.getuser()
+        self.results = utils.system_output('cp %s %s' % (os.path.join(self.bindir, 'user-config.xml'), os.path.join('/etc','phoronix-test-suite.xml')))
+        self.results += self.setup_config(pwd.getpwnam(username)[5])
+        self.results += self.setup_config(os.path.expanduser("~"))
+
+        self.results += utils.system_output('dpkg -i %s' % os.path.join(self.bindir, 'phoronix-test-suite_7.8.0_all.deb'), retain_output=True)
         self.results += utils.system_output('phoronix-test-suite enterprise-setup', retain_output=True)
         self.results += utils.system_output('yes n | phoronix-test-suite batch-setup', retain_output=True)
 

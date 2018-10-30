@@ -13,7 +13,11 @@ class ubuntu_fan_smoke_test(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'gdb', 'git', 'docker.io', 'ubuntu-fan',
+            'docker.io',
+            'gdb',
+            'git',
+            'net-tools',
+            'ubuntu-fan',
         ]
 
         cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)

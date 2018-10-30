@@ -29,6 +29,7 @@ class ubuntu_nbd_smoke_test(test.test):
         pkgs = [
             'nbd-server',
             'nbd-client',
+            'net-tools',
             'gdb',
         ]
         cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)

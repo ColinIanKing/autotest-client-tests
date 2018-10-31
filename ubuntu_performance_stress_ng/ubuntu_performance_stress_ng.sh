@@ -2,7 +2,7 @@
 
 STRESSOR=$1
 THRESHOLD=$2
-RUNS=5
+RUNS=$3
 
 #
 # Stress test duration in seconds

@@ -56,8 +56,8 @@
       <NoInternetCommunication>FALSE</NoInternetCommunication>
       <NoNetworkCommunication>FALSE</NoNetworkCommunication>
       <Timeout>20</Timeout>
-      <ProxyAddress></ProxyAddress>
-      <ProxyPort></ProxyPort>
+      <ProxyAddress>squid.internal</ProxyAddress>
+      <ProxyPort>3128</ProxyPort>
       <ProxyUser></ProxyUser>
       <ProxyPassword></ProxyPassword>
     </Networking>

@@ -6,6 +6,14 @@ import time
 import re
 from autotest.client import test, utils
 
+#
+#  Number of test iterations to get min/max/average stats
+#
+test_iterations = 3
+
+#
+# Size of FIO files in MB
+#
 file_size_mb=2048
 
 class ubuntu_performance_fio(test.test):
@@ -51,6 +59,8 @@ class ubuntu_performance_fio(test.test):
         print 'date_ctime "' + time.ctime() + '"'
         print 'date_ns %-30.0f' % (time.time() * 1000000000)
         print 'kernel_version ' + platform.uname()[2]
+        print 'hostname ' + platform.node()
+        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
         print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
         print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
         print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
@@ -61,6 +71,15 @@ class ubuntu_performance_fio(test.test):
 
     def print_stats(self, benchmark, results, fields):
         return
+
+    def fio_clean_files(self, testname):
+        #
+        #  Remove any fio data files that may be still around
+        #
+        time.sleep(5)
+        cmd = 'rm -f ' + os.path.join(self.srcdir, testname) + '.*.*'
+        results = utils.system_output(cmd, retain_output=True)
+        print results
 
     def drop_cache(self):
         #
@@ -106,6 +125,7 @@ class ubuntu_performance_fio(test.test):
         fout.close()
 
         self.drop_cache()
+        self.fio_clean_files(testname)
 
         #
         #  Run fio
@@ -137,12 +157,60 @@ class ubuntu_performance_fio(test.test):
                     if sc in l:
                         avg = avg * usec_scale[sc]
 
+
         testname = testname.replace("-","_")
+
+        values = {}
+        values['file_size_mb'] = file_size_mb
+        values['bandwidth_kb_per_sec'] = bw
+        values['latency_usec_average'] = avg
+        values['latency_stddev'] = stdev
+
+        self.fio_clean_files(testname)
+
+        return values
+
+    def run_fio_tests(self, testname):
+        values = {}
+        test_pass = True
+
+
+        for i in range(test_iterations):
+            print
+            print "Test %d of %d:" % (i + 1, test_iterations)
+            values[i] = self.run_fio(testname)
+            print "%s_file_size_mb %s" % (testname, values[i]['file_size_mb'])
+            print "%s_bandwidth_kb_per_sec %.2f" % (testname, values[i]['bandwidth_kb_per_sec'])
+            print "%s_latency_usec_average %.2f" % (testname, values[i]['latency_usec_average'])
+            print "%s_latency_stddev %.2f" % (testname, values[i]['latency_stddev'])
+
+        #
+        #  Compute min/max/average:
+        #
+        fields = [ 'bandwidth_kb_per_sec', 'latency_usec_average' ]
         print
-        print "%s_file_size_mb %s" % (testname, file_size_mb)
-        print "%s_bandwidth_kb_per_sec %.2f" % (testname, bw)
-        print "%s_latency_usec_average %.2f" % (testname, avg)
-        print "%s_latency_stddev %.2f" % (testname, stdev)
+        print "Collated Performance Metrics:"
+        for field in fields:
+            v = [ float(values[i][field]) for i in values ]
+            maximum = max(v)
+            minimum = min(v)
+            average = sum(v) / float(len(v))
+            max_err = (maximum - minimum) / average * 100.0
+
+            print
+            print "stream_" + field.lower() + "_minimum %.5f" % (minimum)
+            print "stream_" + field.lower() + "_maximum %.5f" % (maximum)
+            print "stream_" + field.lower() + "_average %.5f" % (average)
+            print "stream_" + field.lower() + "_maximum_error %.2f%%" % (max_err)
+
+            if max_err > 5.0:
+                print "FAIL: maximum error is greater than 5%"
+                test_pass = False
+
+        print
+        if test_pass:
+            print "PASS: test passes specified performance thresholds"
+
 
     def run_once(self, test_name):
         if test_name == 'setup':
@@ -158,12 +226,12 @@ class ubuntu_performance_fio(test.test):
         pages_available = float(utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
         mem_mb = page_size * pages_available / (1024.0 * 1024.0)
 
-        if mem_mb > file_size_mb:
-            print "\nWARNING: file size of %.2f MB should be at least twice the free memory size of %.2f MB" % (file_size_mb, mem_mb)
+        #if mem_mb > file_size_mb:
+        #    print "\nNOTE: file size of %.2f MB should be at least twice the free memory size of %.2f MB when using non-direct I/O" % (file_size_mb, mem_mb)
 
         free_mb = self.get_filesystem_free_mbytes()
         if free_mb > file_size_mb:
-            self.run_fio(test_name)
+            self.run_fio_tests(test_name)
         else:
             print 'cannot execute "%s", required %dMB, only got %dMB on disc' % (test_name, file_size_mb, free_mb)
         print

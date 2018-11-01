@@ -12,12 +12,37 @@ DOC = ""
 
 name = 'ubuntu_performance_fio'
 
-results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup')
-results += job.run_test_detail('ubuntu_performance_fio', test_name='read-4k-rand', tag='ubuntu-performance-fio-read-4k-rand', timeout=120*60)
-results += job.run_test_detail('ubuntu_performance_fio', test_name='write-4k-rand', tag='ubuntu-performance-fio-write-4k-rand', timeout=120*60)
-results += job.run_test_detail('ubuntu_performance_fio', test_name='read-4k-sequential', tag='ubuntu-performance-fio-read-4k-sequential', timeout=120*60)
-results += job.run_test_detail('ubuntu_performance_fio', test_name='write-4k-sequential', tag='ubuntu-performance-fio-write-4k-sequential', timeout=120*60)
+tests = [
+	'rd-100,wr-0,rand,blk-8k,jobs-4,iodepth-32',
+	'rd-100,wr-0,rand,blk-8k,jobs-8,iodepth-32',
+	'rd-100,wr-0,rand,blk-8k,jobs-16,iodepth-32',
 
-# print results
+	'rd-100,wr-0,rand,blk-128k,jobs-4,iodepth-8',
+	'rd-100,wr-0,rand,blk-128k,jobs-8,iodepth-8',
+	'rd-100,wr-0,rand,blk-128k,jobs-16,iodepth-8',
+
+	'rd-100,wr-0,seq,blk-128k,jobs-4,iodepth-8',
+	'rd-100,wr-0,seq,blk-128k,jobs-8,iodepth-8',
+	'rd-100,wr-0,seq,blk-128k,jobs-16,iodepth-8',
+
+	'rd-0,wr-100,rand,blk-8k,jobs-4,iodepth-32',
+	'rd-0,wr-100,rand,blk-8k,jobs-8,iodepth-32',
+	'rd-0,wr-100,rand,blk-8k,jobs-16,iodepth-32',
+
+	'rd-0,wr-100,seq,blk-128k,jobs-16,iodepth-8',
+	'rd-0,wr-100,seq,blk-128k,jobs-4,iodepth-8',
+	'rd-0,wr-100,seq,blk-128k,jobs-8,iodepth-8',
+
+	'rd-75,wr-25,rand,blk-8k,jobs-16,iodepth-32',
+	'rd-75,wr-25,rand,blk-8k,jobs-4,iodepth-32',
+	'rd-75,wr-25,rand,blk-8k,jobs-8,iodepth-32',
+]
+
+results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup')
+
+for test in tests:
+	results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + test, timeout=120*60)
+
+print results
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

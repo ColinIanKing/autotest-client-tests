@@ -140,20 +140,7 @@ do_test()
 	pid=$!
 
 	cd $MNT
-	${STRESS_NG} $*
-	rc=$?
-	case $rc in
-	0)	echo "Stress-ng exited with no errors"
-		;;
-	1)	echo "Stress-ng framework error, stressor not run"
-		;;
-	2)	echo "Stress-ng stressor failed, error: $rc"
-		;;
-	3)	echo "Stress-ng stressor ran out of memory or disk space"
-		;;
-	*)	echo "Stress-ng unknown error: $rc"
-		;;
-	esac
+	${STRESS_NG} $* 2>&1 | grep "info:"
 
 	cd - > /dev/null
 	killall -9 stress-ng &> /dev/null

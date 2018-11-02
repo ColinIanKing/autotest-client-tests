@@ -80,8 +80,20 @@ do_test()
 	dmesg -c > /dev/null
 	echo "TESTING: $*" > /dev/kmsg
 
+
+	mkdir -p ${VFAT_IMAGE_PATH}
+	if [ $? -ne 0 ]; then
+		echo "mkdir -p ${VFAT_IMAGE_PATH} failed"
+		exit 1
+	fi
+	echo "Mounting tmpfs ${VFAT_IMAGE_PATH}"
 	mount -t tmpfs -o size=1050M tmpfs ${VFAT_IMAGE_PATH}
-	echo "Mounted tmpfs ${VFAT_IMAGE_PATH}"
+	if [ $? -ne 0 ]; then
+		echo "Mount tmpfs ${VFAT_IMAGE_PATH} failed"
+		exit 1
+	fi
+
+	sleep 1
 
 	VFAT_IMAGE0=${VFAT_IMAGE_PATH}/vfat-loop-data
 	truncate -s 1G ${VFAT_IMAGE0}
@@ -151,6 +163,7 @@ do_test()
 	echo "umounting tmpfs ${VFAT_IMAGE_PATH}"
 	umount ${VFAT_IMAGE_PATH}
 	kill -TERM $pid &> /dev/null
+	rmdir ${VFAT_IMAGE_PATH}
 
 	echo "================================================================================"
 }

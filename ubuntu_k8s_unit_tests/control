@@ -1,0 +1,17 @@
+AUTHOR = 'po-hsu.lin@canonical.com (Po-Hsu Lin)'
+NAME = "kubernetes_unit_tests"
+CRITERIA = """
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Unit'
+TEST_TYPE = "client"
+DOC = "https://github.com/kubernetes/community/blob/master/contributors/devel/testing.md"
+
+name = 'ubuntu_k8s_unit_tests'
+
+results = job.run_test_detail(name, test_name='setup', tag='setup', timeout=60*15)
+results = job.run_test_detail(name, test_name='all', tag='all', timeout=60*10)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

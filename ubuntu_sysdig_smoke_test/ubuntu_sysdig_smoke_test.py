@@ -1,7 +1,7 @@
 #
 #
-import platform
 from autotest.client                        import test, utils
+from autotest.client.shared                 import error
 
 class ubuntu_sysdig_smoke_test(test.test):
     version = 99
@@ -19,6 +19,13 @@ class ubuntu_sysdig_smoke_test(test.test):
 
     def setup(self):
         self.install_required_pkgs()
+        cmd = 'dkms status -m sysdig_probe | grep installed'
+        try:
+            utils.system(cmd)
+        except error.CmdError:
+            cmd = 'cat /var/lib/dkms/sysdig/*/build/make.log'
+            utils.system(cmd)
+            raise error.TestError('DKMS failed to install')
 
     def run_once(self, test_name):
         cmd = '%s/ubuntu_sysdig_smoke_test.sh' % (self.bindir)

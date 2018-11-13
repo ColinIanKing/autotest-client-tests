@@ -19,7 +19,7 @@ class ubuntu_sysdig_smoke_test(test.test):
 
     def setup(self):
         self.install_required_pkgs()
-        cmd = 'dkms status -m sysdig_probe | grep installed'
+        cmd = 'dkms status -m sysdig | grep installed'
         try:
             utils.system(cmd)
         except error.CmdError:

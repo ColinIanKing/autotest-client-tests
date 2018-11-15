@@ -16,6 +16,6 @@ tests = [ 'setup','breakpoints','cpu-hotplug','efivarfs','memfd','memory-hotplug
 
 
 for test in tests:
-    results = job.run_test_detail('ubuntu_kernel_selftests', test_name=test, tag=test)
+    results = job.run_test_detail('ubuntu_kernel_selftests', test_name=test, tag=test, timeout=60*15)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

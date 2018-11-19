@@ -87,6 +87,8 @@ do_test()
 	echo "Page size:    " $(getconf PAGE_SIZE)
 	echo "Pages avail:  " $(getconf _AVPHYS_PAGES)
 	echo "Pages total:  " $(getconf _PHYS_PAGES)
+	echo "Free space:"
+	df -h
 	echo "--------------------------------------------------------------------------------"
 	echo " "
 

@@ -4,17 +4,18 @@ TESTDIR=vfat-test-$$
 
 MNT=/mnt/$TESTDIR
 VFAT_IMAGE_PATH=/mnt/${TESTDIR}
+TIMEOUT=120
 
 #
 #  Various vfat mount options
 #
-OPTS="allow_utime=20 utf8=1 uni_xlate=1 uid=0 gid=0 umask=777 dmask=777 fmask=777 nonumtail=1 check=s check=r shortname=lower shortname=win95 shortname=winnt showexec flush"
+OPTS="allow_utime=20 utf8=1 uni_xlate=1 uid=0 gid=0 umask=777 dmask=777 fmask=777 nonumtail=1 check=s check=r shortname=lower shortname=win95 shortname=winnt showexec"
 
 #
 # Limit to max of 2 CPUs else we get way too much I/O
 # contention making tests take forever to complete
 #
-N=2
+MAX_STRESSORS=2
 INFO="--verify --times --metrics-brief --syslog --keep-name"
 SCHED=""
 
@@ -34,6 +35,12 @@ fi
 #echo "STARTING.."
 #set -o posix ; set
 #echo "DONE!"
+
+do_log()
+{
+	echo $*
+	echo $* > /dev/kmsg
+}
 
 do_tidy()
 {
@@ -70,26 +77,70 @@ do_check()
 	done
 }
 
+check_dead()
+{
+	local procs=$(ps -C stress-ng | grep -v PID | wc -l)
+	if [ $procs -eq 0 ]; then
+		do_log "stress-ng now terminated"
+		return 0
+	fi
+	return 1
+}
+
+#
+#  forcefully kill stress-ng and stress-ng children
+#  aka "use the hammer"
+#
+do_terminate()
+{
+	local pid=$1
+	local N=0
+
+	while true
+	do
+		if check_dead; then break; fi
+		kill -TERM $pid &> /dev/null
+		sleep 1
+		if check_dead; then break; fi
+		kill -ALRM $pid &> /dev/null
+		sleep 1
+		if check_dead; then break; fi
+		killall -TERM stress-ng &> /dev/null
+		sleep 5
+		if check_dead; then break; fi
+		killall -ALRM stress-ng &> /dev/null
+		sleep 1
+		if check_dead; then break; fi
+		killall -KILL stress-ng &> /dev/null
+		sleep 1
+		if check_dead; then break; fi
+		N=$((N+1))
+		if [ $N -gt 60 ]; then
+			do_log Failed to terminate stress-ng, may have issues unmounting
+			break
+		fi
+	done
+}
+
 do_test()
 {
 	if [ $(grep "$MNT" /proc/mounts | wc -l) -gt 0 ]; then
-		echo "$MNT is already mounted!"
+		do_log "$MNT is already mounted!"
 		exit 1
 	fi
 
 	dmesg -c > /dev/null
-	echo "TESTING: $*" > /dev/kmsg
-
+	do_log "Testing: $*"
 
 	mkdir -p ${VFAT_IMAGE_PATH}
 	if [ $? -ne 0 ]; then
-		echo "mkdir -p ${VFAT_IMAGE_PATH} failed"
+		do_log "mkdir -p ${VFAT_IMAGE_PATH} failed"
 		exit 1
 	fi
 	echo "Mounting tmpfs ${VFAT_IMAGE_PATH}"
 	mount -t tmpfs -o size=1050M tmpfs ${VFAT_IMAGE_PATH}
 	if [ $? -ne 0 ]; then
-		echo "Mount tmpfs ${VFAT_IMAGE_PATH} failed"
+		do_log "Mount tmpfs ${VFAT_IMAGE_PATH} failed"
 		exit 1
 	fi
 
@@ -97,7 +148,7 @@ do_test()
 
 	VFAT_IMAGE0=${VFAT_IMAGE_PATH}/vfat-loop-data
 	truncate -s 1G ${VFAT_IMAGE0}
-	echo "Created loop image ${VFAT_IMAGE0}"
+	do_log "Created loop image ${VFAT_IMAGE0}"
 
 	mkfs.vfat ${VFAT_IMAGE0}
 	mkdir -p ${MNT}
@@ -137,19 +188,53 @@ do_test()
 	echo " "
 
 	do_check $OPT $* &
-	pid=$!
+	chkpid=$!
 
+	#
+	#  run stress-ng in the background and monitor loop, killing it
+	#  if necessary if it overruns
+	#
 	cd $MNT
-	${STRESS_NG} $* 2>&1 | grep "info:"
+	${STRESS_NG} $* 2>&1 | grep "info:" &
+	sngpid=$!
+	do_log "Started, PID $sngpid"
+	terminated=0
+	N=0
+	while true
+	do
+		if check_dead; then
+			terminated=1
+			do_log "Stopped, PID $sngpid (after $N seconds)"
+			break
+		fi
+		N=$((N+1))
+		if [ $N -gt $TIMEOUT  ]; then
+			do_log "Timed out waiting for stress-ng to finish"
+			break
+		fi
+		sleep 1
+	done
+	#
+	#  Timed out, Vulcan death grip required
+	#
+	if [ $terminated -eq 0 ]; then
+		do_log "Forcefully killing, PID $sngpid (after $N seconds)"
+		do_terminate $sngpid
+	fi
 
 	cd - > /dev/null
-	killall -9 stress-ng &> /dev/null
-	sleep 1
-	echo "umounting vfat ${MNT}"
+
+	do_log "umounting vfat"
 	umount ${MNT}
-	echo "umounting tmpfs ${VFAT_IMAGE_PATH}"
+	if [ $? -ne 0 ]; then
+		do_log "umount vfat ${MNT} failed"
+	fi
+	do_log "umounting tmpfs"
 	umount ${VFAT_IMAGE_PATH}
-	kill -TERM $pid &> /dev/null
+	if [ $? -ne 0 ]; then
+		do_log "umount ${VFAT_IMAGE_PATH} failed"
+	fi
+	kill -TERM $chkpid &> /dev/null
 	rmdir ${VFAT_IMAGE_PATH}
 
 	echo "================================================================================"
@@ -163,7 +248,7 @@ if [ $EUID -ne 0 ]; then
 fi
 
 if [ $(grep "$MNT" /proc/mounts | wc -l) -gt 0 ]; then
-	echo "$MNT is already mounted!"
+	do_log "$MNT is already mounted!"
 	exit 1
 fi
 
@@ -178,20 +263,25 @@ do
 	#
 	#  And hammer it to death..
 	#
-	do_test $INFO $IONICE $SCHED -t $DURATION --hdd $N --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd \
-		--lockf $N --seek $N --aio $N --aio-requests 32 --dentry $N --dir $N \
-		--dentry-order stride --fallocate $N --fstat $N --dentries 100 --lease $N \
-		--open $N --rename $N --hdd-bytes 4M --fallocate-bytes 4M \
-		--chdir $N --rename $N --hdd-write-size 512
+	do_test $INFO $IONICE $SCHED -t $DURATION \
+		--hdd $MAX_STRESSORS --hdd-opts sync,wr-rnd,rd-rnd,fadv-willneed,fadv-rnd \
+		--lockf $MAX_STRESSORS --seek $MAX_STRESSORS --aio $MAX_STRESSORS \
+		--aio-requests 32 --dentry $MAX_STRESSORS --dir $MAX_STRESSORS \
+		--dentry-order stride --fallocate $MAX_STRESSORS \
+		--fstat $MAX_STRESSORS --dentries 100 \
+		--lease $MAX_STRESSORS --open $MAX_STRESSORS \
+		--rename $MAX_STRESSORS --hdd-bytes 4M --fallocate-bytes 4M \
+		--chdir $MAX_STRESSORS --rename $MAX_STRESSORS \
+		--hdd-write-size 512
 done
 
 echo " "
 echo "Completed"
 echo " "
 if [ -s $LOG ]; then
-	echo "Kernel issues: SOME"
+	do_log "Kernel issues: SOME"
 	cat $LOG
 else
-	echo "Kernel issues: NONE"
+	do_log "Kernel issues: NONE"
 fi
 echo " "

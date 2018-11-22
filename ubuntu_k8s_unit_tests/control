@@ -12,6 +12,6 @@ DOC = "https://github.com/kubernetes/community/blob/master/contributors/devel/te
 name = 'ubuntu_k8s_unit_tests'
 
 results = job.run_test_detail(name, test_name='setup', tag='setup', timeout=60*15)
-results = job.run_test_detail(name, test_name='all', tag='all', timeout=60*10)
+results = job.run_test_detail(name, test_name='all', tag='all', timeout=60*90)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

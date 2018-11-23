@@ -58,14 +58,6 @@ tests = {
     'pipe': 1.21
 }
 
-#
-# For now, just limit this to fork and clone metrics
-#
-tests = {
-    'fork': 0.89,
-    'clone': 1.19,
-}
-
 results = job.run_test_detail(name, test_name='setup', tag='setup', threshold=0.0)
 print "Estimated run time: %.0f minutes for %d benchmarks." % ((5 + (len(tests) * 3.05)), len(tests))
 

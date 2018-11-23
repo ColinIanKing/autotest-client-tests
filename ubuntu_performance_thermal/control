@@ -1,0 +1,39 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_thermal"
+CRITERIA = """
+Thermal Performace Regression Tests
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_thermal'
+
+tests = {
+    'matrix-all-cpus':    [ 'matrix',    0, '' ],
+    'matrix-yx-all-cpus': [ 'matrix',    0, '--matrix-yx'],
+    'cpu-all-cpus':       [ 'cpu',       0, '--cpu-method int64double'],
+    'icache-all-cpus':    [ 'icache',    0, '' ],
+    'memthrash-all-cpus': [ 'memthrash', 0, '--memthrash-method flip'],
+    'zlib-all-cpus':      [ 'zlib',      0, '--zlib-method pink'],
+    'switch-all-cpus':    [ 'switch',    0, ''],
+    'matrix-one-cpu':     [ 'matrix',    1, '' ],
+    'matrix-yx-one-cpu':  [ 'matrix',    1, '--matrix-yx'],
+    'cpu-one-cpu':        [ 'cpu',       1, '--cpu-method int64double'],
+    'icache-one-cpu':     [ 'icache',    1, '' ],
+    'memthrash-one-cpu':  [ 'memthrash', 1, '--memthrash-method flip'],
+    'zlib-one-cpu':       [ 'zlib',      1, '--zlib-method pink'],
+    'switch-one-cpu':     [ 'switch',    1, ''],
+}
+
+results = job.run_test_detail(name, test_full_name='', test_name='setup', tag='setup', instances=0, options='')
+print "Estimated run time: %.0f minutes for %d benchmarks." % ((2 + (len(tests) * 5.02)), len(tests))
+
+for test in sorted(tests):
+    results = job.run_test_detail(name, test_full_name=test, test_name=tests[test][0], tag=test, instances=tests[test][1], options=tests[test][2], timeout=600)
+    print results
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

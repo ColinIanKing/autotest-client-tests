@@ -1,9 +1,9 @@
 #!/bin/bash
 
-TESTDIR=vfat-test-$$
+VFAT_IMAGE_PATH=vfat-test-$$
+VFAT_IMAGE=${VFAT_IMAGE_PATH}/vfat-image-$$.img
 
-MNT=/mnt/$TESTDIR
-VFAT_IMAGE_PATH=/mnt/${TESTDIR}
+MNT=/mnt/vfat-test-$$
 TIMEOUT=120
 
 #
@@ -48,7 +48,7 @@ do_tidy()
 	killall -9 stress-ng &> /dev/null
 	cd
 	umount $MNT
-	rm -f $VFAT_IMAGE0
+	rm -f $VFAT_IMAGE
 	exit 1
 }
 
@@ -137,24 +137,28 @@ do_test()
 		do_log "mkdir -p ${VFAT_IMAGE_PATH} failed"
 		exit 1
 	fi
-	echo "Mounting tmpfs ${VFAT_IMAGE_PATH}"
-	mount -t tmpfs -o size=1050M tmpfs ${VFAT_IMAGE_PATH}
+
+	truncate -s 1G ${VFAT_IMAGE}
 	if [ $? -ne 0 ]; then
-		do_log "Mount tmpfs ${VFAT_IMAGE_PATH} failed"
+		do_log "truncate -s 1G ${VFAT_IMAGE} failed"
+		rm -rf ${VFAT_IMAGE_PATH}
 		exit 1
 	fi
 
+	LOOP_DEV=$(losetup --direct-io --show -f ${VFAT_IMAGE})
+	if [ $? -ne 0 ]; then
+		do_log "losetup --show -f ${VFAT_IMAGE} failed"
+		rm -rf ${VFAT_IMAGE_PATH}
+		exit 1
+	fi
+
+	do_log "Created loop image ${VFAT_IMAGE} on ${LOOP_DEV}"
+
 	sleep 1
 
-	VFAT_IMAGE0=${VFAT_IMAGE_PATH}/vfat-loop-data
-	truncate -s 1G ${VFAT_IMAGE0}
-	do_log "Created loop image ${VFAT_IMAGE0}"
-
-	mkfs.vfat ${VFAT_IMAGE0}
+	mkfs.vfat ${LOOP_DEV}
 	mkdir -p ${MNT}
-	mount ${VFAT_IMAGE0} ${MNT} -o ${OPT}
-	#echo "Mounted:"
-	#mount
+	mount ${VFAT_IMAGE} ${MNT} -o ${OPT}
 
 	#
 	# Ensure clean state
@@ -167,10 +171,11 @@ do_test()
 	#
 	echo " "
 	echo "--------------------------------------------------------------------------------"
-	echo "VFAT options:  $OPT"
+	echo "VFAT options:  ${OPT}"
 	echo "Stress test:   ${STRESS_NG} $*"
-	echo "VFAT_IMAGE path:     $VFAT_IMAGE_PATH"
-	echo "Mount point:   $MNT"
+	echo "VFAT_IMAGE:    ${VFAT_IMAGE_PATH}"
+	echo "Loop device:   ${LOOP_DEV}"
+	echo "Mount point:   ${MNT}"
 	echo "Date:         " $(date)
 	echo "Host:         " $(hostname)
 	echo "Kernel:       " $(uname -rv)
@@ -194,7 +199,7 @@ do_test()
 	#  run stress-ng in the background and monitor loop, killing it
 	#  if necessary if it overruns
 	#
-	cd $MNT
+	cd ${MNT}
 	${STRESS_NG} $* 2>&1 | grep "info:" &
 	sngpid=$!
 	do_log "Started, PID $sngpid"
@@ -224,22 +229,23 @@ do_test()
 
 	cd - > /dev/null
 
-	sleep 2
-	do_log "umounting vfat"
+	sleep 1
+	do_log "umounting vfat ${LOOP_DEV} ${MNT}"
 	umount ${MNT}
 	if [ $? -ne 0 ]; then
 		do_log "umount vfat ${MNT} failed"
 	fi
-	sleep 5
-	do_log "umounting tmpfs"
-	umount ${VFAT_IMAGE_PATH}
+	sleep 1
+	do_log "destroying loop ${LOOP_DEV}"
+	losetup -d ${LOOP_DEV}
 	if [ $? -ne 0 ]; then
-		do_log "umount ${VFAT_IMAGE_PATH} failed"
+		do_log "losetup -d ${LOOP_DEV} failed"
 	fi
-	sleep 5
+	sleep 1
 	kill -TERM $chkpid &> /dev/null
 	sleep 1
-	rmdir ${VFAT_IMAGE_PATH}
+	rm -rf ${VFAT_IMAGE_PATH}
+	rmdir ${MNT}
 
 	echo "================================================================================"
 }

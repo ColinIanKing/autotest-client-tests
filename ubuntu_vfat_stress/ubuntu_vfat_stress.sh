@@ -224,17 +224,21 @@ do_test()
 
 	cd - > /dev/null
 
+	sleep 2
 	do_log "umounting vfat"
 	umount ${MNT}
 	if [ $? -ne 0 ]; then
 		do_log "umount vfat ${MNT} failed"
 	fi
+	sleep 5
 	do_log "umounting tmpfs"
 	umount ${VFAT_IMAGE_PATH}
 	if [ $? -ne 0 ]; then
 		do_log "umount ${VFAT_IMAGE_PATH} failed"
 	fi
+	sleep 5
 	kill -TERM $chkpid &> /dev/null
+	sleep 1
 	rmdir ${VFAT_IMAGE_PATH}
 
 	echo "================================================================================"

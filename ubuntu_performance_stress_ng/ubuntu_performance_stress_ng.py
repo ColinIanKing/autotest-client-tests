@@ -53,6 +53,8 @@ class ubuntu_performance_stress_ng(test.test):
         test_name = test_name.replace("-", "_")
         test_pass = True
 
+        #print self.results
+
         for line in self.results.splitlines():
             chunks = line.split()
             if len(chunks) > 1 and chunks[0] == 'BogoOps:':

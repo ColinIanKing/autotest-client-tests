@@ -4,7 +4,7 @@ CRITERIA = """
 Use the upstream LTP repository
 """
 SUITE = "None"
-TIME = "SHORT"
+TIME = "MEDIUM"
 TEST_CLASS = 'kernel'
 TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
@@ -14,6 +14,6 @@ name = 'ubuntu_ltp_syscalls'
 
 # This test will take about 50min to run on google cloud
 results = job.run_test_detail('ubuntu_ltp_syscalls', test_name='setup', tag='setup')
-results = job.run_test_detail('ubuntu_ltp_syscalls', test_name='syscalls', tag='syscalls', timeout=60*90)
+results = job.run_test_detail('ubuntu_ltp_syscalls', test_name='syscalls', tag='syscalls', timeout=60*120)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

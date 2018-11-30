@@ -2,9 +2,11 @@
 
 VFAT_IMAGE_PATH=vfat-test-$$
 VFAT_IMAGE=${VFAT_IMAGE_PATH}/vfat-image-$$.img
+VFAT_IMAGE_SIZE=256M
 
 MNT=/mnt/vfat-test-$$
 TIMEOUT=120
+
 
 #
 #  Various vfat mount options
@@ -138,14 +140,14 @@ do_test()
 		exit 1
 	fi
 
-	truncate -s 1G ${VFAT_IMAGE}
+	truncate -s ${VFAT_IMAGE_SIZE} ${VFAT_IMAGE}
 	if [ $? -ne 0 ]; then
-		do_log "truncate -s 1G ${VFAT_IMAGE} failed"
+		do_log "truncate -s ${VFAT_IMAGE_SIZE} ${VFAT_IMAGE} failed"
 		rm -rf ${VFAT_IMAGE_PATH}
 		exit 1
 	fi
 
-	LOOP_DEV=$(losetup --direct-io --show -f ${VFAT_IMAGE})
+	LOOP_DEV=$(losetup --show -f ${VFAT_IMAGE})
 	if [ $? -ne 0 ]; then
 		do_log "losetup --show -f ${VFAT_IMAGE} failed"
 		rm -rf ${VFAT_IMAGE_PATH}
@@ -174,6 +176,7 @@ do_test()
 	echo "VFAT options:  ${OPT}"
 	echo "Stress test:   ${STRESS_NG} $*"
 	echo "VFAT_IMAGE:    ${VFAT_IMAGE_PATH}"
+	echo "Image Size:    ${VFAT_IMAGE_SIZE}"
 	echo "Loop device:   ${LOOP_DEV}"
 	echo "Mount point:   ${MNT}"
 	echo "Date:         " $(date)
@@ -280,7 +283,7 @@ do
 		--dentry-order stride --fallocate $MAX_STRESSORS \
 		--fstat $MAX_STRESSORS --dentries 100 \
 		--lease $MAX_STRESSORS --open $MAX_STRESSORS \
-		--rename $MAX_STRESSORS --hdd-bytes 4M --fallocate-bytes 4M \
+		--rename $MAX_STRESSORS --hdd-bytes 4M --fallocate-bytes 2M \
 		--chdir $MAX_STRESSORS --rename $MAX_STRESSORS \
 		--hdd-write-size 512
 done

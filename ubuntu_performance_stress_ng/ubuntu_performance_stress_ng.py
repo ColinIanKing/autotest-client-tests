@@ -39,7 +39,7 @@ class ubuntu_performance_stress_ng(test.test):
         os.chdir(self.srcdir)
         self.results = utils.system_output('git clone git://kernel.ubuntu.com/cking/stress-ng', retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
-        self.results = utils.system_output('git checkout -b V0.09.42 V0.09.42', retain_output=True)
+        self.results = utils.system_output('git checkout -b V0.09.48 V0.09.48', retain_output=True)
         self.results = utils.system_output('make', retain_output=True)
 
     def run_once(self, test_name, threshold):

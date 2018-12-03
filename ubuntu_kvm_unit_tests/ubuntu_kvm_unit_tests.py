@@ -21,11 +21,6 @@ class ubuntu_kvm_unit_tests(test.test):
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
-        try:
-            utils.system('kvm-ok')
-        except error.CmdError:
-            raise error.TestError('Test skipped, this systems does not have KVM extension support')
-
     def initialize(self):
         pass
 
@@ -67,20 +62,26 @@ class ubuntu_kvm_unit_tests(test.test):
     def run_once(self, test_name, cmd=''):
         if test_name == 'setup':
             return
-        os.chdir(self.srcdir + '/kvm-unit-tests')
 
-        arch = platform.processor()
-        if arch == 'ppc64le':
-            # disable smt (simultaneous multithreading) on ppc for kvm
-            utils.system('ppc64_cpu --smt=off')
+        try:
+            utils.system('kvm-ok')
+            os.chdir(self.srcdir + '/kvm-unit-tests')
+            arch = platform.processor()
 
-        output = utils.system_output('./run_tests.sh -v', retain_output=True)
+            if arch == 'ppc64le':
+                # disable smt (simultaneous multithreading) on ppc for kvm
+                utils.system('ppc64_cpu --smt=off')
 
-        if arch == 'ppc64le':
-            # turn smt back on
-            utils.system('ppc64_cpu --smt=on')
+            output = utils.system_output('./run_tests.sh -v', retain_output=True)
 
-        if 'FAIL' in output:
-            raise error.TestError('Test error, check debug logs for complete test output')
+            if arch == 'ppc64le':
+                # turn smt back on
+                utils.system('ppc64_cpu --smt=on')
+
+            if 'FAIL' in output:
+                raise error.TestError('Test error, check debug logs for complete test output')
+
+        except error.CmdError:
+            print('Test skipped, this systems does not have KVM extension support')
 
 # vi:set ts=4 sw=4 expandtab:

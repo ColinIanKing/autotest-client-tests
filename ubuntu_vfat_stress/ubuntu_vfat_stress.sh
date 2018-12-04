@@ -211,8 +211,13 @@ do_test()
 	while true
 	do
 		if check_dead; then
-			terminated=1
-			do_log "Stopped, PID $sngpid (after $N seconds)"
+			chkrun=$(lsof $MNT | wc -l)
+			if [ $chkrun -eq 0 ]; then
+				terminated=1
+				do_log "Stopped, PID $sngpid (after $N seconds)"
+			else
+				do_log "Still $chkrun processes on ${MNT}, retrying kill"
+			fi
 			break
 		fi
 		N=$((N+1))

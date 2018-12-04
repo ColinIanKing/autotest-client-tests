@@ -22,17 +22,26 @@ MNT=/mnt/$TESTDIR
 LOG=/tmp/nbd-test-$$.log
 NBD_IMAGE_PATH=/tmp/nbd_image.img
 NBD_DEV=/dev/nbd0
-NBD_DUMMY_CONFIG=/tmp/nbd_config_dummy.conf
-NBD_PORT=9999
+NBD_CONFIG=/tmp/nbd-$$.conf
+NBD_PORT=10809
+
+do_log()
+{
+        echo $*
+        echo $* > /dev/kmsg
+}
 
 do_tidy()
 {
+	do_log "unmounting ${MNT}"
 	umount ${MNT}
 	sleep 1
+	do_log "stopping client"
 	nbd-client -d ${NBD_DEV}
 	sleep 1
+	do_log "killing server"
 	killall -9 nbd-server &> /dev/null
-	kill -TERM $pid &> /dev/null
+	kill -TERM ${do_check_pid} &> /dev/null
 	rm -f ${NBD_IMAGE_PATH}
 }
 
@@ -47,8 +56,8 @@ do_check()
 		ioerror=$(dmesg | grep "I/O error.nbd" | wc -l)
 		t=$((warn + call + ioerror))
 		if [ $t -gt 0 ]; then
-			echo "Found kernel warning, IO error and/or call trace:"
-			echo " "
+			do_log "Found kernel warning, IO error and/or call trace"
+			do_log echo " "
 			dmesg
 			echo " " >> $LOG
 			echo "Found kernel warning, IO error and/or call trace:" >> $LOG
@@ -65,10 +74,13 @@ do_check()
 do_test()
 {
 	dmesg -c > /dev/null
-	echo "TESTING: $*" > /dev/kmsg
 
+	do_log "creating backing nbd image ${NBD_IMAGE_PATH}"
 	dd if=/dev/zero of=${NBD_IMAGE_PATH} bs=1M count=128 >& /dev/null
-	echo done
+	if [ $? -ne 0 ]; then
+		do_log "dd onto ${NBD_IMAGE_PATH} failed"
+		do_tidy
+	fi
 	sync
 
 	#
@@ -93,13 +105,18 @@ do_test()
 	echo " "
 
 	do_check $* &
-	pid=$!
+	do_check_pid=$!
 
-	#nbd-server -V
+	echo "[generic]" > ${NBD_CONFIG}
+	echo "    allowlist = true" >> ${NBD_CONFIG}
+	echo "" >> ${NBD_CONFIG}
+	echo "[test]" >> ${NBD_CONFIG}
+	echo "    port = ${NBD_PORT}" >> ${NBD_CONFIG}
+	echo "    exportname = ${NBD_IMAGE_PATH}" >> ${NBD_CONFIG}
 
-	nbd-server ${NBD_PORT} ${NBD_IMAGE_PATH} -C ${NBD_DUMMY_CONFIG} >& /dev/null
+	nbd-server -C ${NBD_CONFIG}
 	if [ $? -ne 0 ]; then
-		echo "nbd-server failed to start"
+		do_log "nbd-server failed to start"
 		do_tidy
 		exit 1
 	fi
@@ -114,13 +131,15 @@ do_test()
 			break;
 		fi
 		if [ $N -gt 20 ]; then
-			echo "network block device ${NBD_DEV} was not created"
+			do_log "network block device ${NBD_DEV} was not created"
 			do_tidy
 			exit 1
 		fi
 		sleep 1
 		N=$((N+1))
 	done
+
+	do_log NBD device ${NBD_DEV} created
 
 	#
 	# Wait for server to be available
@@ -128,31 +147,55 @@ do_test()
 	N=0
 	while true
 	do
-		if netstat -A inet6 -lnp | grep 9999.*nbd-server; then
+		n=$(sudo nbd-client -l localhost | grep test | wc -l)
+		if [ $n -gt 0 ]; then
+			do_log "found nbd export"
 			break;
 		fi
 		if [ $N -gt 20 ]; then
-			echo "server is not listening"
+			do_log "server is not listening"
 			do_tidy
 			exit 1
 		fi
 		sleep 1
 		N=$((N+1))
 	done
-	sleep 5
+	sleep 1
 
-	nbd-client -t 30 localhost ${NBD_PORT} ${NBD_DEV} >& /dev/null
+	echo "NBD exports found:"
+	nbd-client -l localhost | grep -v Negotiation
+
+	do_log "starting clien with NBD device ${NBD_DEV}"
+	nbd-client -t 30 -b 1024 -N test localhost ${NBD_DEV}
 	if [ $? -ne 0 ]; then
-		echo "nbd-client failed to start"
+		do_log  "nbd-client failed to start"
 		do_tidy
 		exit 1
 	fi
 
-	mkfs.ext4 -F ${NBD_DEV} &> /dev/null
+	do_log "creating ext4 on ${NBD_DEV}"
+	mkfs.ext4 -v -D -F ${NBD_DEV} &> /dev/null
+	if [ $? -ne 0 ]; then
+		do_log "mkfs on ${NBD_DEV} failed"
+		do_tidy
+		exit 1;
+	fi
 	sync
-	sleep 5
+
+	do_log "checking ext4 on ${NBD_DEV}"
+	fsck -y ${NBD_DEV}
+	if [ $? -ne 0 ]; then
+		do_log "fsck on ${NBD_DEV} failed"
+		do_tidy
+		exit 1;
+	fi
 
 	mkdir -p ${MNT}
+	if [ $? -ne 0 ]; then
+		do_log "mkdir -p ${MNT} failed"
+		do_tidy
+	fi
+
 	N=0
 	while true
 	do
@@ -161,7 +204,7 @@ do_test()
 			break;
 		fi
 		if [ $N -gt 20 ]; then
-			echo "mount on ${NBD_DEV} failed"
+			do_log "mount on ${NBD_DEV} failed"
 			do_tidy
 			exit 1
 		fi
@@ -169,37 +212,50 @@ do_test()
 		N=$((N+1))
 	done
 
-	echo "Mount: "
+	echo ""
+	echo "mount: "
 	mount | grep ${NBD_DEV}
 	n=$(mount | grep ${NBD_DEV} | wc -l)
 	if [ $n -lt 0 ]; then
-		echo "mount on ${NBD_DEV} failed"
+		do_log "mount on ${NBD_DEV} failed"
 		do_tidy
 		exit 1
 	fi
+	do_log "mounted on ${NBD_DEV}"
 	echo ""
 
-	echo "Free: "
+	echo "free: "
 	df ${MNT}
 	echo ""
+
+	do_log "creating large file ${MNT}/largefile"
 
 	(dd if=/dev/zero of=${MNT}/largefile bs=1M count=100) >& /dev/null
 	if [ $? -ne 0 ]; then
-		echo "failed to write 100MB to nbd mounted file system"
+		do_log "failed to write 100MB to nbd mounted file system"
 		do_tidy
 		exit 1
 	fi
-	echo "Free: "
+
+	ls -alh ${MNT}/largefile
+	echo ""
+
+	echo "free: "
 	df ${MNT}
+	echo ""
 	sync
+
+	do_log "removing file ${MNT}/largefile"
 	rm -f {MNT}/largefile
 	if [ $? -ne 0 ]; then
-		echo "failed to remove 100MB file from nbd mounted file system"
+		do_log "failed to remove 100MB file from nbd mounted file system"
 		do_tidy
 		exit 1
 	fi
 	sync
 	do_tidy
+
+	rm -f ${NBD_CONFIG}
 
 	echo "================================================================================"
 }
@@ -213,7 +269,7 @@ fi
 
 modprobe nbd
 if [ $? -ne 0 ]; then
-	echo "Cannot load Network Block Device module nbd.o"
+	do_log "Cannot load Network Block Device module nbd.o"
 	exit 1
 fi
 
@@ -224,7 +280,7 @@ do_test
 
 modprobe -r nbd
 if [ $? -ne 0 ]; then
-	echo "Cannot unload Network Block Device module nbd.o"
+	do_log "Cannot unload Network Block Device module nbd.o"
 	exit 1
 fi
 

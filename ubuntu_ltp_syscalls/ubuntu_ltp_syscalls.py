@@ -35,6 +35,13 @@ class ubuntu_ltp_syscalls(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
+        try:
+            cloud  = os.environ['CLOUD']
+            if cloud in ['azure', 'gcp', 'gke']:
+                 pkgs.append('linux-modules-extra-' + cloud + '*')
+        except KeyError:
+            pass
+
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 

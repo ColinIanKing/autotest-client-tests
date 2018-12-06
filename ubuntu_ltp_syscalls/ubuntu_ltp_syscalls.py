@@ -3,6 +3,7 @@
 import os
 import platform
 import time
+import yaml
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
 
@@ -71,6 +72,17 @@ class ubuntu_ltp_syscalls(test.test):
         cmd = 'make install'
         self.results = utils.system_output(cmd, retain_output=True)
 
+    def testcase_blacklist(self):
+        flavour = platform.release().split('-')[2]
+        fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
+        with open(fn, 'r') as f:
+            db = yaml.load(f)
+
+        if flavour in db['flavour']:
+            return list(db['flavour'][flavour].keys())
+
+        return None
+
     # run_once
     #
     #    Driven by the control file for each individual test.
@@ -83,9 +95,13 @@ class ubuntu_ltp_syscalls(test.test):
         log_output = fn + '.output'
 
         fn = '/opt/ltp/runtest/%s' % (test_name)
+        blacklisted = self.testcase_blacklist()
+
         with open(fn , 'r') as f:
             for line in f:
                 if line.strip() and not line.startswith('#'):
+                    if blacklisted and line.strip() in blacklisted:
+                        continue
                     with open ('/tmp/target' , 'w') as t:
                         t.write(line)
                     cmd = '/opt/ltp/runltp -f /tmp/target -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
@@ -93,12 +109,15 @@ class ubuntu_ltp_syscalls(test.test):
                     # /dev/loop# creation will be taken care by the runltp
 
         num_failed = sum(1 for line in open(log_failed))
+        num_blacklisted = len(blacklisted) if blacklisted else 0
         print("== Test Suite Summary ==")
         print("{} test cases failed").format(num_failed)
+        print("{} test cases blacklisted").format(num_blacklisted)
 
         if num_failed > 0:
             cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"
             failed_list = utils.system_output(cmd, retain_output=False, verbose=False)
+            print("Blacklisted test cases: %s" % ', '.join(blacklisted))
             print("Failed test cases : %s" % failed_list)
             cmd = 'cat ' + log_output
             utils.system_output(cmd, retain_output=True, verbose=False)

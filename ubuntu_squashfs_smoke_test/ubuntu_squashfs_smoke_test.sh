@@ -23,7 +23,7 @@
 #  if very basic functionality works, that is mounting
 #  and umounting, and data integrity check
 #
-SRC=/bin
+SRC=/sbin
 IMG=/tmp/squashfs.sqsh
 MNT=/tmp/squashfs-mnt
 
@@ -47,7 +47,7 @@ else
 	lazy=""
 fi
 
-rm -rf $IMG $MNT
+rm -rf ${IMG} ${MNT}
 
 which mksquashfs > /dev/null
 if [ $? -ne 0 ]; then
@@ -55,18 +55,18 @@ if [ $? -ne 0 ]; then
 	exit 0
 fi
 
-for comp in $COMP
+for comp in ${COMP}
 do
 	echo "Testing with compression method $comp"
-	mksquashfs $SRC $IMG -no-progress -comp $comp > /dev/null
+	mksquashfs ${SRC} ${IMG} -no-progress -comp $comp > /dev/null
 	if [ $? -ne 0 ]; then
 		echo "SKIPPED: mksquashfs failed, aborting test"
 		exit 0
 	fi
 
-	mkdir -p $MNT
+	mkdir -p ${MNT}
 	echo -n "Testing mount of squashfs: "
-	mount $IMG $MNT -t squashfs -o loop
+	mount ${IMG} ${MNT} -t squashfs -o loop
 	if [ $? -ne 0 ]; then
 		echo "FAILED ($comp)"
 		exit 1
@@ -82,7 +82,7 @@ do
 	retry=0
 	while [ $retry -lt 10 ]
 	do
-		umount $MNT $lazy
+		umount ${MNT} $lazy
 		ret=$?
 		if [ $ret -eq 0 ]; then
 			break
@@ -97,14 +97,14 @@ do
 	echo "PASSED ($comp)"
 
 	echo -n "Checking data integrity: "
-	mount $IMG $MNT -t squashfs -o loop
+	mount ${IMG} ${MNT} -t squashfs -o loop
 	if [ $? -ne 0 ]; then
 		echo "FAILED (remount, $comp)"
 		exit 1
 	fi
 	HERE=$(pwd)
-	cd $SRC
-	diffs=$(find . -exec diff {} $MNT/{} \; 2>&1 | wc -l)
+	cd ${MNT}
+	diffs=$(find . -maxdepth 1 -type f -exec diff {} ${SRC}/{} \; 2>&1 | wc -l)
 	cd $HERE
 	#
 	#  Need to retry because sometimes
@@ -114,7 +114,7 @@ do
 	retry=0
 	while [ $retry -lt 10 ]
 	do
-		umount $MNT $lazy
+		umount ${MNT} $lazy
 		ret=$?
 		if [ $ret -eq 0 ]; then
 			break
@@ -128,11 +128,11 @@ do
 	fi
 
 	if [ $diffs -ne 0 ]; then
-		echo "FAILED (squashed $SRC different from original $SRC, $comp)"
+		echo "FAILED (squashed ${SRC} different from original ${SRC}, $comp)"
 		exit 1
 	fi
 	echo "PASSED ($comp)"
-	rm -rf $IMG $MNT
+	rm -rf ${IMG} ${MNT}
 done
 
 exit 0

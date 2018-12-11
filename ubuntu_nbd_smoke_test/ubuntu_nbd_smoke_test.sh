@@ -165,7 +165,7 @@ do_test()
 	echo "NBD exports found:"
 	nbd-client -l localhost | grep -v Negotiation
 
-	do_log "starting clien with NBD device ${NBD_DEV}"
+	do_log "starting client with NBD device ${NBD_DEV}"
 	nbd-client -t 30 -b 1024 -N test localhost ${NBD_DEV}
 	if [ $? -ne 0 ]; then
 		do_log  "nbd-client failed to start"
@@ -174,12 +174,26 @@ do_test()
 	fi
 
 	do_log "creating ext4 on ${NBD_DEV}"
-	mkfs.ext4 -v -D -F ${NBD_DEV} &> /dev/null
-	if [ $? -ne 0 ]; then
-		do_log "mkfs on ${NBD_DEV} failed"
-		do_tidy
-		exit 1;
-	fi
+	N=0
+	while true
+	do
+		#
+		#  This may fail if the device has not fully initiated on
+		#  slow systems, so we need to have some retries.
+		#
+		mkfs.ext4 -v -D -F ${NBD_DEV} &> /dev/null
+		if [ $? -eq 0 ]; then
+			do_log "mkfs on ${NBD_DEV} succeeded after $N attempt(s)"
+			break;
+		fi
+		if [ $N -gt 20 ]; then
+			do_log "mkfs on ${NBD_DEV} failed"
+			do_tidy
+			exit 1;
+		fi
+		sleep 1
+		N=$((N+1))
+	done
 	sync
 
 	do_log "checking ext4 on ${NBD_DEV}"

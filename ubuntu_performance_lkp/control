@@ -1,0 +1,38 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_lkp"
+CRITERIA = """
+Performace Regression Tests using lkp"
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_lkp'
+
+lkp_jobs = {
+    'aim9.yaml':
+        [ 'aim9-300s-brk_test.yaml',
+          'aim9-300s-dgram_pipe.yaml',
+          'aim9-300s-exec_test.yaml',
+          'aim9-300s-fork_test.yaml',
+          'aim9-300s-link_test.yaml',
+          'aim9-300s-page_test.yaml',
+          'aim9-300s-pipe_cpy.yaml',
+          'aim9-300s-shared_memory.yaml',
+          'aim9-300s-signal_test.yaml',
+          'aim9-300s-stream_pipe.yaml',
+          'aim9-300s-tcp_test.yaml',
+          'aim9-300s-udp_test.yaml' ]
+}
+
+results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', lkp_jobs = lkp_jobs)
+
+for lkp_job in sorted(lkp_jobs):
+    print "JOB '%s'" % lkp_job
+    for sub_job in lkp_jobs[lkp_job]:
+        results = job.run_test_detail(name, tag=sub_job, lkp_job = sub_job, lkp_jobs = lkp_jobs)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

@@ -25,14 +25,24 @@ lkp_jobs = {
           'aim9-300s-signal_test.yaml',
           'aim9-300s-stream_pipe.yaml',
           'aim9-300s-tcp_test.yaml',
-          'aim9-300s-udp_test.yaml' ]
+          'aim9-300s-udp_test.yaml' ],
+    'vm-scalability.yaml':
+        [ 'vm-scalability-300s-lru-file-mmap-read-rand.yaml',
+          'vm-scalability-300s-lru-file-mmap-read.yaml',
+          'vm-scalability-300s-mmap-pread-rand-mt.yaml',
+          'vm-scalability-300s-mmap-pread-rand.yaml',
+          'vm-scalability-300s-mmap-pread-seq-mt.yaml',
+          'vm-scalability-300s-mmap-pread-seq.yaml',
+          'vm-scalability-300s-mmap-xread-rand-mt.yaml',
+          'vm-scalability-300s-mmap-xread-seq-mt.yaml',
+          'vm-scalability-300s-mremap-xread-rand-mt.yaml' ]
 }
 
-results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', lkp_jobs = lkp_jobs)
+results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs)
 
 for lkp_job in sorted(lkp_jobs):
     print "JOB '%s'" % lkp_job
     for sub_job in lkp_jobs[lkp_job]:
-        results = job.run_test_detail(name, tag=sub_job, lkp_job = sub_job, lkp_jobs = lkp_jobs)
+        results = job.run_test_detail(name, tag=sub_job, lkp_job = lkp_job, sub_job = sub_job, lkp_jobs = lkp_jobs)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

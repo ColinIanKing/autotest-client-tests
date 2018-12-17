@@ -1,0 +1,40 @@
+import os
+
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_power"
+CRITERIA = """
+Power Consumption Performace Regression Tests
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_power'
+
+tests = {
+    'cpu-idle':		  [ 'cpu',	 1, '--cpu 0 --cpu-load 0 --cpu-method fft' ],
+    'matrix-all-cpus':    [ 'matrix',    0, '' ],
+    'matrix-two-cpus':    [ 'matrix',    2, '' ],
+    'matrix-one-cpu':     [ 'matrix',    1, '' ],
+    'cpu-two-cpus':       [ 'cpu',       2, '--cpu-method fft'],
+    'cpu-one-cpu':        [ 'cpu',       1, '--cpu-method fft'],
+    'icache-two-cpus':    [ 'icache',    2, '' ],
+    'icache-one-cpu':     [ 'icache',    1, '' ],
+    'switch-two-cpus':    [ 'switch',    2, ''],
+    'switch-one-cpu':     [ 'switch',    1, ''],
+}
+
+if os.path.exists("/sys/class/powercap/intel-rapl"):
+    results = job.run_test_detail(name, test_full_name='', test_name='setup', tag='setup', instances=0, options='')
+    print "Estimated run time: %.0f minutes for %d benchmarks." % ((2 + (len(tests) * 7.50)), len(tests))
+
+    for test in sorted(tests):
+        results = job.run_test_detail(name, test_full_name=test, test_name=tests[test][0], tag=test, instances=tests[test][1], options=tests[test][2], timeout=600)
+        print results
+else:
+    print "Machine does not support Intel RAPL power measuring"
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

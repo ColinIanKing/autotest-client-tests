@@ -4,6 +4,7 @@ import os
 from autotest.client import test, utils
 from math import sqrt
 import platform
+import time
 
 #
 # Number of test iterations to get min/max/average stats
@@ -11,7 +12,7 @@ import platform
 test_iterations = 3
 
 class ubuntu_performance_lkp(test.test):
-    version = 1
+    version = 2
 
     def is_number(self, s):
         try:
@@ -106,6 +107,48 @@ class ubuntu_performance_lkp(test.test):
         print "%s_seconds" % (test_name), "%.3f " * len(values) % tuple(values)
         return values
 
+    def run_linpack(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            #
+            # Allow CPU to cool before next try
+            #
+            time.sleep(45)
+            #
+            # parse text, find ops/sec in fields as follows:
+            #
+            # Maximum memory requested that can be used=1449646096, at the size=13460
+            # 
+            # =================== Timing linear equation system solver ===================
+            # 
+            # Size   LDA    Align. Time(s)    GFlops   Residual     Residual(norm) Check
+            # 13460  13460  4      9.851      165.0621 1.255759e-10 2.452756e-02   pass
+            # 
+            # Performance Summary (GFlops)
+            # 
+            # Size   LDA    Align.  Average  Maximal
+            # 13460  13460  4       165.0621 165.0621
+            # 
+            # Residual checks PASSED
+            #
+            for line in self.results.splitlines():
+                chunks = line.split()
+                if len(chunks) == 8 and chunks[7] == "pass" and self.is_number(chunks[0]) \
+                   and self.is_number(chunks[1]) and self.is_number(chunks[2]) \
+                   and self.is_number(chunks[3]) and self.is_number(chunks[4]) \
+                   and self.is_number(chunks[5]) and self.is_number(chunks[6]):
+                    values.append(float(chunks[4]))
+
+
+        print "%s_gflops" % (test_name), "%.4f " * len(values) % tuple(values)
+        return values
+
+
     def run_vm_scalability(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
@@ -138,6 +181,7 @@ class ubuntu_performance_lkp(test.test):
         job_funcs = {
             'aim9.yaml':           self.run_aim9,
             'hackbench.yaml':      self.run_hackbench,
+            'linpack.yaml':        self.run_linpack,
             'vm-scalability.yaml': self.run_vm_scalability,
         }
 
@@ -149,7 +193,7 @@ class ubuntu_performance_lkp(test.test):
         if lkp_job in job_funcs:
             values = job_funcs[lkp_job](sub_job, lkp_jobs, test_name)
         else:
-            print "Cannot find running/parser for %s" % lkp_job
+            print "Cannot find running/parser for %s, please fix ubuntu_performance_lkp.py" % lkp_job
             return
 
         minimum = min(values)

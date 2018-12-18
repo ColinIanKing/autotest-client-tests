@@ -84,6 +84,28 @@ class ubuntu_performance_lkp(test.test):
         print "%s_bogoops" % (test_name), "%.3f " * len(values) % tuple(values)
         return values
 
+    def run_hackbench(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        print "Testing %s: 1 of 1" % lkp_job
+        os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+        cmd = 'sudo lkp run %s' % lkp_job
+        self.results = utils.system_output(cmd, retain_output=True)
+        #
+        # parse text, find Time: fields in multiple repeats of results such as:
+        #
+        # 2018-12-18 10:57:33 /usr/bin/hackbench -g 32 --process threads -l 3750
+        # Running in process mode with 32 groups using 40 file descriptors each (== 1280 tasks)
+        # Each sender will pass 3750 messages of 100 bytes
+        # Time: 29.915
+        #
+        for line in self.results.splitlines():
+            chunks = line.split()
+            if len(chunks) == 2 and chunks[0] == "Time:":
+                values.append(float(chunks[1]))
+
+        print "%s_seconds" % (test_name), "%.3f " * len(values) % tuple(values)
+        return values
+
     def run_vm_scalability(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
@@ -115,6 +137,7 @@ class ubuntu_performance_lkp(test.test):
 
         job_funcs = {
             'aim9.yaml':           self.run_aim9,
+            'hackbench.yaml':      self.run_hackbench,
             'vm-scalability.yaml': self.run_vm_scalability,
         }
 

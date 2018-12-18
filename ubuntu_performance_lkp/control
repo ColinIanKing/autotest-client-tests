@@ -35,7 +35,11 @@ lkp_jobs = {
           'vm-scalability-300s-mmap-pread-seq.yaml',
           'vm-scalability-300s-mmap-xread-rand-mt.yaml',
           'vm-scalability-300s-mmap-xread-seq-mt.yaml',
-          'vm-scalability-300s-mremap-xread-rand-mt.yaml' ]
+          'vm-scalability-300s-mremap-xread-rand-mt.yaml' ],
+    'hackbench.yaml':
+        [ 'hackbench-100.yaml',
+          'hackbench-8.yaml',
+          'hackbench-perf.yaml' ]
 }
 
 results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs)

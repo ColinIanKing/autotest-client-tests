@@ -79,7 +79,7 @@ class ubuntu_kernel_selftests(test.test):
             return
 
         os.chdir(self.srcdir)
-        cmd = "sudo make -C linux/tools/testing/selftests/%s all run_tests" % test_name
+        cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
         utils.system(cmd)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

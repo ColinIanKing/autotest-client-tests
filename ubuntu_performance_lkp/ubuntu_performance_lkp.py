@@ -148,6 +148,39 @@ class ubuntu_performance_lkp(test.test):
         print "%s_gflops" % (test_name), "%.4f " * len(values) % tuple(values)
         return values
 
+    def run_perf_bench_futex(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        print "Testing %s: 1 of 1" % lkp_job
+        os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+        cmd = 'sudo lkp run %s' % lkp_job
+        self.results = utils.system_output(cmd, retain_output=True)
+
+        #
+        # parse text, find KB/s data in fields as follows:
+        #
+        # [thread  0] futexes: 0x56007a705030 ... 0x56007a70602c [ 2267037 ops/sec ]
+        # [thread  1] futexes: 0x56007a706fe0 ... 0x56007a707fdc [ 2199947 ops/sec ]
+        # [thread  2] futexes: 0x56007a707ff0 ... 0x56007a708fec [ 2166125 ops/sec ]
+        # [thread  3] futexes: 0x56007a709000 ... 0x56007a709ffc [ 2194377 ops/sec ]
+        #
+        # or:
+        #
+        # [thread   0] futex: 0x555f99164140 [ 1866 ops/sec ]
+        # [thread   1] futex: 0x555f99164140 [ 1866 ops/sec ]
+        # [thread   2] futex: 0x555f99164140 [ 1866 ops/sec ]
+        # [thread   3] futex: 0x555f99164140 [ 1866 ops/sec ]
+        #
+        for line in self.results.splitlines():
+            chunks = line.split()
+            if len(chunks) == 10 and chunks[0] == "[thread" and chunks[2] == "futexes:" \
+               and chunks[8] == "ops/sec" and self.is_number(chunks[7]):
+                values.append(float(chunks[7]))
+            elif len(chunks) == 8 and chunks[0] == "[thread" and chunks[2] == "futex:" \
+               and chunks[6] == "ops/sec" and self.is_number(chunks[5]):
+                values.append(float(chunks[5]))
+
+        print "%s_ops_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
+        return values
 
     def run_vm_scalability(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -179,10 +212,11 @@ class ubuntu_performance_lkp(test.test):
             return
 
         job_funcs = {
-            'aim9.yaml':           self.run_aim9,
-            'hackbench.yaml':      self.run_hackbench,
-            'linpack.yaml':        self.run_linpack,
-            'vm-scalability.yaml': self.run_vm_scalability,
+            'aim9.yaml':             self.run_aim9,
+            'hackbench.yaml':        self.run_hackbench,
+            'linpack.yaml':          self.run_linpack,
+            'perf-bench-futex.yaml': self.run_perf_bench_futex,
+            'vm-scalability.yaml':   self.run_vm_scalability,
         }
 
         test_name = sub_job

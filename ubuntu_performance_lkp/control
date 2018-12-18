@@ -43,6 +43,13 @@ lkp_jobs = {
     'linpack.yaml':
         [ 'linpack-defaults.yaml' ]
 }
+lkp_jobs = {
+    'perf-bench-futex.yaml':
+	[ 'perf-bench-futex-300s-100%-hash-shared.yaml',
+	  'perf-bench-futex-300s-100%-hash.yaml',
+          'perf-bench-futex-300s-100%-lock-pi-shared.yaml',
+          'perf-bench-futex-300s-100%-lock-pi.yaml' ],
+}
 
 results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs)
 

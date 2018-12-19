@@ -26,6 +26,19 @@ lkp_jobs = {
           'aim9-300s-stream_pipe.yaml',
           'aim9-300s-tcp_test.yaml',
           'aim9-300s-udp_test.yaml' ],
+    'ebizzy.yaml':
+        [ 'ebizzy-200%-100x-10s.yaml' ],
+    'hackbench.yaml':
+        [ 'hackbench-100.yaml',
+          'hackbench-8.yaml',
+          'hackbench-perf.yaml' ],
+    'linpack.yaml':
+        [ 'linpack-defaults.yaml' ],
+    'perf-bench-futex.yaml':
+	[ 'perf-bench-futex-300s-100%-hash-shared.yaml',
+	  'perf-bench-futex-300s-100%-hash.yaml',
+          'perf-bench-futex-300s-100%-lock-pi-shared.yaml',
+          'perf-bench-futex-300s-100%-lock-pi.yaml' ],
     'vm-scalability.yaml':
         [ 'vm-scalability-300s-lru-file-mmap-read-rand.yaml',
           'vm-scalability-300s-lru-file-mmap-read.yaml',
@@ -36,19 +49,6 @@ lkp_jobs = {
           'vm-scalability-300s-mmap-xread-rand-mt.yaml',
           'vm-scalability-300s-mmap-xread-seq-mt.yaml',
           'vm-scalability-300s-mremap-xread-rand-mt.yaml' ],
-    'hackbench.yaml':
-        [ 'hackbench-100.yaml',
-          'hackbench-8.yaml',
-          'hackbench-perf.yaml' ],
-    'linpack.yaml':
-        [ 'linpack-defaults.yaml' ]
-}
-lkp_jobs = {
-    'perf-bench-futex.yaml':
-	[ 'perf-bench-futex-300s-100%-hash-shared.yaml',
-	  'perf-bench-futex-300s-100%-hash.yaml',
-          'perf-bench-futex-300s-100%-lock-pi-shared.yaml',
-          'perf-bench-futex-300s-100%-lock-pi.yaml' ],
 }
 
 results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs)

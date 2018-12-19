@@ -182,6 +182,26 @@ class ubuntu_performance_lkp(test.test):
         print "%s_ops_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
         return values
 
+    def run_ebizzy(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        print "Testing %s: 1 of 1" % lkp_job
+        os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+        cmd = 'sudo lkp run %s' % lkp_job
+        self.results = utils.system_output(cmd, retain_output=True)
+
+        #
+        # parse text, find KB/s data in fields as follows:
+        #
+        # 46348 records/s 5652 5731 6011 5844 5852 5640 6055 5560
+        #
+        for line in self.results.splitlines():
+            chunks = line.split()
+            if len(chunks) >= 2 and chunks[1] == "records/s" and self.is_number(chunks[0]):
+                values.append(float(chunks[0]))
+
+        print "%s_records_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
+        return values
+
     def run_vm_scalability(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
@@ -213,6 +233,7 @@ class ubuntu_performance_lkp(test.test):
 
         job_funcs = {
             'aim9.yaml':             self.run_aim9,
+            'ebizzy.yaml':           self.run_ebizzy,
             'hackbench.yaml':        self.run_hackbench,
             'linpack.yaml':          self.run_linpack,
             'perf-bench-futex.yaml': self.run_perf_bench_futex,

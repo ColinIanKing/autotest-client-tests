@@ -64,12 +64,8 @@ class ubuntu_bpf(test.test):
             self.download()
         # Assist local testing by restoring the linux repo to vanilla.
         self.extract()
-        os.chdir(os.path.join(self.srcdir, 'linux'))
-        cmd = 'patch -p1 < %s/0001-selftests-just-build-bpf.patch' % self.bindir
-        utils.system(cmd)
-        os.chdir(os.path.join(self.srcdir, 'linux/tools/testing/selftests'))
-        utils.make('clean')
-        utils.make()
+        os.chdir(self.srcdir)
+        utils.make('-C linux/tools/testing/selftests TARGETS=bpf clean all')
 
     def run_once(self, test_name):
         if test_name == 'setup':

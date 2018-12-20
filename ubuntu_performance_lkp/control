@@ -28,6 +28,8 @@ lkp_jobs = {
           'aim9-300s-udp_test.yaml' ],
     'cassandra.yaml':
         [ 'cassandra-cs-localhost-300s-3.yaml' ],
+    'dbench.yaml':
+        [ 'dbench-100%.yaml' ],
     'ebizzy.yaml':
         [ 'ebizzy-200%-100x-10s.yaml' ],
     'hackbench.yaml':

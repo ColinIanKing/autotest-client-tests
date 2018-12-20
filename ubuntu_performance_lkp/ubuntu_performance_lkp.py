@@ -110,6 +110,29 @@ class ubuntu_performance_lkp(test.test):
         print "%s_rows_per_second" % (test_name), "%.3f " * len(values) % tuple(values)
         return values
 
+    def run_dbench(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            #
+            # parse text, find throughput in fields as follows:
+            #
+            # Throughput 1154.73 MB/sec  4 clients  4 procs  max_latency=2606.696 ms
+            #
+            for line in self.results.splitlines():
+                chunks = line.split()
+                if len(chunks) >= 3 and chunks[0] == "Throughput" and chunks[2] == "MB/sec" \
+                   and self.is_number(chunks[1]):
+                    values.append(float(chunks[1]))
+
+        print "%s_throughput_mb_per_second" % (test_name), "%.3f " * len(values) % tuple(values)
+        return values
+
+
     def run_hackbench(self, lkp_job, lkp_jobs, test_name):
         values = []
         print "Testing %s: 1 of 1" % lkp_job
@@ -259,6 +282,7 @@ class ubuntu_performance_lkp(test.test):
         job_funcs = {
             'aim9.yaml':             self.run_aim9,
             'cassandra.yaml':        self.run_cassandra,
+            'dbench.yaml':           self.run_dbench,
             'ebizzy.yaml':           self.run_ebizzy,
             'hackbench.yaml':        self.run_hackbench,
             'linpack.yaml':          self.run_linpack,

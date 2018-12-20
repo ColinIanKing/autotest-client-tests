@@ -3,6 +3,7 @@
 import os
 import platform
 from autotest.client                        import test, utils
+from autotest.client.shared                 import error
 
 class ubuntu_kernel_selftests(test.test):
     version = 1
@@ -83,6 +84,10 @@ class ubuntu_kernel_selftests(test.test):
 
         os.chdir(self.srcdir)
         cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
-        utils.system(cmd)
+        self.results = utils.system_output(cmd, retain_output=True)
+
+        if self.results.find('[FAIL]') != -1:
+            raise error.TestFail('Test failed for ' + test_name)
+
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

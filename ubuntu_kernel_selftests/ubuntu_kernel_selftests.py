@@ -26,25 +26,28 @@ class ubuntu_kernel_selftests(test.test):
     def initialize(self):
         pass
 
+    def download(self):
+        kv = platform.release()
+        cmd = "dpkg -S /lib/modules/" + kv + "/kernel | cut -d: -f 1 | cut -d, -f 1"
+        pkg = os.popen(cmd).readlines()[0].strip()
+        utils.system("apt-get source --download-only " + pkg)
+
+    def extract(self):
+        os.system("rm -rf linux/")
+        utils.system("dpkg-source -x linux*dsc linux")
+
     def setup(self):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
-        series = platform.dist()[2]
 
         # Use a local repo for manual testing. If it does not exist, then clone from the master
         # repository.
         #
-        repo = os.environ['HOME'] + '/ubuntu/ubuntu-%s' % series
-        if os.path.exists(repo) is True:
-            cmd = 'git clone -q %s linux' % repo
-            utils.system(cmd)
+        if not os.path.exists('linux'):
+            self.download()
+            self.extract()
 
-        # No local repository, so clone from the master repo.
-        #
-        if os.path.exists('linux') is False:
-            cmd = 'GIT_CURL_VERBOSE=1 GIT_TRACE=1 git clone --depth 1 https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/%s linux' % series
-            utils.system(cmd)
             # tweak sleep wake alarm time to 30 seconds as 5 is a bit too small
             #
             fn = 'linux/tools/testing/selftests/breakpoints/step_after_suspend_test.c'

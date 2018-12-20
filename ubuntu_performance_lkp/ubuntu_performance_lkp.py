@@ -5,6 +5,7 @@ from autotest.client import test, utils
 from math import sqrt
 import platform
 import time
+import json
 
 #
 # Number of test iterations to get min/max/average stats
@@ -132,7 +133,6 @@ class ubuntu_performance_lkp(test.test):
         print "%s_throughput_mb_per_second" % (test_name), "%.3f " * len(values) % tuple(values)
         return values
 
-
     def run_hackbench(self, lkp_job, lkp_jobs, test_name):
         values = []
         print "Testing %s: 1 of 1" % lkp_job
@@ -153,6 +153,30 @@ class ubuntu_performance_lkp(test.test):
                 values.append(float(chunks[1]))
 
         print "%s_seconds" % (test_name), "%.3f " * len(values) % tuple(values)
+        return values
+
+    def run_iperf(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            idx1 = self.results.find("{")
+            idx2 = self.results.rfind("}")
+
+            intervals = []
+            if idx1 > -1 and idx2 > 0:
+                data = self.results[idx1:idx2+1]
+                j = json.loads(data)
+                n = len(j['intervals'])
+                for i in range(n):
+                    intervals.append(float(j['intervals'][i]['sum']['bits_per_second']))
+
+            values.append(sum(intervals) / len(intervals))
+
+        #print "%s_bits_per_second_second" % (test_name), "%.3f " * len(values) % tuple(values)
         return values
 
     def run_linpack(self, lkp_job, lkp_jobs, test_name):
@@ -285,6 +309,7 @@ class ubuntu_performance_lkp(test.test):
             'dbench.yaml':           self.run_dbench,
             'ebizzy.yaml':           self.run_ebizzy,
             'hackbench.yaml':        self.run_hackbench,
+            'iperf.yaml':            self.run_iperf,
             'linpack.yaml':          self.run_linpack,
             'perf-bench-futex.yaml': self.run_perf_bench_futex,
             'vm-scalability.yaml':   self.run_vm_scalability,

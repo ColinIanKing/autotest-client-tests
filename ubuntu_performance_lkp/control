@@ -36,6 +36,9 @@ lkp_jobs = {
         [ 'hackbench-100.yaml',
           'hackbench-8.yaml',
           'hackbench-perf.yaml' ],
+    'iperf.yaml':
+        [ 'iperf-300s-cs-localhost-udp.yaml',
+          'iperf-300s-cs-localhost-tcp.yaml' ],
     'linpack.yaml':
         [ 'linpack-defaults.yaml' ],
     'perf-bench-futex.yaml':

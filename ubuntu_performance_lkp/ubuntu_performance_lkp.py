@@ -46,15 +46,16 @@ class ubuntu_performance_lkp(test.test):
         os.chdir(self.srcdir)
         self.results = utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
-        self.results = utils.system_output('git checkout -b stable d719cf911a0bd0b2b6528c7220ccb41cf69c726f', retain_output=True)
+        #self.results = utils.system_output('git checkout -b stable d719cf911a0bd0b2b6528c7220ccb41cf69c726f', retain_output=True)
+        self.results = utils.system_output('git checkout -b stable 376cf211dbf94c7145b5383c7e9fb251d04a43bc', retain_output=True)
 
         utils.system_output('make install', retain_output=True)
         utils.system_output('lkp install', retain_output=True)
 
         for lkp_job in lkp_jobs:
             print "setting up " + lkp_job
-            utils.system_output('lkp install jobs/%s || true' % lkp_job, retain_output=True)
-            utils.system_output('lkp split jobs/%s || true' % lkp_job, retain_output=True)
+            print utils.system_output('lkp install jobs/%s || true' % lkp_job, retain_output=True)
+            print utils.system_output('lkp split jobs/%s || true' % lkp_job, retain_output=True)
 
     def run_aim9(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -83,6 +84,30 @@ class ubuntu_performance_lkp(test.test):
                     found_dashes = False
 
         print "%s_bogoops" % (test_name), "%.3f " * len(values) % tuple(values)
+        return values
+
+    def run_cassandra(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            #
+            # parse text, find ops/sec in fields as follows:
+            #
+            # Row rate                  :   21,376 row/s [insert: 15,345 row/s, simple1: 6,031 row/s]
+            #
+            for line in self.results.splitlines():
+                chunks = line.split()
+                if len(chunks) >= 4 and chunks[0] == "Row" and chunks[1] == "rate" \
+                   and chunks[2] == ':':
+                    val = chunks[3].replace(",", "")
+                    if (self.is_number(val)):
+                        values.append(float(val))
+
+        print "%s_rows_per_second" % (test_name), "%.3f " * len(values) % tuple(values)
         return values
 
     def run_hackbench(self, lkp_job, lkp_jobs, test_name):
@@ -233,6 +258,7 @@ class ubuntu_performance_lkp(test.test):
 
         job_funcs = {
             'aim9.yaml':             self.run_aim9,
+            'cassandra.yaml':        self.run_cassandra,
             'ebizzy.yaml':           self.run_ebizzy,
             'hackbench.yaml':        self.run_hackbench,
             'linpack.yaml':          self.run_linpack,

@@ -26,6 +26,8 @@ lkp_jobs = {
           'aim9-300s-stream_pipe.yaml',
           'aim9-300s-tcp_test.yaml',
           'aim9-300s-udp_test.yaml' ],
+    'cassandra.yaml':
+        [ 'cassandra-cs-localhost-300s-3.yaml' ],
     'ebizzy.yaml':
         [ 'ebizzy-200%-100x-10s.yaml' ],
     'hackbench.yaml':

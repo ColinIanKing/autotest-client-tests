@@ -86,7 +86,7 @@ class ubuntu_kernel_selftests(test.test):
         cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
         self.results = utils.system_output(cmd, retain_output=True)
 
-        if self.results.find('[FAIL]') != -1:
+        if self.results.rfind('[FAIL]\n') != -1:
             raise error.TestFail('Test failed for ' + test_name)
 
 

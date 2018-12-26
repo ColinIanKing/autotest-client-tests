@@ -69,7 +69,7 @@ class ubuntu_performance_stress_ng(test.test):
                 else:
                     stddev = 0.0
                 percent_stddev = (stddev / average) * 100.0
-		print
+                print
                 print "%s_bogoops" % (test_name), "%.3f " * len(bogoops) % tuple(bogoops)
                 print "%s_minimum %.3f" % (test_name, minimum)
                 print "%s_maximum %.3f" % (test_name, maximum)
@@ -86,6 +86,6 @@ class ubuntu_performance_stress_ng(test.test):
 
                 if test_pass:
                     print "PASS: test passes specified performance thresholds"
-		print
+                print
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -8,10 +8,10 @@ class ubuntu_overlayfs_smoke_test(test.test):
     version = 1
 
     def initialize(self):
-	pass
+        pass
 
     def setup(self):
-	pass
+        pass
 
     def run_once(self, test_name):
         stress_ng = os.path.join(self.srcdir, 'stress-ng', 'stress-ng')

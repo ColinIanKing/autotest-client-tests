@@ -50,7 +50,7 @@ class ubuntu_performance_thermal(test.test):
 
         test_name = test_name.replace("-", "_")
         test_pass = True
-	test_full_name = test_full_name.replace("-", "_")
+        test_full_name = test_full_name.replace("-", "_")
 
         for line in self.results.splitlines():
             chunks = line.split()

@@ -30,13 +30,13 @@ mkdir $MNT/a/Z
 mkdir -p $MNT/a/x1/x2/x3/x4/x5
 
 btrfs subvolume snapshot -r $MNT $MNT/snap1
-btrfs send $MNT/snap1 -f $TMP/base.send
+btrfs send -f $TMP/base.send $MNT/snap1
 
 mv $MNT/a/x1/x2/x3 $MNT/a/Z/X33
 mv $MNT/a/x1/x2 $MNT/a/Z/X33/x4/x5/X22
 
 btrfs subvolume snapshot -r $MNT $MNT/snap2
-btrfs send -p $MNT/snap1 $MNT/snap2 -f $TMP/incremental.send
+btrfs send -p $MNT/snap1 -f $TMP/incremental.send $MNT/snap2
 
 rc=$?
 if [ $rc -ne 0 ]; then

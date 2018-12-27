@@ -35,14 +35,14 @@ mv $MNT/B $MNT/A/C
 mkdir $MNT/A/C/D
 
 btrfs subvolume snapshot -r $MNT $MNT/snap1
-btrfs send $MNT/snap1 -f $TMP/base.send
+btrfs send -f $TMP/base.send $MNT/snap1
 
 mv $MNT/A/C/D $MNT/A/D2
 mv $MNT/A/C/B $MNT/A/D2/B2
 mv $MNT/A/C $MNT/A/D2/B2/C2
 
 btrfs subvolume snapshot -r $MNT $MNT/snap2
-btrfs send -p $MNT/snap1 $MNT/snap2 -f $TMP/incremental.send
+btrfs send -p $MNT/snap1 -f $TMP/incremental.send $MNT/snap2
 
 rc=$?
 if [ $rc -ne 0 ]; then

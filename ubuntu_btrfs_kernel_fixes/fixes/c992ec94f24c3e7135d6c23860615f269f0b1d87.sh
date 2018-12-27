@@ -73,11 +73,10 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV
 	rm -f $TMPIMG
 	exit 1
-	echo "btrfs send $MNT/mysnap1 -f /tmp/base.send failed"
 fi
-btrfs send $MNT/mysnap1 -f /tmp/base.send
+btrfs send -f /tmp/base.send $MNT/mysnap1
 if [ $? -ne 0 ]; then
-	echo "btrfs send $MNT/mysnap1 -f /tmp/base.send failed"
+	echo "btrfs send -f /tmp/base.send $MNT/mysnap1 failed"
 	umount $DEV
 	losetup -d $DEV
 	rm -f $TMPIMG /tmp/base.send
@@ -96,9 +95,9 @@ if [ $? -ne 0 ]; then
 	rm -f $TMPIMG /tmp/base.send
 	exit 1
 fi
-btrfs send -p $MNT/mysnap1 $MNT/mysnap2 -f /tmp/incremental.send
+btrfs send -p $MNT/mysnap1 -f /tmp/incremental.send $MNT/mysnap2
 if [ $? -ne 0 ]; then
-	echo "btrfs send -p $MNT/mysnap1 $MNT/mysnap2 -f /tmp/incremental.send failed"
+	echo "btrfs send -p $MNT/mysnap1 -f /tmp/incremental.send $MNT/mysnap2 failed"
 	umount $DEV
 	losetup -d $DEV
 	rm -f $TMPIMG /tmp/base.send /tmp/incremental.send

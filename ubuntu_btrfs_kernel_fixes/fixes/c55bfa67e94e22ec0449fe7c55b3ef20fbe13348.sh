@@ -82,9 +82,9 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-btrfs send -p $MNT/mysnap1 $MNT/mysnap2 -f /tmp/send.data
+btrfs send -p $MNT/mysnap1 -f /tmp/send.data $MNT/mysnap2
 if [ $? -ne 0 ]; then
-	echo "btrfs send -p $MNT/mysnap1 $MNT/mysnap2 -f /tmp/send.data failed"
+	echo "btrfs send -p $MNT/mysnap1 -f /tmp/send.data $MNT/mysnap2 failed"
 	umount $DEV
 	losetup -d $DEV
 	rm -f $TMPIMG /tmp/send.data

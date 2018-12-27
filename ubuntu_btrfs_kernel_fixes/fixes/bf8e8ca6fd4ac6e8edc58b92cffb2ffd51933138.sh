@@ -74,16 +74,16 @@ mv $MNT0/OSD $MNT0/merlin/RC
 
 btrfs subvolume snapshot -r $MNT0 $MNT0/mysnap2
 
-btrfs send $MNT0/mysnap1 -f /tmp/1.snap
-btrfs send -p $MNT0/mysnap1 $MNT0/mysnap2 -f /tmp/2.snap
+btrfs send -f /tmp/1.snap $MNT0/mysnap1
+btrfs send -p $MNT0/mysnap1 -f /tmp/2.snap $MNT0/mysnap2
 
-btrfs receive $MNT1 -f /tmp/1.snap
+btrfs receive -f /tmp/1.snap $MNT1
 #
 # Check for 3.16 regression, should NOT fail.
 #  Failure message:
 #     "rename o261-7-0 -> merlin/RC/OSD failed"
 #
-btrfs receive $MNT1 -f /tmp/2.snap
+btrfs receive -f /tmp/2.snap $MNT1
 rc=$?
 
 umount $DEV1

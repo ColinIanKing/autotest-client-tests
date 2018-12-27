@@ -34,19 +34,19 @@ mount $DEV0 $MNT >& /dev/null
 mkdir -p $MNT/a/b/c/x
 mkdir $MNT/a/b/y
 btrfs subvolume snapshot -r $MNT $MNT/snap1
-btrfs send $MNT/snap1 -f $TMP/base.send
+btrfs send -f $TMP/base.send $MNT/snap1
 mv $MNT/a/b/y $MNT/a/b/YY
 mv $MNT/a/b/c/x $MNT/a/b/YY
 rmdir $MNT/a/b/c
 btrfs subvolume snapshot -r $MNT $MNT/snap2
-btrfs send -p $MNT/snap1 $MNT/snap2 -f $TMP/incremental.send
+btrfs send -p $MNT/snap1 -f $TMP/incremental.send $MNT/snap2
 
 umount $MNT
 mkfs.btrfs -f $DEV0
 mount $DEV0 $MNT
 
-btrfs receive $MNT -f $TMP/base.send
-btrfs receive $MNT -f $TMP/incremental.send
+btrfs receive -f $TMP/base.send $MNT
+btrfs receive -f $TMP/incremental.send $MNT
 
 rc=$?
 if [ $rc -ne 0 ]; then

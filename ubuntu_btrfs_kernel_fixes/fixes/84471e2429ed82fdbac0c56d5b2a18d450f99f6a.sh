@@ -71,11 +71,11 @@ mv $MNT0/b $MNT0/q
 
 btrfs subvolume snapshot -r $MNT0 $MNT0/snap2
 
-btrfs send $MNT0/snap1 -f /tmp/1.send
-btrfs send -p $MNT0/snap1 $MNT0/snap2 -f /tmp/2.send
+btrfs send -f /tmp/1.send $MNT0/snap1
+btrfs send -p $MNT0/snap1 -f /tmp/2.send $MNT0/snap2
 
-btrfs receive $MNT1 -f /tmp/1.send
-btrfs receive $MNT1 -f /tmp/2.send
+btrfs receive -f /tmp/1.send $MNT1
+btrfs receive -f /tmp/2.send $MNT1
 rc=$?
 if [ $rc -ne 0 ]; then
 	echo "failed: btrfs receive $MN1 -f /tmp/2.send failed"

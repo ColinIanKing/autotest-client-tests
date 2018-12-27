@@ -72,7 +72,7 @@ if [ $? -ne 0 ]; then
 	rm -f $TMPIMG ${FIX}.out
 	exit 1
 fi
-btrfs send $MNT/snap1 -f /tmp/send.data
+btrfs send -f /tmp/send.data $MNT/snap1
 if [ $? -ne 0 ]; then
 	echo "btrfs send $MNT/snap1 -f /tmp/send.data failed"
 	kill -SIGUSR1 $pid

@@ -28,20 +28,20 @@ mkdir -p $MNT/a/b/c/d/e
 mkdir $MNT/a/b/c/f
 chmod 0777 $MNT/b/c/d/e
 btrfs subvolume snapshot -r $MNT $MNT/snap1
-btrfs send $MNT/snap1 -f $TMP/base.send
+btrfs send -f $TMP/base.send $MNT/snap1
 mv $MNT/a/b/c/f $MNT/a/b/f2
 mv $MNT/a/b/c/d/e $MNT/a/b/f2/e2
 mv $MNT/a/b/c $MNT/a/b/c2
 mv $MNT/a/b/c2/d $MNT/a/b/c2/d2
 chmod 0700 $MNT/a/b/f2/e2
 btrfs subvolume snapshot -r $MNT $MNT/snap2
-btrfs send -p $MNT/snap1 $MNT/snap2 -f $TMP/incremental.send
+btrfs send -p $MNT/snap1 -f $TMP/incremental.send $MNT/snap2
 
 umount $MNT
 mkfs.btrfs -f $DEV0
 mount $DEV0 $MNT
-btrfs receive $MNT -f $TMP/base.send
-btrfs receive $MNT -f $TMP/incremental.send
+btrfs receive -f $TMP/base.send $MNT
+btrfs receive -f $TMP/incremental.send $MNT
 rc=$?
 if [ $rc -ne 0 ]; then
 	echo "incremental receive failed with outdated paths for utimes, chown and chmod"

@@ -38,12 +38,14 @@ class ubuntu_btrfs_kernel_fixes(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
+        if self.which('sysbench') is None:
+            pkgs.append('sysbench')
+
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        if self.which('sysbench') is None:
-            utils.system_output('sudo apt-get install sysbench --yes --force-yes', retain_output=True)
+        pass
 
     #
     # if you change setup, be sure to increment version

@@ -12,12 +12,12 @@ DOC = ""
 
 import platform
 
-rel = ".".join(platform.release().split(".")[:2])
-
+kernel = ".".join(platform.release().split(".")[:2])
+release = platform.dist()[1]
 #
 #  Ugly, but necessary for now :-(
 #
-if rel == '3.13':
+if kernel == '3.13':
 	blacklist = [
 		'03cb4fb9d86d591bc8a3f66eac6fb874b50b1b4d.sh',
 		'0aeb8a6e67cddeac1d42cf64795fde0641a1cffb.sh',
@@ -38,7 +38,7 @@ if rel == '3.13':
 		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh',
 		'f959492fc15b60d874a9cbf55ae4760f2ef261ed.sh'
 	]
-elif rel == '3.16':
+elif kernel == '3.16':
 	blacklist = [
 		'0aeb8a6e67cddeac1d42cf64795fde0641a1cffb.sh',
 		'4027e0f4c4b2df28d564560a3c65c179bebae4c8.sh',
@@ -47,15 +47,18 @@ elif rel == '3.16':
 		'e755f780865221252ef3321215c9796b78e7b1c5.sh',
 		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh'
 	]
-elif rel == '3.19':
+elif kernel == '3.19':
 	blacklist = [
 		'3821f348889e506efbd268cc8149e0ebfa47c4e5.sh',
 		'5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh'
 	]
-elif rel == '4.0':
+elif kernel == '4.0':
 	blacklist = [ ]
 else:
 	blacklist = [ ]
+
+if release == '14.04':
+    blacklist.append('0061280d2c7240805cfd7b1f493da967c97c2f34.sh')
 
 #
 # This forces setup() to be run, it is in fact a no-op test

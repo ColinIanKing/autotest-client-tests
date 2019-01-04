@@ -41,7 +41,8 @@ mkdir a
 chattr +c a
 touch a/file
 attr=$(lsattr a/file)
-if [ "$attr" != "--------c------- a/file" ]; then
+if [ "$attr" != "--------c------- a/file" ] && \
+   [ "$attr" != "--------c--------- a/file" ]; then
 	echo "Incorrect attributes on file, got: $attr"
 	rc=1
 fi
@@ -49,12 +50,14 @@ fi
 chattr -c a
 touch a/file2
 attr=$(lsattr a/file2)
-if [ "$attr" != "---------------- a/file2" ]; then
+if [ "$attr" != "---------------- a/file2" ] && \
+   [ "$attr" != "------------------ a/file2" ]; then
 	echo "Incorrect attributes on file2, got: $attr"
 	rc=1
 fi
 attr=$(lsattr -d a)
-if [ "$attr" != "---------------- a" ]; then
+if [ "$attr" != "---------------- a" ] && \
+   [ "$attr" != "------------------ a" ]; then
 	echo "Incorrect attributes on directory, got: $attr"
 	rc=1
 fi

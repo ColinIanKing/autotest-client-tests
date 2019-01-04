@@ -46,7 +46,7 @@ losetup $DEV2 $TMPIMG2
 losetup $DEV3 $TMPIMG3
 losetup $DEV4 $TMPIMG4
 
-mkfs.btrfs -f -m raid5 $DEV0 $DEV1 $DEV2 $DEV3 $DEV4 >& /dev/null
+mkfs.btrfs -f -m raid5 -d raid5 $DEV0 $DEV1 $DEV2 $DEV3 $DEV4 >& /dev/null
 if [ $? -ne 0 ]; then
 	losetup -d $DEV0
 	losetup -d $DEV1
@@ -54,7 +54,7 @@ if [ $? -ne 0 ]; then
 	losetup -d $DEV3
 	losetup -d $DEV4
 	rm -f $TMPIMG0 $TMPIMG1 $TMPIMG2 $TMPIMG3 $TMPIMG4
-	echo "mkfs.btrfs -f $DEV0 $DEV1 $DEV2 $DEV3 $DEV4 $MNT failed"
+	echo "mkfs.btrfs -f -m raid5 -d raid5 $DEV0 $DEV1 $DEV2 $DEV3 $DEV4 $MNT failed"
 	exit 1
 fi
 

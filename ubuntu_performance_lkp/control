@@ -50,6 +50,8 @@ lkp_jobs = {
         [ 'pxz-100%.yaml' ],
     'schbench.yaml':
         [ 'schbench-100%.yaml' ],
+    'sysbench-threads.yaml':
+        [ 'sysbench-threads-100%-300s-8-1000.yaml' ],
     'thrulay.yaml':
         [ 'thrulay-cs-localhost-300s.yaml' ],
     'vm-scalability.yaml':

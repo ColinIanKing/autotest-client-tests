@@ -14,7 +14,7 @@ test_iterations = 3
 commit='7078336702a53c99f3a17ad1ca2af9a3323a818c'
 
 class ubuntu_performance_lkp(test.test):
-    version = 5
+    version = 6
 
     def is_number(self, s):
         try:
@@ -297,6 +297,27 @@ class ubuntu_performance_lkp(test.test):
         print "%s_99th_percentile" % (test_name), "%.3f " * len(values) % tuple(values)
         return [ ('99th_percentile', values) ]
 
+    def run_sysbench_threads(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            #
+            # parse text, we are interested in the 95th percentile:
+            #
+            # 95th percentile:                        0.45
+            #
+            for line in self.results.splitlines():
+                chunks = line.split()
+                if len(chunks) >= 3 and chunks[0] == "95th" and self.is_number(chunks[2]):
+                    values.append(float(chunks[2]))
+
+        print "%s_95th_percentile" % (test_name), "%.3f " * len(values) % tuple(values)
+        return [ ('95th_percentile', values) ]
+
     def run_thrulay(self, lkp_job, lkp_jobs, test_name):
         values_throughput = []
         values_latency = []
@@ -380,6 +401,7 @@ class ubuntu_performance_lkp(test.test):
             'perf-bench-futex.yaml': self.run_perf_bench_futex,
             'pxz.yaml':              self.run_pxz,
             'schbench.yaml':         self.run_schbench,
+            'sysbench-threads.yaml': self.run_sysbench_threads,
             'thrulay.yaml':          self.run_thrulay,
             'vm-scalability.yaml':   self.run_vm_scalability,
         }

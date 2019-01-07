@@ -13,7 +13,7 @@ import json
 test_iterations = 3
 
 class ubuntu_performance_lkp(test.test):
-    version = 2
+    version = 3
 
     def is_number(self, s):
         try:
@@ -28,6 +28,7 @@ class ubuntu_performance_lkp(test.test):
 
         pkgs = [
             'build-essential',
+            'pxz',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -254,6 +255,27 @@ class ubuntu_performance_lkp(test.test):
         print "%s_ops_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
         return values
 
+    def run_pxz(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            #
+            # parse text, find throughput in fields as follows:
+            #
+            # throughput: 25116233.198712446
+            #
+            for line in self.results.splitlines():
+                chunks = line.split()
+                if len(chunks) >= 2 and chunks[0] == "throughput:" and self.is_number(chunks[1]):
+                    values.append(float(chunks[1]))
+
+        print "%s_throughput" % (test_name), "%.3f " * len(values) % tuple(values)
+        return values
+
     def run_ebizzy(self, lkp_job, lkp_jobs, test_name):
         values = []
         print "Testing %s: 1 of 1" % lkp_job
@@ -312,6 +334,7 @@ class ubuntu_performance_lkp(test.test):
             'iperf.yaml':            self.run_iperf,
             'linpack.yaml':          self.run_linpack,
             'perf-bench-futex.yaml': self.run_perf_bench_futex,
+            'pxz.yaml':              self.run_pxz,
             'vm-scalability.yaml':   self.run_vm_scalability,
         }
 

@@ -11,9 +11,10 @@ import json
 # Number of test iterations to get min/max/average stats
 #
 test_iterations = 3
+commit='7078336702a53c99f3a17ad1ca2af9a3323a818c'
 
 class ubuntu_performance_lkp(test.test):
-    version = 3
+    version = 4
 
     def is_number(self, s):
         try:
@@ -48,15 +49,14 @@ class ubuntu_performance_lkp(test.test):
         os.chdir(self.srcdir)
         self.results = utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
-        #self.results = utils.system_output('git checkout -b stable d719cf911a0bd0b2b6528c7220ccb41cf69c726f', retain_output=True)
-        self.results = utils.system_output('git checkout -b stable 376cf211dbf94c7145b5383c7e9fb251d04a43bc', retain_output=True)
+        self.results = utils.system_output('git checkout -b stable ' + commit, retain_output=True)
 
         utils.system_output('make install', retain_output=True)
-        utils.system_output('lkp install', retain_output=True)
+        utils.system_output('yes "" | lkp install', retain_output=True)
 
         for lkp_job in lkp_jobs:
             print "setting up " + lkp_job
-            print utils.system_output('lkp install jobs/%s || true' % lkp_job, retain_output=True)
+            print utils.system_output('yes "" | lkp install jobs/%s || true' % lkp_job, retain_output=True)
             print utils.system_output('lkp split jobs/%s || true' % lkp_job, retain_output=True)
 
     def run_aim9(self, lkp_job, lkp_jobs, test_name):
@@ -86,7 +86,7 @@ class ubuntu_performance_lkp(test.test):
                     found_dashes = False
 
         print "%s_bogoops" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('bogoops', values) ]
 
     def run_cassandra(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -110,7 +110,7 @@ class ubuntu_performance_lkp(test.test):
                         values.append(float(val))
 
         print "%s_rows_per_second" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('rows_per_sec', values) ]
 
     def run_dbench(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -132,7 +132,7 @@ class ubuntu_performance_lkp(test.test):
                     values.append(float(chunks[1]))
 
         print "%s_throughput_mb_per_second" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('throughput', values) ]
 
     def run_hackbench(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -154,7 +154,7 @@ class ubuntu_performance_lkp(test.test):
                 values.append(float(chunks[1]))
 
         print "%s_seconds" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('duration', values) ]
 
     def run_iperf(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -178,7 +178,7 @@ class ubuntu_performance_lkp(test.test):
             values.append(sum(intervals) / len(intervals))
 
         #print "%s_bits_per_second_second" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('bitrate', values) ]
 
     def run_linpack(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -219,7 +219,7 @@ class ubuntu_performance_lkp(test.test):
 
 
         print "%s_gflops" % (test_name), "%.4f " * len(values) % tuple(values)
-        return values
+        return [ ('gflops', values) ]
 
     def run_perf_bench_futex(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -253,7 +253,7 @@ class ubuntu_performance_lkp(test.test):
                 values.append(float(chunks[5]))
 
         print "%s_ops_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('futex_rate', values) ]
 
     def run_pxz(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -274,7 +274,30 @@ class ubuntu_performance_lkp(test.test):
                     values.append(float(chunks[1]))
 
         print "%s_throughput" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('throughput', values) ]
+
+    def run_thrulay(self, lkp_job, lkp_jobs, test_name):
+        values_throughput = []
+        values_latency = []
+        print "Testing %s: 1 of 1" % (lkp_job)
+        os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+        cmd = 'sudo lkp run %s' % lkp_job
+        self.results = utils.system_output(cmd, retain_output=True)
+
+        #
+        # parse text, find throughput in fields as follows:
+        #
+        # ( 0)  249.000  250.000 59896.294    0.068    0.004
+        #
+        for line in self.results.splitlines():
+            chunks = line.split()
+            if len(chunks) == 7 and chunks[0] == "(" and chunks[1] == "0)" and self.is_number(chunks[4]) and self.is_number(chunks[5]):
+                values_throughput.append(float(chunks[4]))
+                values_latency.append(float(chunks[5]))
+
+        #print "%s_throughput" % (test_name), "%.3f " * len(values_throughput) % tuple(values_throughput)
+        #print "%s_latency" % (test_name), "%.3f " * len(values_latency) % tuple(values_latency)
+        return [ ('throughput', values_throughput), ('latency', values_latency) ]
 
     def run_ebizzy(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -294,7 +317,7 @@ class ubuntu_performance_lkp(test.test):
                 values.append(float(chunks[0]))
 
         print "%s_records_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('record_rate', values) ]
 
     def run_vm_scalability(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -318,7 +341,7 @@ class ubuntu_performance_lkp(test.test):
                     values.append(float(chunks[6]))
 
         print "%s_kb_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
-        return values
+        return [ ('rate', values) ]
 
     def run_once(self, lkp_job, sub_job, lkp_jobs):
         if lkp_job == 'setup':
@@ -335,6 +358,7 @@ class ubuntu_performance_lkp(test.test):
             'linpack.yaml':          self.run_linpack,
             'perf-bench-futex.yaml': self.run_perf_bench_futex,
             'pxz.yaml':              self.run_pxz,
+            'thrulay.yaml':          self.run_thrulay,
             'vm-scalability.yaml':   self.run_vm_scalability,
         }
 
@@ -344,31 +368,32 @@ class ubuntu_performance_lkp(test.test):
 
         print
         if lkp_job in job_funcs:
-            values = job_funcs[lkp_job](sub_job, lkp_jobs, test_name)
+            ret_values = job_funcs[lkp_job](sub_job, lkp_jobs, test_name)
         else:
             print "Cannot find running/parser for %s, please fix ubuntu_performance_lkp.py" % lkp_job
             return
 
-        minimum = min(values)
-        maximum = max(values)
-        average = sum(values) / len(values)
-        max_err = (maximum - minimum) / average * 100.0
+        for (label, values) in ret_values:
+            minimum = min(values)
+            maximum = max(values)
+            average = sum(values) / len(values)
+            max_err = (maximum - minimum) / average * 100.0
 
-        if len(values) > 1:
-            stddev = sqrt(float(reduce(lambda x, y: x + y, map(lambda x: (x - average) ** 2, values))) / (len(values) - 1))
-        else:
-            stddev = 0.0
-        percent_stddev = (stddev / average) * 100.0
-        print "%s_minimum %.3f" % (test_name, minimum)
-        print "%s_maximum %.3f" % (test_name, maximum)
-        print "%s_average %.3f" % (test_name, average)
-        print "%s_maximum_error %.3f%%" % (test_name, max_err)
-        print "%s_stddev %.3f" % (test_name, stddev)
-        print "%s_percent_stddev %.3f" % (test_name, percent_stddev)
+            if len(values) > 1:
+                stddev = sqrt(float(reduce(lambda x, y: x + y, map(lambda x: (x - average) ** 2, values))) / (len(values) - 1))
+            else:
+                stddev = 0.0
+            percent_stddev = (stddev / average) * 100.0
+            print "%s_%s_minimum %.3f" % (test_name, label, minimum)
+            print "%s_%s_maximum %.3f" % (test_name, label, maximum)
+            print "%s_%s_average %.3f" % (test_name, label, average)
+            print "%s_%s_maximum_error %.3f%%" % (test_name, label, max_err)
+            print "%s_%s_stddev %.3f" % (test_name, label, stddev)
+            print "%s_%s_percent_stddev %.3f" % (test_name, label, percent_stddev)
 
-        if max_err > 5.0:
-            print "FAIL: maximum error is greater than 5%"
-            test_pass = False
+            if max_err > 5.0:
+                print "FAIL: maximum error is greater than 5%"
+                test_pass = False
 
         if test_pass:
             print "PASS: test passes specified performance thresholds"

@@ -48,6 +48,8 @@ lkp_jobs = {
           'perf-bench-futex-300s-100%-lock-pi.yaml' ],
     'pxz.yaml':
         [ 'pxz-100%.yaml' ],
+    'thrulay.yaml':
+        [ 'thrulay-cs-localhost-300s.yaml' ],
     'vm-scalability.yaml':
         [ 'vm-scalability-300s-lru-file-mmap-read-rand.yaml',
           'vm-scalability-300s-lru-file-mmap-read.yaml',

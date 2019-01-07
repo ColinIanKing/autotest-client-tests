@@ -14,7 +14,7 @@ test_iterations = 3
 commit='7078336702a53c99f3a17ad1ca2af9a3323a818c'
 
 class ubuntu_performance_lkp(test.test):
-    version = 4
+    version = 5
 
     def is_number(self, s):
         try:
@@ -276,6 +276,27 @@ class ubuntu_performance_lkp(test.test):
         print "%s_throughput" % (test_name), "%.3f " * len(values) % tuple(values)
         return [ ('throughput', values) ]
 
+    def run_schbench(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            #
+            # parse text, we are interested in the 99th percentile:
+            #
+            # *99.0000th: 103296
+            #
+            for line in self.results.splitlines():
+                chunks = line.split()
+                if len(chunks) >= 2 and chunks[0] == "*99.0000th:" and self.is_number(chunks[1]):
+                    values.append(float(chunks[1]))
+
+        print "%s_99th_percentile" % (test_name), "%.3f " * len(values) % tuple(values)
+        return [ ('99th_percentile', values) ]
+
     def run_thrulay(self, lkp_job, lkp_jobs, test_name):
         values_throughput = []
         values_latency = []
@@ -358,6 +379,7 @@ class ubuntu_performance_lkp(test.test):
             'linpack.yaml':          self.run_linpack,
             'perf-bench-futex.yaml': self.run_perf_bench_futex,
             'pxz.yaml':              self.run_pxz,
+            'schbench.yaml':         self.run_schbench,
             'thrulay.yaml':          self.run_thrulay,
             'vm-scalability.yaml':   self.run_vm_scalability,
         }

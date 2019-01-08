@@ -14,7 +14,7 @@ test_iterations = 3
 commit='7078336702a53c99f3a17ad1ca2af9a3323a818c'
 
 class ubuntu_performance_lkp(test.test):
-    version = 6
+    version = 7
 
     def is_number(self, s):
         try:
@@ -333,7 +333,8 @@ class ubuntu_performance_lkp(test.test):
         #
         for line in self.results.splitlines():
             chunks = line.split()
-            if len(chunks) == 7 and chunks[0] == "(" and chunks[1] == "0)" and self.is_number(chunks[4]) and self.is_number(chunks[5]):
+            if len(chunks) == 7 and chunks[0] == "(" and chunks[1] == "0)" and \
+               self.is_number(chunks[4]) and self.is_number(chunks[5]):
                 values_throughput.append(float(chunks[4]))
                 values_latency.append(float(chunks[5]))
 
@@ -360,6 +361,29 @@ class ubuntu_performance_lkp(test.test):
 
         print "%s_records_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
         return [ ('record_rate', values) ]
+
+    def run_unixbench(self, lkp_job, lkp_jobs, test_name):
+        values = []
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            #
+            # parse text, find index score in fields as follows:
+            #
+            # System Benchmarks Index Score (Partial Only)                          275.3
+            #
+            for line in self.results.splitlines():
+                chunks = line.split()
+                if len(chunks) == 7 and chunks[0] == "System" and chunks[1] == "Benchmarks" and \
+                   chunks[2] == "Index" and chunks[3] == "Score" and chunks[4] == "(Partial" and \
+                   chunks[5] == "Only)" and self.is_number(chunks[6]):
+                    values.append(float(chunks[6]))
+
+        print "%s_score" % (test_name), "%.3f " * len(values) % tuple(values)
+        return [ ('score', values) ]
 
     def run_vm_scalability(self, lkp_job, lkp_jobs, test_name):
         values = []
@@ -403,6 +427,7 @@ class ubuntu_performance_lkp(test.test):
             'schbench.yaml':         self.run_schbench,
             'sysbench-threads.yaml': self.run_sysbench_threads,
             'thrulay.yaml':          self.run_thrulay,
+            'unixbench.yaml':        self.run_unixbench,
             'vm-scalability.yaml':   self.run_vm_scalability,
         }
 

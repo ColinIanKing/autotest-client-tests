@@ -66,6 +66,16 @@ lkp_jobs = {
           'vm-scalability-300s-mremap-xread-rand-mt.yaml' ],
 }
 
+lkp_jobs = {
+    'unixbench.yaml':
+        [ 'unixbench-100%-300s-context1.yaml',
+          'unixbench-100%-300s-dhry2reg.yaml',
+          'unixbench-100%-300s-execl.yaml',
+          'unixbench-100%-300s-pipe.yaml',
+          'unixbench-100%-300s-syscall.yaml',
+          'unixbench-100%-300s-whetstone-double.yaml' ]
+}
+
 results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs)
 
 for lkp_job in sorted(lkp_jobs):

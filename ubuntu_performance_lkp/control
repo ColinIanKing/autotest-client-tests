@@ -50,10 +50,19 @@ lkp_jobs = {
         [ 'pxz-100%.yaml' ],
     'schbench.yaml':
         [ 'schbench-100%.yaml' ],
+    'sockperf.yaml':
+        [ 'sockperf-cs-localhost-1472b-600s.yaml' ],
     'sysbench-threads.yaml':
         [ 'sysbench-threads-100%-300s-8-1000.yaml' ],
     'thrulay.yaml':
         [ 'thrulay-cs-localhost-300s.yaml' ],
+    'unixbench.yaml':
+        [ 'unixbench-100%-300s-context1.yaml',
+          'unixbench-100%-300s-dhry2reg.yaml',
+          'unixbench-100%-300s-execl.yaml',
+          'unixbench-100%-300s-pipe.yaml',
+          'unixbench-100%-300s-syscall.yaml',
+          'unixbench-100%-300s-whetstone-double.yaml' ]
     'vm-scalability.yaml':
         [ 'vm-scalability-300s-lru-file-mmap-read-rand.yaml',
           'vm-scalability-300s-lru-file-mmap-read.yaml',
@@ -64,16 +73,6 @@ lkp_jobs = {
           'vm-scalability-300s-mmap-xread-rand-mt.yaml',
           'vm-scalability-300s-mmap-xread-seq-mt.yaml',
           'vm-scalability-300s-mremap-xread-rand-mt.yaml' ],
-}
-
-lkp_jobs = {
-    'unixbench.yaml':
-        [ 'unixbench-100%-300s-context1.yaml',
-          'unixbench-100%-300s-dhry2reg.yaml',
-          'unixbench-100%-300s-execl.yaml',
-          'unixbench-100%-300s-pipe.yaml',
-          'unixbench-100%-300s-syscall.yaml',
-          'unixbench-100%-300s-whetstone-double.yaml' ]
 }
 
 results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs)

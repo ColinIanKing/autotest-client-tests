@@ -297,6 +297,56 @@ class ubuntu_performance_lkp(test.test):
         print "%s_99th_percentile" % (test_name), "%.3f " * len(values) % tuple(values)
         return [ ('99th_percentile', values) ]
 
+    def run_sockperf(self, lkp_job, lkp_jobs, test_name):
+        filters = [
+            ("subcommand under-load UDP",
+              [ ("percentile 90.00", 5, "UDP-under-load-90%-percentile"),
+                ("Summary: Latency", 4, "UDP-under-load-latency") ]),
+            ("subcommand under-load TCP",
+              [ ("percentile 90.00", 5, "TCP-under-load-90%-percentile"),
+                ("Summary: Latency", 4, "TCP-under-load-latency") ]),
+            ("subcommand ping-pong UDP",
+              [ ("percentile 90.00", 5, "UDP-ping-pong-90%-percentile"),
+                ("Summary: Latency", 4, "UDP-ping-pong-latency") ]),
+            ("subcommand ping-pong TCP",
+              [ ("percentile 90.00", 5, "TCP-ping-pong-90%-percentile"),
+                ("Summary: Latency", 4, "TCP-ping-pong-latency") ]),
+            ("subcommand throughput UDP",
+              [ ("Summary: Message Rate", 5, "UDP-throughput-rate"),
+                ("Summary: BandWidth", 4, "UDP-bandwidth") ]),
+            ("subcommand throughput TCP",
+              [ ("Summary: Message Rate", 5, "TCP-throughput-rate"),
+                ("Summary: BandWidth", 4, "TCP-bandwidth") ]),
+        ]
+
+        data = {}
+        for i in range(test_iterations):
+            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            cmd = 'sudo lkp run %s' % lkp_job
+            self.results = utils.system_output(cmd, retain_output=True)
+
+            metrics = []
+            for line in self.results.splitlines():
+                for filter in filters:
+                    if filter[0] in line:
+                        metrics = filter[1]
+                        break
+
+                chunks = line.split()
+                for metric in metrics:
+                    if metric[0] in line and len(chunks) >= metric[1] and self.is_number(chunks[metric[1]]):
+                        label = metric[2]
+                        if label not in data:
+                            data[label] = []
+                        data[label].append(float(chunks[metric[1]]))
+
+        values = []
+        for d in data:
+            values.append((d, data[d]))
+
+        return values
+
     def run_sysbench_threads(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
@@ -425,6 +475,7 @@ class ubuntu_performance_lkp(test.test):
             'perf-bench-futex.yaml': self.run_perf_bench_futex,
             'pxz.yaml':              self.run_pxz,
             'schbench.yaml':         self.run_schbench,
+            'sockperf.yaml':         self.run_sockperf,
             'sysbench-threads.yaml': self.run_sysbench_threads,
             'thrulay.yaml':          self.run_thrulay,
             'unixbench.yaml':        self.run_unixbench,

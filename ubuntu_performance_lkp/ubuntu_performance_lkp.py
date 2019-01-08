@@ -483,7 +483,7 @@ class ubuntu_performance_lkp(test.test):
         }
 
         test_name = sub_job
-        test_name = test_name.replace("-", "_")
+        test_name = test_name.replace("-", "_").replace(".yaml", "")
         test_pass = True
 
         print

@@ -14,18 +14,18 @@ name = 'ubuntu_performance_lkp'
 
 lkp_jobs = {
     'aim9.yaml':
-        [ 'aim9-300s-brk_test.yaml',
-          'aim9-300s-dgram_pipe.yaml',
-          'aim9-300s-exec_test.yaml',
-          'aim9-300s-fork_test.yaml',
-          'aim9-300s-link_test.yaml',
-          'aim9-300s-page_test.yaml',
-          'aim9-300s-pipe_cpy.yaml',
-          'aim9-300s-shared_memory.yaml',
-          'aim9-300s-signal_test.yaml',
-          'aim9-300s-stream_pipe.yaml',
-          'aim9-300s-tcp_test.yaml',
-          'aim9-300s-udp_test.yaml' ],
+        [ 'aim9-brk_test-300s.yaml',
+          'aim9-dgram_pipe-300s.yaml',
+          'aim9-exec_test-300s.yaml',
+          'aim9-fork_test-300s.yaml',
+          'aim9-link_test-300s.yaml',
+          'aim9-page_test-300s.yaml',
+          'aim9-pipe_cpy-300s.yaml',
+          'aim9-shared_memory-300s.yaml',
+          'aim9-signal_test-300s.yaml',
+          'aim9-stream_pipe-300s.yaml',
+          'aim9-tcp_test-300s.yaml',
+          'aim9-udp_test-300s.yaml' ],
     'cassandra.yaml':
         [ 'cassandra-cs-localhost-300s-3.yaml' ],
     'dbench.yaml':
@@ -62,7 +62,7 @@ lkp_jobs = {
           'unixbench-100%-300s-execl.yaml',
           'unixbench-100%-300s-pipe.yaml',
           'unixbench-100%-300s-syscall.yaml',
-          'unixbench-100%-300s-whetstone-double.yaml' ]
+          'unixbench-100%-300s-whetstone-double.yaml' ],
     'vm-scalability.yaml':
         [ 'vm-scalability-300s-lru-file-mmap-read-rand.yaml',
           'vm-scalability-300s-lru-file-mmap-read.yaml',

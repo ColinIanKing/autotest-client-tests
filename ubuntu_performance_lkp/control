@@ -31,21 +31,21 @@ lkp_jobs = {
     'dbench.yaml':
         [ 'dbench-100%.yaml' ],
     'ebizzy.yaml':
-        [ 'ebizzy-200%-100x-10s.yaml' ],
+        [ 'ebizzy-10s-100x-200%.yaml' ],
     'hackbench.yaml':
         [ 'hackbench-100.yaml',
           'hackbench-8.yaml',
           'hackbench-perf.yaml' ],
     'iperf.yaml':
-        [ 'iperf-300s-cs-localhost-udp.yaml',
-          'iperf-300s-cs-localhost-tcp.yaml' ],
+        [ 'iperf-cs-localhost-udp-300s.yaml',
+          'iperf-cs-localhost-tcp-300s.yaml' ],
     'linpack.yaml':
         [ 'linpack-defaults.yaml' ],
     'perf-bench-futex.yaml':
-	[ 'perf-bench-futex-300s-100%-hash-shared.yaml',
-	  'perf-bench-futex-300s-100%-hash.yaml',
-          'perf-bench-futex-300s-100%-lock-pi-shared.yaml',
-          'perf-bench-futex-300s-100%-lock-pi.yaml' ],
+	[ 'perf-bench-futex-100%-300s-shared-hash.yaml',
+	  'perf-bench-futex-100%-300s-hash.yaml',
+          'perf-bench-futex-100%-300s-shared-lock-pi.yaml',
+          'perf-bench-futex-100%-300s-lock-pi.yaml' ],
     'pxz.yaml':
         [ 'pxz-100%.yaml' ],
     'schbench.yaml':

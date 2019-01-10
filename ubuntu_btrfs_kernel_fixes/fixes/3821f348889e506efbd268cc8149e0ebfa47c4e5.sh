@@ -89,4 +89,3 @@ wait $pid
 umount $DEV
 losetup -d $DEV
 rm -f $TMPIMG ${FIX}.out /tmp/send.data
-exit $rc

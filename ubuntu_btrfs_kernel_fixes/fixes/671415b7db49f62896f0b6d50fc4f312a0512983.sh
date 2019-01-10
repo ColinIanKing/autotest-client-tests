@@ -75,6 +75,10 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 dd if=/dev/zero of=$MNT/tmpfile bs=1M count=1 >& /dev/null
+rc=$?
+if [ $rc -ne 0 ]; then
+    echo "dd command didn't trigger the deadlock, but failed with another reason"
+fi
 
 umount $MNT
 losetup -d $DEV0 $DEV1 $DEV2 $DEV3

@@ -75,4 +75,3 @@ fi
 umount $MNT >& /dev/null
 losetup -d $DEV1
 rm -f $TMPIMG0 $TMPIMG1
-exit $rc

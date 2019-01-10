@@ -41,6 +41,13 @@ fi
 
 btrfs quota enable $MNT
 btrfs qgroup assign 0/1 1/1 $MNT
+if [ $? -eq 0 ]; then
+    echo "btrfs qgroup relationship assignment should fail for a non-existing src/dst"
+    rc=1
+else
+    echo "btrfs qgroup relationship assignemnt for a non-existing src/dst failed as expected"
+    rc=0
+fi
 umount $MNT >& /dev/null
 btrfs-debug-tree $DEV0 | grep QGROUP
 

@@ -106,6 +106,10 @@ fi
 #
 modprobe -s btrfs
 modprobe btrfs
+rc=$?
+if [ $rc -ne 0 ]; then
+    echo "modprobe btrfs failed, return: $rc"
+fi
 
 losetup -d $DEV0 $DEV1
 rm -f $TMPIMG0 $TMPIMG1

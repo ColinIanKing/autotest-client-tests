@@ -58,6 +58,10 @@ mv $MNT/btrfs/a/b/c/d $MNT/btrfs/a/b/c2/d2
 mv $MNT/btrfs/a/b/c $MNT/btrfs/a/b/c2/d2/cc
 btrfs subvol snapshot -r $MNT/btrfs $MNT/btrfs/snap2
 btrfs send -p $MNT/btrfs/snap1 $MNT/btrfs/snap2 > /tmp/incremental.send
+rc=$?
+if [ $? -ne 0 ]; then
+    echo "incremental send failed"
+fi
 
 umount $MNT/btrfs
 losetup -d $DEV

@@ -60,4 +60,3 @@ fi
 umount $MNT >& /dev/null
 losetup -d $DEV0
 rm -f $TMPIMG0
-exit $rc

@@ -28,6 +28,7 @@ fix 3821f348889e506efbd268cc8149e0ebfa47c4e5
         btrfs send /mnt/snap1 -f /tmp/send.data
 
     The send operation will fail with the following error:
+        ERROR: send ioctl failed with -116: Stale file handle
 
 EOF
 

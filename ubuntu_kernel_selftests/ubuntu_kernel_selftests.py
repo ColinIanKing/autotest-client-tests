@@ -89,6 +89,20 @@ class ubuntu_kernel_selftests(test.test):
                 cmd = 'sed -i "s/ rtcpie//" ' + fn
                 utils.system(cmd)
 
+            #
+            # update fix CPU hotplug test, new and old versions
+            #
+            print "Updating CPU hotplug test"
+            fn="linux/tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh"
+            if os.path.exists(fn) and 'present_cpus=' not in open(fn).read():
+                cmd = 'cp %s/cpu-on-off-test.sh %s' % (self.bindir, fn)
+                utils.system(cmd)
+            else:
+                fn="linux/tools/testing/selftests/cpu-hotplug/on-off-test.sh"
+                if os.path.exists(fn) and 'present_cpus=' not in open(fn).read():
+                    cmd = 'cp %s/cpu-on-off-test.sh %s' % (self.bindir, fn)
+                    utils.system(cmd)
+
     def run_once(self, test_name):
         if test_name == 'setup':
             return

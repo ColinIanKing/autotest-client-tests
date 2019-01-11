@@ -25,6 +25,7 @@ if kernel == '3.13':
 		'3821f348889e506efbd268cc8149e0ebfa47c4e5.sh',
 		'3b080b2564287be91605bfd1d5ee985696e61d3c.sh',
 		'4027e0f4c4b2df28d564560a3c65c179bebae4c8.sh',
+		'4330e183c9537df20952d4a9ee142c536fb8ae54.sh',
 		'48fcc3ff7dce0138c053833adf81670494f177f3.sh',
 		'5ed7f9ff15e6ea56bcb78f69e9503dc1a587caf0.sh',
 		'7b119a8b8998f17abd6caf928dee5bf203eef8c5.sh',
@@ -52,8 +53,10 @@ elif kernel == '3.19':
 		'3821f348889e506efbd268cc8149e0ebfa47c4e5.sh',
 		'5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh'
 	]
-elif kernel == '4.0':
-	blacklist = [ ]
+elif kernel == '4.4':
+	blacklist = [
+		'4330e183c9537df20952d4a9ee142c536fb8ae54.sh'
+	]
 else:
 	# for 4.15 and newer
 	blacklist = [

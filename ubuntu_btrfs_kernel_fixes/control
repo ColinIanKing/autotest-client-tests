@@ -55,10 +55,13 @@ elif kernel == '3.19':
 elif kernel == '4.0':
 	blacklist = [ ]
 else:
-	blacklist = [ ]
+	# for 4.15 and newer
+	blacklist = [
+		'2365dd3ca02bbb6d3412404482e1d85752549953.sh'
+	]
 
 if release == '14.04':
-    blacklist.append('0061280d2c7240805cfd7b1f493da967c97c2f34.sh')
+	blacklist.append('0061280d2c7240805cfd7b1f493da967c97c2f34.sh')
 
 #
 # This forces setup() to be run, it is in fact a no-op test

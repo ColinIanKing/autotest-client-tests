@@ -18,6 +18,7 @@ btrfs: undo sysfs when open_ctree() fails
     sysfs: cannot create duplicate filename '/fs/btrfs/3f48c79e-5ed0-4e87-b189-86e749e503f4'
     ::
 
+Note: this test is only valid for kernel without 4330e183c9537df20952d4a9ee142c536fb8ae54
 EOF
 
 TMPIMG0=$TMP/test0.img

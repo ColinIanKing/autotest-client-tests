@@ -32,7 +32,7 @@ if [ $? -ne 0 ]; then
 fi
 
 TMPIMG=$TMP/test.img
-DEV=/dev/loop0
+DEV=`losetup -f`
 
 truncate --size 256M $TMPIMG
 losetup $DEV $TMPIMG

@@ -13,7 +13,7 @@ echo "MNT=$MNT"
 echo "TMP=$TMP"
 
 TMPIMG=$TMP/test.img
-DEV=/dev/loop0
+DEV=`losetup -f`
 
 truncate --size 1500m $TMPIMG
 losetup $DEV $TMPIMG

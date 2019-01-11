@@ -10,7 +10,7 @@ fix c9a9dbf2cbd1641af49bf081ca3bbe4101df3991
 EOF
 
 TMPIMG0=$TMP/test0.img
-DEV0=/dev/loop0
+DEV0=`losetup -f`
 
 truncate --size 512M $TMPIMG0
 losetup $DEV0 $TMPIMG0

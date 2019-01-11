@@ -30,7 +30,7 @@ EOF
 
 TMPIMG0=$TMP/test0.img
 
-DEV0=/dev/loop0
+DEV0=`losetup -f`
 
 truncate --size 256M $TMPIMG0
 

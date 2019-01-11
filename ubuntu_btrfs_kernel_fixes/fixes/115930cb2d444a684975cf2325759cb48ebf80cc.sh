@@ -26,22 +26,25 @@ TMPIMG2=$TMP/test2.img
 TMPIMG3=$TMP/test3.img
 TMPIMG4=$TMP/test4.img
 
-DEV0=/dev/loop0
-DEV1=/dev/loop1
-DEV2=/dev/loop2
-DEV3=/dev/loop3
-DEV4=/dev/loop4
-
 truncate --size 1G $TMPIMG0
 truncate --size 1G $TMPIMG1
 truncate --size 1G $TMPIMG2
 truncate --size 1G $TMPIMG3
 truncate --size 1G $TMPIMG4
 
+DEV0=`losetup -f`
 losetup $DEV0 $TMPIMG0
+
+DEV1=`losetup -f`
 losetup $DEV1 $TMPIMG1
+
+DEV2=`losetup -f`
 losetup $DEV2 $TMPIMG2
+
+DEV3=`losetup -f`
 losetup $DEV3 $TMPIMG3
+
+DEV4=`losetup -f`
 losetup $DEV4 $TMPIMG4
 
 mkfs.btrfs -f -m single -d raid10 $DEV0 $DEV1 $DEV2 $DEV3 >& /dev/null

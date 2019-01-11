@@ -18,7 +18,7 @@ fix b772a86ea6d932ac29d5e50e67c977653c832f8a
 EOF
 
 TMPIMG0=$TMP/test0.img
-DEV0=/dev/loop0
+DEV0=`losetup -f`
 
 dd if=/dev/zero of=$TMPIMG0 bs=1M count=256
 

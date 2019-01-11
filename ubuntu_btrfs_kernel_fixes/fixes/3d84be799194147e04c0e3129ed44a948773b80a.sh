@@ -11,7 +11,7 @@ exit 0
 
 mntpath=/tmp/btrfs-test
 mkdir $mntpath
-loopdev=/dev/loop0
+loopdev=`losetup -f`
 filepath=image
 
 umount $mntpath

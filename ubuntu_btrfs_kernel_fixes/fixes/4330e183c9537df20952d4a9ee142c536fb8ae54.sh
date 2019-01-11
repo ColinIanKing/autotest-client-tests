@@ -28,17 +28,17 @@ EOF
 TMPIMG0=$TMP/test0.img
 TMPIMG1=$TMP/test1.img
 
-DEV0=/dev/loop0
-DEV1=/dev/loop1
-
 truncate --size 512M $TMPIMG0
 truncate --size 512M $TMPIMG1
 
+DEV0=`losetup -f`
 losetup $DEV0 $TMPIMG0
+
+DEV1=`losetup -f`
 losetup $DEV1 $TMPIMG1
 
 function cleanup {
-    umount $MNT &> /dev/null
+	umount $MNT &> /dev/null
 	losetup -d $DEV0 $DEV1
 	rm -f $TMPIMG0 $TMPIMG1
 }

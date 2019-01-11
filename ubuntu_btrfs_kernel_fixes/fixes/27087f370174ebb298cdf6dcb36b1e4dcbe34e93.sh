@@ -20,15 +20,18 @@ EOF
 TMPIMG0=$TMP/test0.img
 TMPIMG1=$TMP/test1.img
 TMPIMG2=$TMP/test2.img
-DEV0=/dev/loop0
-DEV1=/dev/loop1
-DEV2=/dev/loop2
 
 truncate --size 512M $TMPIMG0
 truncate --size 512M $TMPIMG1
 truncate --size 512M $TMPIMG2
+
+DEV0=`losetup -f`
 losetup $DEV0 $TMPIMG0
+
+DEV1=`losetup -f`
 losetup $DEV1 $TMPIMG1
+
+DEV2=`losetup -f`
 losetup $DEV2 $TMPIMG2
 
 mkfs.btrfs -f $DEV0 >& /dev/null

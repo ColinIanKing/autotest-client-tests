@@ -30,8 +30,6 @@ losetup $DEV0 $TMPIMG0
 mkfs.btrfs -f $DEV0
 mount $DEV0 $MNT
 
-mkfs.btrfs -f $DEV0
-mount $DEV0 $MNT
 mkdir -p $MNT/a/b/c/d
 touch $MNT/a/b/c/d/file
 mkdir -p $MNT/a/b/x

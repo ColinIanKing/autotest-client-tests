@@ -4,7 +4,7 @@ SCRIPT=$1
 
 clean_loops()
 {
-	loops=$(grep "loop" /proc/mounts |  awk '{print $1}')
+	loops=$(grep "loop" /proc/mounts | grep -v '/snap/' |  awk '{print $1}')
 	if [ ! -z "$loops" ]; then
 		echo "Found following still mounted: $loops"
 		for loop in $loops

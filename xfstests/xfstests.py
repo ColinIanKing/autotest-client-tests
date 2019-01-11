@@ -181,6 +181,8 @@ class xfstests(test.test):
         utils.system('patch -p1 < %s/0003-config-use-the-latest-xfsprogs-release.patch' % self.bindir)
         print "Patching xfstests-bld to add ARM64 xattr syscall support"
         utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
+        print "Patching xfstest-blkd to fix static linking issue"
+        utils.system('patch -p1 < %s/0005-build-all-remove-static-linking-flags-to-fix-build-i.patch' % self.bindir)
         print "Fetching all repos.."
         utils.system('./get-all')
         commit = "204860fa5c454e2b3b75fb3c8fc15dd9b6115a70"
@@ -189,6 +191,7 @@ class xfstests(test.test):
         utils.system('git reset --hard ' + commit)
         print "Patching xfstests.."
         utils.system('patch -N -p1 < %s/0001-xfstests-disable-the-broken-btrfs-130-test.patch' % self.bindir)
+        utils.system('patch -N -p1 < %s/0006-src-statx.h-ensure-xfstests_statx-is-declared.patch' % self.bindir)
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "Building xfstests"
         utils.system('pwd')

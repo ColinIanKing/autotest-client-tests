@@ -40,24 +40,21 @@ cd $MNT
 mkdir a
 chattr +c a
 touch a/file
-attr=$(lsattr a/file)
-if [ "$attr" != "--------c------- a/file" ] && \
-   [ "$attr" != "--------c--------- a/file" ]; then
+attr=$(lsattr -l a/file | awk '{$1=""; print $0}')
+if [ "$attr" != " Compression_Requested" ]; then
 	echo "Incorrect attributes on file, got: $attr"
 	rc=1
 fi
 
 chattr -c a
 touch a/file2
-attr=$(lsattr a/file2)
-if [ "$attr" != "---------------- a/file2" ] && \
-   [ "$attr" != "------------------ a/file2" ]; then
+attr=$(lsattr -l a/file2 | awk '{$1=""; print $0}')
+if [ "$attr" != " ---" ]; then
 	echo "Incorrect attributes on file2, got: $attr"
 	rc=1
 fi
-attr=$(lsattr -d a)
-if [ "$attr" != "---------------- a" ] && \
-   [ "$attr" != "------------------ a" ]; then
+attr=$(lsattr -d -l a | awk '{$1=""; print $0}')
+if [ "$attr" != " ---" ]; then
 	echo "Incorrect attributes on directory, got: $attr"
 	rc=1
 fi

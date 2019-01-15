@@ -39,7 +39,7 @@ if [ $? -ne 0 ]; then
 	echo "mkfs.btrfs -f $DEV0 failed"
 	losetup -d $DEV0
 	losetup -d $DEV1
-	rm -f $TMPIMG0 $TNPIMAG1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 

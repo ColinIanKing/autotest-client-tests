@@ -55,7 +55,8 @@ elif kernel == '3.19':
 	]
 elif kernel == '4.4':
 	blacklist = [
-		'4330e183c9537df20952d4a9ee142c536fb8ae54.sh'
+		'4330e183c9537df20952d4a9ee142c536fb8ae54.sh',
+		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh'
 	]
 else:
 	# for 4.15 and newer

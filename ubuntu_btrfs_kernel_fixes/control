@@ -58,8 +58,13 @@ elif kernel == '4.4':
 		'4330e183c9537df20952d4a9ee142c536fb8ae54.sh',
 		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh'
 	]
+elif kernel == '4.15':
+	blacklist = [
+		'2365dd3ca02bbb6d3412404482e1d85752549953.sh',
+		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh'
+	]
 else:
-	# for 4.15 and newer
+	# for 4.18 and newer
 	blacklist = [
 		'2365dd3ca02bbb6d3412404482e1d85752549953.sh'
 	]

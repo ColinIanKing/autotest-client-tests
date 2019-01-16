@@ -50,9 +50,16 @@ dmesg -c > /dev/null
 mount -o degraded $DEV0 $MNT >& /dev/null
 if [ $? -ne 0 ]; then
 	echo "mount -o degraded $DEV0 $MNT was expected to pass"
+	losetup -d $DEV0
+	losetup -d $DEV1
+	rm -f $TMPIMG0 $TMPIMG1
 	exit 1
 fi
 btrfs balance start -f -sconvert=single -mconvert=single -dconvert=single $MNT >& /dev/null
+if [ $? -ne 0 ]; then
+	echo "btrfs balance failed on $MNT"
+	rc=1
+fi
 n=$(dmesg | grep "BTRFS error (device loop0) in write_all_supers" | wc -l)
 if [ $n -gt 0 ]; then
 	echo "failed: found btrfs error: BTRFS error (device loop0) in write_all_supers"

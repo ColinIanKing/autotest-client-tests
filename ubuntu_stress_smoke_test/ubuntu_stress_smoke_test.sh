@@ -31,6 +31,16 @@ EXCLUDE+="xattr efivar "
 # Tests that should be skipped on KVM kernels
 #
 [ "$(uname -r | awk -F'-' '{print $NF}')" == "kvm" ] && EXCLUDE+="dnotify "
+#
+# Tests that break on specific kernel versions and we won't fix
+#
+ver=$(uname -r | cut -d'.' -f1-2)
+if [ "$ver" == "4.20" ]; then
+	#
+	#  Broken on 4.20, fixed in 5.0-rc2
+	#
+	EXCLUDE+="dccp "
+fi
 
 #
 # Get built-in stressor names

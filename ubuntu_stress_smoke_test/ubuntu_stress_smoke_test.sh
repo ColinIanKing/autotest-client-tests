@@ -18,6 +18,7 @@ STRESS_OPTIONS="--ignite-cpu --syslog --verbose --verify --oomable"
 #
 EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec "
 EXCLUDE+="spawn remap stack oom-pipe resources opcode sockfd vforkmany sockpair "
+EXCLUDE+="bind-mount funccall ioport "
 #
 # Tests that are not kernel specific
 #
@@ -39,7 +40,7 @@ if [ "$ver" == "4.20" ]; then
 	#
 	#  Broken on 4.20, fixed in 5.0-rc2
 	#
-	EXCLUDE+="dccp "
+	EXCLUDE+="dccp sctp "
 fi
 
 #

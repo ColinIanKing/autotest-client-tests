@@ -125,6 +125,9 @@ class ubuntu_kernel_selftests(test.test):
         if test_name == 'setup':
             return
 
+        cmd = "sudo sh -c 'echo 1 > /proc/sys/net/ipv4/conf/all/accept_local'"
+        utils.system(cmd)
+
         os.chdir(self.srcdir)
         cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
         self.results = utils.system_output(cmd, retain_output=True)

@@ -53,7 +53,7 @@ do_check()
 	do
 		warn=$(dmesg | grep "WARNING:" | wc -l)
 		call=$(dmesg | grep "Call Trace:" | wc -l)
-		ioerror=$(dmesg | grep "I/O error.nbd" | wc -l)
+		ioerror=$(dmesg | grep "I/O error.*nbd" | wc -l)
 		t=$((warn + call + ioerror))
 		if [ $t -gt 0 ]; then
 			do_log "Found kernel warning, IO error and/or call trace"

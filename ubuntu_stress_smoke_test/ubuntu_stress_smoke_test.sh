@@ -18,14 +18,14 @@ STRESS_OPTIONS="--ignite-cpu --syslog --verbose --verify --oomable"
 #
 EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec "
 EXCLUDE+="spawn remap stack oom-pipe resources opcode sockfd vforkmany sockpair "
-EXCLUDE+="bind-mount funccall ioport watchdog "
+EXCLUDE+="bind-mount funccall ioport watchdog mlockmany "
 #
 # Tests that are not kernel specific
 #
 EXCLUDE+="atomic bsearch heapsort hsearch longjmp lsearch matrix memcpy nop qsort "
 EXCLUDE+="rdrand str tsc vecmath wcs zlib "
 #
-# Tests that are know to cause breakage
+# Tests that are known to cause breakage
 #
 EXCLUDE+="xattr efivar "
 #

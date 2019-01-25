@@ -115,6 +115,7 @@ class ubuntu_kernel_selftests(test.test):
                 'trigger/trigger-hist.tc',
                 'trigger/trigger-trace-marker-hist.tc',
                 'kprobe/probepoint.tc',
+                'kprobe/kprobe_module.tc',
             ]
             for fn in filenames:
                 fn = 'linux/tools/testing/selftests/ftrace/test.d/' + fn

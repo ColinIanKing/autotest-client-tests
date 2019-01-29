@@ -64,6 +64,7 @@ if [ $? -ne 0 ]; then
 fi
 
 umount $MNT/btrfs
+rm -fr $MNT/btrfs
 losetup -d $DEV
 rm -f $TMPIMG /tmp/incremental.send
 exit $rc

@@ -81,7 +81,9 @@ if [ $rc -ne 0 ]; then
 	echo "failed: btrfs receive $MN1 -f /tmp/2.send failed"
 fi
 
-umount $MNT0
+umount $MNT0 >& /dev/null
+umount $MNT1 >& /dev/null
+rm -rf $MNT0 $MNT1
 
 losetup -d $DEV0
 losetup -d $DEV1

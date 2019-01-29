@@ -24,6 +24,6 @@ if 'seccomp' in tests and release > 418 and platform.machine() != 'x86_64':
 	tests.remove('seccomp')
 
 for test in tests:
-    results = job.run_test_detail('ubuntu_kernel_selftests', test_name=test, tag=test, timeout=60*15)
+    results = job.run_test_detail('ubuntu_kernel_selftests', test_name=test, tag=test, timeout=60*20)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

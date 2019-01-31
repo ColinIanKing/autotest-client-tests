@@ -30,6 +30,7 @@ if kernel == '3.13':
 		'5ed7f9ff15e6ea56bcb78f69e9503dc1a587caf0.sh',
 		'7b119a8b8998f17abd6caf928dee5bf203eef8c5.sh',
 		'9a40f1222a372de77344d85d31f8fe0e1c0e60e7.sh',
+		'9f03740a956d7ac6a1b8f8c455da6fa5cae11c22.sh',
 		'bf8e8ca6fd4ac6e8edc58b92cffb2ffd51933138.sh',
 		'bfa7e1f8be4bd7118e485a42cc8889530d415d05.sh',
 		'c1895442be01c58449e3bf9272f22062a670e08f.sh',

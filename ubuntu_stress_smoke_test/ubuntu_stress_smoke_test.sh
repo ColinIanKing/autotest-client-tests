@@ -23,7 +23,7 @@ EXCLUDE+="bind-mount funccall ioport watchdog mlockmany "
 # Tests that are not kernel specific
 #
 EXCLUDE+="atomic bsearch heapsort hsearch longjmp lsearch matrix memcpy nop qsort "
-EXCLUDE+="rdrand str tsc vecmath wcs zlib "
+EXCLUDE+="rdrand str tsc vecmath wcs zlib matrix-3d "
 #
 # Tests that are known to cause breakage
 #

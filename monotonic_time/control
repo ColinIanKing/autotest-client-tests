@@ -30,5 +30,5 @@ Based on time-warp-test.c by Ingo Molnar.
 job.run_test('monotonic_time', tag='clock', test_type='clock',
              duration=300, threshold=0)
 
-job.run_test('monotonic_time', tag='tsc',   test_type='tsc',
+job.run_test('monotonic_time', tag='tsc',   test_type='tsc_lfence',
              duration=300, threshold=0)

@@ -8,7 +8,7 @@ set -x
 SUT=bjf-test
 SSH_KEY="$HOME/.ssh/id_rsa"
 SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -i $SSH_KEY"
-DISTRO="xenial"
+DISTRO="`lsb_release -c | awk '{print$2}'`"
 ARCHITECTURE="$1"
 
 if [ -z "$ARCHITECTURE" ]; then
@@ -32,7 +32,7 @@ fi
 # Download a release image that can be used to create the KVM instance.
 #
 image=`uvt-simplestreams-libvirt query | grep -P $DISTRO.*$ARCHITECTURE`
-[ -z "$image" ] && uvt-simplestreams-libvirt sync release=$DISTRO arch=$ARCHITECTURE
+[ -z "$image" ] && uvt-simplestreams-libvirt sync --source http://cloud-images.ubuntu.com/daily release=$DISTRO arch=$ARCHITECTURE
 
 uvt-kvm create $SUT release=$DISTRO arch=$ARCHITECTURE
 uvt-kvm wait $SUT --insecure --ssh-private-key-file $SSH_KEY

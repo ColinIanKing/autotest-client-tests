@@ -130,6 +130,10 @@ class ubuntu_kernel_selftests(test.test):
         utils.system(cmd)
 
         os.chdir(self.srcdir)
+        if test_name == "net":
+            # net selftests use a module built by bpf selftests
+            cmd = "make -C linux/tools/testing/selftests TARGETS=bpf"
+            utils.system(cmd)
         cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
         self.results = utils.system_output(cmd, retain_output=True)
 

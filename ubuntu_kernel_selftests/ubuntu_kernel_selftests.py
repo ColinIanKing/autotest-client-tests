@@ -131,7 +131,7 @@ class ubuntu_kernel_selftests(test.test):
 
         os.chdir(self.srcdir)
         kv = platform.release().split(".")[:2]
-        kv = int(release[0])*100 + int(release[1])
+        kv = int(kv[0])*100 + int(kv[1])
         if test_name == "net" and kv >= 415:
             # net selftests use a module built by bpf selftests, bpf is available since bionic kernel
             cmd = "make -C linux/tools/testing/selftests TARGETS=bpf"

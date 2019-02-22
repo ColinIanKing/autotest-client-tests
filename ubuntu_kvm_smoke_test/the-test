@@ -29,6 +29,11 @@ fi
 #
 [ ! -f $SSH_KEY ] && ssh-keygen -f $SSH_KEY -t rsa -N ''
 
+# On ppc64el, we need to disable SMT in order for libvirt use of KVM to work.
+if [ "${ARCHITECTURE}" = "ppc64el" ] ; then
+	ppc64_cpu --smt=off
+fi
+
 # Download a release image that can be used to create the KVM instance.
 #
 image=`uvt-simplestreams-libvirt query | grep -P $DISTRO.*$ARCHITECTURE`

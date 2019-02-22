@@ -53,7 +53,15 @@ class ubuntu_kvm_smoke_test(test.test):
         elif arch in ['ppc64le']:
             arch = 'ppc64el'
 
+        # Note that the arch here has been overrided by the if above
+        if arch == 'ppc64el':
+            # disable smt (simultaneous multithreading) on ppc for kvm
+            utils.system('ppc64_cpu --smt=off')
+
         cmd = 'sudo -u %s %s/the-test %s' % (os.getlogin(), self.bindir, arch)
         self.results = utils.system_output(cmd, retain_output=True)
 
+        if arch == 'ppc64el':
+            # turn smt back on
+            utils.system('ppc64_cpu --smt=on')
 # vi:set ts=4 sw=4 expandtab syntax=python:

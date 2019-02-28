@@ -29,7 +29,7 @@ class ubuntu_bootspeed_firstboot(test.test):
             'iname'         : os.environ['REGION'],
             'series'        : platform.dist()[2],
             'instance_type' : os.environ['INSTANCE_TYPE'],
-            'region'        : os.environ['REGiON'],
+            'region'        : os.environ['REGION'],
             'arch'          : 'x86',
         }
         ckct_root = os.path.expanduser('~') + '/ckct'

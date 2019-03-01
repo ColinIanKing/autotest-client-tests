@@ -24,16 +24,14 @@ class ubuntu_bootspeed_firstboot(test.test):
         # bootspeed.
         #
 
-        params = {
-            'cloud'         : os.environ['CLOUD'],
-            'iname'         : os.environ['REGION'],
-            'series'        : platform.dist()[2],
-            'instance_type' : os.environ['INSTANCE_TYPE'],
-            'region'        : os.environ['REGION'],
-            'arch'          : 'x86',
-        }
-        ckct_root = os.path.expanduser('~') + '/ckct'
-        deploy = 'sut-deploy {cloud} {iname} {series} {instance_type} --region {region} --arch {arch}'.format(**params)
-        cmd = ckct_root + '/' + deploy
+        os.environ['BS_CLOUD']          = os.environ['CLOUD']
+        os.environ['BS_SERIES']         = platform.dist()[2]
+        os.environ['BS_INSTNANCE_TYPE'] = os.environ['INSTANCE_TYPE']
+        os.environ['BS_CLOUD_REGION']   = os.environ['REGION']
+        os.environ['BS_ARCH']           = 'x86'
+        os.environ['BS_KERNEL_PACKAGE'] = 'linux-aws'
+        os.environ['BS_KERNEL_FLAVOUR'] = 'aws'
+        os.environ['BS_INSTANCE_NAME']  = 'foo'
 
-        utils.system('echo' + ' ' + cmd)
+        cmd = 'bs-test'
+        utils.system(cmd)

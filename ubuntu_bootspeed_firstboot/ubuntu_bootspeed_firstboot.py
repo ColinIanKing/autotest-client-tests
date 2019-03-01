@@ -34,4 +34,4 @@ class ubuntu_bootspeed_firstboot(test.test):
         os.environ['BS_INSTANCE_NAME']  = 'foo'
 
         cmd = 'bs-test'
-        utils.system(self.srcdir + '/' + cmd)
+        utils.system(self.bindir + '/' + cmd)

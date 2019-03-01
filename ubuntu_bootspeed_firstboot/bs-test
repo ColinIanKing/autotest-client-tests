@@ -2,7 +2,6 @@
 #
 
 set +e
-set -x
 
 KT=$HOME/ckct
 SSH_OPTIONS=" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"
@@ -19,7 +18,7 @@ set +x
 echo '-------------------------------------------------------------------------------------------------------'
 echo 'D E P L O Y'
 echo '-------------------------------------------------------------------------------------------------------'
-# set -x
+set -x
 # Provision the hardware.
 #
 $KT/sut-deploy $BS_CLOUD $SUT $BS_SERIES $BS_INSTANCE_TYPE --nc --region $BS_CLOUD_REGION --arch $BS_ARCH
@@ -33,7 +32,7 @@ if [ $? -eq 0 ]; then
         echo '-------------------------------------------------------------------------------------------------------'
         echo 'T E S T'
         echo '-------------------------------------------------------------------------------------------------------'
-        # set -x
+        set -x
         SRU_CYCLE="unknown" INSTANCE_TYPE="$BS_INSTANCE_TYPE" $KT/sut-test $BS_CLOUD $SUT $BS_SERIES ubuntu_bootspeed_firstboot $HOME --nc --region $BS_CLOUD_REGION
         if [ $? -eq 0 ]; then
             set +x

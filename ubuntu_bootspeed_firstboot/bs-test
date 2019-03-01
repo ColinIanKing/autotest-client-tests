@@ -2,7 +2,7 @@
 #
 
 set +e
-# set -x
+set -x
 
 KT=$HOME/ckct
 SSH_OPTIONS=" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"

@@ -26,7 +26,7 @@ class ubuntu_bootspeed_firstboot(test.test):
 
         os.environ['BS_CLOUD']          = os.environ['CLOUD']
         os.environ['BS_SERIES']         = platform.dist()[2]
-        os.environ['BS_INSTNANCE_TYPE'] = os.environ['INSTANCE_TYPE']
+        os.environ['BS_INSTANCE_TYPE']  = os.environ['INSTANCE_TYPE']
         os.environ['BS_CLOUD_REGION']   = os.environ['REGION']
         os.environ['BS_ARCH']           = 'x86'
         os.environ['BS_KERNEL_PACKAGE'] = 'linux-aws'

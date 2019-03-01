@@ -1,0 +1,61 @@
+#!/bin/bash
+#
+
+set +e
+# set -x
+
+KT=$HOME/ckct
+SSH_OPTIONS=" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"
+SUT=bjf-test
+
+function cleanup {
+    # Don't need the HW any longer, it can be powered off.
+    #
+    $KT/sut-release $BS_CLOUD $SUT --region $BS_CLOUD_REGION
+}
+trap cleanup EXIT
+
+set +x
+echo '-------------------------------------------------------------------------------------------------------'
+echo 'D E P L O Y'
+echo '-------------------------------------------------------------------------------------------------------'
+# set -x
+# Provision the hardware.
+#
+$KT/sut-deploy $BS_CLOUD $SUT $BS_SERIES $BS_INSTANCE_TYPE --nc --region $BS_CLOUD_REGION --arch $BS_ARCH
+if [ $? -eq 0 ]; then
+    SUT_IP=`$KT/sut-info $BS_CLOUD $SUT --region $BS_CLOUD_REGION`
+    $KT/sut-prep $BS_CLOUD $SUT --nc --series $BS_SERIES --package $BS_KERNEL_PACKAGE --arch $BS_ARCH --region $BS_CLOUD_REGION --flavour $BS_KERNEL_FLAVOUR
+    if [ $? -ne 0 ]; then
+        cat provisioning.log
+    else
+        set +x
+        echo '-------------------------------------------------------------------------------------------------------'
+        echo 'T E S T'
+        echo '-------------------------------------------------------------------------------------------------------'
+        # set -x
+        SRU_CYCLE="unknown" INSTANCE_TYPE="$BS_INSTANCE_TYPE" $KT/sut-test $BS_CLOUD $SUT $BS_SERIES ubuntu_bootspeed_firstboot $HOME --nc --region $BS_CLOUD_REGION
+        if [ $? -eq 0 ]; then
+            set +x
+            echo '-------------------------------------------------------------------------------------------------------'
+            echo 'R E S U L T S'
+            echo '-------------------------------------------------------------------------------------------------------'
+            # set -x
+            # BUILD_DIR=~/jobs/$JOB_NAME/builds/$BUILD_ID
+            # ARCHIVE=$BUILD_DIR/archive
+            # mkdir -p $BUILD_DIR
+            # scp $SSH_OPTIONS -r $SUT_IP:kernel-test-results $ARCHIVE
+
+            # if [[ $(python --version) = *3.5.* ]]; then
+            #     $JENKINS_HOME/autotest/client/tools/glue_testsuites $ARCHIVE/*.xml > $WORKSPACE/kernel-results.xml
+            # else
+            #     $JENKINS_HOME/autotest/client/tools/glue_testsuites $ARCHIVE/*.xml > $WORKSPACE/kernel-results-unfiltered.xml
+            #     $KT/unicode-filter $WORKSPACE/kernel-results-unfiltered.xml > $WORKSPACE/kernel-results.xml
+            # fi
+
+            # mv $ARCHIVE $WORKSPACE
+        fi
+    fi
+fi
+
+exit 0

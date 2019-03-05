@@ -14,13 +14,8 @@ name = 'ubuntu_kernel_selftests'
 
 tests = [ 'setup','breakpoints','cpu-hotplug','efivarfs','memory-hotplug','mount','net','ptrace','powerpc','seccomp','user' ]
 
-suite_failed = False
 
 for test in tests:
     results = job.run_test_detail('ubuntu_kernel_selftests', test_name=test, tag=test, timeout=60*15)
-    if results != "GOOD":
-        suite_failed = True
 
-if suite_failed:
-    raise error.JobError
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -23,13 +23,7 @@ release = int(release[0])*100 + int(release[1])
 if 'seccomp' in tests and release > 418 and platform.machine() != 'x86_64':
 	tests.remove('seccomp')
 
-suite_failed = False
-
 for test in tests:
     results = job.run_test_detail('ubuntu_kernel_selftests', test_name=test, tag=test, timeout=60*20)
-    if results != "GOOD":
-        suite_failed = True
 
-if suite_failed:
-    raise error.JobError
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -79,32 +79,25 @@ disable_tracing()
 	sleep 1
 }
 
-alrm_handler()
-{
-	echo "FAILED: aborting, timeout, took way too long to complete"
-	disable_tracing
-	exit 1
-}
-
 timer_start()
 {
-	pid=$$
-	trap alrm_handler SIGALRM
-	( sleep $1
-	  echo "TIMEOUT $pid"
-	  if [ -d /proc/$pid ]; then
-		echo "KILLING $pid"
-		kill -SIGALRM $pid
-		timer_stop
-	  fi
+	local pid=$$
+	(sleep $1
+	 echo TIMER END $(date)
+	 echo "TIMEOUT"
+	 echo "FAILED: aborting, timeout, took way too long to complete"
+	 disable_tracing
+	 exit 1
 	) &
+	timer_pid=$!
 }
 
 timer_stop()
 {
-	trap '' SIGALRM
-}
+	kill -9 $timer_pid 2> /dev/null
+	wait $timer_pid 2> /dev/null
 
+}
 
 test_tracing_files_exist()
 {
@@ -141,9 +134,6 @@ test_available_tracers_exist()
 
 test_enable_all_tracers()
 {
-	n=$(cat /sys/kernel/debug/tracing/available_tracers | wc -w)
-	n=$((n * 30))
-	timer_start $n
 	disable_tracing
 	for t in $(cat /sys/kernel/debug/tracing/available_tracers)
 	do
@@ -154,6 +144,7 @@ test_enable_all_tracers()
 		if [ "$t" == "nop" ]; then
 			continue
 		fi
+		timer_start 30
 		n=0
 		echo $t > /sys/kernel/debug/tracing/current_tracer
 		r=$?
@@ -166,8 +157,8 @@ test_enable_all_tracers()
 		fi
 		disable_tracing
 		check $r "tracer $t can be enabled (got $n lines of tracing output)"
+		timer_stop
 	done
-	timer_stop
 }
 
 test_function_graph_tracer()
@@ -179,14 +170,15 @@ test_function_graph_tracer()
 	echo "function_graph" > /sys/kernel/debug/tracing/current_tracer
 	check $? "function_graph can be enabled"
 	echo 1 > /sys/kernel/debug/tracing/tracing_on
-	cat /sys/kernel/debug/tracing/trace_pipe | grep vfs_write > ${TMPFILE}.log &
-	pid=$$
+	cat /sys/kernel/debug/tracing/trace_pipe > ${TMPFILE}.log &
+	pid=$!
 	dd if=/dev/zero of=$TMPFILE bs=4096 count=200000 conv=sync >& /dev/null
+	sync
+	sleep 5
 	echo 0 > /sys/kernel/debug/tracing/tracing_on
-	if [ ! -d /proc/$pid ]; then
-		kill -9 $pid >& /dev/null
-	fi
-	n=$(wc -l ${TMPFILE}.log | cut -d' ' -f1)
+	kill -9 $pid >& /dev/null
+	wait $pid 2> /dev/null
+	n=$(grep vfs_write ${TMPFILE}.log | wc -l ${TMPFILE}.log | cut -d' ' -f1)
 	threshold=32
 	if [ $n -lt $threshold ]; then
 		fail=1
@@ -208,14 +200,16 @@ test_function_tracer()
 	echo "function" > /sys/kernel/debug/tracing/current_tracer
 	check $? "function can be enabled"
 	echo 1 > /sys/kernel/debug/tracing/tracing_on
-	cat /sys/kernel/debug/tracing/trace_pipe | grep "SyS_write\|ksys_write" > ${TMPFILE}.log &
-	pid=$$
+	cat /sys/kernel/debug/tracing/trace_pipe > ${TMPFILE}.log &
+	pid=$!
 	dd if=/dev/zero of=$TMPFILE bs=4096 count=200000 conv=sync >& /dev/null
+	sync
+	sleep 5
 	echo 0 > /sys/kernel/debug/tracing/tracing_on
-	if [ ! -d /proc/$pid ]; then
-		kill -9 $pid >& /dev/null
-	fi
-	n=$(wc -l ${TMPFILE}.log | cut -d' ' -f1)
+	kill -9 $pid >& /dev/null
+	wait $pid 2> /dev/null
+	n=$(grep "SyS_write\|ksys_write" ${TMPFILE}.log | wc -l | cut -d' ' -f1)
+	cp ${TMPFILE}.log /tmp/cking.log
 	threshold=32
 	if [ $n -lt $threshold ]; then
 		fail=1

@@ -95,6 +95,7 @@ timer_start()
 	  if [ -d /proc/$pid ]; then
 		echo "KILLING $pid"
 		kill -SIGALRM $pid
+		timer_stop
 	  fi
 	) &
 }
@@ -146,6 +147,13 @@ test_enable_all_tracers()
 	disable_tracing
 	for t in $(cat /sys/kernel/debug/tracing/available_tracers)
 	do
+		#
+		#  The nop tracer does nothing and turns of tracing
+		#  so skip this
+		#
+		if [ "$t" == "nop" ]; then
+			continue
+		fi
 		n=0
 		echo $t > /sys/kernel/debug/tracing/current_tracer
 		r=$?
@@ -193,7 +201,7 @@ test_function_graph_tracer()
 
 test_function_tracer()
 {
-	timer_start 60
+	timer_start 120
 
 	disable_tracing
 

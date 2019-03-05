@@ -200,7 +200,7 @@ test_function_tracer()
 	echo "function" > /sys/kernel/debug/tracing/current_tracer
 	check $? "function can be enabled"
 	echo 1 > /sys/kernel/debug/tracing/tracing_on
-	cat /sys/kernel/debug/tracing/trace_pipe | grep "SyS_write" > ${TMPFILE}.log &
+	cat /sys/kernel/debug/tracing/trace_pipe | grep "SyS_write\|ksys_write" > ${TMPFILE}.log &
 	pid=$$
 	dd if=/dev/zero of=$TMPFILE bs=4096 count=200000 conv=sync >& /dev/null
 	echo 0 > /sys/kernel/debug/tracing/tracing_on
@@ -214,7 +214,7 @@ test_function_tracer()
 	else
 		fail=0
 	fi
-	check $fail "SyS_write traces found must be > $threshold, got $n"
+	check $fail "SyS_write or ksys_write traces found must be > $threshold, got $n"
 
 	rm -f $TMPFILE ${TMPFILE}.log
 	timer_stop

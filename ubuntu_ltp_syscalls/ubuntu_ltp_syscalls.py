@@ -29,6 +29,7 @@ class ubuntu_ltp_syscalls(test.test):
             'libselinux1-dev',
             'libssl-dev',
             'libtirpc-dev',
+            'nfs-kernel-server',
             'quota',
             'xfslibs-dev',
             'xfsprogs',

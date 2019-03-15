@@ -38,7 +38,7 @@ class ubuntu_performance_power(test.test):
         os.chdir(self.srcdir)
         self.results = utils.system_output('git clone git://kernel.ubuntu.com/cking/stress-ng', retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
-        self.results = utils.system_output('git checkout -b V0.09.49 V0.09.49', retain_output=True)
+        self.results = utils.system_output('git checkout -b V0.09.56 V0.09.56', retain_output=True)
         self.results = utils.system_output('make', retain_output=True)
 
     def run_once(self, test_full_name, test_name, options, instances):

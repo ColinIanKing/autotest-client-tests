@@ -10,14 +10,39 @@ TEST_CATEGORY = 'Benchmark'
 TEST_TYPE = "client"
 DOC = ""
 
+import os
+hostname = os.uname()[1]
+
 name = 'ubuntu_performance_pts'
 
-results = job.run_test_detail('ubuntu_performance_pts', test_name='setup', tag='setup')
-results += job.run_test_detail('ubuntu_performance_pts', test_name='john-the-ripper-blowfish', tag='ubuntu-performance-pts-john-the-ripper-blowfish', timeout=60*30)
-results += job.run_test_detail('ubuntu_performance_pts', test_name='john-the-ripper-des', tag='ubuntu-performance-pts-john-the-ripper-blowfish-des', timeout=60*30)
-results += job.run_test_detail('ubuntu_performance_pts', test_name='openssl', tag='ubuntu-performance-pts-openssl', timeout=30*60)
-results += job.run_test_detail('ubuntu_performance_pts', test_name='povray', tag='ubuntu-performance-pts-povray', timeout=80*60)
-results += job.run_test_detail('ubuntu_performance_pts', test_name='ttsiod-renderer', tag='ubuntu-performance-pts-ttsiod-renderer', timeout=30*60)
+results = job.run_test_detail(name, test_name='setup', tag='setup', subtest='setup')
+
+jobs = [
+    [ 'john-the-ripper', 'john-the-ripper-blowfish', 30 ],
+    [ 'john-the-ripper', 'john-the-ripper-des', 30 ],
+    [ 'openssl', 'openssl', 30 ],
+    [ 'povray', 'povral', 80 ],
+    [ 'ttsiod-renderer', 'ttsiod-renderer', 30 ],
+]
+
+if os.uname()[1] == 'ivysaur':
+    jobs = jobs + [
+        [ 'apache', 'apache', 10 ],
+        [ 'cloverleaf', 'cloverleaf', 5 ],
+        [ 'crafty', 'crafty', 10 ],
+        [ 'ebizzy', 'ebizzy', 10 ],
+        [ 'git', 'git', 10 ],
+        [ 'phpbench', 'phpbench', 10 ],
+        [ 'unpack-linux', 'unpack-linux', 10 ],
+        [ 'hmmer', 'hmmer', 10 ],
+        [ 'osbench', 'osbench-files', 10 ],
+        [ 'osbench', 'osbench-processes', 10 ],
+        [ 'osbench', 'osbench-threads', 10 ],
+        [ 'osbench', 'osbench-memory', 10 ],
+    ]
+
+for j in jobs:
+    results += job.run_test_detail(name, test_name=j[0], tag=name + '_' + j[1], subtest=j[1], timeout=j[2] * 60)
 
 # print results
 

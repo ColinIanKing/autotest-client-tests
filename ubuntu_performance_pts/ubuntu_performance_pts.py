@@ -67,7 +67,7 @@ class ubuntu_performance_pts(test.test):
 
         print self.results
 
-    def get_sysinfo(self):
+    def get_sysinfo(self, test_name, subtest):
         print 'date_ctime "' + time.ctime() + '"'
         print 'date_ns %-30.0f' % (time.time() * 1000000000)
         print 'kernel_version ' + platform.uname()[2]
@@ -76,7 +76,7 @@ class ubuntu_performance_pts(test.test):
         print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
         print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
         print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
-        print 'pages_availble ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
+        print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
         print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
 
     def get_stats(self, results, fields):
@@ -105,6 +105,8 @@ class ubuntu_performance_pts(test.test):
         fields = [ 'Average', 'Deviation' ]
         values = {}
         test_pass = True
+
+        benchmark = benchmark.replace("-","_")
 
         for i in range(test_iterations):
             results = utils.system_output(command)
@@ -139,42 +141,58 @@ class ubuntu_performance_pts(test.test):
         if test_pass:
             print "PASS: test passes specified performance thresholds"
 
-    def run_john_the_ripper_blowfish(self):
+    def run_john_the_ripper_blowfish(self, test_name, tag):
         cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; %s phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run
         self.print_stats('john_the_ripper_blowfish', cmd)
 
-    def run_john_the_ripper_des(self):
+    def run_john_the_ripper_des(self, test_name, tag):
         cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Traditional DES"; %s phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run
         self.print_stats('john_the_ripper_des', cmd)
 
-    def run_openssl(self):
-        cmd = '%s phoronix-test-suite batch-benchmark openssl' % force_times_to_run
-        self.print_stats('openssl', cmd)
+    def run_generic(self, test_name, subtest):
+        cmd = '%s phoronix-test-suite batch-benchmark %s' % (force_times_to_run, test_name)
+        self.print_stats(test_name, cmd)
 
-    def run_povray(self):
-        cmd = '%s phoronix-test-suite batch-benchmark povray' % force_times_to_run
-        self.print_stats('povray', cmd)
+    def run_osbench_files(self, test_name, subtest):
+        cmd = 'echo 1 | %s phoronix-test-suite batch-benchmark %s' % (force_times_to_run, test_name)
+        self.print_stats(test_name, cmd)
 
-    def run_ttsiod_renderer(self):
-        cmd = '%s phoronix-test-suite batch-benchmark ttsiod-renderer' % force_times_to_run
-        self.print_stats('ttsiod_renderer', cmd)
+    def run_osbench_processes(self, test_name, subtest):
+        cmd = 'echo 2 | %s phoronix-test-suite batch-benchmark %s' % (force_times_to_run, test_name)
+        self.print_stats(test_name, cmd)
 
+    def run_osbench_threads(self, test_name, subtest):
+        cmd = 'echo 3 | %s phoronix-test-suite batch-benchmark %s' % (force_times_to_run, test_name)
+        self.print_stats(test_name, cmd)
 
-    def run_once(self, test_name):
+    def run_osbench_memory(self, test_name, subtest):
+        cmd = 'echo 5 | %s phoronix-test-suite batch-benchmark %s' % (force_times_to_run, test_name)
+        self.print_stats(test_name, cmd)
+
+    def run_once(self, test_name, subtest):
+        print "Testing " + subtest
         run_funcs = {
             'setup': self.get_sysinfo,
+            'cloverleaf': self.run_generic,
+            'crafty': self.run_generic,
+            'ebizzy': self.run_generic,
+            'git': self.run_generic,
+            'build-llvm': self.run_generic,
             'john-the-ripper-blowfish' : self.run_john_the_ripper_blowfish,
             'john-the-ripper-des': self.run_john_the_ripper_des,
-            'openssl': self.run_openssl,
-            'povray': self.run_povray,
-            'ttsiod-renderer': self.run_ttsiod_renderer,
+            'openssl': self.run_generic,
+            'osbench-files': self.run_osbench_files,
+            'osbench-processes': self.run_osbench_files,
+            'osbench-threads': self.run_osbench_threads,
+            'osbench-memory': self.run_osbench_memory,
+            'povray': self.run_generic,
+            'ttsiod-renderer': self.run_generic,
         }
 
-        if test_name in run_funcs:
-                run_funcs[test_name]()
-                print
+        if subtest in run_funcs:
+                run_funcs[subtest](test_name, subtest)
         else:
-                print 'cannot find test "%s"' % test_name
-
+            self.run_generic(test_name, subtest)
+        print
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

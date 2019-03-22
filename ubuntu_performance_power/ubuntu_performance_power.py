@@ -4,6 +4,7 @@ import os
 from autotest.client                        import test, utils
 from math import sqrt
 import platform
+import time
 
 #
 # Number of test iterations to get min/max/average stats
@@ -41,9 +42,21 @@ class ubuntu_performance_power(test.test):
         self.results = utils.system_output('git checkout -b V0.09.56 V0.09.56', retain_output=True)
         self.results = utils.system_output('make', retain_output=True)
 
+    def get_sysinfo(self):
+        print 'date_ctime "' + time.ctime() + '"'
+        print 'date_ns %-30.0f' % (time.time() * 1000000000)
+        print 'kernel_version ' + platform.uname()[2]
+        print 'hostname ' + platform.node()
+        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
+        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
+        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
+        print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
+        print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
+        print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
+
     def run_once(self, test_full_name, test_name, options, instances):
         if test_name == 'setup':
-            return
+            return self.get_sysinfo()
 
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
         cmd = "%s/ubuntu_performance_power.sh '%s' '%s' %d %d" % (self.bindir, test_name, options, test_iterations, instances)

@@ -12,6 +12,14 @@ DOC = ""
 
 name = 'ubuntu_performance_lkp'
 
+#
+#  Broken and/or problematic tests
+#
+unused_lkp_jobs = {
+    'pxz.yaml':
+        [ 'pxz-100%.yaml' ],
+}
+
 lkp_jobs = {
     'aim9.yaml':
         [ 'aim9-brk_test-300s.yaml',
@@ -46,8 +54,6 @@ lkp_jobs = {
 	  'perf-bench-futex-100%-300s-hash.yaml',
           'perf-bench-futex-100%-300s-shared-lock-pi.yaml',
           'perf-bench-futex-100%-300s-lock-pi.yaml' ],
-    'pxz.yaml':
-        [ 'pxz-100%.yaml' ],
     'schbench.yaml':
         [ 'schbench-100%.yaml' ],
     'sockperf.yaml':
@@ -76,6 +82,7 @@ lkp_jobs = {
 }
 
 results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs)
+print results
 
 for lkp_job in sorted(lkp_jobs):
     print "JOB '%s'" % lkp_job

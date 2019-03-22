@@ -6,6 +6,7 @@ from math import sqrt
 import platform
 import time
 import json
+import socket
 
 #
 # Number of test iterations to get min/max/average stats
@@ -29,7 +30,6 @@ class ubuntu_performance_lkp(test.test):
 
         pkgs = [
             'build-essential',
-            'pxz',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -44,15 +44,19 @@ class ubuntu_performance_lkp(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
 
-        os.environ["https_proxy"] = "http://squid.internal:3128"
-        os.environ["http_proxy"] = "http://squid.internal:3128"
+        ipaddr = socket.gethostbyname(socket.gethostname())
+        if not "192.168." in ipaddr:
+            os.environ["https_proxy"] = "http://squid.internal:3128"
+            os.environ["http_proxy"] = "http://squid.internal:3128"
 
         utils.system_output('apt-get install git', retain_output=True)
 
         os.chdir(self.srcdir)
-        self.results = utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
-        os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
-        self.results = utils.system_output('git checkout -b stable ' + commit, retain_output=True)
+
+        if not os.path.isdir("lkp-tests"):
+            self.results += utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
+            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+            self.results += utils.system_output('git checkout -b stable ' + commit, retain_output=True)
 
         utils.system_output('make install', retain_output=True)
         utils.system_output('yes "" | lkp install', retain_output=True)
@@ -463,9 +467,22 @@ class ubuntu_performance_lkp(test.test):
         print "%s_kb_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
         return [ ('rate', values) ]
 
+    def get_sysinfo(self):
+        print 'date_ctime "' + time.ctime() + '"'
+        print 'date_ns %-30.0f' % (time.time() * 1000000000)
+        print 'kernel_version ' + platform.uname()[2]
+        print 'hostname ' + platform.node()
+        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
+        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
+        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
+        print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
+        print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
+        print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
+
     def run_once(self, lkp_job, sub_job, lkp_jobs):
         if lkp_job == 'setup':
-            #self.setup(lkp_jobs)
+            self.get_sysinfo()
+            self.setup(lkp_jobs)
             return
 
         job_funcs = {

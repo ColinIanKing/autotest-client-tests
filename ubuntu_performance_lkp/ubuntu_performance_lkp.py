@@ -44,6 +44,9 @@ class ubuntu_performance_lkp(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
 
+        os.environ["https_proxy"] = "http://squid.internal:3128"
+        os.environ["http_proxy"] = "http://squid.internal:3128"
+
         utils.system_output('apt-get install git', retain_output=True)
 
         os.chdir(self.srcdir)
@@ -78,6 +81,7 @@ class ubuntu_performance_lkp(test.test):
             # ------------------------------------------------------------------------------------------------------------
             found_dashes = False;
             for line in self.results.splitlines():
+                print line
                 chunks = line.split()
                 if len(chunks) > 0 and '---------' in chunks[0]:
                     found_dashes = True;
@@ -485,6 +489,7 @@ class ubuntu_performance_lkp(test.test):
         test_name = sub_job
         test_name = test_name.replace("-", "_").replace(".yaml", "")
         test_pass = True
+        test_run  = False
 
         print
         if lkp_job in job_funcs:
@@ -494,10 +499,14 @@ class ubuntu_performance_lkp(test.test):
             return
 
         for (label, values) in ret_values:
+            if len(values) == 0:
+                    continue
             minimum = min(values)
             maximum = max(values)
             average = sum(values) / len(values)
             max_err = (maximum - minimum) / average * 100.0
+
+            test_run = True
 
             if len(values) > 1:
                 stddev = sqrt(float(reduce(lambda x, y: x + y, map(lambda x: (x - average) ** 2, values))) / (len(values) - 1))
@@ -515,8 +524,12 @@ class ubuntu_performance_lkp(test.test):
                 print "FAIL: maximum error is greater than 5%"
                 test_pass = False
 
-        if test_pass:
-            print "PASS: test passes specified performance thresholds"
-            print
+        if test_run:
+            if test_pass:
+                print "PASS: test passes specified performance thresholds"
+                print
+        else:
+                print "NOTRUN: test not run on this sytem"
+                print
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

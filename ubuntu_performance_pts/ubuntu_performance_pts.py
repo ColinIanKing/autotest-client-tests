@@ -35,7 +35,7 @@ class ubuntu_performance_pts(test.test):
             'php-cli',
             'php-xml',
             'gdb',
-            'libssl1.0-dev',
+            'libssl-dev',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -106,6 +106,7 @@ class ubuntu_performance_pts(test.test):
         fields = [ 'Average', 'Deviation' ]
         values = {}
         test_pass = True
+        test_run = False
 
         benchmark = benchmark.replace("-","_")
 
@@ -113,34 +114,41 @@ class ubuntu_performance_pts(test.test):
             results = utils.system_output(command)
             values[i] = self.get_stats(results, fields)
 
-            print
-            print "Test %d of %d:" % (i + 1, test_iterations)
-            for field in fields:
-                print benchmark + "_" + field.lower() + "[%d] %s" % (i, values[i][field])
+            if values[i] != {}:
+                print
+                print "Test %d of %d:" % (i + 1, test_iterations)
+                for field in fields:
+                    print benchmark + "_" + field.lower() + "[%d] %s" % (i, values[i][field])
 
         #
         #  Compute min/max/average:
         #
         field = 'Average'
-        v = [ float(values[i][field]) for i in values ]
-        maximum = max(v)
-        minimum = min(v)
-        average = sum(v) / float(len(v))
-        max_err = (maximum - minimum) / average * 100.0
+        if values[i] != {}:
+            test_run = True
+            v = [ float(values[i][field]) for i in values ]
+            test_run = True
+            maximum = max(v)
+            minimum = min(v)
+            average = sum(v) / float(len(v))
+            max_err = (maximum - minimum) / average * 100.0
 
-        print
-        print benchmark + "_" + field.lower() + "_minimum", minimum
-        print benchmark + "_" + field.lower() + "_maximum", maximum
-        print benchmark + "_" + field.lower() + "_average", average
-        print benchmark + "_" + field.lower() + "_maximum_error %.2f%%" % (max_err)
-        print
+            print
+            print benchmark + "_" + field.lower() + "_minimum", minimum
+            print benchmark + "_" + field.lower() + "_maximum", maximum
+            print benchmark + "_" + field.lower() + "_average", average
+            print benchmark + "_" + field.lower() + "_maximum_error %.2f%%" % (max_err)
+            print
 
-        if max_err > 5.0:
-            print "FAIL: maximum error is greater than 5%"
-            test_pass = False
+            if max_err > 5.0:
+                print "FAIL: maximum error is greater than 5%"
+                test_pass = False
 
-        if test_pass:
-            print "PASS: test passes specified performance thresholds"
+            if test_pass:
+                print "PASS: test passes specified performance thresholds"
+
+        if not test_run:
+            print "NOTRUN: test not run, no data"
 
     def run_john_the_ripper_blowfish(self, test_name, tag):
         cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; %s phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run

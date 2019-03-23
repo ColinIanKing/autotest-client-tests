@@ -29,6 +29,7 @@ jobs = [
 # More OS orientated benchmarks
 #
 if os.uname()[1] == 'ivysaur':
+    jobs = [
         [ 'apache', 'apache', 10 ],
         [ 'cloverleaf', 'cloverleaf', 5 ],
         [ 'crafty', 'crafty', 10 ],

@@ -34,14 +34,15 @@ class ubuntu_performance_pts(test.test):
             'zlib1g-dev',
             'php-cli',
             'php-xml',
-            'libssl1.0-dev',
             'gdb',
+            'libssl1.0-dev',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
-        self.results = utils.system_output(cmd, retain_output=True)
+        for p in pkgs:
+            cmd = 'apt-get install --yes --force-yes ' + ' ' + p
+            utils.system_output(cmd, retain_output=False)
 
     def initialize(self):
         pass

@@ -25,8 +25,10 @@ jobs = [
     [ 'ttsiod-renderer', 'ttsiod-renderer', 30 ],
 ]
 
+#
+# More OS orientated benchmarks
+#
 if os.uname()[1] == 'ivysaur':
-    jobs = jobs + [
         [ 'apache', 'apache', 10 ],
         [ 'cloverleaf', 'cloverleaf', 5 ],
         [ 'crafty', 'crafty', 10 ],

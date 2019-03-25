@@ -48,7 +48,7 @@ class ubuntu_kvm_unit_tests(test.test):
         arch = platform.processor()
         opt = []
         os.chdir(self.srcdir)
-        cmd = 'git clone --depth=1 https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git'
+        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/ubuntu/kvm-unit-tests/ -b disco'
         self.results = utils.system_output(cmd, retain_output=True)
         os.chdir('kvm-unit-tests')
         if arch == 'ppc64le':

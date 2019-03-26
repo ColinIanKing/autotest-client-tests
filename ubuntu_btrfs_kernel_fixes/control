@@ -85,6 +85,13 @@ else:
 if release == '14.04':
 	blacklist.append('0061280d2c7240805cfd7b1f493da967c97c2f34.sh')
 
+# Specical case for 5fbc7c59fd22c5a6531b40b0759624b680a95e52 (lp:1821317)
+# This bug exists in upstream kernel, disable it until we have the fix
+arch = platform.processor()
+if arch == 'i686':
+    if release in ['16.04', '18.04']:
+    blacklist.apped('5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh')
+
 #
 # This forces setup() to be run, it is in fact a no-op test
 #

@@ -89,7 +89,7 @@ if release == '14.04':
 # This bug exists in upstream kernel, disable it until we have the fix
 arch = platform.processor()
 if arch == 'i686':
-    if release in ['16.04', '18.04']:
+    if kernel in ['4.4', '4.15']:
         blacklist.append('5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh')
 
 #

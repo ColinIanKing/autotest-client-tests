@@ -90,7 +90,7 @@ if release == '14.04':
 arch = platform.processor()
 if arch == 'i686':
     if release in ['16.04', '18.04']:
-    blacklist.apped('5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh')
+        blacklist.append('5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh')
 
 #
 # This forces setup() to be run, it is in fact a no-op test

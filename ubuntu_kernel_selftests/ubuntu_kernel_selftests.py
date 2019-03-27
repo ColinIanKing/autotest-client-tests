@@ -146,7 +146,7 @@ class ubuntu_kernel_selftests(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
         if self.results.rfind('[FAIL]\n') != -1:
-            raise error.TestFail('Test failed for ' + test_name)
+            raise error.TestError('Test failed for ' + test_name)
 
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -102,8 +102,16 @@ timer_stop()
 test_tracing_files_exist()
 {
 	ok=1
-	files="current_tracer available_tracers tracing_on trace trace_pipe trace_options options tracing_max_latency tracing_thresh buffer_size_kb buffer_total_size_kb free_buffer tracing_cpumask set_ftrace_filter set_ftrace_notrace set_ftrace_pid set_graph_function available_filter_functions enabled_functions function_profile_enabled kprobe_events kprobe_profile max_graph_depth printk_formats saved_cmdlines snapshot stack_max_size stack_trace stack_trace_filter trace_clock trace_marker uprobe_events uprobe_profile instances events"
-	for f in $files
+	files=(current_tracer available_tracers tracing_on trace \
+	       trace_pipe trace_options options tracing_max_latency \
+	       tracing_thresh buffer_size_kb buffer_total_size_kb \
+	       free_buffer tracing_cpumask set_ftrace_filter \
+	       set_ftrace_notrace set_ftrace_pid set_graph_function \
+	       available_filter_functions enabled_functions \
+	       function_profile_enabled max_graph_depth printk_formats \
+	       saved_cmdlines snapshot stack_max_size stack_trace \
+	       stack_trace_filter trace_clock trace_marker instances events)
+	for f in "${files[@]}"
 	do
 		if [ ! -e /sys/kernel/debug/tracing/$f ]; then
 			echo "FAILED /sys/kernel/debug/tracing/$f does not exist"
@@ -163,7 +171,7 @@ test_enable_all_tracers()
 
 test_function_graph_tracer()
 {
-	timer_start 60
+	timer_start 120
 
 	disable_tracing
 

@@ -56,14 +56,12 @@ elif kernel == '3.19':
 	]
 elif kernel == '4.4':
 	blacklist = [
-		'3b080b2564287be91605bfd1d5ee985696e61d3c.sh',
 		'4330e183c9537df20952d4a9ee142c536fb8ae54.sh',
 		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh'
 	]
 elif kernel == '4.15':
 	blacklist = [
 		'2365dd3ca02bbb6d3412404482e1d85752549953.sh',
-		'3b080b2564287be91605bfd1d5ee985696e61d3c.sh',
 		'6113077cd319e747875ec71227d2b5cb54e08c76.sh',
 		'f88ba6a2a44ee98e8d59654463dc157bb6d13c43.sh'
 	]
@@ -71,26 +69,17 @@ elif kernel == '4.19':
 	# broken in 4.19, fixed in 5.0
 	blacklist = [
 		'2365dd3ca02bbb6d3412404482e1d85752549953.sh',
-		'3b080b2564287be91605bfd1d5ee985696e61d3c.sh',
 		'6113077cd319e747875ec71227d2b5cb54e08c76.sh',
 	]
 else:
 	# for 4.20 and newer
 	blacklist = [
 		'2365dd3ca02bbb6d3412404482e1d85752549953.sh',
-		'3b080b2564287be91605bfd1d5ee985696e61d3c.sh',
 		'6113077cd319e747875ec71227d2b5cb54e08c76.sh'
 	]
 
 if release == '14.04':
 	blacklist.append('0061280d2c7240805cfd7b1f493da967c97c2f34.sh')
-
-# Specical case for 5fbc7c59fd22c5a6531b40b0759624b680a95e52 (lp:1821317)
-# This bug exists in upstream kernel, disable it until we have the fix
-arch = platform.processor()
-if arch == 'i686':
-    if kernel in ['4.4', '4.15']:
-        blacklist.append('5fbc7c59fd22c5a6531b40b0759624b680a95e52.sh')
 
 #
 # This forces setup() to be run, it is in fact a no-op test

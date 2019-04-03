@@ -134,15 +134,18 @@ class ubuntu_performance_stream(test.test):
         print 'ntimes %d' % ntimes
 
         if memory_required > memory_available:
-                print 'WARNING: Not enough memory available to run stream for %d elements without swapping' % stream_size
+                print 'WARNING: Not enough memory available to run stream for %d elements without swapping, skipping test' % stream_size
+		return False
+	return True
 
     def run_once(self, test_name):
         if test_name == 'setup':
             return
 
-        self.get_sysinfo()
-        print
-        self.run_stream()
+        enough_ram = self.get_sysinfo()
+        if enough_ram:
+            print
+            self.run_stream()
         print
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

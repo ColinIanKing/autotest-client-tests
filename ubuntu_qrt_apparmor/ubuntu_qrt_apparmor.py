@@ -32,7 +32,6 @@ class ubuntu_qrt_apparmor(test.test):
             'pyflakes',
             'python3',
             'python3-all-dev',
-            'python-libapparmor',
             'python-pexpect',
             'quilt',
             'sudo',
@@ -41,7 +40,10 @@ class ubuntu_qrt_apparmor(test.test):
         pkgs.append(gcc)
 
         if series == 'precise':
-            for p in ['ruby1.8']:
+            for p in ['python-libapparmor', 'ruby1.8']:
+                pkgs.append(p)
+        elif series in ['trusty', 'xenial', 'bionic', 'cosmic']:
+            for p in ['python-libapparmor', 'python3-libapparmor', 'ruby', 'apparmor-easyprof']:
                 pkgs.append(p)
         else:
             for p in ['python3-libapparmor', 'ruby', 'apparmor-easyprof']:

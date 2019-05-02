@@ -229,6 +229,8 @@ test_dd_trace()
 	rd=$(grep "Reads Completed:" ${TMPFILE}.parsed | tail -1 | awk '{ print $3 + 0 }')
 	wr=$(grep "Writes Completed:" ${TMPFILE}.parsed | tail -1 | awk '{ print $7 + 0 }')
 
+	rd=$(($rd + 0))
+	wr=$(($wr + 0))
 	#
 	#  older kernels can't trace read events on loop back, so fall back
 	#  and count queued events as a way of testing trace events are
@@ -236,9 +238,11 @@ test_dd_trace()
 	#
 	if [ $rd -eq 0 ]; then
 		rd=$(grep "Reads Queued:" ${TMPFILE}.parsed | tail -1 | awk '{ print $3 + 0 }')
+		rd=$(($rd + 0))
 	fi
 	if [ $wr -eq 0 ]; then
 		wr=$(grep "Writes Queued:" ${TMPFILE}.parsed | tail -1 | awk '{ print $7 + 0 }')
+		wr=$(($wr + 0))
 	fi
 
 	#
@@ -256,9 +260,6 @@ test_dd_trace()
 		echo "PASSED (got $dd_count block trace events)"
 	fi
 
-	if [ -z "$rd" ]; then
-		rd=0
-	fi
 	if [ $rd -lt ${EVENTS} ]; then
 		inc_failed
 		echo "FAILED (expecting at least ${EVENTS} block read traces events, got $rd)"
@@ -267,9 +268,6 @@ test_dd_trace()
 		echo "PASSED (got $rd block read trace events)"
 	fi
 
-	if [ -z "$wr" ]; then
-		wr=0
-	fi
 	if [ $wr -lt ${EVENTS} ]; then
 		inc_failed
 		echo "FAILED (expecting at least ${EVENTS} block write traces events, got $wr)"

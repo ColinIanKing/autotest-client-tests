@@ -115,11 +115,14 @@ class ubuntu_ltp_syscalls(test.test):
         if num_failed > 0:
             cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"
             failed_list = utils.system_output(cmd, retain_output=False, verbose=False)
-            if num_blacklisted > 0:
-                print("Blacklisted test cases: %s" % ', '.join(blacklisted))
             print("Failed test cases : %s" % failed_list)
-            cmd = 'cat ' + log_output
-            utils.system_output(cmd, retain_output=True, verbose=False)
+
+        if num_blacklisted > 0:
+            print("Blacklisted test cases: %s" % ', '.join(blacklisted))
+        cmd = 'cat ' + log_output
+        utils.system_output(cmd, retain_output=True, verbose=False)
+
+        if num_failed > 0:
             raise error.TestFail()
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

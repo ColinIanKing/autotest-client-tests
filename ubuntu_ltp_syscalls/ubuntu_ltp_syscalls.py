@@ -31,6 +31,7 @@ class ubuntu_ltp_syscalls(test.test):
             'libtirpc-dev',
             'nfs-kernel-server',
             'quota',
+            'virt-what',
             'xfslibs-dev',
             'xfsprogs',
         ]
@@ -95,6 +96,10 @@ class ubuntu_ltp_syscalls(test.test):
         fn = '/opt/ltp/runtest/%s' % (test_name)
         blacklisted = self.testcase_blacklist()
 
+        print("Checking virt-what to see if we need to set LTP_TIMEOUT_MUL...")
+        if utils.system_output('virt-what', verbose=False):
+            print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL=3 (lp:1797327)")
+            os.environ["LTP_TIMEOUT_MUL"] = "3"
         with open(fn , 'r') as f:
             for line in f:
                 if line.strip() and not line.startswith('#'):

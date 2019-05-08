@@ -44,18 +44,24 @@ class ubuntu_performance_misc(test.test):
                 return float(words[3])
         return 0.0
 
-    def parse_vmstat(self, output):
+    def parse_vmstat_generic(self, output, field):
 	lines = output.splitlines()
 	if len(lines) < 3:
 		return 0.0
 	words = lines[0].split()
-	if 'in' not in words:
+	if field not in words:
 		return 0.0
-	idx = words.index('in')
+	idx = words.index(field)
 	words = lines[2].split()
 	if len(words) < idx:
 		return 0.0
 	return float(words[idx])
+
+    def parse_vmstat_interrupts(self, output):
+	return self.parse_vmstat_generic(output, 'in')
+
+    def parse_vmstat_context_switches(self, output):
+	return self.parse_vmstat_generic(output, 'cs')
 
     def run_once(self, test_name):
         if test_name == 'setup':
@@ -69,7 +75,10 @@ class ubuntu_performance_misc(test.test):
             self.parser = self.parse_eventstat
 	elif test_name == 'interrupts':
 	    cmd = 'vmstat 60 2 -n  | grep -v ^procs'
-            self.parser = self.parse_vmstat
+            self.parser = self.parse_vmstat_interrupts
+	elif test_name == 'context-switches':
+	    cmd = 'vmstat 60 2 -n  | grep -v ^procs'
+            self.parser = self.parse_vmstat_context_switches
         else:
             return
 

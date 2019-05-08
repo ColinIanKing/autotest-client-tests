@@ -16,7 +16,8 @@ name = 'ubuntu_performance_misc'
 
 tests = [ 'kernel-wakeups',
 	  'userspace-wakeups',
-          'interrupts' ]
+          'interrupts',
+          'context-switches' ]
 
 results = job.run_test_detail(name, tag='setup', test_name='setup')
 

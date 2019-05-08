@@ -521,7 +521,7 @@ class ubuntu_performance_lkp(test.test):
             minimum = min(values)
             maximum = max(values)
             average = sum(values) / len(values)
-            max_err = (maximum - minimum) / average * 100.0
+            max_err = (maximum - minimum) / average * 100.0 if average > 0 else 0.0
 
             test_run = True
 
@@ -529,7 +529,7 @@ class ubuntu_performance_lkp(test.test):
                 stddev = sqrt(float(reduce(lambda x, y: x + y, map(lambda x: (x - average) ** 2, values))) / (len(values) - 1))
             else:
                 stddev = 0.0
-            percent_stddev = (stddev / average) * 100.0
+            percent_stddev = (stddev / average) * 100.0 if averafe > 0 else 0.0
             print "%s_%s_minimum %.3f" % (test_name, label, minimum)
             print "%s_%s_maximum %.3f" % (test_name, label, maximum)
             print "%s_%s_average %.3f" % (test_name, label, average)

@@ -44,6 +44,19 @@ class ubuntu_performance_misc(test.test):
                 return float(words[3])
         return 0.0
 
+    def parse_vmstat(self, output):
+	lines = output.splitlines()
+	if len(lines) < 3:
+		return 0.0
+	words = lines[0].split()
+	if 'in' not in words:
+		return 0.0
+	idx = words.index('in')
+	words = lines[2].split()
+	if len(words) < idx:
+		return 0.0
+	return float(words[idx])
+
     def run_once(self, test_name):
         if test_name == 'setup':
             return self.get_sysinfo()
@@ -54,6 +67,9 @@ class ubuntu_performance_misc(test.test):
         elif test_name == 'userspace-wakeups':
             cmd = 'sudo eventstat 60 1 -u'
             self.parser = self.parse_eventstat
+	elif test_name == 'interrupts':
+	    cmd = 'vmstat 60 2 -n  | grep -v ^procs'
+            self.parser = self.parse_vmstat
         else:
             return
 

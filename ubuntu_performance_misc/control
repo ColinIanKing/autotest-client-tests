@@ -15,7 +15,8 @@ DOC = ""
 name = 'ubuntu_performance_misc'
 
 tests = [ 'kernel-wakeups',
-	  'userspace-wakeups' ]
+	  'userspace-wakeups',
+          'interrupts' ]
 
 results = job.run_test_detail(name, tag='setup', test_name='setup')
 

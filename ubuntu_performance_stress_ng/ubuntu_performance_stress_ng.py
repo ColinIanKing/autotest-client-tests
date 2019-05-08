@@ -75,13 +75,13 @@ class ubuntu_performance_stress_ng(test.test):
                 minimum = min(bogoops)
                 maximum = max(bogoops)
                 average = sum(bogoops) / len(bogoops)
-                max_err = (maximum - minimum) / average * 100.0
+                max_err = (maximum - minimum) / average * 100.0 if average > 0 else 0.0
 
                 if len(bogoops) > 1:
                     stddev = sqrt(float(reduce(lambda x, y: x + y, map(lambda x: (x - average) ** 2, bogoops))) / (len(bogoops) - 1))
                 else:
                     stddev = 0.0
-                percent_stddev = (stddev / average) * 100.0
+                percent_stddev = (stddev / average) * 100.0 if average > 0 else 0.0
                 print
                 print "%s_bogoops" % (test_name), "%.3f " * len(bogoops) % tuple(bogoops)
                 print "%s_minimum %.3f" % (test_name, minimum)

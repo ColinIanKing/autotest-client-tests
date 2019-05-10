@@ -36,6 +36,8 @@ class ubuntu_performance_pts(test.test):
             'php-xml',
             'gdb',
             'libssl-dev',
+            'libssl1.0-dev',
+            'autoconf'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

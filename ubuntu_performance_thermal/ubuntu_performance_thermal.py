@@ -57,13 +57,13 @@ class ubuntu_performance_thermal(test.test):
                 percent_stddev = (stddev / average) * 100.0
 
                 print
-                print "%s_%s" % (name, test_full_name), "%.3f " * len(bogoops) % tuple(bogoops)
-                print "%s_%s_minimum %.3f" % (name, test_full_name, minimum)
-                print "%s_%s_maximum %.3f" % (name, test_full_name, maximum)
-                print "%s_%s_average %.3f" % (name, test_full_name, average)
-                print "%s_%s_maximum_error %.3f%%" % (name, test_full_name, max_err)
-                print "%s_%s_stddev %.3f" % (name, test_full_name, stddev)
-                print "%s_%s_percent_stddev %.3f" % (name, test_full_name, percent_stddev)
+                print "%s_%s" % (test_full_name, name), "%.3f " * len(bogoops) % tuple(bogoops)
+                print "%s_%s_minimum %.3f" % (test_full_name, name, minimum)
+                print "%s_%s_maximum %.3f" % (test_full_name, name, maximum)
+                print "%s_%s_average %.3f" % (test_full_name, name, average)
+                print "%s_%s_maximum_error %.3f%%" % (test_full_name, name, max_err)
+                print "%s_%s_stddev %.3f" % (test_full_name, name, stddev)
+                print "%s_%s_percent_stddev %.3f" % (test_full_name, name, percent_stddev)
 
                 if max_err > 5.0:
                     print "FAIL: maximum error is greater than 5%"

@@ -24,6 +24,8 @@ NBD_IMAGE_PATH=/tmp/nbd_image.img
 NBD_DEV=/dev/nbd0
 NBD_CONFIG=/tmp/nbd-$$.conf
 NBD_PORT=10809
+NBD_BLOCK_SIZE=512
+NBD_TIMEOUT=240
 
 do_log()
 {
@@ -166,7 +168,7 @@ do_test()
 	nbd-client -l localhost | grep -v Negotiation
 
 	do_log "starting client with NBD device ${NBD_DEV}"
-	nbd-client -t 30 -b 1024 -N test localhost ${NBD_DEV}
+	nbd-client -t ${NBD_TIMEOUT} -b ${NBD_BLOCK_SIZE} -p -N test localhost ${NBD_DEV}
 	if [ $? -ne 0 ]; then
 		do_log  "nbd-client failed to start"
 		do_tidy

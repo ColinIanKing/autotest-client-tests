@@ -100,6 +100,13 @@ do
 	wait $PID
 	ret=$?
 
+	BOGO_OP=$(grep bogo-ops: ${YML_FILE} | awk '{print $2}')
+	echo "BOGO_OP=${BOGO_OP}"
+	BOGO_OPS="${BOGO_OPS} ${BOGO_OP}"
+
+	BOGO_OP_PER_WATT=$(echo "scale=5; ${BOGO_OP} / ${WATT}" | bc)
+	BOGO_OPS_PER_WATT="${BOGO_OPS_PER_WATT} ${BOGO_OP_PER_WATT}"
+
 	n=$(dmesg | grep "Out of memory:" | wc -l)
 	if [ $ret -ne 0 -a $n -gt 0 ]; then
 		ret=88
@@ -163,14 +170,16 @@ dur=$((s2 - $s1))
 echo " "
 echo "Summary:"
 echo "  Stressors run: $count"
-echo "  Skipped:  $(echo $skipped | wc -w), $skipped"
-echo "  Failed:   $(echo $failed | wc -w), $failed"
-echo "  Oopsed:   $(echo $oopsed | wc -w), $oopsed"
-echo "  Oomed:    $(echo $oomed | wc -w), $oomed"
-echo "  Passed:   $(echo $passed | wc -w), $passed"
-echo "  Badret:   $(echo $badret | wc -w), $badret"
-echo "  Watts:    ${WATTS}"
-echo " "
+echo "  Skipped:        $(echo $skipped | wc -w), $skipped"
+echo "  Failed:         $(echo $failed | wc -w), $failed"
+echo "  Oopsed:         $(echo $oopsed | wc -w), $oopsed"
+echo "  Oomed:          $(echo $oomed | wc -w), $oomed"
+echo "  Passed:         $(echo $passed | wc -w), $passed"
+echo "  Badret:         $(echo $badret | wc -w), $badret"
+echo "  Watts:          ${WATTS}"
+echo "  BogoOps:        ${BOGO_OPS}"
+echo "  BogoOpsPerWatt: ${BOGO_OPS_PER_WATT}"
+echo "  "
 echo "Tests took $dur seconds to run"
 
 exit $rc

@@ -54,21 +54,10 @@ class ubuntu_performance_power(test.test):
         print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
         print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
 
-    def run_once(self, test_full_name, test_name, options, instances):
-        if test_name == 'setup':
-            return self.get_sysinfo()
-
-        os.chdir(os.path.join(self.srcdir, 'stress-ng'))
-        cmd = "%s/ubuntu_performance_power.sh '%s' '%s' %d %d" % (self.bindir, test_name, options, test_iterations, instances)
-        self.results = utils.system_output(cmd, retain_output=True)
-
-        test_name = test_name.replace("-", "_")
-        test_pass = True
-        test_full_name = test_full_name.replace("-", "_")
-
+    def parse(self, results, test_pass, test_full_name, field, name):
         for line in self.results.splitlines():
             chunks = line.split()
-            if len(chunks) > 1 and chunks[0] == 'Watts:':
+            if len(chunks) > 1 and chunks[0] == field:
                 watts = [float(x) for x in chunks[1:]]
                 minimum = min(watts)
                 maximum = max(watts)
@@ -82,20 +71,36 @@ class ubuntu_performance_power(test.test):
                 percent_stddev = (stddev / average) * 100.0
 
                 print
-                print "%s_x86_watts" % (test_full_name), "%.3f " * len(watts) % tuple(watts)
-                print "%s_x86_watts_minimum %.3f" % (test_full_name, minimum)
-                print "%s_x86_watts_maximum %.3f" % (test_full_name, maximum)
-                print "%s_x86_watts_average %.3f" % (test_full_name, average)
-                print "%s_x86_watts_maximum_error %.3f%%" % (test_full_name, max_err)
-                print "%s_x86_watts_stddev %.3f" % (test_full_name, stddev)
-                print "%s_x86_watts_percent_stddev %.3f" % (test_full_name, percent_stddev)
+                print "%s_%s" % (test_full_name, name), "%.3f " * len(watts) % tuple(watts)
+                print "%s_%s_minimum %.3f" % (test_full_name, name, minimum)
+                print "%s_%s_maximum %.3f" % (test_full_name, name, maximum)
+                print "%s_%s_average %.3f" % (test_full_name, name, average)
+                print "%s_%s_maximum_error %.3f%%" % (test_full_name, name, max_err)
+                print "%s_%s_stddev %.3f" % (test_full_name, name, stddev)
+                print "%s_%s_percent_stddev %.3f" % (test_full_name, name, percent_stddev)
 
                 if max_err > 5.0:
                     print "FAIL: maximum error is greater than 5%"
                     test_pass = False
+        return test_pass
 
-                if test_pass:
-                    print "PASS: test passes specified performance thresholds"
-                print
+    def run_once(self, test_full_name, test_name, options, instances):
+        if test_name == 'setup':
+            return self.get_sysinfo()
+
+        os.chdir(os.path.join(self.srcdir, 'stress-ng'))
+        cmd = "%s/ubuntu_performance_power.sh '%s' '%s' %d %d" % (self.bindir, test_name, options, test_iterations, instances)
+        self.results = utils.system_output(cmd, retain_output=True)
+
+        test_name = test_name.replace("-", "_")
+        test_pass = True
+        test_full_name = test_full_name.replace("-", "_")
+
+        test_pass = self.parse(self.results, True, test_full_name, 'Watts:', 'x86_watts')
+        test_pass = self.parse(self.results, test_pass, test_full_name, 'BogoOps:', 'bogoops')
+        test_pass = self.parse(self.results, test_pass, test_full_name, 'BogoOpsPerWatt:', 'bogoops_per_watt')
+        if test_pass:
+            print "PASS: test passes specified performance thresholds"
+        print
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

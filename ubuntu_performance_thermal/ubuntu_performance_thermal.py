@@ -40,21 +40,10 @@ class ubuntu_performance_thermal(test.test):
         self.results = utils.system_output('git checkout -b V0.09.56 V0.09.56', retain_output=True)
         self.results = utils.system_output('make', retain_output=True)
 
-    def run_once(self, test_full_name, test_name, options, instances):
-        if test_name == 'setup':
-            return
-
-        os.chdir(os.path.join(self.srcdir, 'stress-ng'))
-        cmd = "%s/ubuntu_performance_thermal.sh '%s' '%s' %d %d" % (self.bindir, test_name, options, test_iterations, instances)
-        self.results = utils.system_output(cmd, retain_output=True)
-
-        test_name = test_name.replace("-", "_")
-        test_pass = True
-        test_full_name = test_full_name.replace("-", "_")
-
-        for line in self.results.splitlines():
+    def parse(self, results, test_pass, test_full_name, field, name):
+        for line in results.splitlines():
             chunks = line.split()
-            if len(chunks) > 1 and chunks[0] == 'PkgTemps:':
+            if len(chunks) > 1 and chunks[0] == field:
                 bogoops = [float(x) for x in chunks[1:]]
                 minimum = min(bogoops)
                 maximum = max(bogoops)
@@ -68,20 +57,35 @@ class ubuntu_performance_thermal(test.test):
                 percent_stddev = (stddev / average) * 100.0
 
                 print
-                print "%s_x86_pkg_temp" % (test_full_name), "%.3f " * len(bogoops) % tuple(bogoops)
-                print "%s_x86_pkg_temp_minimum %.3f" % (test_full_name, minimum)
-                print "%s_x86_pkg_temp_maximum %.3f" % (test_full_name, maximum)
-                print "%s_x86_pkg_temp_average %.3f" % (test_full_name, average)
-                print "%s_x86_pkg_temp_maximum_error %.3f%%" % (test_full_name, max_err)
-                print "%s_x86_pkg_temp_stddev %.3f" % (test_full_name, stddev)
-                print "%s_x86_pkg_temp_percent_stddev %.3f" % (test_full_name, percent_stddev)
+                print "%s_%s" % (name, test_full_name), "%.3f " * len(bogoops) % tuple(bogoops)
+                print "%s_%s_minimum %.3f" % (name, test_full_name, minimum)
+                print "%s_%s_maximum %.3f" % (name, test_full_name, maximum)
+                print "%s_%s_average %.3f" % (name, test_full_name, average)
+                print "%s_%s_maximum_error %.3f%%" % (name, test_full_name, max_err)
+                print "%s_%s_stddev %.3f" % (name, test_full_name, stddev)
+                print "%s_%s_percent_stddev %.3f" % (name, test_full_name, percent_stddev)
 
                 if max_err > 5.0:
                     print "FAIL: maximum error is greater than 5%"
                     test_pass = False
+        return test_pass
 
-                if test_pass:
-                    print "PASS: test passes specified performance thresholds"
-                print
+    def run_once(self, test_full_name, test_name, options, instances):
+        if test_name == 'setup':
+            return
+
+        os.chdir(os.path.join(self.srcdir, 'stress-ng'))
+        cmd = "%s/ubuntu_performance_thermal.sh '%s' '%s' %d %d" % (self.bindir, test_name, options, test_iterations, instances)
+        self.results = utils.system_output(cmd, retain_output=True)
+
+        test_name = test_name.replace("-", "_")
+        test_full_name = test_full_name.replace("-", "_")
+
+        test_pass = self.parse(self.results, True, test_full_name, 'PkgTemps:', 'x86_pkg_temp')
+        test_pass = self.parse(self.results, test_pass, test_full_name, 'BogoOps:', 'bogoops')
+        test_pass = self.parse(self.results, test_pass, test_full_name, 'BogoOpsPerKelvin:', 'bogoops_per_kelvin')
+        if test_pass:
+            print "PASS: test passes specified performance thresholds"
+        print
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -80,6 +80,7 @@ set_max_oom_level
 #  Now run the tests and gather stats
 #
 PKG_TEMPS=""
+BOGO_OPS=""
 s1=$(secs_now)
 for i in $(seq ${RUNS})
 do
@@ -93,9 +94,18 @@ do
 	echo "$s RETURNED $ret"
 
 	cat ${YML_FILE}
-	PKG_TEMP=$(grep x86_pkg_temp ${YML_FILE}  | awk '{print $2}')
+	PKG_TEMP=$(grep x86_pkg_temp: ${YML_FILE} | awk '{print $2}')
 	echo "PKG_TEMP=${PKG_TEMP}"
 	PKG_TEMPS="${PKG_TEMPS} ${PKG_TEMP}"
+
+	BOGO_OP=$(grep bogo-ops: ${YML_FILE} | awk '{print $2}')
+	echo "BOGO_OP=${BOGO_OP}"
+	BOGO_OPS="${BOGO_OPS} ${BOGO_OP}"
+
+	KELVIN=$(echo "scale=2; 273.15 + ${PKG_TEMP}" | bc)
+	BOGO_OP_PER_KELVIN=$(echo "scale=5; ${BOGO_OP} / ${KELVIN}" | bc)
+	BOGO_OPS_PER_KELVIN="${BOGO_OPS_PER_KELVIN} ${BOGO_OP_PER_KELVIN}"
+
 	rm -f ${YML_FILE}
 
 	n=$(dmesg | grep "Out of memory:" | wc -l)
@@ -156,13 +166,15 @@ dur=$((s2 - $s1))
 echo " "
 echo "Summary:"
 echo "  Stressors run: $count"
-echo "  Skipped:  $(echo $skipped | wc -w), $skipped"
-echo "  Failed:   $(echo $failed | wc -w), $failed"
-echo "  Oopsed:   $(echo $oopsed | wc -w), $oopsed"
-echo "  Oomed:    $(echo $oomed | wc -w), $oomed"
-echo "  Passed:   $(echo $passed | wc -w), $passed"
-echo "  Badret:   $(echo $badret | wc -w), $badret"
-echo "  PkgTemps: ${PKG_TEMPS}"
+echo "  Skipped:          $(echo $skipped | wc -w), $skipped"
+echo "  Failed:           $(echo $failed | wc -w), $failed"
+echo "  Oopsed:           $(echo $oopsed | wc -w), $oopsed"
+echo "  Oomed:            $(echo $oomed | wc -w), $oomed"
+echo "  Passed:           $(echo $passed | wc -w), $passed"
+echo "  Badret:           $(echo $badret | wc -w), $badret"
+echo "  PkgTemps:         ${PKG_TEMPS}"
+echo "  BogoOps:          ${BOGO_OPS}"
+echo "  BogoOpsPerKelvin: ${BOGO_OPS_PER_KELVIN}"
 echo " "
 echo "Tests took $dur seconds to run"
 

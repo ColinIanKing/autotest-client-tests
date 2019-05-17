@@ -38,8 +38,7 @@ class ubuntu_futex(test.test):
         cmd = 'sed -i s/lpthread/pthread/ Makefile'
         self.results = utils.system_output(cmd, retain_output=True)
 
-        cmd = 'make'
-        self.results = utils.system_output(cmd, retain_output=True)
+        utils.make()
 
     # run_once
     #

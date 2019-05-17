@@ -35,8 +35,7 @@ class ubuntu_seccomp(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'seccomp', 'tests'))
-        cmd = 'make'
-        self.results = utils.system_output(cmd, retain_output=True)
+        utils.make()
 
     # run_once
     #

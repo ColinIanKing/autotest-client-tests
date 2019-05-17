@@ -66,6 +66,9 @@ class ubuntu_ltp(test.test):
         utils.make(nprocs)
         utils.make('install')
 
+        cmd = 'cat %s > /tmp/skip' % os.path.join(self.bindir, 'skip')
+        utils.system_output(cmd)
+
     # run_once
     #
     #    Driven by the control file for each individual test.
@@ -74,14 +77,8 @@ class ubuntu_ltp(test.test):
         if test_name == 'setup':
             return
 
-        os.chdir('/opt/ltp')
-
-        cmd = 'rm -f /opt/ltp/runtest/syscalls'
-        utils.system_output(cmd)
-        cmd = 'cat %s >> /tmp/skip' % os.path.join(self.bindir, 'skip')
-        utils.system_output(cmd)
-
-        cmd = './runltp -S /tmp/skip'
+        fn = '/opt/ltp/runtest/%s' % (test_name)
+        cmd = '/opt/ltp/runltp -f ' + fn + ' -S /tmp/skip'
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

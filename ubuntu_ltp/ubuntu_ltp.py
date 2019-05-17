@@ -76,7 +76,7 @@ class ubuntu_ltp(test.test):
 
         os.chdir('/opt/ltp')
 
-        cmd = 'cat /opt/ltp/runtest/syscalls > /tmp/skip'
+        cmd = 'rm -f /opt/ltp/runtest/syscalls'
         utils.system_output(cmd)
         cmd = 'cat %s >> /tmp/skip' % os.path.join(self.bindir, 'skip')
         utils.system_output(cmd)

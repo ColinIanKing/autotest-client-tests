@@ -31,7 +31,7 @@ class ubuntu_stress_smoke_test(test.test):
         cmd = 'apt-get install zlib1g-dev libbsd-dev libattr1-dev libkeyutils-dev libapparmor-dev apparmor libaio-dev --assume-yes'
         utils.system_output(cmd, retain_output=True)
         os.chdir(self.srcdir)
-        cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng'
+        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/cking/stress-ng'
         self.results = utils.system_output(cmd, retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
         try:

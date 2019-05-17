@@ -51,7 +51,7 @@ class ubuntu_fs_fio_perf(test.test):
 
         os.chdir(self.srcdir)
         utils.system('rm -rf fs-test-proto')
-        utils.system('git clone git://kernel.ubuntu.com/cking/fs-test-proto.git')
+        utils.system('git clone --depth=1 git://kernel.ubuntu.com/cking/fs-test-proto.git')
         os.chdir(self.fio_tests_dir)
         utils.system('tar xvfz ../tools/fio-2.1.9.tar.gz')
         os.chdir(os.path.join(self.fio_tests_dir, 'fio'))

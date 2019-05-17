@@ -31,7 +31,7 @@ class ubuntu_futex(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
-        cmd = 'git clone git://git.kernel.org/pub/scm/linux/kernel/git/dvhart/futextest.git'
+        cmd = 'git clone --depth=1 git://git.kernel.org/pub/scm/linux/kernel/git/dvhart/futextest.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'futextest', 'functional'))

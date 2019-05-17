@@ -32,7 +32,7 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
         if not os.path.exists('/upper'):
             os.mkdir('/upper')
         os.chdir(self.srcdir)
-        cmd = 'git clone http://kernel.ubuntu.com/git-repos/kernel-ppa/unionmount-testsuite.git'
+        cmd = 'git clone --depth=1 http://kernel.ubuntu.com/git-repos/kernel-ppa/unionmount-testsuite.git'
         self.results = utils.system_output(cmd, retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'unionmount-testsuite'))
         cmd = 'patch -p1 < %s/0001-Fix-check-for-file-on-overlayfs.patch' % self.bindir

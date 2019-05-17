@@ -53,7 +53,7 @@ class ubuntu_zfs_stress(test.test):
 
         utils.system('cp %s/ubuntu_zfs_stress.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
-        cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng 2>&1'
+        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/cking/stress-ng 2>&1'
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))

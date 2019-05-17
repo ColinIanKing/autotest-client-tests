@@ -31,7 +31,7 @@ class ubuntu_seccomp(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
-        cmd = 'git clone https://github.com/redpig/seccomp.git'
+        cmd = 'git clone --depth=1 https://github.com/redpig/seccomp.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'seccomp', 'tests'))

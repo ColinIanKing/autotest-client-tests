@@ -53,7 +53,7 @@ class ubuntu_ltp(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
-        cmd = 'git clone https://github.com/linux-test-project/ltp.git'
+        cmd = 'git clone --depth=1 https://github.com/linux-test-project/ltp.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'ltp'))

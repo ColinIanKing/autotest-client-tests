@@ -37,7 +37,7 @@ class ubuntu_stress_btrfs(test.test):
         self.job.require_gcc()
         utils.system('cp %s/ubuntu_stress_btrfs.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
-        cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng 2>&1'
+        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/cking/stress-ng 2>&1'
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))

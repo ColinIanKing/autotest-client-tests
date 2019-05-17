@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import platform
 from autotest.client import test, utils
@@ -34,7 +35,11 @@ class ubuntu_ecryptfs(test.test):
         utils.system('autoreconf -ivf')
         utils.system('intltoolize -c -f')
         utils.configure('--enable-tests --disable-pywrap')
-        utils.make()
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
 
     def run_once(self, test_name, fs_type):
         os.chdir(self.srcdir)

@@ -1,5 +1,6 @@
 #
 #
+import multiprocessing
 import os
 import platform
 import time
@@ -62,14 +63,14 @@ class ubuntu_ltp_syscalls(test.test):
         os.chdir(os.path.join(self.srcdir, 'ltp'))
         print("Patching utimensat_tests for Xenial...")
         utils.system('patch -N -p1 < %s/0001-utimensat_tests-fix-for-xenial.patch' % self.bindir)
-        cmd = 'make autotools'
-        self.results = utils.system_output(cmd, retain_output=True)
-        cmd = './configure'
-        self.results = utils.system_output(cmd, retain_output=True)
-        cmd = 'make'
-        self.results = utils.system_output(cmd, retain_output=True)
-        cmd = 'make install'
-        self.results = utils.system_output(cmd, retain_output=True)
+        utils.make('autotools')
+        utils.configure()
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
+        utils.make('install')
 
     def testcase_blacklist(self):
         flavour = platform.release().split('-')[2]

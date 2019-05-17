@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import sys
 import re
@@ -54,7 +55,11 @@ class ubuntu_kvm_unit_tests(test.test):
         if arch == 'ppc64le':
             opt.append('--endian={}'.format(sys.byteorder))
         utils.configure(' '.join(opt))
-        utils.make()
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
 
         # patch run_tests.sh to build our tests list
         utils.system('patch -p1 < %s/runtime_show.patch' % self.bindir)

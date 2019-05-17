@@ -1,3 +1,4 @@
+import multiprocessing
 import os, re, glob, logging
 import platform
 from autotest.client.shared import error
@@ -199,7 +200,11 @@ class xfstests(test.test):
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "Building xfstests"
         utils.system('pwd')
-        utils.make()
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
 
         logging.debug("Available tests in srcdir: %s" %
                       ", ".join(self._get_available_tests()))

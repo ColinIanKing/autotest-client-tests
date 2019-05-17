@@ -1,5 +1,6 @@
 #
 #
+import multiprocessing
 import os
 import platform
 from autotest.client                        import test, utils
@@ -56,14 +57,14 @@ class ubuntu_ltp(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'ltp'))
-        cmd = 'make autotools'
-        self.results = utils.system_output(cmd, retain_output=True)
-        cmd = './configure'
-        self.results = utils.system_output(cmd, retain_output=True)
-        cmd = 'make'
-        self.results = utils.system_output(cmd, retain_output=True)
-        cmd = 'make install'
-        self.results = utils.system_output(cmd, retain_output=True)
+        utils.make('autotools')
+        utils.configure()
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
+        utils.make('install')
 
     # run_once
     #

@@ -1,5 +1,6 @@
 #
 #
+import multiprocessing
 import os
 from autotest.client                        import test, utils
 import platform
@@ -33,7 +34,11 @@ class ubuntu_stress_smoke_test(test.test):
         cmd = 'git clone git://kernel.ubuntu.com/cking/stress-ng'
         self.results = utils.system_output(cmd, retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
-        self.results = utils.system_output('make', retain_output=True)
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
 
     def run_once(self, test_name):
         if test_name == 'setup':

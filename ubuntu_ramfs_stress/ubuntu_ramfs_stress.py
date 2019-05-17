@@ -1,5 +1,6 @@
 #
 #
+import multiprocessing
 import os
 import platform
 from autotest.client                        import test, utils
@@ -45,8 +46,11 @@ class ubuntu_ramfs_stress(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
-        cmd = 'make -j 4'
-        self.results = utils.system_output(cmd, retain_output=True)
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
 
         cmd = 'ls -al ' + self.bindir
         self.results = utils.system_output(cmd, retain_output=True)

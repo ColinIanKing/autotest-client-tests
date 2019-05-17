@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import platform
 from autotest.client import test, utils
@@ -54,8 +55,12 @@ class ubuntu_fs_fio_perf(test.test):
         os.chdir(self.fio_tests_dir)
         utils.system('tar xvfz ../tools/fio-2.1.9.tar.gz')
         os.chdir(os.path.join(self.fio_tests_dir, 'fio'))
-        utils.system('make clean')
-        utils.system('make -j 4')
+        utils.make('clean')
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
         os.chdir(self.srcdir)
 
         #

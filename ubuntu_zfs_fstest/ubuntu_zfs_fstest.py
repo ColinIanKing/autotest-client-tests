@@ -1,9 +1,9 @@
 #
 #
+import multiprocessing
 import os
 import platform
 from autotest.client                        import test, utils
-import platform
 
 class ubuntu_zfs_fstest(test.test):
     version = 1
@@ -59,7 +59,11 @@ class ubuntu_zfs_fstest(test.test):
 
         os.chdir(self.srcdir)
         print "Building fstest.."
-        utils.system('make')
+        try:
+            nprocs = '-j' + str(multiprocessing.cpu_count())
+        except:
+            nprocs = ''
+        utils.make(nprocs)
         print "Loading zfs driver.."
         utils.system('modprobe zfs')
 

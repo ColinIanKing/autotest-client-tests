@@ -214,8 +214,12 @@ rc=0
 test_lttng_session_create
 echo " "
 
-test_lttng_list_kernel
-echo " "
+#
+# Disabled for all kernels as this is broken for all kernels > 4.8-rc1.
+# See LP#1802495
+#
+#test_lttng_list_kernel
+#echo " "
 
 #
 # Disabled because of LP#1671063, https://bugs.lttng.org/issues/1091
@@ -227,15 +231,12 @@ echo " "
 
 #
 # Disabled for s390x, this is broken because of syscall tracing vmalloc
-# issues (as above)
+# issues (as above).
+# Also disabled for all kernels as this is broken for all kernels > 4.8-rc1.
+# See LP#1802495
 #
-processor=$(uname -p)
-if [ "$processor" == "s390x" ]; then
-	echo "lttng smoke test trace open/close system calls SKIPPED for $processor"
-else
-	test_lttng_open_close
-fi
-echo " "
+#test_lttng_open_close
+#echo " "
 
 test_lttng_context_switch
 echo " "

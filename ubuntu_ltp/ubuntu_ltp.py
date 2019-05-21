@@ -3,6 +3,7 @@
 import multiprocessing
 import os
 import platform
+import time
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
 
@@ -76,9 +77,33 @@ class ubuntu_ltp(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
+        fn = '/tmp/syscalls-' + time.strftime("%h%d-%H%M")
+        log_failed = fn + '.failed'
+        log_output = fn + '.output'
 
         fn = '/opt/ltp/runtest/%s' % (test_name)
-        cmd = '/opt/ltp/runltp -f ' + fn + ' -S /tmp/skip'
-        self.results = utils.system_output(cmd, retain_output=True)
+        with open(fn , 'r') as f:
+            for line in f:
+                if line.strip() and not line.startswith('#'):
+                    with open ('/tmp/target' , 'w') as t:
+                        t.write(line)
+                    cmd = '/opt/ltp/runltp -f /tmp/target -S /tmp/skip -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
+                    utils.run(cmd, ignore_status=True, verbose=False)
+                    # /dev/loop# creation will be taken care by the runltp
+
+        num_failed = sum(1 for line in open(log_failed))
+        print("== Test Suite Summary ==")
+        print("{} test cases failed").format(num_failed)
+
+        if num_failed > 0:
+            cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"
+            failed_list = utils.system_output(cmd, retain_output=False, verbose=False)
+            print("Failed test cases : %s" % failed_list)
+
+        cmd = 'cat ' + log_output
+        utils.system_output(cmd, retain_output=True, verbose=False)
+
+        if num_failed > 0:
+            raise error.TestError('Test failed for ' + test_name)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

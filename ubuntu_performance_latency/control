@@ -1,0 +1,31 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_latency"
+CRITERIA = """
+Latency Performace Regression Tests using stress-ng cyclic tests
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_latency'
+
+tests = [ 'switch',
+          'cpu',
+          'fork',
+          'hdd',
+          'iomix',
+          'mmap',
+          'sock',
+          'udp' ]
+
+results = job.run_test_detail(name, test_name='setup', tag='setup')
+print "Estimated run time: %.0f minutes for %d benchmarks." % ((5 + (len(tests) * 2.05)), len(tests))
+
+for test in sorted(tests):
+    print test
+    results = job.run_test_detail(name, test_name=test, tag=test, timeout=600)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

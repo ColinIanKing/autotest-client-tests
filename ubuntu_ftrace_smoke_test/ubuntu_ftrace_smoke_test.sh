@@ -142,6 +142,7 @@ test_available_tracers_exist()
 
 test_enable_all_tracers()
 {
+	TMPFILE=/tmp/tracing-$$.log
 	disable_tracing
 	for t in $(cat /sys/kernel/debug/tracing/available_tracers)
 	do
@@ -158,8 +159,15 @@ test_enable_all_tracers()
 		r=$?
 		if [ $r -eq 0 ]; then
 			echo 1 > /sys/kernel/debug/tracing/tracing_on
-			dd if=/dev/zero of=/dev/null bs=1024 count=8192 >& /dev/null
-			n=$(cat  /sys/kernel/debug/tracing/trace | wc -l)
+			#
+			#  Force some activity
+			#
+			(dd if=/dev/zero bs=1024 count=4096 | dd of=$TMPFILE bs=1024 conv=sync) >& /dev/null
+			pid=$!
+			n=$(dd if=/sys/kernel/debug/tracing/trace bs=1024 count=64 2> /dev/null | wc -l)
+			kill -9 $pid 2> /dev/null
+			wait $pid 2> /dev/null
+			rm -f $TMPFILE
 			echo 0 > /sys/kernel/debug/tracing/tracing_on
 			echo nop > /sys/kernel/debug/tracing/current_tracer
 		fi
@@ -171,29 +179,23 @@ test_enable_all_tracers()
 
 test_function_graph_tracer()
 {
-	timer_start 120
+	timer_start 60
 
 	disable_tracing
 
 	echo "function_graph" > /sys/kernel/debug/tracing/current_tracer
 	check $? "function_graph can be enabled"
 	echo 1 > /sys/kernel/debug/tracing/tracing_on
-	cat /sys/kernel/debug/tracing/trace_pipe > ${TMPFILE}.log &
-	pid=$!
-	dd if=/dev/zero of=$TMPFILE bs=4096 count=200000 conv=sync >& /dev/null
-	sync
-	sleep 5
+	(dd if=/sys/kernel/debug/tracing/trace_pipe bs=1024 count=1024 2> /dev/null) > ${TMPFILE}.log
 	echo 0 > /sys/kernel/debug/tracing/tracing_on
-	kill -9 $pid >& /dev/null
-	wait $pid 2> /dev/null
-	n=$(grep vfs_write ${TMPFILE}.log | wc -l ${TMPFILE}.log | cut -d' ' -f1)
+	n=$(grep irq ${TMPFILE}.log | grep "()" | wc -l ${TMPFILE}.log | cut -d' ' -f1)
 	threshold=32
 	if [ $n -lt $threshold ]; then
 		fail=1
 	else
 		fail=0
 	fi
-	check $fail "vfs_write traces found must be > $threshold, got $n"
+	check $fail "irq traces found must be > $threshold, got $n"
 
 	rm -f $TMPFILE ${TMPFILE}.log
 	timer_stop
@@ -201,22 +203,16 @@ test_function_graph_tracer()
 
 test_function_tracer()
 {
-	timer_start 120
+	timer_start 60
 
 	disable_tracing
 
 	echo "function" > /sys/kernel/debug/tracing/current_tracer
 	check $? "function can be enabled"
 	echo 1 > /sys/kernel/debug/tracing/tracing_on
-	cat /sys/kernel/debug/tracing/trace_pipe > ${TMPFILE}.log &
-	pid=$!
-	dd if=/dev/zero of=$TMPFILE bs=4096 count=200000 conv=sync >& /dev/null
-	sync
-	sleep 5
+	(dd if=/sys/kernel/debug/tracing/trace_pipe bs=1K count=1024 2> /dev/null) > ${TMPFILE}.log
 	echo 0 > /sys/kernel/debug/tracing/tracing_on
-	kill -9 $pid >& /dev/null
-	wait $pid 2> /dev/null
-	n=$(grep "SyS_write\|ksys_write" ${TMPFILE}.log | wc -l | cut -d' ' -f1)
+	n=$(grep "irq" ${TMPFILE}.log | wc -l | cut -d' ' -f1)
 	cp ${TMPFILE}.log /tmp/cking.log
 	threshold=32
 	if [ $n -lt $threshold ]; then
@@ -224,7 +220,7 @@ test_function_tracer()
 	else
 		fail=0
 	fi
-	check $fail "SyS_write or ksys_write traces found must be > $threshold, got $n"
+	check $fail "irq traces found must be > $threshold, got $n"
 
 	rm -f $TMPFILE ${TMPFILE}.log
 	timer_stop

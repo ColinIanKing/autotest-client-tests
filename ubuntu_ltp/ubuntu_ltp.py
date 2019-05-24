@@ -77,7 +77,7 @@ class ubuntu_ltp(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
-        fn = '/tmp/syscalls-' + time.strftime("%h%d-%H%M")
+        fn = '/tmp/syscalls-' + time.strftime("%h%d-%H%M%S")
         log_failed = fn + '.failed'
         log_output = fn + '.output'
 

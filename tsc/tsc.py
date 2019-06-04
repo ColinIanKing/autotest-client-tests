@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+import platform
 from autotest.client import test, utils
 from autotest.client.shared import error
 
@@ -11,9 +12,23 @@ class tsc(test.test):
     preserve_srcdir = True
 
     def setup(self):
+        self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
         utils.make()
+
+    def install_required_pkgs(self):
+        arch   = platform.processor()
+        series = platform.dist()[2]
+
+        pkgs = [
+            'build-essential',
+        ]
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
+        pkgs.append(gcc)
+
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
         pass

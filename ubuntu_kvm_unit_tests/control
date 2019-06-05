@@ -9,11 +9,24 @@ kvm-unit-tests is the upstream project that tests KVM:
 http://git.kernel.org/cgit/virt/kvm/kvm-unit-tests.git
 '''
 
-# BLACKLIST is a list of kvm-unit-tests that we know we don't want to run
-#
-BLACKLIST = []
+# When running the whole suite with ./run_test -v, these are the test in
+# nodefault group and will be marked as:
+#     test marked as manual run only
+# Switch to standalone mode so we need to exclude them explicitly
+BLACKLIST = [
+    "hyperv_clock",
+    "vmware_backdoors"
+]
 
 job.run_test_detail(NAME, test_name='setup', tag='setup')
-job.run_test_detail(NAME, test_name=NAME, tag='all', timeout=60*60*1)
+
+tests_dir = os.path.join(job.bindir, 'tmp', NAME, 'src', 'kvm-unit-tests', 'tests')
+tests_list = os.listdir(tests_dir)
+tests_list.sort()
+for test in tests_list:
+    if test in BLACKLIST:
+        print("BLACKLISTED: " + test)
+        continue
+    job.run_test_detail(NAME, test_name=test, tag=test)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

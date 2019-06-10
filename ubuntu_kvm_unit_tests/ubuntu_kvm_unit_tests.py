@@ -52,6 +52,10 @@ class ubuntu_kvm_unit_tests(test.test):
         cmd = 'git clone --depth=1 git://kernel.ubuntu.com/ubuntu/kvm-unit-tests/ -b disco'
         self.results = utils.system_output(cmd, retain_output=True)
         os.chdir('kvm-unit-tests')
+
+        # patch run_tests.sh to get rid of the color output
+        utils.system('patch -p1 < %s/runtime_show.patch' % self.bindir)
+
         if arch == 'ppc64le':
             opt.append('--endian={}'.format(sys.byteorder))
         utils.configure(' '.join(opt))
@@ -60,9 +64,6 @@ class ubuntu_kvm_unit_tests(test.test):
         except:
             nprocs = ''
         utils.make(nprocs + ' standalone')
-
-        # patch run_tests.sh to build our tests list
-        utils.system('patch -p1 < %s/runtime_show.patch' % self.bindir)
 
     def run_once(self, test_name):
         if test_name == 'setup':

@@ -13,10 +13,6 @@ class ubuntu_ltp(test.test):
     def install_required_pkgs(self):
         arch   = platform.processor()
         series = platform.dist()[2]
-        cloud  = os.environ['CLOUD']
-
-        if cloud in ['gcp', 'gke', 'aws', 'azure']:
-            raise error.TestError('This test suite does not run correctly on any of these clouds and needs to be investigated.')
 
         pkgs = [
             'automake',

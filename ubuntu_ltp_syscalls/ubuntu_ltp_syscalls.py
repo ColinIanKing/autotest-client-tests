@@ -40,7 +40,7 @@ class ubuntu_ltp_syscalls(test.test):
         pkgs.append(gcc)
 
         flavour = platform.uname()[2].split('-')[-1]
-        if flavour in ['azure', 'gcp']:
+        if flavour in ['azure', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + flavour + '*')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

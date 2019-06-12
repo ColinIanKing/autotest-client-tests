@@ -19,9 +19,9 @@ tests = [
     'mm',         'ipc',             'sched',          'math',        'nptl',
     'pty',        'containers',      'fs_bind',        'controllers', 'filecaps',
     'cap_bounds', 'fcntl-locktests', 'connectors',     'timers',      'power_management_tests',
-    'hugetlb',    'commands',        'hyperthreading', 'kernel_misc', 'fs_ext4',
-    'can',        'cpuhotplug',      'net.ipv6_lib',   'input',       'cve',
-    'crypto'
+    'hugetlb',    'commands',        'hyperthreading', 'fs_ext4',     'can',
+    'cpuhotplug', 'net.ipv6_lib',    'input',          'cve',         'crypto',
+    'kernel_misc'
 ]
 for test in tests:
     results = job.run_test_detail('ubuntu_ltp', test_name=test, tag=test, timeout=60*60*2)

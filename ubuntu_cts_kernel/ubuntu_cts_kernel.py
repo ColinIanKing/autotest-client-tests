@@ -17,6 +17,9 @@ class ubuntu_cts_kernel(test.test):
         else:
             pkgs.append('iproute2')
 
+        if series not in ['precise', 'trusty']:
+            pkgs.append('net-tools')
+
         if major_kernel_version == '3.2.0':
             pkgs.append('linux-tools')
         else:

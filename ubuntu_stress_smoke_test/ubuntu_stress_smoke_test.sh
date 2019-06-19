@@ -1,5 +1,7 @@
 #!/bin/bash 
 
+SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
+
 #
 # Stress test duration in seconds
 #
@@ -96,6 +98,18 @@ oomed=""
 badret=""
 
 #
+# Enable Zswap if it is available and save original setting
+# to restore later.
+#
+if [ -e ${SYS_ZSWAP_ENABLED} ]; then
+	ORIGINAL_SYS_ZSWAP_SETTING=$(cat ${SYS_ZSWAP_ENABLED})
+	echo Y > ${SYS_ZSWAP_ENABLED}
+	SYS_ZSWAP_SETTING=$(cat ${SYS_ZSWAP_ENABLED})
+else
+	SYS_ZSWAP_SETTING="N"
+fi
+
+#
 #  Always add 1GB of swap to ensure swapping is exercised
 #
 SWPIMG=$PWD/swap.img
@@ -110,6 +124,7 @@ echo "Machine Configuration"
 echo "Physical Pages:  $(getconf _PHYS_PAGES)"
 echo "Pages available: $(getconf _AVPHYS_PAGES)"
 echo "Page Size:       $(getconf PAGE_SIZE)"
+echo "Zswap enabled:   ${SYS_ZSWAP_SETTING}"
 echo " "
 echo "Free memory:"
 free
@@ -202,5 +217,9 @@ echo "Tests took $dur seconds to run"
 
 swapoff -a ${SWPIMG}
 rm ${SWPIMG}
+
+if [ -e ${SYS_ZSWAP_ENABLED} ]; then
+	echo ${ORIGINAL_SYS_ZSWAP_SETTING} > ${SYS_ZSWAP_ENABLED}
+fi
 
 exit $rc

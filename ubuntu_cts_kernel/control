@@ -28,6 +28,13 @@ except:
 name = 'ubuntu_cts_kernel'
 
 BUGS=['lp1256988','lp1153769','lp1262692','lp1026116']
+cmd = 'modprobe dummy'
+try:
+    utils.system(cmd)
+except CmdError:
+    # This test needs the dummy module (lp:1833375), remove it if the module is not available
+    BUGS.remove('lp1262692')
+
 for bug in BUGS:
     result = job.run_test_detail(name, bug=bug, tag=bug, ifname=ifname)
 

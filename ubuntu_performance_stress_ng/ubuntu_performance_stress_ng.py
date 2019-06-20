@@ -5,6 +5,8 @@ from autotest.client                        import test, utils
 from math import sqrt
 import platform
 import time
+import subprocess
+import resource
 
 #
 # Number of test iterations to get min/max/average stats

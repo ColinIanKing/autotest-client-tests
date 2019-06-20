@@ -115,7 +115,7 @@ class ubuntu_performance_stream(test.test):
         pages_available = int(utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
         memory_available = float(page_size * pages_available)
         #
-        # 4 arrays of 8 byres per elemet
+        # 4 arrays of 8 bytes per elemet
         #
         memory_required = float(4 * 8 * stream_size)
 

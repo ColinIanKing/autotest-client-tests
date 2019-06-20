@@ -6,6 +6,8 @@ import time
 import re
 import getpass
 import pwd
+import subprocess
+import resource
 from autotest.client import test, utils
 
 #
@@ -23,6 +25,53 @@ force_times_to_run = ""
 
 class ubuntu_performance_pts(test.test):
     version = 2
+    systemd_services = [
+        "smartd.service",
+        "iscsid.service",
+        "apport.service",
+        "cron.service",
+        "anacron.timer",
+        "apt-daily.timer",
+        "apt-daily-upgrade.timer",
+        "fstrim.timer",
+        "logrotate.timer",
+        "motd-news.timer",
+        "man-db.timer",
+        "foobar"
+    ]
+    systemctl = "systemctl"
+
+    def stop_services(self):
+        stopped_services = []
+        for service in self.systemd_services:
+            cmd = "%s is-active --quiet %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode == 0:
+                cmd = "%s stop %s" % (self.systemctl, service)
+                result = subprocess.Popen(cmd, shell=True)
+                result.communicate()
+                if result.returncode == 0:
+                    stopped_services.append(service)
+                else:
+                    print "WARNING: could not stop %s" % s(service)
+        return stopped_services
+
+    def start_services(self, services):
+        for service in services:
+            cmd = "%s start %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode != 0:
+                print "WARNING: could not start %s" % s(service)
+
+    def set_rlimit_nofile(self, newres):
+        oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
+        resource.setrlimit(resource.RLIMIT_NOFILE, newres)
+        return oldres
+
+    def restore_rlimit_nofile(self, res):
+        resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -36,7 +85,6 @@ class ubuntu_performance_pts(test.test):
             'php-xml',
             'gdb',
             'libssl-dev',
-            'libssl1.0-dev',
             'autoconf'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
@@ -200,10 +248,18 @@ class ubuntu_performance_pts(test.test):
             'ttsiod-renderer': self.run_generic,
         }
 
+	if subtest != "setup":
+            self.stopped_services = self.stop_services()
+            self.oldres = self.set_rlimit_nofile((500000, 500000))
+
         if subtest in run_funcs:
-                run_funcs[subtest](test_name, subtest)
+            run_funcs[subtest](test_name, subtest)
         else:
             self.run_generic(test_name, subtest)
+
+	if subtest != "setup":
+            self.set_rlimit_nofile(self.oldres)
+            self.start_services(self.stopped_services)
         print
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

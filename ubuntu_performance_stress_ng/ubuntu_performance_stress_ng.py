@@ -16,6 +16,53 @@ percentage_threshold_slop=10
 class ubuntu_performance_stress_ng(test.test):
     version = 0
 
+    systemd_services = [
+        "smartd.service",
+        "iscsid.service",
+        "apport.service",
+        "cron.service",
+        "anacron.timer",
+        "apt-daily.timer",
+        "apt-daily-upgrade.timer",
+        "fstrim.timer",
+        "logrotate.timer",
+        "motd-news.timer",
+        "man-db.timer",
+    ]
+    systemctl = "systemctl"
+
+    def stop_services(self):
+        stopped_services = []
+        for service in self.systemd_services:
+            cmd = "%s is-active --quiet %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode == 0:
+                cmd = "%s stop %s" % (self.systemctl, service)
+                result = subprocess.Popen(cmd, shell=True)
+                result.communicate()
+                if result.returncode == 0:
+                    stopped_services.append(service)
+                else:
+                    print "WARNING: could not stop %s" % (service)
+        return stopped_services
+
+    def start_services(self, services):
+        for service in services:
+            cmd = "%s start %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode != 0:
+                print "WARNING: could not start %s" % (service)
+
+    def set_rlimit_nofile(self, newres):
+        oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
+        resource.setrlimit(resource.RLIMIT_NOFILE, newres)
+        return oldres
+
+    def restore_rlimit_nofile(self, res):
+        resource.setrlimit(resource.RLIMIT_NOFILE, res)
+
     def install_required_pkgs(self):
         arch   = platform.processor()
         series = platform.dist()[2]
@@ -59,9 +106,15 @@ class ubuntu_performance_stress_ng(test.test):
         if test_name == 'setup':
             return self.get_sysinfo()
 
+        self.stopped_services = self.stop_services()
+        self.oldres = self.set_rlimit_nofile((500000, 500000))
+
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
         cmd = '%s/ubuntu_performance_stress_ng.sh %s %s %d' % (self.bindir, test_name, threshold, test_iterations)
         self.results = utils.system_output(cmd, retain_output=True)
+
+        self.set_rlimit_nofile(self.oldres)
+        self.start_services(self.stopped_services)
 
         test_name = test_name.replace("-", "_")
         test_pass = True

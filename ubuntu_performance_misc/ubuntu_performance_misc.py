@@ -5,6 +5,8 @@ from autotest.client                        import test, utils
 from math import sqrt
 import platform
 import time
+import subprocess
+import resource
 
 #
 # Number of test iterations to get min/max/average stats
@@ -13,6 +15,53 @@ test_iterations = 5
 
 class ubuntu_performance_misc(test.test):
     version = 0
+
+    systemd_services = [
+        "smartd.service",
+        "iscsid.service",
+        "apport.service",
+        "cron.service",
+        "anacron.timer",
+        "apt-daily.timer",
+        "apt-daily-upgrade.timer",
+        "fstrim.timer",
+        "logrotate.timer",
+        "motd-news.timer",
+        "man-db.timer",
+    ]
+    systemctl = "systemctl"
+
+    def stop_services(self):
+        stopped_services = []
+        for service in self.systemd_services:
+            cmd = "%s is-active --quiet %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode == 0:
+                cmd = "%s stop %s" % (self.systemctl, service)
+                result = subprocess.Popen(cmd, shell=True)
+                result.communicate()
+                if result.returncode == 0:
+                    stopped_services.append(service)
+                else:
+                    print "WARNING: could not stop %s" % (service)
+        return stopped_services
+
+    def start_services(self, services):
+        for service in services:
+            cmd = "%s start %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode != 0:
+                print "WARNING: could not start %s" % (service)
+
+    def set_rlimit_nofile(self, newres):
+        oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
+        resource.setrlimit(resource.RLIMIT_NOFILE, newres)
+        return oldres
+
+    def restore_rlimit_nofile(self, res):
+        resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
     def install_required_pkgs(self):
         pkgs = [ 'eventstat' ]
@@ -84,6 +133,9 @@ class ubuntu_performance_misc(test.test):
 
         test_name = test_name.replace("-", "_")
 
+        self.stopped_services = self.stop_services()
+        self.oldres = self.set_rlimit_nofile((500000, 500000))
+
         results = []
         for i in range(test_iterations):
             output = utils.system_output(cmd, retain_output=True)
@@ -109,6 +161,9 @@ class ubuntu_performance_misc(test.test):
             print "FAIL: maximum error is greater than 5%"
         else:
             print "PASS: test passes specified performance thresholds"
+
+        self.set_rlimit_nofile(self.oldres)
+        self.start_services(self.stopped_services)
 
         print
 

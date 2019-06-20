@@ -3,6 +3,8 @@
 import os
 import platform
 import time
+import subprocess
+import resource
 from autotest.client import test, utils
 
 #
@@ -15,6 +17,7 @@ ntimes = 10
 #
 #stream_size = 2000000000
 stream_size = 200000000
+stream_size = 20000
 stream_bin = 'stream_mp'
 
 #
@@ -25,6 +28,56 @@ test_iterations = 3
 
 class ubuntu_performance_stream(test.test):
     version = 1
+    systemd_services = [
+        "smartd.service",
+        "iscsid.service",
+        "apport.service",
+        "cron.service",
+        "anacron.timer",
+        "apt-daily.timer",
+        "apt-daily-upgrade.timer",
+        "fstrim.timer",
+        "logrotate.timer",
+        "motd-news.timer",
+        "man-db.timer",
+        "foobar"
+    ]
+    systemctl = "systemctl"
+
+    def stop_services(self):
+        stopped_services = []
+        for service in self.systemd_services:
+            cmd = "%s is-active --quiet %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode == 0:
+                cmd = "%s stop %s" % (self.systemctl, service)
+                result = subprocess.Popen(cmd, shell=True)
+                result.communicate()
+                if result.returncode == 0:
+                    stopped_services.append(service)
+                    print "stopped service %s" % (service)
+                else:
+                    print "WARNING: could not stop %s" % s(service)
+        return stopped_services
+
+    def start_services(self, services):
+        for service in services:
+            cmd = "%s start %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode == 0:
+                print "restarted service %s" % (service)
+            else:
+                print "WARNING: could not start %s" % s(service)
+
+    def set_rlimit_nofile(self, newres):
+        oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
+        resource.setrlimit(resource.RLIMIT_NOFILE, newres)
+        return oldres
+
+    def restore_rlimit_nofile(self, res):
+        resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -145,7 +198,13 @@ class ubuntu_performance_stream(test.test):
         enough_ram = self.get_sysinfo()
         if enough_ram:
             print
+            self.stopped_services = self.stop_services()
+            self.oldres = self.set_rlimit_nofile((500000, 500000))
+
             self.run_stream()
+
+            self.set_rlimit_nofile(self.oldres)
+            self.start_services(self.stopped_services)
         print
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

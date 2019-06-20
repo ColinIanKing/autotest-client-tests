@@ -33,7 +33,6 @@ class ubuntu_performance_fio(test.test):
         "logrotate.timer",
         "motd-news.timer",
         "man-db.timer",
-        "foobar"
     ]
     systemctl = "systemctl"
 

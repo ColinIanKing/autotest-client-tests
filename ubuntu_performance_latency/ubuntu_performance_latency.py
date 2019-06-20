@@ -30,7 +30,6 @@ class ubuntu_performance_latency(test.test):
         "logrotate.timer",
         "motd-news.timer",
         "man-db.timer",
-        "foobar"
     ]
     systemctl = "systemctl"
 

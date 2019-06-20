@@ -39,7 +39,6 @@ class ubuntu_performance_stream(test.test):
         "logrotate.timer",
         "motd-news.timer",
         "man-db.timer",
-        "foobar"
     ]
     systemctl = "systemctl"
 

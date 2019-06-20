@@ -4,6 +4,8 @@ import os
 import platform
 import time
 import re
+import subprocess
+import resource
 from autotest.client import test, utils
 
 #
@@ -18,6 +20,54 @@ file_size_mb=2048
 
 class ubuntu_performance_fio(test.test):
     version = 0
+    version = 1
+    systemd_services = [
+        "smartd.service",
+        "iscsid.service",
+        "apport.service",
+        "cron.service",
+        "anacron.timer",
+        "apt-daily.timer",
+        "apt-daily-upgrade.timer",
+        "fstrim.timer",
+        "logrotate.timer",
+        "motd-news.timer",
+        "man-db.timer",
+        "foobar"
+    ]
+    systemctl = "systemctl"
+
+    def stop_services(self):
+        stopped_services = []
+        for service in self.systemd_services:
+            cmd = "%s is-active --quiet %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode == 0:
+                cmd = "%s stop %s" % (self.systemctl, service)
+                result = subprocess.Popen(cmd, shell=True)
+                result.communicate()
+                if result.returncode == 0:
+                    stopped_services.append(service)
+                else:
+                    print "WARNING: could not stop %s" % (service)
+        return stopped_services
+
+    def start_services(self, services):
+        for service in services:
+            cmd = "%s start %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode != 0:
+                print "WARNING: could not start %s" % (service)
+
+    def set_rlimit_nofile(self, newres):
+        oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
+        resource.setrlimit(resource.RLIMIT_NOFILE, newres)
+        return oldres
+
+    def restore_rlimit_nofile(self, res):
+        resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -231,7 +281,13 @@ class ubuntu_performance_fio(test.test):
 
         free_mb = self.get_filesystem_free_mbytes()
         if free_mb > file_size_mb:
+            self.stopped_services = self.stop_services()
+            self.oldres = self.set_rlimit_nofile((500000, 500000))
+
             self.run_fio_tests(test_name)
+
+            self.set_rlimit_nofile(self.oldres)
+            self.start_services(self.stopped_services)
         else:
             print 'cannot execute "%s", required %dMB, only got %dMB on disc' % (test_name, file_size_mb, free_mb)
         print

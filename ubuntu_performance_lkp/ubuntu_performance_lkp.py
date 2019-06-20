@@ -7,6 +7,8 @@ import platform
 import time
 import json
 import socket
+import subprocess
+import resource
 
 #
 # Number of test iterations to get min/max/average stats
@@ -16,6 +18,53 @@ commit='7078336702a53c99f3a17ad1ca2af9a3323a818c'
 
 class ubuntu_performance_lkp(test.test):
     version = 7
+
+    systemd_services = [
+        "smartd.service",
+        "iscsid.service",
+        "apport.service",
+        "cron.service",
+        "anacron.timer",
+        "apt-daily.timer",
+        "apt-daily-upgrade.timer",
+        "fstrim.timer",
+        "logrotate.timer",
+        "motd-news.timer",
+        "man-db.timer",
+    ]
+    systemctl = "systemctl"
+
+    def stop_services(self):
+        stopped_services = []
+        for service in self.systemd_services:
+            cmd = "%s is-active --quiet %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode == 0:
+                cmd = "%s stop %s" % (self.systemctl, service)
+                result = subprocess.Popen(cmd, shell=True)
+                result.communicate()
+                if result.returncode == 0:
+                    stopped_services.append(service)
+                else:
+                    print "WARNING: could not stop %s" % (service)
+        return stopped_services
+
+    def start_services(self, services):
+        for service in services:
+            cmd = "%s start %s" % (self.systemctl, service)
+            result = subprocess.Popen(cmd, shell=True)
+            result.communicate()
+            if result.returncode != 0:
+                print "WARNING: could not start %s" % (service)
+
+    def set_rlimit_nofile(self, newres):
+        oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
+        resource.setrlimit(resource.RLIMIT_NOFILE, newres)
+        return oldres
+
+    def restore_rlimit_nofile(self, res):
+        resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
     def is_number(self, s):
         try:
@@ -510,7 +559,13 @@ class ubuntu_performance_lkp(test.test):
 
         print
         if lkp_job in job_funcs:
+            self.stopped_services = self.stop_services()
+            self.oldres = self.set_rlimit_nofile((500000, 500000))
+
             ret_values = job_funcs[lkp_job](sub_job, lkp_jobs, test_name)
+
+            self.set_rlimit_nofile(self.oldres)
+            self.start_services(self.stopped_services)
         else:
             print "Cannot find running/parser for %s, please fix ubuntu_performance_lkp.py" % lkp_job
             return

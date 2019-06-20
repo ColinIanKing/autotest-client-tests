@@ -57,7 +57,7 @@ class ubuntu_performance_stream(test.test):
                     stopped_services.append(service)
                     print "stopped service %s" % (service)
                 else:
-                    print "WARNING: could not stop %s" % s(service)
+                    print "WARNING: could not stop %s" % (service)
         return stopped_services
 
     def start_services(self, services):
@@ -68,7 +68,7 @@ class ubuntu_performance_stream(test.test):
             if result.returncode == 0:
                 print "restarted service %s" % (service)
             else:
-                print "WARNING: could not start %s" % s(service)
+                print "WARNING: could not start %s" % (service)
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)

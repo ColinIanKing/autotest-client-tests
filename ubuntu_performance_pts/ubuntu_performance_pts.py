@@ -54,7 +54,7 @@ class ubuntu_performance_pts(test.test):
                 if result.returncode == 0:
                     stopped_services.append(service)
                 else:
-                    print "WARNING: could not stop %s" % s(service)
+                    print "WARNING: could not stop %s" % (service)
         return stopped_services
 
     def start_services(self, services):
@@ -63,7 +63,7 @@ class ubuntu_performance_pts(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode != 0:
-                print "WARNING: could not start %s" % s(service)
+                print "WARNING: could not start %s" % (service)
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)

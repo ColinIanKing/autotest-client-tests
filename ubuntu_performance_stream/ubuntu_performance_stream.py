@@ -17,7 +17,6 @@ ntimes = 10
 #
 #stream_size = 2000000000
 stream_size = 200000000
-stream_size = 20000
 stream_bin = 'stream_mp'
 
 #
@@ -168,7 +167,7 @@ class ubuntu_performance_stream(test.test):
         pages_available = int(utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
         memory_available = float(page_size * pages_available)
         #
-        # 4 arrays of 8 bytes per elemet
+        # 4 arrays of 8 bytes per element
         #
         memory_required = float(4 * 8 * stream_size)
 

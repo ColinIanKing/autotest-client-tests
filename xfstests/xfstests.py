@@ -46,7 +46,10 @@ class xfstests(test.test):
             'autopoint',
             'pkg-config',
             'libblkid-dev',
-            'xfslibs-dev'
+            'xfslibs-dev',
+            'libattr1-dev',
+            'libacl1-dev',
+            'libaio-dev'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

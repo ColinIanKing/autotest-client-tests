@@ -40,8 +40,11 @@ class ubuntu_ltp_syscalls(test.test):
         pkgs.append(gcc)
 
         flavour = platform.uname()[2].split('-')[-1]
+        series = platform.dist()[2]
         if flavour in ['azure', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + flavour + '*')
+        if series not in ['trusty']:
+             pkgs.append('haveged')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

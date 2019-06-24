@@ -39,17 +39,17 @@ class ubuntu_ltp_syscalls(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        flavour = platform.uname()[2].split('-')[-1]
-        series = platform.dist()[2]
-        if flavour in ['azure', 'gcp', 'gke']:
-             pkgs.append('linux-modules-extra-' + flavour + '*')
-        if series not in ['trusty']:
+        if self.flavour in ['azure', 'gcp', 'gke']:
+             pkgs.append('linux-modules-extra-' + self.flavour + '*')
+        if self.series not in ['trusty']:
              pkgs.append('haveged')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        self.series = platform.dist()[2]
+        self.flavour = platform.uname()[2].split('-')[-1]
         pass
 
     # setup
@@ -76,13 +76,12 @@ class ubuntu_ltp_syscalls(test.test):
         utils.make('install')
 
     def testcase_blacklist(self):
-        flavour = platform.release().split('-')[2]
         fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
         with open(fn, 'r') as f:
             db = yaml.load(f)
 
-        if flavour in db['flavour']:
-            return list(db['flavour'][flavour].keys())
+        if self.flavour in db['flavour']:
+            return list(db['flavour'][self.flavour].keys())
 
         return None
 

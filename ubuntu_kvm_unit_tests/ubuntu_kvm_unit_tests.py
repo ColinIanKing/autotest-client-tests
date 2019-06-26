@@ -71,23 +71,24 @@ class ubuntu_kvm_unit_tests(test.test):
 
         try:
             utils.system('kvm-ok')
+            arch = platform.processor()
+            if arch == 'ppc64le':
+                # disable smt (simultaneous multithreading) on ppc for kvm
+                utils.system('ppc64_cpu --smt=off')
+
+            cmd = os.path.join(self.srcdir, 'kvm-unit-tests/tests', test_name)
+            output = utils.system_output(cmd, ignore_status=True, retain_output=True)
+
+            if arch == 'ppc64le':
+                # turn smt back on
+                utils.system('ppc64_cpu --smt=on')
+
+            # The SKIP status will be treated as PASS as well.
+            if output.split('\n')[-1].startswith('FAIL'):
+                raise error.TestError("Test failed for {}".format(test_name))
+
         except error.CmdError:
             print('Test skipped, this systems does not have KVM extension support')
 
-        arch = platform.processor()
-        if arch == 'ppc64le':
-            # disable smt (simultaneous multithreading) on ppc for kvm
-            utils.system('ppc64_cpu --smt=off')
-
-        cmd = os.path.join(self.srcdir, 'kvm-unit-tests/tests', test_name)
-        output = utils.system_output(cmd, ignore_status=True, retain_output=True)
-
-        if arch == 'ppc64le':
-            # turn smt back on
-            utils.system('ppc64_cpu --smt=on')
-
-        # The SKIP status will be treated as PASS as well.
-        if output.split('\n')[-1].startswith('FAIL'):
-             raise error.TestError("Test failed for {}".format(test_name))
 
 # vi:set ts=4 sw=4 expandtab:

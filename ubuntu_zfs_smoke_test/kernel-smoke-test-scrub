@@ -81,7 +81,7 @@ if [ $ret -ne 0 ]; then
 fi
 
 #
-#  Wait 60 seconds for resilver to complete
+#  Wait 300 seconds for resilver to complete
 #
 i=0
 while true
@@ -93,7 +93,7 @@ do
 	i=$((i + 1))
 	echo $i
 	sleep 1
-	if [ $i -gt 60 ]; then
+	if [ $i -gt 300 ]; then
 		break
 	fi
 done

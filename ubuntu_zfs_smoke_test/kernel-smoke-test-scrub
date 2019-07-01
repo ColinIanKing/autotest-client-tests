@@ -97,7 +97,14 @@ do
 		break
 	fi
 done
+#
+#  Wait 5 seconds to settle post-scrub
+#
+sleep 5
 
+#
+#  ..and do the scrub
+#
 zpool scrub ${POOL}
 ret=$?
 if [ $ret -ne 0 ]; then

@@ -12,6 +12,6 @@ DOC = ""
 
 name = 'ubuntu_ftrace_smoke_test'
 
-results = job.run_test_detail('ubuntu_ftrace_smoke_test', test_name='ftrace-smoke-test', tag='ftrace-smoke-test')
+results = job.run_test_detail('ubuntu_ftrace_smoke_test', test_name='ftrace-smoke-test', tag='ftrace-smoke-test', timeout=60*10)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

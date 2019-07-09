@@ -13,7 +13,7 @@ class ubuntu_kernel_selftests(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'bc', 'build-essential', 'git', 'pkg-config',
+            'bc', 'build-essential', 'git', 'pkg-config', 'kernel-wedge'
         ]
         if not (arch == 's390x' and series in ['precise', 'trusty', 'vivid', 'xenial']):
             pkgs.append('libnuma-dev')
@@ -54,6 +54,13 @@ class ubuntu_kernel_selftests(test.test):
         if not os.path.exists('linux'):
             self.download()
             self.extract()
+
+            # clean source tree so changes from debian.foo/reconstruct
+            # (e.g. deleting files) are applied
+            os.chdir('linux')
+            cmd = 'fakeroot debian/rules clean'
+            utils.system(cmd)
+            os.chdir(self.srcdir)
 
             # tweak sleep wake alarm time to 30 seconds as 5 is a bit too small
             #

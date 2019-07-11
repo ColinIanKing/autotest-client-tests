@@ -105,8 +105,8 @@ for test in tests:
 		if (os.access(test, os.X_OK)):
 			print "Invoking test: " + name
             # 9e622d6bea0202e9fe267955362c01918562c09b will take about 110 min on B-arm64
-            # 361c093d7f99c3f6cbb07d5c580ce778ab418c42 will take about 90 min on B-arm64
-			results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=name.replace('.sh',''), timeout=60*60*2)
+            # 361c093d7f99c3f6cbb07d5c580ce778ab418c42 will take about 120 min on X-arm64 (ThunderX)
+			results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=name.replace('.sh',''), timeout=60*20*7)
 			run = run + 1
 
 print "Total of %d tests, %d invoked, %d skipped" % (run + skip, run, skip)

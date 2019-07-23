@@ -146,8 +146,8 @@ class ubuntu_performance_iperf(test.test):
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
-	 cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
-	 cmd += " sudo apt-get install --yes --force-yes " + " ".join(pkgs) + "'"
+        cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
+        cmd += " sudo apt-get install --yes --force-yes " + " ".join(pkgs) + "'"
         self.results = utils.system_output(cmd, retain_output=True)
 
     def get_stats(self, results, fields):
@@ -174,7 +174,7 @@ class ubuntu_performance_iperf(test.test):
             for port in xrange(port_start, port_end, port_step):
 	        cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
 	        cmd += " nohup iperf3 -s -i 60 -p " + str(port) + "&'"
-               utils.system_output(cmd, retain_output=True)
+                utils.system_output(cmd, retain_output=True)
             results = ""
             values[i] = self.get_stats(results, fields)
 

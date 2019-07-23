@@ -1,0 +1,18 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_iperf"
+CRITERIA = """
+Uses iperf3 to measure network throughput"
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_iperf'
+
+results = job.run_test_detail('ubuntu_performance_iperf', test_name='setup', tag='setup')
+results = job.run_test_detail('ubuntu_performance_iperf', test_name='ubuntu-performance-iperf', tag='ubuntu-performance-iperf', timeout=60*30)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

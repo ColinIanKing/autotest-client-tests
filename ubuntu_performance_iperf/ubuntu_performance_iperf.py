@@ -25,8 +25,6 @@ username = 'ubuntu'
 #
 port_start=5001
 port_step=100
-port_count=8
-port_end = port_start + (port_step * port_count)
 
 class ubuntu_performance_iperf(test.test):
     version = 1
@@ -177,7 +175,7 @@ class ubuntu_performance_iperf(test.test):
                         values[field] = chunks[2]
         return values
 
-    def run_iperf_tcp(self, direction, interface, rate):
+    def run_iperf_tcp(self, direction, interface, rate, clients):
         fields = [ 'sender_rate', 'receiver_rate' ]
         values = {}
         test_pass = True
@@ -187,7 +185,8 @@ class ubuntu_performance_iperf(test.test):
 
         for i in range(test_iterations):
             print "Test %d of %d:" % (i + 1, test_iterations)
-            print "  Starting %d iperf3 instances on %s" % (port_count, test_server)
+            print "  Starting %d iperf3 instances on %s" % (clients, test_server)
+            port_end = port_start + (port_step * clients)
             for port in xrange(port_start, port_end, port_step):
 	        cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
 	        cmd += " nohup iperf3 -s -i 60 -p " + str(port) + "&'"
@@ -259,10 +258,10 @@ class ubuntu_performance_iperf(test.test):
             max_err = (maximum - minimum) / average * 100.0
 
             print
-            print "iperf3_" + direction + "_" + field.lower() + "_mbit_per_sec_minimum %.5f" % (minimum)
-            print "iperf3_" + direction + "_" + field.lower() + "_mbit_per_sec_maximum %.5f" % (maximum)
-            print "iperf3_" + direction + "_" + field.lower() + "_mbit_per_sec_average %.5f" % (average)
-            print "iperf3_" + direction + "_" + field.lower() + "_mbit_per_sec_maximum_error %.2f%%" % (max_err)
+            print "iperf3_clients%d_%s_%s_mbit_per_sec_minimum %.5f" % (clients, direction, field.lower(), minimum)
+            print "iperf3_clients%d_%s_%s_mbit_per_sec_maximum %.5f" % (clients, direction, field.lower(), maximum)
+            print "iperf3_clients%d_%s_%s_mbit_per_sec_average %.5f" % (clients, direction, field.lower(), average)
+            print "iperf3_clients%d_%s_%s_mbit_per_sec_maximum_error %.2f%%" % (clients, direction, field.lower(), max_err)
             if max_err > 5.0:
                 print "FAIL: maximum error is greater than 5%"
                 test_pass = False
@@ -288,7 +287,7 @@ class ubuntu_performance_iperf(test.test):
         print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
 	return True
 
-    def run_once(self, test_name):
+    def run_once(self, test_name, clients):
         if test_name == 'setup':
             return
 
@@ -299,8 +298,8 @@ class ubuntu_performance_iperf(test.test):
 
         (interface, rate) = self.get_interface_info()
 
-        self.run_iperf_tcp('forward', interface, rate)
-        self.run_iperf_tcp('reverse', interface, rate)
+        self.run_iperf_tcp('forward', interface, rate, clients)
+        self.run_iperf_tcp('reverse', interface, rate, clients)
 
         self.set_swap_on(True)
         self.set_cpu_governor('powersave')

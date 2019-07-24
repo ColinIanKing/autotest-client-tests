@@ -72,9 +72,17 @@ class ubuntu_performance_pts(test.test):
     def restore_rlimit_nofile(self, res):
         resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
+    def set_cpu_governor(self, mode):
+        cmd = "/usr/bin/cpupower frequency-set -g " + mode + " > /dev/null"
+        result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
+        result.communicate()
+        if result.returncode != 0:
+            print "WARNING: could not set CPUs to performance mode '%s'" % mode
+
     def install_required_pkgs(self):
-        arch   = platform.processor()
-        series = platform.dist()[2]
+        arch    = platform.processor()
+        series  = platform.dist()[2]
+        release = platform.release()
 
         pkgs = [
             'zip',
@@ -84,7 +92,9 @@ class ubuntu_performance_pts(test.test):
             'php-xml',
             'gdb',
             'libssl-dev',
-            'autoconf'
+            'autoconf',
+            'linux-tools-generic',
+            'linux-tools-' + release
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -250,6 +260,7 @@ class ubuntu_performance_pts(test.test):
 	if subtest != "setup":
             self.stopped_services = self.stop_services()
             self.oldres = self.set_rlimit_nofile((500000, 500000))
+            self.set_cpu_governor('performance')
 
         if subtest in run_funcs:
             run_funcs[subtest](test_name, subtest)
@@ -257,6 +268,7 @@ class ubuntu_performance_pts(test.test):
             self.run_generic(test_name, subtest)
 
 	if subtest != "setup":
+            self.set_cpu_governor('powersave')
             self.set_rlimit_nofile(self.oldres)
             self.start_services(self.stopped_services)
         print

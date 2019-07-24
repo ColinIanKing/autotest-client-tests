@@ -79,6 +79,13 @@ class ubuntu_performance_pts(test.test):
         if result.returncode != 0:
             print "WARNING: could not set CPUs to performance mode '%s'" % mode
 
+    def set_swap_on(self, swap_on):
+        cmd = "/sbin/swapon -a" if swap_on else "/sbin/swapoff -a"
+        result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
+        result.communicate()
+        if result.returncode != 0:
+            print "WARNING: could not set swap %s" % ("on" if swap_on else "off")
+
     def install_required_pkgs(self):
         arch    = platform.processor()
         series  = platform.dist()[2]
@@ -261,6 +268,7 @@ class ubuntu_performance_pts(test.test):
             self.stopped_services = self.stop_services()
             self.oldres = self.set_rlimit_nofile((500000, 500000))
             self.set_cpu_governor('performance')
+            self.set_swap_on(False)
 
         if subtest in run_funcs:
             run_funcs[subtest](test_name, subtest)
@@ -268,6 +276,7 @@ class ubuntu_performance_pts(test.test):
             self.run_generic(test_name, subtest)
 
 	if subtest != "setup":
+            self.set_swap_on(True)
             self.set_cpu_governor('powersave')
             self.set_rlimit_nofile(self.oldres)
             self.start_services(self.stopped_services)

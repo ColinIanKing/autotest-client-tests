@@ -80,6 +80,13 @@ class ubuntu_performance_iperf(test.test):
     def restore_rlimit_nofile(self, res):
         resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
+    def set_cpu_governor(self, mode):
+        cmd = "/usr/bin/cpupower frequency-set -g " + mode + " > /dev/null"
+        result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
+        result.communicate()
+        if result.returncode != 0:
+            print "WARNING: could not set CPUs to performance mode '%s'" % mode
+
     def initialize(self):
         pass
 
@@ -139,9 +146,12 @@ class ubuntu_performance_iperf(test.test):
 
     def setup(self):
         test_server = self.get_setting('TEST_SERVER')
+        release = platform.release()
 
         pkgs = [
             'iperf3',
+            'linux-tools-generic',
+            'linux-tools-' + release
         ]
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
@@ -277,12 +287,14 @@ class ubuntu_performance_iperf(test.test):
 
         self.stopped_services = self.stop_services()
         self.oldres = self.set_rlimit_nofile((500000, 500000))
+        self.set_cpu_governor('performance')
 
         (interface, rate) = self.get_interface_info()
 
         self.run_iperf_tcp('forward', interface, rate)
         self.run_iperf_tcp('reverse', interface, rate)
 
+        self.set_cpu_governor('powersave')
         self.set_rlimit_nofile(self.oldres)
         self.start_services(self.stopped_services)
         print

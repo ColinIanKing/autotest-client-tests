@@ -68,13 +68,23 @@ class ubuntu_performance_fio(test.test):
     def restore_rlimit_nofile(self, res):
         resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
+    def set_cpu_governor(self, mode):
+        cmd = "/usr/bin/cpupower frequency-set -g " + mode + " > /dev/null"
+        result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
+        result.communicate()
+        if result.returncode != 0:
+            print "WARNING: could not set CPUs to performance mode '%s'" % mode
+
     def install_required_pkgs(self):
-        arch   = platform.processor()
-        series = platform.dist()[2]
+        arch    = platform.processor()
+        series  = platform.dist()[2]
+        release = platform.release()
 
         pkgs = [
             'build-essential',
             'libaio-dev',
+            'linux-tools-generic',
+            'linux-tools-' + release
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -282,9 +292,11 @@ class ubuntu_performance_fio(test.test):
         if free_mb > file_size_mb:
             self.stopped_services = self.stop_services()
             self.oldres = self.set_rlimit_nofile((500000, 500000))
+            self.set_cpu_governor('performance')
 
             self.run_fio_tests(test_name)
 
+            self.set_cpu_governor('powersave')
             self.set_rlimit_nofile(self.oldres)
             self.start_services(self.stopped_services)
         else:

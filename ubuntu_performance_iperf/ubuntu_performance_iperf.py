@@ -87,6 +87,13 @@ class ubuntu_performance_iperf(test.test):
         if result.returncode != 0:
             print "WARNING: could not set CPUs to performance mode '%s'" % mode
 
+    def set_swap_on(self, swap_on):
+        cmd = "/sbin/swapon -a" if swap_on else "/sbin/swapoff -a"
+        result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
+        result.communicate()
+        if result.returncode != 0:
+            print "WARNING: could not set swap %s" % ("on" if swap_on else "off")
+
     def initialize(self):
         pass
 
@@ -288,12 +295,14 @@ class ubuntu_performance_iperf(test.test):
         self.stopped_services = self.stop_services()
         self.oldres = self.set_rlimit_nofile((500000, 500000))
         self.set_cpu_governor('performance')
+        self.set_swap_on(False)
 
         (interface, rate) = self.get_interface_info()
 
         self.run_iperf_tcp('forward', interface, rate)
         self.run_iperf_tcp('reverse', interface, rate)
 
+        self.set_swap_on(True)
         self.set_cpu_governor('powersave')
         self.set_rlimit_nofile(self.oldres)
         self.start_services(self.stopped_services)

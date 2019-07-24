@@ -77,6 +77,13 @@ class ubuntu_performance_stream(test.test):
     def restore_rlimit_nofile(self, res):
         resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
+    def set_cpu_governor(self, mode):
+        cmd = "/usr/bin/cpupower frequency-set -g " + mode + " > /dev/null"
+        result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
+        result.communicate()
+        if result.returncode != 0:
+            print "WARNING: could not set CPUs to performance mode '%s'" % mode
+
     def install_required_pkgs(self):
         arch   = platform.processor()
         series = platform.dist()[2]
@@ -95,6 +102,15 @@ class ubuntu_performance_stream(test.test):
         pass
 
     def setup(self):
+        release = platform.release()
+
+        pkgs = [
+            'linux-tools-generic',
+            'linux-tools-' + release
+        ]
+        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
         self.install_required_pkgs()
         self.job.require_gcc()
         stream_exe_path = os.path.join(self.srcdir, stream_bin)
@@ -198,9 +214,11 @@ class ubuntu_performance_stream(test.test):
             print
             self.stopped_services = self.stop_services()
             self.oldres = self.set_rlimit_nofile((500000, 500000))
+            self.set_cpu_governor('performance')
 
             self.run_stream()
 
+            self.set_cpu_governor('powersave')
             self.set_rlimit_nofile(self.oldres)
             self.start_services(self.stopped_services)
         print

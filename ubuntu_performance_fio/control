@@ -38,10 +38,14 @@ tests = [
 	'rd-75,wr-25,rand,blk-8k,jobs-8,iodepth-32',
 ]
 
-results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup')
+results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup', media='')
 
-for test in tests:
-	results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + test, timeout=120*60)
+#
+#  Media is 'ramdisk' (/dev/shm) or 'dataset' (normally a raid device)
+#
+for media_type in [ 'ramdisk', 'dataset' ]:
+    for test in tests:
+	results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + media_type + '-' + test, media=media_type, timeout=120*60)
 
 print results
 

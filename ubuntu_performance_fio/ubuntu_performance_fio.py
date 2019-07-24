@@ -6,6 +6,7 @@ import time
 import re
 import subprocess
 import resource
+import shutil
 from autotest.client import test, utils
 
 #
@@ -17,6 +18,10 @@ test_iterations = 3
 # Size of FIO files in MB
 #
 file_size_mb=2048
+#
+# Max size of ramfs image (16GB)
+#
+max_ramdisk_bytes=16 * 1024 * 1024 * 1024
 
 class ubuntu_performance_fio(test.test):
     version = 0
@@ -119,7 +124,6 @@ class ubuntu_performance_fio(test.test):
         os.close(fd);
         return statvfs.f_bsize * statvfs.f_bavail / (1024.0 * 1024.0)
 
-
     def get_sysinfo(self):
         print
         print 'date_ctime "' + time.ctime() + '"'
@@ -157,7 +161,16 @@ class ubuntu_performance_fio(test.test):
         f.write("3")
         f.close()
 
-    def run_fio(self, testname):
+    def mk_ramdisk(self, ramdisk_bytes, mount_point):
+        #print "ramfs device size: %.2f MB" % (float(ramdisk_bytes) / (1024.0 * 1024.0))
+        cmd = 'mount -t ramfs none %s -o maxsize=%d' % (mount_point, ramdisk_bytes)
+        utils.system_output(cmd, retain_output=True)
+
+    def rm_ramdisk(self, mount_point):
+        cmd = 'umount %s' % mount_point
+        utils.system_output(cmd, retain_output=True)
+
+    def run_fio(self, testname, ramdisk_bytes, media):
         kb_scale = {
             "KiB":  1024.0 / 1000.0,
             "KB": 1000.0 / 1000.0,
@@ -178,14 +191,26 @@ class ubuntu_performance_fio(test.test):
         #  Edit various fio configs to use dynamic settings
         #  relevant to this test location and test size
         #
+        test_dir = os.path.join(self.srcdir, 'fio-test')
+        if os.path.isdir(test_dir):
+            shutil.rmtree(test_dir)
+        os.mkdir(test_dir)
+        if media == 'ramdisk':
+            self.mk_ramdisk(ramdisk_bytes, test_dir)
+
         file = testname + ".fio"
         fin = open(os.path.join(self.bindir, file), "r")
         fout = open(os.path.join(self.srcdir, file), "w")
         file_size = "%dM" % (file_size_mb)
 
         for line in fin:
-            line = line.replace("DIRECTORY", self.srcdir)
+            line = line.replace("DIRECTORY", test_dir)
             line = line.replace("SIZE", file_size)
+            #
+            #  ramdisk can't do O_DIRECT, so skip this
+            #
+            if media == 'ramdisk' and "direct=1" in line:
+                continue
             fout.write(line)
         fin.close()
         fout.close()
@@ -198,6 +223,11 @@ class ubuntu_performance_fio(test.test):
         #
         cmd = os.path.join(self.srcdir, 'fio-3.10', 'fio') + " " + os.path.join(self.srcdir, file)
         results = utils.system_output(cmd, retain_output=True)
+
+        if media == 'ramdisk':
+            self.rm_ramdisk(test_dir)
+        if os.path.isdir(test_dir):
+            shutil.rmtree(test_dir)
         bw = 0.0
         avg = 0.0
         stdev = 0.0
@@ -236,19 +266,17 @@ class ubuntu_performance_fio(test.test):
 
         return values
 
-    def run_fio_tests(self, testname):
+    def run_fio_tests(self, testname, media, ramdisk_bytes):
         values = {}
         test_pass = True
 
-
         for i in range(test_iterations):
-            print
             print "Test %d of %d:" % (i + 1, test_iterations)
-            values[i] = self.run_fio(testname)
-            print "%s_file_size_mb %s" % (testname, values[i]['file_size_mb'])
-            print "%s_bandwidth_kb_per_sec %.2f" % (testname, values[i]['bandwidth_kb_per_sec'])
-            print "%s_latency_usec_average %.2f" % (testname, values[i]['latency_usec_average'])
-            print "%s_latency_stddev %.2f" % (testname, values[i]['latency_stddev'])
+            values[i] = self.run_fio(testname, ramdisk_bytes, media)
+            print "fio_%s_%s_file_size_mb %s" % (media, testname, values[i]['file_size_mb'])
+            print "fio_%s_%s_bandwidth_kb_per_sec %.2f" % (media, testname, values[i]['bandwidth_kb_per_sec'])
+            print "fio_%s_%s_latency_usec_average %.2f" % (media, testname, values[i]['latency_usec_average'])
+            print "fio_%s_%s_latency_stddev %.2f" % (media, testname, values[i]['latency_stddev'])
 
         #
         #  Compute min/max/average:
@@ -262,12 +290,13 @@ class ubuntu_performance_fio(test.test):
             minimum = min(v)
             average = sum(v) / float(len(v))
             max_err = (maximum - minimum) / average * 100.0
+            str = field.lower().replace("-", "_").replace(",","_")
 
             print
-            print "stream_" + field.lower() + "_minimum %.5f" % (minimum)
-            print "stream_" + field.lower() + "_maximum %.5f" % (maximum)
-            print "stream_" + field.lower() + "_average %.5f" % (average)
-            print "stream_" + field.lower() + "_maximum_error %.2f%%" % (max_err)
+            print "fio_%s_%s_minimum %.5f" % (media, str, minimum)
+            print "fio_%s_%s_maximum %.5f" % (media, str, maximum)
+            print "fio_%s_%s_average %.5f" % (media, str, average)
+            print "fio_%s_%s_maximum_error %.2f%%" % (media, str, max_err)
 
             if max_err > 5.0:
                 print "FAIL: maximum error is greater than 5%"
@@ -278,7 +307,7 @@ class ubuntu_performance_fio(test.test):
             print "PASS: test passes specified performance thresholds"
 
 
-    def run_once(self, test_name):
+    def run_once(self, test_name, media):
         if test_name == 'setup':
             self.setup()
             self.get_sysinfo()
@@ -290,7 +319,11 @@ class ubuntu_performance_fio(test.test):
         self.drop_cache()
         page_size = float(utils.system_output('getconf PAGE_SIZE', retain_output=True))
         pages_available = float(utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
-        mem_mb = page_size * pages_available / (1024.0 * 1024.0)
+        mem_bytes = page_size * pages_available
+        mem_mb = mem_bytes / (1024.0 * 1024.0)
+        ramdisk_bytes = mem_bytes / 4
+        if ramdisk_bytes > max_ramdisk_bytes:
+            ramdisk_bytes = max_ramdisk_bytes
 
         #if mem_mb > file_size_mb:
         #    print "\nNOTE: file size of %.2f MB should be at least twice the free memory size of %.2f MB when using non-direct I/O" % (file_size_mb, mem_mb)
@@ -302,7 +335,7 @@ class ubuntu_performance_fio(test.test):
             self.set_cpu_governor('performance')
             self.set_swap_on(False)
 
-            self.run_fio_tests(test_name)
+            self.run_fio_tests(test_name, media, ramdisk_bytes)
 
             self.set_swap_on(True)
             self.set_cpu_governor('powersave')

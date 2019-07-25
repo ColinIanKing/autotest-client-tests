@@ -183,6 +183,10 @@ class ubuntu_performance_iperf(test.test):
 
         test_server = self.get_setting('TEST_SERVER')
 
+        cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
+        cmd += " sudo /usr/bin/cpupower frequency-set -g performance'"
+        utils.system_output(cmd, retain_output=True)
+
         for i in range(test_iterations):
             print "Test %d of %d:" % (i + 1, test_iterations)
             print "  Starting %d iperf3 instances on %s" % (clients, test_server)
@@ -215,6 +219,7 @@ class ubuntu_performance_iperf(test.test):
             cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
             cmd += " killall -9 iperf3'"
             self.results = utils.system_output(cmd, retain_output=True)
+
             #
             # 10:53:01 INFO | [ ID] Interval           Transfer     Bitrate         Retr
             # 10:53:01 INFO | [ 19]   0.00-10.00  sec   125 MBytes   105 Mbits/sec    0             sender
@@ -245,6 +250,10 @@ class ubuntu_performance_iperf(test.test):
                 f.close()
 
             values[i] = data
+
+        cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
+        cmd += " sudo /usr/bin/cpupower frequency-set -g powersave'"
+        utils.system_output(cmd, retain_output=True)
 
         #
         #  Compute min/max/average:

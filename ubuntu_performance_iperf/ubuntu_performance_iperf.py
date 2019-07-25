@@ -181,28 +181,29 @@ class ubuntu_performance_iperf(test.test):
         test_pass = True
         megabit_rates = [ ("Mbits", 1), ("Gbits", 1000) ]
 
-	test_server = self.get_setting('TEST_SERVER')
+        test_server = self.get_setting('TEST_SERVER')
 
         for i in range(test_iterations):
             print "Test %d of %d:" % (i + 1, test_iterations)
             print "  Starting %d iperf3 instances on %s" % (clients, test_server)
             port_end = port_start + (port_step * clients)
             for port in xrange(port_start, port_end, port_step):
-	        cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
-	        cmd += " nohup iperf3 -s -i 60 -p " + str(port) + "&'"
+                cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
+                cmd += " nohup iperf3 -i 60 -D -s -p " + str(port) + "'"
+
                 utils.system_output(cmd, retain_output=True)
             results = ""
             values[i] = self.get_stats(results, fields)
 
             proc = {}
             for port in xrange(port_start, port_end, port_step):
-	        cmd = "/usr/bin/iperf3 -c %s -p %d" % (test_server, port)
+                cmd = "/usr/bin/iperf3 -t 60 -c %s -p %d -l256K -Z" % (test_server, port)
                 if direction == 'reverse':
                     cmd += " -R"
-		filename = "/tmp/port-%d.txt" % port
+                filename = "/tmp/port-%d.txt" % port
                 if os.path.isfile(filename):
                     os.remove(filename)
-		p = subprocess.Popen(cmd.split(), stdout=file(filename, "ab"))
+                p = subprocess.Popen(cmd.split(), stdout=file(filename, "ab"))
                 proc[port] = (p, filename)
 
             print "  Waiting for iperf3 to complete"
@@ -211,8 +212,8 @@ class ubuntu_performance_iperf(test.test):
                     proc[port][0].wait()
 
             print "  Terminating iperf3 instances on %s" % test_server
-	    cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
-	    cmd += " killall -9 iperf3'"
+            cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
+            cmd += " killall -9 iperf3'"
             self.results = utils.system_output(cmd, retain_output=True)
             #
             # 10:53:01 INFO | [ ID] Interval           Transfer     Bitrate         Retr
@@ -226,7 +227,7 @@ class ubuntu_performance_iperf(test.test):
             for port in xrange(port_start, port_end, port_step):
                 f = open(proc[port][1], "r")
                 for line in f.readlines():
-		    idx = line.find("]")
+                    idx = line.find("]")
                     if idx == -1:
                         continue
                     words = line[idx + 1:].split()
@@ -285,7 +286,7 @@ class ubuntu_performance_iperf(test.test):
         print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
         print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
         print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
-	return True
+        return True
 
     def run_once(self, test_name, clients):
         if test_name == 'setup':

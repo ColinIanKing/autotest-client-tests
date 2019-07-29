@@ -37,6 +37,9 @@ class ubuntu_ltp(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
+        if self.flavour in ['azure', 'gcp', 'gke']:
+             pkgs.append('linux-modules-extra-' + self.flavour + '*')
+
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 

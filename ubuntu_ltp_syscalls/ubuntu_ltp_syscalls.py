@@ -30,7 +30,6 @@ class ubuntu_ltp_syscalls(test.test):
             'libselinux1-dev',
             'libssl-dev',
             'libtirpc-dev',
-            'nfs-kernel-server',
             'quota',
             'virt-what',
             'xfslibs-dev',
@@ -41,6 +40,8 @@ class ubuntu_ltp_syscalls(test.test):
 
         if self.flavour in ['azure', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + self.flavour + '*')
+        if self.flavour not in ['kvm']:
+             pkgs.append('nfs-kernel-server')
         if self.series not in ['trusty']:
              pkgs.append('haveged')
 

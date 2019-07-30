@@ -7,3 +7,6 @@ flavour:
             comment: 'quota not support in AWS (lp: 1777813)'
         'quotactl03 quotactl03':
             comment: 'quota not support in AWS (lp: 1777813)'
+    kvm:
+        'statx07 statx07':
+            comment: 'nfs-kernel-server requires CONFIG_NFSD on KVM kernels (lp: 1821275)'

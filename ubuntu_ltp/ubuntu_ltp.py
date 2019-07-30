@@ -44,6 +44,7 @@ class ubuntu_ltp(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        self.flavour = platform.uname()[2].split('-')[-1]
         pass
 
     # setup

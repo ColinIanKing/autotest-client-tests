@@ -13,19 +13,9 @@ class ubuntu_zfs_fstest(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'perl',
             'build-essential',
             'gdb',
             'git',
-            'ksh',
-            'autoconf',
-            'acl',
-            'dump',
-            'kpartx',
-            'pax',
-            'nfs-kernel-server',
-            'xfsprogs',
-            'libattr1-dev',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -34,9 +24,6 @@ class ubuntu_zfs_fstest(test.test):
             utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
             utils.system_output('apt-get update || true', retain_output=True)
             pkgs.append('ubuntu-zfs')
-        elif series == 'wily':
-            pkgs.append('zfs-dkms')
-            pkgs.append('zfsutils-linux')
         else:
             pkgs.append('zfsutils-linux')
 

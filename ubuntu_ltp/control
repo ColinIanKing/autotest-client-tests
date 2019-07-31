@@ -18,7 +18,7 @@ tests = [
     'fs',         'fs_perms_simple', 'fsx',            'dio',         'io',
     'mm',         'ipc',             'sched',          'math',        'nptl',
     'pty',        'containers',      'fs_bind',        'controllers', 'filecaps',
-    'cap_bounds', 'fcntl-locktests', 'connectors',     'timers',      'power_management_tests',
+    'cap_bounds', 'fcntl-locktests', 'connectors',     'power_management_tests',
     'hugetlb',    'commands',        'hyperthreading', 'fs_ext4',     'can',
     'cpuhotplug', 'net.ipv6_lib',    'input',          'cve',         'crypto',
     'kernel_misc'

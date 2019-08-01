@@ -15,9 +15,12 @@ ntimes = 10
 #
 # Stream size and binary name
 #
-#stream_size = 2000000000
-stream_size = 200000000
 stream_bin = 'stream_mp'
+
+if 'TEST_CONFIG' in os.environ and 'config' in os.environ['TEST_CONFIG']:
+    stream_size = 2000000000
+else:
+    stream_size = 200000000
 
 #
 # Number of test iterations to get min/max/average stats
@@ -211,6 +214,7 @@ class ubuntu_performance_stream(test.test):
         print 'memory_required %.2f MB' % (memory_required / (1024 * 1024))
         print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
         print 'ntimes %d' % ntimes
+        print 'stream_size %d ' % stream_size
 
         if memory_required > memory_available:
                 print 'WARNING: Not enough memory available to run stream for %d elements without swapping, skipping test' % stream_size

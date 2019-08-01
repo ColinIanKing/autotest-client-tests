@@ -140,11 +140,14 @@ class ubuntu_performance_stream(test.test):
             if len(chunks) > 2:
                 for field in fields:
                     if chunks[0] == field + ':':
-                        values[field] = chunks[2]
+                        values[field] = {}
+                        values[field]['average_rate'] = chunks[1]
+                        values[field]['average_time'] = chunks[2]
         return values
 
     def run_stream(self):
         fields = [ 'Copy', 'Scale', 'Add', 'Triad' ]
+        stats = [ 'average_rate', 'average_time' ]
         values = {}
         stream_exe_path = os.path.join(self.srcdir, stream_bin)
         size = stream_size / 1000000
@@ -155,6 +158,7 @@ class ubuntu_performance_stream(test.test):
         else:
             config = ''
 
+
         for i in range(test_iterations):
             results = utils.system_output(stream_exe_path, retain_output=True)
             values[i] = self.get_stats(results, fields)
@@ -164,7 +168,8 @@ class ubuntu_performance_stream(test.test):
             print
             print "Test %d of %d:" % (i + 1, test_iterations)
             for field in fields:
-                print "stream%s_average_time_for_%s_%dM[%d] %s" % (config, field.lower(), size , i, values[i][field])
+                for stat in stats:
+                    print "stream%s_%s_for_%s_%dM[%d] %s" % (config, stat, field.lower(), size , i, values[i][field][stat])
 
         #
         #  Compute min/max/average:
@@ -172,21 +177,21 @@ class ubuntu_performance_stream(test.test):
         print
         print "Collated Performance Metrics:"
         for field in fields:
-            v = [ float(values[i][field]) for i in values ]
-            maximum = max(v)
-            minimum = min(v)
-            average = sum(v) / float(len(v))
-            max_err = (maximum - minimum) / average * 100.0
+            for stat in stats:
+                v = [ float(values[i][field][stat]) for i in values ]
+                maximum = max(v)
+                minimum = min(v)
+                average = sum(v) / float(len(v))
+                max_err = (maximum - minimum) / average * 100.0
 
-            print
-            print "stream%s_%s_minimum %.5f" % (config, field.lower(), minimum)
-            print "stream%s_%s_maximum %.5f" % (config, field.lower(), maximum)
-            print "stream%s_%s_average %.5f" % (config, field.lower(), average)
-            print "stream%s_%s_maximum_error %.2f%%" % (config, field.lower(), max_err)
-
-            if max_err > 5.0:
-                print "FAIL: maximum error is greater than 5%"
-                test_pass = False
+                print
+                print "stream%s_%s_%s_minimum %.5f" % (config, stat, field.lower(), minimum)
+                print "stream%s_%s_%s_maximum %.5f" % (config, stat, field.lower(), maximum)
+                print "stream%s_%s_%s_average %.5f" % (config, stat, field.lower(), average)
+                print "stream%s_%s_%s_maximum_error %.2f%%" % (config, stat, field.lower(), max_err)
+                if max_err > 5.0:
+                    print "FAIL: maximum error is greater than 5%"
+                    test_pass = False
 
         print
         if test_pass:

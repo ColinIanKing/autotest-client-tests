@@ -187,6 +187,11 @@ class ubuntu_performance_iperf(test.test):
         cmd += " sudo /usr/bin/cpupower frequency-set -g performance'"
         utils.system_output(cmd, retain_output=True)
 
+        if 'TEST_CONFIG' in os.environ:
+            config = '_' + os.environ['TEST_CONFIG']
+        else:
+            config = ''
+
         for i in range(test_iterations):
             print "Test %d of %d:" % (i + 1, test_iterations)
             print "  Starting %d iperf3 instances on %s" % (clients, test_server)
@@ -268,10 +273,10 @@ class ubuntu_performance_iperf(test.test):
             max_err = (maximum - minimum) / average * 100.0
 
             print
-            print "iperf3_clients%d_%s_%s_mbit_per_sec_minimum %.5f" % (clients, direction, field.lower(), minimum)
-            print "iperf3_clients%d_%s_%s_mbit_per_sec_maximum %.5f" % (clients, direction, field.lower(), maximum)
-            print "iperf3_clients%d_%s_%s_mbit_per_sec_average %.5f" % (clients, direction, field.lower(), average)
-            print "iperf3_clients%d_%s_%s_mbit_per_sec_maximum_error %.2f%%" % (clients, direction, field.lower(), max_err)
+            print "iperf3%s_clients%d_%s_%s_mbit_per_sec_minimum %.5f" % (config, clients, direction, field.lower(), minimum)
+            print "iperf3%s_clients%d_%s_%s_mbit_per_sec_maximum %.5f" % (config, clients, direction, field.lower(), maximum)
+            print "iperf3%s_clients%d_%s_%s_mbit_per_sec_average %.5f" % (config, clients, direction, field.lower(), average)
+            print "iperf3%s_clients%d_%s_%s_mbit_per_sec_maximum_error %.2f%%" % (config, clients, direction, field.lower(), max_err)
             if max_err > 5.0:
                 print "FAIL: maximum error is greater than 5%"
                 test_pass = False

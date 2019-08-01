@@ -147,6 +147,11 @@ class ubuntu_performance_stream(test.test):
         size = stream_size / 1000000
         test_pass = True
 
+        if 'TEST_CONFIG' in os.environ:
+            config = '_' + os.environ['TEST_CONFIG']
+        else:
+            config = ''
+
         for i in range(test_iterations):
             results = utils.system_output(stream_exe_path, retain_output=True)
             values[i] = self.get_stats(results, fields)
@@ -156,7 +161,7 @@ class ubuntu_performance_stream(test.test):
             print
             print "Test %d of %d:" % (i + 1, test_iterations)
             for field in fields:
-                print "average_time_for_%s_%dM[%d] %s" % (field.lower(), size , i, values[i][field])
+                print "stream%s_average_time_for_%s_%dM[%d] %s" % (config, field.lower(), size , i, values[i][field])
 
         #
         #  Compute min/max/average:
@@ -171,10 +176,10 @@ class ubuntu_performance_stream(test.test):
             max_err = (maximum - minimum) / average * 100.0
 
             print
-            print "stream_" + field.lower() + "_minimum %.5f" % (minimum)
-            print "stream_" + field.lower() + "_maximum %.5f" % (maximum)
-            print "stream_" + field.lower() + "_average %.5f" % (average)
-            print "stream_" + field.lower() + "_maximum_error %.2f%%" % (max_err)
+            print "stream%s_%s_minimum %.5f" % (config, field.lower(), minimum)
+            print "stream%s_%s_maximum %.5f" % (config, field.lower(), maximum)
+            print "stream%s_%s_average %.5f" % (config, field.lower(), average)
+            print "stream%s_%s_maximum_error %.2f%%" % (config, field.lower(), max_err)
 
             if max_err > 5.0:
                 print "FAIL: maximum error is greater than 5%"

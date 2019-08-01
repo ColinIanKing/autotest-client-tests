@@ -175,6 +175,8 @@ class ubuntu_performance_pts(test.test):
         test_run = False
 
         benchmark = benchmark.replace("-","_")
+        if 'TEST_CONFIG' in os.environ:
+            benchmark += '_' + os.environ['TEST_CONFIG']
 
         for i in range(test_iterations):
             results = utils.system_output(command)

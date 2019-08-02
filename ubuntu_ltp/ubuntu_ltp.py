@@ -83,14 +83,29 @@ class ubuntu_ltp(test.test):
         log_output = fn + '.output'
 
         fn = '/opt/ltp/runtest/%s' % (test_name)
+
+        print("Checking virt-what to see if we need to set LTP_TIMEOUT_MUL for memcg_test_3...")
+        LTP_TIMEOUT_MUL = 1
+        if utils.system_output('virt-what', verbose=False):
+            print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1797327) for memcg_test_3")
+            LTP_TIMEOUT_MUL = 3
         with open(fn , 'r') as f:
             for line in f:
                 if line.strip() and not line.startswith('#'):
                     with open ('/tmp/target' , 'w') as t:
                         t.write(line)
+
+                    # Set the timeout multiplier exclusively for getrandom02 (lp:1831235)
+                    if 'memcg_test_3' in line and LTP_TIMEOUT_MUL > 1:
+                        os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
+
                     cmd = '/opt/ltp/runltp -f /tmp/target -S /tmp/skip -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
                     utils.run(cmd, ignore_status=True, verbose=False)
                     # /dev/loop# creation will be taken care by the runltp
+
+                    # Restore the timeout multiplier
+                    if 'memcg_test_3' in line and 'LTP_TIMEOUT_MUL' in os.environ:
+                        del os.environ["LTP_TIMEOUT_MUL"]
 
         num_failed = sum(1 for line in open(log_failed))
         print("== Test Suite Summary ==")

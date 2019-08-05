@@ -31,6 +31,7 @@ class ubuntu_ltp(test.test):
             'libssl-dev',
             'libtirpc-dev',
             'quota',
+            'virt-what',
             'xfslibs-dev',
             'xfsprogs',
         ]

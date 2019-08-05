@@ -10,3 +10,10 @@ flavour:
     kvm:
         'statx07 statx07':
             comment: 'nfs-kernel-server requires CONFIG_NFSD on KVM kernels (lp: 1821275)'
+kernel:
+    3.13.0:
+        'fanotify07 fanotify07':
+            comment: 'fanotify07 will not get fixed <= 4.4.0 (lp: 1775165)'
+    4.4.0:
+        'fanotify07 fanotify07':
+            comment: 'fanotify07 will not get fixed <= 4.4.0 (lp: 1775165)'

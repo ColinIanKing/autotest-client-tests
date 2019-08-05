@@ -51,6 +51,7 @@ class ubuntu_ltp_syscalls(test.test):
     def initialize(self):
         self.series = platform.dist()[2]
         self.flavour = platform.uname()[2].split('-')[-1]
+        self.kernel = platform.uname()[2].split('-')[0]
         pass
 
     # setup
@@ -77,14 +78,16 @@ class ubuntu_ltp_syscalls(test.test):
         utils.make('install')
 
     def testcase_blacklist(self):
+        _blacklist = []
         fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
         with open(fn, 'r') as f:
             db = yaml.load(f)
-
         if self.flavour in db['flavour']:
-            return list(db['flavour'][self.flavour].keys())
+             _blacklist += list(db['flavour'][self.flavour].keys())
+        if self.kernel in db['kernel']:
+            _blacklist += list(db['kernel'][self.kernel].keys())
 
-        return None
+        return _blacklist
 
     # run_once
     #

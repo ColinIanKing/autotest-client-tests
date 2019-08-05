@@ -88,7 +88,7 @@ class ubuntu_ltp(test.test):
         print("Checking virt-what to see if we need to set LTP_TIMEOUT_MUL for memcg_test_3...")
         LTP_TIMEOUT_MUL = 1
         if utils.system_output('virt-what', verbose=False):
-            print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1797327) for memcg_test_3")
+            print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1836694) for memcg_test_3")
             LTP_TIMEOUT_MUL = 3
         with open(fn , 'r') as f:
             for line in f:
@@ -96,7 +96,6 @@ class ubuntu_ltp(test.test):
                     with open ('/tmp/target' , 'w') as t:
                         t.write(line)
 
-                    # Set the timeout multiplier exclusively for getrandom02 (lp:1831235)
                     if 'memcg_test_3' in line and LTP_TIMEOUT_MUL > 1:
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
 

@@ -40,10 +40,18 @@ tests = [
 
 results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup', media='')
 
+media_types = [ 'ramdisk', 'dataset' ]
+#
+# Spec states that config1 should not run ramdisk tests
+#
+if 'TEST_CONFIG' in os.environ:
+	if  os.environ['TEST_CONFIG'] == 'config1':
+		media_types = [ 'dataset' ]
+
 #
 #  Media is 'ramdisk' (/dev/shm) or 'dataset' (normally a raid device)
 #
-for media_type in [ 'ramdisk', 'dataset' ]:
+for media_type in media_types:
     for test in tests:
 	results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + media_type + '-' + test, media=media_type, timeout=120*60)
 

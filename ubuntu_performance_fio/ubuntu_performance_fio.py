@@ -270,13 +270,18 @@ class ubuntu_performance_fio(test.test):
         values = {}
         test_pass = True
 
+        if 'TEST_CONFIG' in os.environ:
+            config = '_' + os.environ['TEST_CONFIG']
+        else:
+            config = ''
+
         for i in range(test_iterations):
             print "Test %d of %d:" % (i + 1, test_iterations)
             values[i] = self.run_fio(testname, ramdisk_bytes, media)
-            print "fio_%s_%s_file_size_mb %s" % (media, testname, values[i]['file_size_mb'])
-            print "fio_%s_%s_bandwidth_kb_per_sec %.2f" % (media, testname, values[i]['bandwidth_kb_per_sec'])
-            print "fio_%s_%s_latency_usec_average %.2f" % (media, testname, values[i]['latency_usec_average'])
-            print "fio_%s_%s_latency_stddev %.2f" % (media, testname, values[i]['latency_stddev'])
+            print "fio_%s%s_%s_file_size_mb %s" % (media, config, testname, values[i]['file_size_mb'])
+            print "fio_%s%s_%s_bandwidth_kb_per_sec %.2f" % (media, config, testname, values[i]['bandwidth_kb_per_sec'])
+            print "fio_%s%s_%s_latency_usec_average %.2f" % (media, config, testname, values[i]['latency_usec_average'])
+            print "fio_%s%s_%s_latency_stddev %.2f" % (media, config, testname, values[i]['latency_stddev'])
 
         #
         #  Compute min/max/average:
@@ -293,10 +298,10 @@ class ubuntu_performance_fio(test.test):
             str = field.lower().replace("-", "_").replace(",","_")
 
             print
-            print "fio_%s_%s_minimum %.5f" % (media, str, minimum)
-            print "fio_%s_%s_maximum %.5f" % (media, str, maximum)
-            print "fio_%s_%s_average %.5f" % (media, str, average)
-            print "fio_%s_%s_maximum_error %.2f%%" % (media, str, max_err)
+            print "fio_%s%s_%s_%s_minimum %.5f" % (media, config, testname, str, minimum)
+            print "fio_%s%s_%s_%s_maximum %.5f" % (media, config, testname, str, maximum)
+            print "fio_%s%s_%s_%s_average %.5f" % (media, config, testname, str, average)
+            print "fio_%s%s_%s_%s_maximum_error %.2f%%" % (media, config, testname, str, max_err)
 
             if max_err > 5.0:
                 print "FAIL: maximum error is greater than 5%"

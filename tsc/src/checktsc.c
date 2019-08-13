@@ -195,7 +195,7 @@ tsc_delta(int cpu_a, int cpu_b)
 	uint64_t	best_t1	= ~0ULL;
 	uint64_t	best_tm	= 0;
 	int64_t		delta;
-	uint64_t	t0, t1, tm;
+	uint64_t	t0, t1;
 	int		i;
 
 	if (verbose)
@@ -223,13 +223,14 @@ tsc_delta(int cpu_a, int cpu_b)
 			best_tm = slave_tsc;
 		}
 		if (verbose)
-			printf("loop %2d: roundtrip = %5Ld\n", i, t1 - t0);
+			printf("loop %2d: roundtrip = %5ld\n", i,
+			       (int64_t)(t1 - t0));
 	}
 
 	delta = (best_t0/2 + best_t1/2 + (best_t0 & best_t1 & 1)) - best_tm; 
 
 	if (!silent)
-		printf("CPU %d - CPU %d = % 5Ld\n", cpu_a, cpu_b, delta);
+		printf("CPU %d - CPU %d = % 5ld\n", cpu_a, cpu_b, delta);
 
 	return delta;
 }

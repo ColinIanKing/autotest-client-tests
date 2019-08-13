@@ -1,5 +1,5 @@
 CC=		cc
-CFLAGS=		-O
+CFLAGS=		-O -Wall -Wpedantic -Werror
 LIBS=		-lpthread
 
 PROGS=		checktsc

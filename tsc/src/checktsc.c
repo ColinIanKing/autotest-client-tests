@@ -8,7 +8,6 @@
 #include <getopt.h>
 #include <pthread.h>
 #include <errno.h>
-#include "sched.h"
 
 
 #define MAX_CPUS		32

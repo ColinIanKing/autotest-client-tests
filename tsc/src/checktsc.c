@@ -229,9 +229,6 @@ tsc_delta(int cpu_a, int cpu_b)
 
 	delta = (best_t0/2 + best_t1/2 + (best_t0 & best_t1 & 1)) - best_tm; 
 
-	if (!silent)
-		printf("CPU %d - CPU %d = % 5ld\n", cpu_a, cpu_b, delta);
-
 	return delta;
 }
 
@@ -298,6 +295,12 @@ check_tsc(cpu_set_t *cpus)
 
 			if (llabs(delta) > threshold) {
 				++err;
+				printf("ERROR: CPU %d - CPU %d = % 5ld\n",
+				       cpu_a, cpu_b, delta);
+			} else {
+				if (!silent)
+					printf("CPU %d - CPU %d = % 5ld\n",
+					       cpu_a, cpu_b, delta);
 			}
 		}
 	}

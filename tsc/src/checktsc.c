@@ -8,9 +8,9 @@
 #include <getopt.h>
 #include <pthread.h>
 #include <errno.h>
+#include <sys/sysinfo.h>
 
 
-#define MAX_CPUS		32
 #define	DEFAULT_THRESHOLD	500	/* default maximum TSC skew	*/
 
 
@@ -277,18 +277,19 @@ check_tsc(cpu_set_t *cpus)
 	int64_t		delta;
 	int		err	= 0;
 	pthread_t	thread;
+	int		num_cpus;
 
 	if ((err = pthread_create(&thread, NULL, slave_thread, NULL))) {
 		error(err, "pthread_create_failed");
 		return -1;
 	}
 	
-
-	for (cpu_a = 0; cpu_a < MAX_CPUS; cpu_a++) {
+	num_cpus = get_nprocs();
+	for (cpu_a = 0; cpu_a < num_cpus; cpu_a++) {
 		if (!CPU_ISSET(cpu_a, cpus))
 			continue;
 
-		for (cpu_b = 0; cpu_b < MAX_CPUS; cpu_b++) {
+		for (cpu_b = 0; cpu_b < num_cpus; cpu_b++) {
 			if (!CPU_ISSET(cpu_b, cpus) || cpu_a == cpu_b)
 				continue;
 
@@ -329,9 +330,7 @@ main(int argc, char *argv[])
 	/*
 	 * default to checking all cpus
 	 */
-	for (c = 0; c < MAX_CPUS; c++) {
-		CPU_SET(c, &cpus);
-	}
+	memset(&cpus, 0xff, sizeof(cpus));
 
 	while ((c = getopt_long(argc, argv, "c:hst:v", options, NULL)) != EOF) {
 		switch (c) {

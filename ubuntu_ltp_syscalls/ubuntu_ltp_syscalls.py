@@ -7,6 +7,7 @@ import time
 import yaml
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
+from packaging.version          import parse
 
 class ubuntu_ltp_syscalls(test.test):
     version = 1
@@ -84,8 +85,10 @@ class ubuntu_ltp_syscalls(test.test):
             db = yaml.load(f)
         if self.flavour in db['flavour']:
              _blacklist += list(db['flavour'][self.flavour].keys())
-        if self.kernel in db['kernel']:
-            _blacklist += list(db['kernel'][self.kernel].keys())
+        current_version = parse(self.kernel)
+        for _kernel in db['kernel']:
+            if current_version < parse(_kernel):
+                _blacklist += list(db['kernel'][_kernel].keys())
 
         return _blacklist
 

@@ -4,9 +4,9 @@ flavour:
         'statx07 statx07':
             comment: 'nfs-kernel-server requires CONFIG_NFSD on KVM kernels (lp: 1821275)'
 kernel:
-    3.13.0:
+    4.5.0:
         'fanotify07 fanotify07':
-            comment: 'fanotify07 will not get fixed <= 4.4.0 (lp: 1775165)'
-    4.4.0:
-        'fanotify07 fanotify07':
-            comment: 'fanotify07 will not get fixed <= 4.4.0 (lp: 1775165)'
+            comment: 'fanotify07 will not get fixed < 4.5.0 (lp: 1775165)'
+    5.2.0:
+        'copy_file_range02 copy_file_range02':
+            comment: 'copy_file_range02 will not get fixed < 5.2.0 (https://lwn.net/Articles/774114)'

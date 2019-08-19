@@ -15,7 +15,7 @@ class ubuntu_zram_smoke_test(test.test):
         ]
 
         flavour = platform.uname()[2].split('-')[-1]
-        if flavour in ['azure', 'gcp', 'gke']:
+        if flavour in ['aws', 'azure', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + flavour + '*')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

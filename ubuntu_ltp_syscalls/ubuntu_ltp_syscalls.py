@@ -38,7 +38,7 @@ class ubuntu_ltp_syscalls(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if self.flavour in ['azure', 'gcp', 'gke']:
+        if self.flavour in ['aws', 'azure', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + self.flavour + '*')
         if self.flavour not in ['kvm']:
              pkgs.append('nfs-kernel-server')

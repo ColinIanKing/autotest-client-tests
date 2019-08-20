@@ -192,7 +192,7 @@ int64_t
 tsc_delta(int cpu_a, int cpu_b)
 {
 	uint64_t	best_t0	= 0;
-	uint64_t	best_t1	= ~0ULL;
+	uint64_t	best_t1	= ~UINT64_C(0);
 	uint64_t	best_tm	= 0;
 	int64_t		delta;
 	uint64_t	t0, t1;

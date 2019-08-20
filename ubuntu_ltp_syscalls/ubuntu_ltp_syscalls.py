@@ -40,11 +40,12 @@ class ubuntu_ltp_syscalls(test.test):
         pkgs.append(gcc)
 
         if self.flavour in ['aws', 'azure', 'gcp', 'gke']:
-             pkgs.append('linux-modules-extra-' + self.flavour + '*')
+            pkgs.append('linux-modules-extra-' + self.flavour + '*')
         if self.flavour not in ['kvm']:
-             pkgs.append('nfs-kernel-server')
+            pkgs.append('nfs-kernel-server')
         if self.series not in ['trusty']:
-             pkgs.append('haveged')
+            pkgs.append('haveged')
+            pkgs.append('python-packaging')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

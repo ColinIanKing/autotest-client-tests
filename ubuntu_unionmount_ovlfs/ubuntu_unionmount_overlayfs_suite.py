@@ -32,11 +32,13 @@ class ubuntu_unionmount_overlayfs_suite(test.test):
         if not os.path.exists('/upper'):
             os.mkdir('/upper')
         os.chdir(self.srcdir)
-        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/kernel-ppa/unionmount-testsuite.git'
+        cmd = 'git clone --depth=1 https://github.com/amir73il/unionmount-testsuite.git'
         self.results = utils.system_output(cmd, retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'unionmount-testsuite'))
-        cmd = 'patch -p1 < %s/0001-Fix-check-for-file-on-overlayfs.patch' % self.bindir
-        utils.system(cmd)
+        # We are using a new github fork of unionmount_overlayfs_suite, this patch is
+        # no longer needed. -sfeole 8/21/2019
+        # cmd = 'patch -p1 < %s/0001-Fix-check-for-file-on-overlayfs.patch' % self.bindir
+        # utils.system(cmd)
 
     # run_once
     #

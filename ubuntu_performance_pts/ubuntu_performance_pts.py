@@ -99,6 +99,8 @@ class ubuntu_performance_pts(test.test):
             'php-xml',
             'gdb',
             'libssl-dev',
+            'libssl1.0-dev',
+            'libpng-dev',
             'autoconf',
             'linux-tools-generic',
             'linux-tools-' + release
@@ -219,12 +221,24 @@ class ubuntu_performance_pts(test.test):
             print "NOTRUN: test not run, no data"
 
     def run_john_the_ripper_blowfish(self, test_name, tag):
-        cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; %s phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run
+        cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; %s phoronix-test-suite batch-benchmark john-the-ripper-1.6.2' % force_times_to_run
         self.print_stats('john_the_ripper_blowfish', cmd)
 
     def run_john_the_ripper_des(self, test_name, tag):
-        cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Traditional DES"; %s phoronix-test-suite batch-benchmark john-the-ripper' % force_times_to_run
+        cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Traditional DES"; %s phoronix-test-suite batch-benchmark john-the-ripper-1.6.2' % force_times_to_run
         self.print_stats('john_the_ripper_des', cmd)
+
+    def run_openssl(self, test_name, tag):
+        cmd = '%s phoronix-test-suite batch-benchmark openssl-1.11.0' % force_times_to_run
+        self.print_stats(test_name, cmd)
+
+    def run_povray(self, test_name, tag):
+        cmd = '%s phoronix-test-suite batch-benchmark povray-1.2.1' % force_times_to_run
+        self.print_stats(test_name, cmd)
+
+    def run_ttsiod_renderer(self, test_name, tag):
+        cmd = '%s phoronix-test-suite batch-benchmark ttsiod-renderer-1.7.0' % force_times_to_run
+        self.print_stats(test_name, cmd)
 
     def run_generic(self, test_name, subtest):
         cmd = '%s phoronix-test-suite batch-benchmark %s' % (force_times_to_run, test_name)
@@ -257,13 +271,13 @@ class ubuntu_performance_pts(test.test):
             'build-llvm': self.run_generic,
             'john-the-ripper-blowfish' : self.run_john_the_ripper_blowfish,
             'john-the-ripper-des': self.run_john_the_ripper_des,
-            'openssl': self.run_generic,
+            'openssl': self.run_openssl,
             'osbench-files': self.run_osbench_files,
             'osbench-processes': self.run_osbench_files,
             'osbench-threads': self.run_osbench_threads,
             'osbench-memory': self.run_osbench_memory,
-            'povray': self.run_generic,
-            'ttsiod-renderer': self.run_generic,
+            'povray': self.run_povray,
+            'ttsiod-renderer': self.run_ttsiod_renderer,
         }
 
 	if subtest != "setup":

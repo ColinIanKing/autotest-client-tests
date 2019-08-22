@@ -182,13 +182,14 @@ class ubuntu_performance_pts(test.test):
 
         for i in range(test_iterations):
             results = utils.system_output(command)
-            values[i] = self.get_stats(results, fields)
 
+            values[i] = self.get_stats(results, fields)
             if values[i] != {}:
                 print
                 print "Test %d of %d:" % (i + 1, test_iterations)
                 for field in fields:
-                    print benchmark + "_" + field.lower() + "[%d] %s" % (i, values[i][field])
+                    if field in values[i]:
+                        print benchmark + "_" + field.lower() + "[%d] %s" % (i, values[i][field])
 
         #
         #  Compute min/max/average:

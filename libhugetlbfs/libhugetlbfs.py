@@ -62,8 +62,6 @@ class libhugetlbfs(test.test):
         # apply SAUCE patches
         os.chdir(os.path.join(self.srcdir, 'libhugetlbfs'))
         utils.system('patch -p1 < %s/001-fix-fallocate-test-before-kernel-4.3.patch' % self.bindir)
-        utils.system('patch -p1 < %s/002-task-size-overrun-fix-ppc64el.patch' % self.bindir)
-        utils.system('patch -p1 < %s/003-task-size-overrun-fix-s390x.patch' % self.bindir)
 
         # build for the underlying arch only (i.e. only 64 bit on 64 bit etc)
         utils.make('BUILDTYPE=NATIVEONLY')

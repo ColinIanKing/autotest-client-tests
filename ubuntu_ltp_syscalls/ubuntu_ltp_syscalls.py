@@ -7,7 +7,6 @@ import time
 import yaml
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
-from packaging.version          import parse
 
 class ubuntu_ltp_syscalls(test.test):
     version = 1
@@ -80,6 +79,7 @@ class ubuntu_ltp_syscalls(test.test):
         utils.make('install')
 
     def testcase_blacklist(self):
+        from packaging.version          import parse
         _blacklist = []
         fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
         with open(fn, 'r') as f:

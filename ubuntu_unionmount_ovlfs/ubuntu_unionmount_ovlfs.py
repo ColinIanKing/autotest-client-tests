@@ -4,7 +4,7 @@ import os
 from autotest.client                        import test, utils
 import platform
 
-class ubuntu_unionmount_overlayfs_suite(test.test):
+class ubuntu_unionmount_ovlfs(test.test):
     version = 1
 
     def install_required_pkgs(self):

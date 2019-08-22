@@ -10,10 +10,10 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
 DOC = ""
 
-name = 'ubuntu_unionmount_overlayfs_suite'
+name = 'ubuntu_unionmount_ovlfs'
 
-results = job.run_test_detail('ubuntu_unionmount_overlayfs_suite', test_name='setup', tag='setup')
-results = job.run_test_detail('ubuntu_unionmount_overlayfs_suite', test_name='overlayfs',  tag='overlayfs',  timeout=60*60*1) # 1hr. timeout
+results = job.run_test_detail('ubuntu_unionmount_ovlfs', test_name='setup', tag='setup')
+results = job.run_test_detail('ubuntu_unionmount_ovlfs', test_name='overlayfs',  tag='overlayfs',  timeout=60*60*1) # 1hr. timeout
 
 # The unionmount tests require a patched util-linux to work so
 # for now, just don't run them.

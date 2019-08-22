@@ -79,17 +79,26 @@ class ubuntu_ltp_syscalls(test.test):
         utils.make('install')
 
     def testcase_blacklist(self):
-        from packaging.version          import parse
+        try:
+            from packaging.version          import parse
+        except ImportError:
+            # Compatibility fix for release < xenial
+            from distutils.version import StrictVersion
         _blacklist = []
         fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
         with open(fn, 'r') as f:
             db = yaml.load(f)
         if self.flavour in db['flavour']:
              _blacklist += list(db['flavour'][self.flavour].keys())
-        current_version = parse(self.kernel)
-        for _kernel in db['kernel']:
-            if current_version < parse(_kernel):
-                _blacklist += list(db['kernel'][_kernel].keys())
+        try:
+            current_version = parse(self.kernel)
+            for _kernel in db['kernel']:
+                if current_version < parse(_kernel):
+                    _blacklist += list(db['kernel'][_kernel].keys())
+        except NameError:
+            for _kernel in db['kernel']:
+                if StrictVersion(self.kernel) < StrictVersion(_kernel):
+                    _blacklist += list(db['kernel'][_kernel].keys())
 
         return _blacklist
 

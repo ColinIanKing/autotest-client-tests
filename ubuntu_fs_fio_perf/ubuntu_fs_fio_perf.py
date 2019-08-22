@@ -4,8 +4,71 @@ import platform
 from autotest.client import test, utils
 import time
 
+gb = 1024 * 1024 * 1024
+mem_path = '/sys/devices/system/memory'
+
 class ubuntu_fs_fio_perf(test.test):
     version = 1
+
+    def online_all_memory(self):
+        sys_memory = [ f for f in os.listdir(mem_path) if f.startswith("memory") ]
+        for mem_file in sys_memory:
+            try:
+                with open(os.path.join(mem_path, mem_file, 'online'), 'w') as f:
+                    f.write("1")
+            except IOError:
+                pass
+
+    def online_shrink_memory(self, mem_required):
+        sys_memory = sorted([ f for f in os.listdir(mem_path) if f.startswith("memory") ])
+        with open(os.path.join(mem_path, 'block_size_bytes')) as f:
+            mem_block_size = int(f.readline(), 16)
+
+        online_blocks = 0
+        online_memory = { }
+        for mem_file in sys_memory:
+            with open(os.path.join(mem_path, mem_file, 'online')) as f:
+                online_memory[mem_file] = int(f.readline())
+                online_blocks += online_memory[mem_file]
+
+        mem_total = mem_block_size * online_blocks
+        blocks_required = mem_required / mem_block_size
+
+        if mem_total < mem_required:
+            print("required %d GB but only have %d GB" % (mem_required / gb, mem_total / gb))
+            return
+
+        if mem_required < mem_block_size:
+            print("required %d GB but minimum allowed is %d GB" % (mem_required / gb, mem_block_size / gb))
+            mem_required = mem_block_size
+
+        required_blocks = (mem_required + mem_block_size - 1) / mem_block_size
+        if required_blocks < 1:
+            required_blocks = 1
+        blocks_to_offline = online_blocks - required_blocks
+
+        print("%d x %d GB blocks online, %d blocks required, %d blocks to offline" % (online_blocks, mem_block_size / gb, required_blocks, blocks_to_offline))
+
+        for mem_file in sys_memory:
+            path = os.path.join(mem_path, mem_file, 'online')
+            try:
+                if online_memory[mem_file] == 1 and blocks_to_offline > 0:
+                    with open(path, 'w') as f:
+                        f.write("0")
+            except IOError:
+                pass
+
+            with open(path, 'r') as f:
+                if int(f.readline()) == 0:
+                    blocks_to_offline -= 1
+
+        online_blocks = 0
+        for mem_file in sys_memory:
+            path = os.path.join(mem_path, mem_file, 'online')
+            with open(path) as f:
+                online_blocks += int(f.readline())
+        mem_total = mem_block_size * online_blocks
+        print("memory online: %d GB" % (mem_total / gb))
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -15,15 +78,11 @@ class ubuntu_fs_fio_perf(test.test):
             'build-essential',
             'git-core',
             'fio',
-            'xfsprogs',
-            'btrfs-tools',
+            'btrfs-progs',
             'libaio-dev',
             'git-core',
-            'fio',
-            'libaio-dev',
             'xfsdump',
             'xfsprogs',
-            'btrfs-tools',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -32,15 +91,12 @@ class ubuntu_fs_fio_perf(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.valid_clients = ['gonzo', 'intel-uefi']
+        self.valid_clients = ['ivysaur']
         self.hostname = os.uname()[1]
-        if self.hostname == 'gonzo':
+        if self.hostname == 'ivysaur':
             self.dev = '/dev/sdb'
-        elif self.hostname == 'intel-uefi':
-            # cking's test box
-            self.dev = '/dev/sda'
         else:
-            self.dev = ''
+            raise error.TestError("ERROR: No device specified")
         self.fio_tests_dir = os.path.join(self.srcdir, 'fs-test-proto', 'fio-tests')
 
     def setup(self):
@@ -52,16 +108,6 @@ class ubuntu_fs_fio_perf(test.test):
         os.chdir(self.srcdir)
         utils.system('rm -rf fs-test-proto')
         utils.system('git clone --depth=1 git://kernel.ubuntu.com/cking/fs-test-proto.git')
-        os.chdir(self.fio_tests_dir)
-        utils.system('tar xvfz ../tools/fio-2.1.9.tar.gz')
-        os.chdir(os.path.join(self.fio_tests_dir, 'fio'))
-        utils.make('clean')
-        try:
-            nprocs = '-j' + str(multiprocessing.cpu_count())
-        except:
-            nprocs = ''
-        utils.make(nprocs)
-        os.chdir(self.srcdir)
 
         #
         #  Nuke any existing parition info and setup partition
@@ -79,16 +125,27 @@ class ubuntu_fs_fio_perf(test.test):
         # as this is really quite destructive!
         #
         if not os.uname()[1] in self.valid_clients:
+            print "unknown host"
             return
 
         date_start = time.strftime("%Y-%m-%d")
         time_start = time.strftime("%H%M")
 
+        self.online_all_memory()
+        self.online_shrink_memory(8 * gb)
+
         output = ''
         #
         # Test 3 different I/O schedulers:
         #
-        for iosched in ['cfq', 'deadline', 'noop']:
+        devbase = os.path.basename(self.dev)
+        with open(os.path.join('/sys/block', devbase, 'queue/scheduler')) as f:
+            schedulers = f.readline().replace('[', '').replace(']', '').split()
+
+        print("Using device %s (%s):" % (self.dev, devbase))
+        print(schedulers)
+
+        for iosched in schedulers:
             #
             # Test 5 different file systems, across 20+ tests..
             #
@@ -103,5 +160,7 @@ class ubuntu_fs_fio_perf(test.test):
         # get picked up and copied over to the jenkins server.
         #
         os.rename(os.path.join(self.srcdir, 'fs-test-proto'), os.path.join(self.resultsdir, 'fs-test-proto'))
+
+        self.online_all_memory()
 
 # vi:set ts=4 sw=4 expandtab:

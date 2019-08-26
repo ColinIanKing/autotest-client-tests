@@ -12,7 +12,7 @@ class ubuntu_seccomp(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'git',
+            'build-essential', 'git', 'libtool', 'build-essential', 'autoconf',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -31,10 +31,13 @@ class ubuntu_seccomp(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
-        cmd = 'git clone --depth=1 https://github.com/redpig/seccomp.git'
+        cmd = 'git clone --depth=1 https://github.com/seccomp/libseccomp.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
-        os.chdir(os.path.join(self.srcdir, 'seccomp', 'tests'))
+        autogen = self.srcdir + '/libseccomp/autogen.sh'
+        os.chdir(os.path.join(self.srcdir, 'libseccomp'))
+        self.results = utils.system_output(autogen, retain_output=True)
+        utils.configure()
         utils.make()
 
     # run_once
@@ -42,9 +45,9 @@ class ubuntu_seccomp(test.test):
     #    Driven by the control file for each individual test.
     #
     def run_once(self, test_name):
-        os.chdir(os.path.join(self.srcdir, 'seccomp', 'tests'))
+        os.chdir(os.path.join(self.srcdir, 'libseccomp', 'tests'))
 
-        cmd = 'make run_tests'
+        cmd = 'make check'
         self.results = utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

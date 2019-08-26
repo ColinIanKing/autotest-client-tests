@@ -39,7 +39,8 @@ class ubuntu_ltp_syscalls(test.test):
         pkgs.append(gcc)
 
         if self.flavour in ['aws', 'azure', 'gcp', 'gke']:
-            pkgs.append('linux-modules-extra-' + self.flavour + '*')
+            if not (self.flavour == 'aws' and self.series == 'trusty'):
+                pkgs.append('linux-modules-extra-' + self.flavour + '*')
         if self.flavour not in ['kvm']:
             pkgs.append('nfs-kernel-server')
         if self.series not in ['trusty']:
@@ -90,6 +91,8 @@ class ubuntu_ltp_syscalls(test.test):
             db = yaml.load(f)
         if self.flavour in db['flavour']:
              _blacklist += list(db['flavour'][self.flavour].keys())
+        if self.flavour + '-' + self.series in db['flavour-series']:
+             _blacklist += list(db['flavour-series'][self.flavour + '-' + self.series].keys())
         try:
             current_version = parse(self.kernel)
             for _kernel in db['kernel']:

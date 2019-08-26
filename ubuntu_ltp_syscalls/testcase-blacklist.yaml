@@ -3,6 +3,14 @@ flavour:
     kvm:
         'statx07 statx07':
             comment: 'nfs-kernel-server requires CONFIG_NFSD on KVM kernels (lp: 1821275)'
+flavour-series:
+    aws-trusty:
+        'quotactl01 quotactl01':
+            comment: 'no extra module for Trusty AWS (lp: 1841410)'
+        'quotactl02 quotactl02':
+            comment: 'no extra module for Trusty AWS (lp: 1841410)'
+        'quotactl03 quotactl03':
+            comment: 'no extra module for Trusty AWS (lp: 1841410)'
 kernel:
     4.5.0:
         'fanotify07 fanotify07':

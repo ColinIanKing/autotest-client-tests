@@ -52,10 +52,8 @@ class ubuntu_bpf(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
-        os.chdir(os.path.join(self.srcdir, 'linux/tools/testing/selftests'))
-        cmd = '%s/ubuntu_bpf.sh' % self.bindir
+        os.chdir(os.path.join(self.srcdir, 'linux/tools/testing/selftests/bpf'))
+        cmd = './%s' % test_name
         self.results = utils.system_output(cmd, retain_output=True)
-
-        print(self.results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

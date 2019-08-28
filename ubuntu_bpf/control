@@ -11,8 +11,10 @@ TEST_TYPE = "client"
 DOC = ""
 
 name = 'ubuntu_bpf'
+tests = ['setup', 'test_verifier', 'test_maps']
 
-results = job.run_test_detail('ubuntu_bpf', test_name='setup', tag='setup')
-results = job.run_test_detail('ubuntu_bpf', test_name='ubuntu-bpf', tag='ubuntu-bjf')
+for test in tests:
+    results = job.run_test_detail(name, test_name=test, tag=test)
+
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

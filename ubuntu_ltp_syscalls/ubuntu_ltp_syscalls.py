@@ -137,7 +137,7 @@ class ubuntu_ltp_syscalls(test.test):
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
 
                     # Stop timesyncd when testing leap sec.
-                    if 'leapsec01' in line:
+                    if 'leapsec01' in line and self.series != 'trusty':
                         utils.run('systemctl stop systemd-timesyncd')
 
                     cmd = '/opt/ltp/runltp -f /tmp/target -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
@@ -145,7 +145,7 @@ class ubuntu_ltp_syscalls(test.test):
                     # /dev/loop# creation will be taken care by the runltp
 
                     # Stop timesyncd when testing leap sec. Restart it now that it's done.
-                    if 'leapsec01' in line:
+                    if 'leapsec01' in line and self.series != 'trusty':
                         utils.run('systemctl start systemd-timesyncd')
 
                     # Restore the timeout multiplier

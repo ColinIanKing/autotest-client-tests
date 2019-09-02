@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+
+set +x
+
+DEVICE=$1
+FS=$2
+
+if [ -z $DEVICE ]; then
+    echo ""
+    echo " ** Error: A device must be specified."
+    echo ""
+    echo "Usage: $0 <device> <file-system>"
+    exit
+fi
+
+if [ -z $FS ]; then
+    echo ""
+    echo " ** Error: A file-system must be specified."
+    echo ""
+    echo "Usage: $0 <device> <file-system>"
+    exit
+fi
+
+# remove partition only if it exists to avoid error messages
+partitions=`sudo partprobe -d -s $DEVICE | grep -oP 'partitions \K.*'`
+for i in $partitions
+do
+    sudo parted $DEVICE rm -s $i
+done
+
+set -e
+sudo parted $DEVICE mklabel -s gpt
+sudo parted $DEVICE mkpart -s p1 $FS 1MiB 20000MiB
+sudo parted $DEVICE mkpart -s p2 $FS 20001MiB 40000MiB
+sudo parted $DEVICE mkpart -s p3 $FS 40001MiB 60000MiB
+sudo parted $DEVICE mkpart -s p4 $FS 60001MiB 80000MiB
+sudo parted $DEVICE mkpart -s p5 $FS 80001MiB 80500MiB
+sudo parted $DEVICE mkpart -s p6 $FS 80501MiB 81000MiB
+
+if [ $FS = "btrfs" ]; then
+    FS_OPT=-f
+elif [ $FS = "xfs" ]; then
+    FS_OPT=-f
+elif [ $FS = "ext4" ]; then
+    FS_OPT=-F
+fi
+
+sleep 60 # Give things a minute to settle before creating new partitions
+
+for i in `seq 1 5`
+do
+    sudo mkfs.$FS $FS_OPT ${DEVICE}$i
+done
+sudo parted $DEVICE print
+

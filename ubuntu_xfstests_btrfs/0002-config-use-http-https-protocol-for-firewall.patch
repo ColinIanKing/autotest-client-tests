@@ -1,0 +1,34 @@
+From f8977f21125eb24ec9ec73cbedb7e78d29d34b6a Mon Sep 17 00:00:00 2001
+From: Po-Hsu Lin <po-hsu.lin@canonical.com>
+Date: Mon, 13 Nov 2017 06:58:35 -0500
+Subject: [PATCH] config: use http/https protocol for firewall restrictions
+
+Use the http/https protocol instead, to comply with our firewall rules.
+
+Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
+---
+ config | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/config b/config
+index 2a57a43..bc816d8 100644
+--- a/config
++++ b/config
+@@ -2,10 +2,10 @@
+ # Configuration file for building xfstests and root filesystem images
+ #
+ 
+-XFSTESTS_GIT=git://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git
+-XFSPROGS_GIT=git://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git
+-FIO_GIT=git://git.kernel.dk/fio.git
+-QUOTA_GIT=git://git.kernel.org/pub/scm/utils/quota/quota-tools.git
++XFSTESTS_GIT=https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git
++XFSPROGS_GIT=https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git
++FIO_GIT=http://git.kernel.dk/fio.git
++QUOTA_GIT=https://git.kernel.org/pub/scm/utils/quota/quota-tools.git
+ 
+ # Optional repositories, uncomment only if needed
+ #
+-- 
+2.7.4
+

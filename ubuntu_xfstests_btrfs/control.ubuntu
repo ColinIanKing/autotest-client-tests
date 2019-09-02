@@ -1,0 +1,85 @@
+TIME="LONG"
+AUTHOR = "Cleber Rosa <cleber@redhat.com>"
+NAME = 'xfs filesystem test suite for btrfs'
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = 'client'
+DOC = """
+"""
+
+# Get the device name from the arguments passed in
+#
+argdict = {}
+for uarg in args:
+    key, val = uarg.split('=')
+    argdict[key] = val
+
+# For right now, all of our (Ubuntu) testing makes use of a single,
+# scratch device.
+#
+if 'UBUNTU_SCRATCH_DEVICE' in argdict:
+    device = argdict['UBUNTU_SCRATCH_DEVICE']
+else:
+    device = '/dev/sdb'
+
+
+# Create all the partitions we want. These are determined by looking
+# at the README in the xfstests directory and seeing what is usefull
+# for the tests.
+#
+
+# for debugging if needed
+#print "argdict = ", argdict
+
+# Job configuration, instead of editing xfstests config files, set them
+# right here as environment variables
+#
+
+os.environ['XFSTESTS_TEST_DRIVE'] = device
+
+# TEST_DEV: "device containing TEST PARTITION"
+os.environ['TEST_DEV'] = '%s1' % device
+
+# TEST_DIR: "mount point of TEST PARTITION"
+test_mountpoint = os.path.join(job.tmpdir, 'xfstests-test')
+if not os.path.isdir(test_mountpoint):
+    os.makedirs(test_mountpoint)
+os.environ['TEST_DIR'] = test_mountpoint
+
+# SCRATCH_DEV "device containing SCRATCH PARTITION"
+os.environ['SCRATCH_DEV'] = '%s2' % device
+
+# SCRATCH_MNT "mount point for SCRATCH PARTITION"
+# By default, we create a directory under autotest
+#
+scratch_mountpoint = os.path.join(job.tmpdir, 'xfstests-scratch')
+if not os.path.isdir(scratch_mountpoint):
+    os.makedirs(scratch_mountpoint)
+
+os.environ['SCRATCH_MNT'] = scratch_mountpoint
+
+# SCRATCH_LOGDEV "device for scratch-fs external log"
+os.environ['SCRATCH_LOGDEV'] = '/dev/sdb3'
+
+# SCRATCH_RTDEV "device for scratch-fs realtime data"
+# os.environ['SCRATCH_RTDEV'] = ''
+
+# TEST_LOGDEV "device for test-fs external log"
+# os.environ['TEST_LOGDEV'] = ''
+
+# TEST_RTDEV "device for test-fs realtime data"
+# os.environ['TEST_RTDEV'] = ''
+
+# Whether UDF tests are disable
+# os.environ['DISABLE_UDF_TEST'] = '1'
+
+
+# Choose the filesystem types you want the tests to run on
+#
+#FS_TYPES = ['ext2', 'ext3', 'ext4', 'xfs', 'btrfs']
+fs_type = 'btrfs'
+
+# Finally, run the tests
+#
+result = job.run_test_detail('ubuntu_xfstests_btrfs', test_name='setup', tag='setup')
+result = job.run_test_detail('ubuntu_xfstests_btrfs', test_name='ubuntu_xfstests_btrfs', filesystem=fs_type, tag=fs_type, timeout=60*60*4)

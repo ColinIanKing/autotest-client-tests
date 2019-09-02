@@ -1,0 +1,41 @@
+From d29a24a9c30eeac73ef830c5c5342cb2cef941d2 Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Tue, 20 Mar 2018 09:43:29 +0000
+Subject: [PATCH] Add syscalls for ARM64 platforms (LP: #1755499)
+
+We currently don't have ARM64 syscall shims so we are getting
+-ENOSYS returns for the extended attribute tests. Add these in.
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ attr/libattr/syscalls.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/attr/libattr/syscalls.c b/attr/libattr/syscalls.c
+index 6ab0ca3..a8a9190 100644
+--- a/attr/libattr/syscalls.c
++++ b/attr/libattr/syscalls.c
+@@ -185,6 +185,20 @@
+ # define __NR_removexattr	232
+ # define __NR_lremovexattr	233
+ # define __NR_fremovexattr	234
++#elif defined (__aarch64__)
++# define HAVE_XATTR_SYSCALLS 1
++# define __NR_setxattr		(5)
++# define __NR_lsetxattr		(6)
++# define __NR_fsetxattr		(7)
++# define __NR_getxattr		(8)
++# define __NR_lgetxattr		(9)
++# define __NR_fgetxattr		(10)
++# define __NR_listxattr		(11)
++# define __NR_llistxattr	(12)
++# define __NR_flistxattr	(13)
++# define __NR_removexattr	(14)
++# define __NR_lremovexattr	(15)
++# define __NR_fremovexattr	(16)
+ #else
+ # warning "Extended attribute syscalls undefined for this architecture"
+ # define HAVE_XATTR_SYSCALLS 0
+-- 
+2.14.1
+

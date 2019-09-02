@@ -1,0 +1,40 @@
+From 5be3451621c62dec992b8c5eb68f44b3f8a2426b Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Fri, 11 Jan 2019 13:47:00 +0000
+Subject: [PATCH] build-all: remove static linking flags to fix build issue on
+ cosmic+
+
+BugLink: https://bugs.launchpad.net/bugs/1802486
+
+It seems that static linking with the blkid libs breaks with missing
+symbols with some versions of the blkid libraries. Work around this
+by disabling static linking for now.
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ build-all | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/build-all b/build-all
+index 950bc74..61b56dd 100755
+--- a/build-all
++++ b/build-all
+@@ -279,7 +279,6 @@ if test -z "$SKIP_XFSPROGS" ; then
+     (cd xfsprogs-dev; \
+      export CFLAGS="$LCF -I$DESTDIR/include" ; \
+      export CPPFLAGS="-I$DESTDIR/include" ; \
+-     export LDFLAGS="$LLF -static -L$DESTDIR/lib" ; \
+      export LIBS=-lpthread ; \
+      export LOCAL_CONFIGURE_OPTIONS="$cross --prefix=/ --disable-lib64 --disable-gettext" ; \
+      make $J realclean ; make $J configure ; \
+@@ -309,7 +308,6 @@ if test -z "$SKIP_XFSTESTS" ; then
+      autoreconf --include=m4 ; \
+      export CFLAGS="$LCF -I$DESTDIR/include -fno-stack-protector" ; \
+      export CPPFLAGS="-I$DESTDIR/include" ; \
+-     export LDFLAGS="$LLF -static -L$DESTDIR/lib" ; \
+      export LIBS=-lpthread ; \
+      export LOCAL_CONFIGURE_OPTIONS="$cross" ; \
+      libtoolize -i ; $MAKE_CLEAN ; \
+-- 
+2.19.1
+

@@ -1,0 +1,28 @@
+From 1c6b2d3625b11883b95ad0321514f08af478fa7d Mon Sep 17 00:00:00 2001
+From: Po-Hsu Lin <po-hsu.lin@canonical.com>
+Date: Thu, 8 Mar 2018 06:07:43 -0500
+Subject: [PATCH 2/2] config: use the latest xfsprogs release
+
+Use the latest 4.15.1 xfsprogs to fix the build issue with glibc 2.27.
+
+Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
+---
+ config | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config b/config
+index c273a53..2a1e5de 100644
+--- a/config
++++ b/config
+@@ -15,7 +15,7 @@ QUOTA_GIT=https://git.kernel.org/pub/scm/utils/quota/quota-tools.git
+ 
+ FIO_COMMIT=fio-3.2
+ QUOTA_COMMIT=4d81e8b4af
+-XFSPROGS_COMMIT=v4.14.0
++XFSPROGS_COMMIT=v4.15.1
+ 
+ # TOOLCHAIN_DIR=/u1/arm64-toolchain
+ # CROSS_COMPILE=aarch64-linux-android
+-- 
+2.7.4
+

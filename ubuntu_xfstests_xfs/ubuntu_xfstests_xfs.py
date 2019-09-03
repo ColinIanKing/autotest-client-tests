@@ -49,7 +49,8 @@ class ubuntu_xfstests_xfs(test.test):
             'xfslibs-dev',
             'libattr1-dev',
             'libacl1-dev',
-            'libaio-dev'
+            'libaio-dev',
+            'libssl-dev'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -178,14 +179,10 @@ class ubuntu_xfstests_xfs(test.test):
         os.chdir(self.srcdir)
         utils.system('git clone https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
-        print "Using head commit d6e3c3559cf05b5ef078f91a97e9639c3688ead0"
-        utils.system('git reset --hard d6e3c3559cf05b5ef078f91a97e9639c3688ead0')
-        print "Patching git repo sources for xfstests-bld"
-        utils.system('patch -p1 < %s/0002-config-use-http-https-protocol-for-firewall.patch' % self.bindir)
-        print "Patching xfsprogs release version for lp:1753987"
-        utils.system('patch -p1 < %s/0003-config-use-the-latest-xfsprogs-release.patch' % self.bindir)
-        print "Patching xfstests-bld to add ARM64 xattr syscall support"
-        utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
+        print "Using head commit 3a6b79e9c383534f72d55057857dc8282fc98e95"
+        utils.system('git reset --hard 3a6b79e9c383534f72d55057857dc8282fc98e95')
+        # print "Patching xfstests-bld to add ARM64 xattr syscall support"
+        # utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
         #
         #  Fix build link issues with newer toolchains (this is an ugly hack)
         #
@@ -194,13 +191,11 @@ class ubuntu_xfstests_xfs(test.test):
             utils.system('patch -p1 < %s/0005-build-all-remove-static-linking-flags-to-fix-build-i.patch' % self.bindir)
         print "Fetching all repos.."
         utils.system('./get-all')
-        commit = "204860fa5c454e2b3b75fb3c8fc15dd9b6115a70"
+        commit = "82eda8820ddd68dab0bc35199a53a08f58b1d26c"
         print "Using xfs from known stable commit point " + commit
         os.chdir('xfstests-dev')
         utils.system('git reset --hard ' + commit)
         print "Patching xfstests.."
-        utils.system('patch -N -p1 < %s/0001-xfstests-disable-the-broken-btrfs-130-test.patch' % self.bindir)
-        utils.system('patch -N -p1 < %s/0006-src-statx.h-ensure-xfstests_statx-is-declared.patch' % self.bindir)
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "Building xfstests"
         utils.system('pwd')

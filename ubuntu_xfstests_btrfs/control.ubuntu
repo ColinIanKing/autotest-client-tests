@@ -82,4 +82,4 @@ fs_type = 'btrfs'
 # Finally, run the tests
 #
 result = job.run_test_detail('ubuntu_xfstests_btrfs', test_name='setup', tag='setup')
-result = job.run_test_detail('ubuntu_xfstests_btrfs', test_name='ubuntu_xfstests_btrfs', filesystem=fs_type, tag=fs_type, timeout=60*60*4)
+result = job.run_test_detail('ubuntu_xfstests_btrfs', test_name='ubuntu_xfstests_btrfs', filesystem=fs_type, tag=fs_type, timeout=60*60*3)

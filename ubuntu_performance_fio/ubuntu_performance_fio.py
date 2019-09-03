@@ -137,6 +137,7 @@ class ubuntu_performance_fio(test.test):
         print 'pages_availble ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
         print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
         print 'free_disk_mb %.2f' % (self.get_filesystem_free_mbytes())
+	print 'run_from_path %s' % (os.getcwd())
         print
 
     def print_stats(self, benchmark, results, fields):

@@ -30,7 +30,7 @@ tests = [ '001', '002', '005', '006', '007', '010', '011',
 #
 print "Invoking zfs xfs generic functional tests.."
 for test in tests:
-	results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name=test, tag=test, timeout=60*30)
+	results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name=test, tag=test, timeout=60*40)
 
 print "Done!"
 

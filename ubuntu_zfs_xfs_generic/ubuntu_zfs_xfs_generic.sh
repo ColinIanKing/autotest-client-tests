@@ -39,8 +39,8 @@ zfs create $POOL/$SCRATCHDIR
 zfs set acltype=posixacl $POOL/$TESTDIR
 zfs set acltype=posixacl $POOL/$SCRATCHDIR
 zfs set compression=on $POOL/$TESTDIR
-zfs set copies=3 $POOL/$TESTDIR
-zfs set dedup=on $POOL/$TESTDIR
+#zfs set copies=3 $POOL/$TESTDIR
+#zfs set dedup=on $POOL/$TESTDIR
 zfs set mountpoint=legacy $POOL/$TESTDIR
 zfs set mountpoint=legacy $POOL/$SCRATCHDIR
 

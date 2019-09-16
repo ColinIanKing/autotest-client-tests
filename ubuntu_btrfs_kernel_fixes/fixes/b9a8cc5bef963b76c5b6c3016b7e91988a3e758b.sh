@@ -55,7 +55,7 @@ wait $pid
 
 umount $DEV0
 n=$(btrfsck $DEV0 | grep "errors")
-if [ $n -gt 0 ]; then
+if [[ "$n" != "" ]]; then
 	echo "failed, btrfsck found some errors"
 	rc=1
 else

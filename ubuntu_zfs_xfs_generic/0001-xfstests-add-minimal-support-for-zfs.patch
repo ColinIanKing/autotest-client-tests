@@ -1,6 +1,6 @@
-From e967eb7c9abc72d83f98614f55d27d55213726f1 Mon Sep 17 00:00:00 2001
+From 4d06185605e6c99c7b51ede23390b7fc268fc748 Mon Sep 17 00:00:00 2001
 From: Po-Hsu Lin <po-hsu.lin@canonical.com>
-Date: Fri, 9 Mar 2018 15:22:06 +0800
+Date: Wed, 18 Sep 2019 16:28:42 +0000
 Subject: [PATCH] xfstests: add minimal support for zfs
 
 Patch created based on Colin Ian King's commit bb18b1b9 in autotest-client-tests.
@@ -162,10 +162,10 @@ Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
  4 files changed, 33 insertions(+), 2 deletions(-)
 
 diff --git a/check b/check
-index 546683c5..e0af90bc 100755
+index 3d6a64cd..5970bf16 100755
 --- a/check
 +++ b/check
-@@ -72,6 +72,7 @@ check options
+@@ -60,6 +60,7 @@ check options
      -pvfs2          test PVFS2
      -tmpfs              test TMPFS
      -ubifs              test ubifs
@@ -182,10 +182,10 @@ index 546683c5..e0af90bc 100755
  	-g)	group=$2 ; shift ;
  		GROUP_LIST="$GROUP_LIST ${group//,/ }"
 diff --git a/common/attr b/common/attr
-index 3d1385a4..596fe22e 100644
+index 20049de0..d6e543b9 100644
 --- a/common/attr
 +++ b/common/attr
-@@ -42,6 +42,9 @@ _acl_get_max()
+@@ -25,6 +25,9 @@ _acl_get_max()
  	jfs)
  		echo 8191
  		;;
@@ -195,7 +195,7 @@ index 3d1385a4..596fe22e 100644
  	f2fs)
  		_fs_options $TEST_DEV | grep "inline_xattr" >/dev/null 2>&1
  		if [ $? -eq 0 ]; then
-@@ -243,7 +246,7 @@ _sort_getfattr_output()
+@@ -238,7 +241,7 @@ _getfattr()
  
  # set maximum total attr space based on fs type
  case "$FSTYP" in
@@ -204,7 +204,7 @@ index 3d1385a4..596fe22e 100644
  	MAX_ATTRS=1000
  	;;
  *)
-@@ -257,7 +260,7 @@ export MAX_ATTRS
+@@ -252,7 +255,7 @@ export MAX_ATTRS
  
  # Set max attr value size based on fs type
  case "$FSTYP" in
@@ -214,10 +214,10 @@ index 3d1385a4..596fe22e 100644
  	;;
  pvfs2)
 diff --git a/common/config b/common/config
-index 20f0e5f3..fc0d2f75 100644
+index 4c86a492..97dc96e9 100644
 --- a/common/config
 +++ b/common/config
-@@ -350,6 +350,8 @@ _test_mount_opts()
+@@ -362,6 +362,8 @@ _test_mount_opts()
  		# acls & xattrs aren't turned on by default on older ext$FOO
  		export TEST_FS_MOUNT_OPTS="-o acl,user_xattr $EXT_MOUNT_OPTIONS"
  		;;
@@ -226,29 +226,29 @@ index 20f0e5f3..fc0d2f75 100644
  	*)
  		;;
  	esac
-@@ -466,6 +468,8 @@ _check_device()
+@@ -478,6 +480,8 @@ _check_device()
  	fi
  
  	case "$FSTYP" in
 +	zfs)
 +		;;
- 	9p)
+ 	9p|tmpfs)
  		# 9p mount tags are just plain strings, so anything is allowed
- 		;;
+ 		# tmpfs doesn't use mount source, ignore
 diff --git a/common/rc b/common/rc
-index 5dbb8fe5..cc1a560b 100644
+index 66c7fd4d..51c4f36e 100644
 --- a/common/rc
 +++ b/common/rc
-@@ -188,6 +188,8 @@ case "$FSTYP" in
+@@ -153,6 +153,8 @@ case "$FSTYP" in
      reiser4)
  	 [ "$MKFS_REISER4_PROG" = "" ] && _fatal "mkfs.reiser4 not found"
  	 ;;
 +    zfs)
-+	 ;;
++	;;
      pvfs2)
  	;;
      ubifs)
-@@ -644,6 +646,9 @@ _test_mkfs()
+@@ -624,6 +626,9 @@ _test_mkfs()
      ext2|ext3|ext4)
  	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* $TEST_DEV
  	;;
@@ -258,17 +258,17 @@ index 5dbb8fe5..cc1a560b 100644
      *)
  	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $TEST_DEV
  	;;
-@@ -676,6 +681,9 @@ _mkfs_dev()
+@@ -656,6 +661,9 @@ _mkfs_dev()
  	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* \
  		2>$tmp.mkfserr 1>$tmp.mkfsstd
  	;;
-+	zfs)
++    zfs)
 +		# do nothing for zfs
 +	;;
      xfs)
  	$MKFS_PROG -t $FSTYP -- -f $MKFS_OPTIONS $* \
  		2>$tmp.mkfserr 1>$tmp.mkfsstd
-@@ -777,6 +785,10 @@ _scratch_mkfs()
+@@ -757,6 +765,10 @@ _scratch_mkfs()
  		mkfs_cmd="yes | $MKFS_PROG -t $FSTYP --"
  		mkfs_filter="grep -v -e ^mkfs\.ocfs2"
  		;;
@@ -279,7 +279,7 @@ index 5dbb8fe5..cc1a560b 100644
  	*)
  		mkfs_cmd="yes | $MKFS_PROG -t $FSTYP --"
  		mkfs_filter="cat"
-@@ -1557,6 +1569,8 @@ _require_scratch_nocheck()
+@@ -1534,6 +1546,8 @@ _require_scratch_nocheck()
  			_notrun "this test requires a valid \$SCRATCH_MNT"
  		fi
  		;;
@@ -288,7 +288,7 @@ index 5dbb8fe5..cc1a560b 100644
  	*)
  		 if [ -z "$SCRATCH_DEV" -o "`_is_block_dev "$SCRATCH_DEV"`" = "" ]
  		 then
-@@ -1653,6 +1667,11 @@ _require_test()
+@@ -1640,6 +1654,11 @@ _require_test()
  			_notrun "this test requires a valid \$TEST_DIR"
  		fi
  		;;
@@ -300,16 +300,15 @@ index 5dbb8fe5..cc1a560b 100644
  	tmpfs)
  		if [ -z "$TEST_DEV" -o ! -d "$TEST_DIR" ];
  		then
-@@ -2618,6 +2637,9 @@ _check_test_fs()
+@@ -2712,6 +2731,9 @@ _check_test_fs()
      tmpfs)
  	# no way to check consistency for tmpfs
  	;;
 +    zfs)
-+    # no way to check consistency for zfs yet
-+    ;;
++	# no way to check consistency for zfs yet
++	;;
      ubifs)
  	# there is no fsck program for ubifs yet
  	;;
 -- 
-2.14.1
-
+2.17.1

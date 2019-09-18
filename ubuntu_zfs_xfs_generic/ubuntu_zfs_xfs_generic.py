@@ -38,6 +38,7 @@ class ubuntu_zfs_xfs_generic(test.test):
             'quota',
             'git',
             'libblkid-dev',
+            'libssl-dev',
             'xfsprogs'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
@@ -89,33 +90,29 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system('git clone https://github.com/tytso/xfstests-bld')
 
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
-        print "Using head commit d6e3c3559cf05b5ef078f91a97e9639c3688ead0"
-        utils.system('git reset --hard d6e3c3559cf05b5ef078f91a97e9639c3688ead0')
-        print "Patching git repo sources for xfstests-bld"
-        utils.system('patch -p1 < %s/0002-config-use-http-https-protocol-for-firewall.patch' % self.bindir)
-        print "Patching xfsprogs release version for lp:1753987"
-        utils.system('patch -p1 < %s/0003-config-use-the-latest-xfsprogs-release.patch' % self.bindir)
-        print "Patching xfstests-bld to add ARM64 xattr syscall support"
-        utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
+        commit_bld = 'a4df7d7b31125901cb1fe9b092f495b6aa950448'
+        print "Using head commit for xfstests-bld" + commit_bld
+        utils.system('git reset --hard ' + commit_bld)
+
+        # print "Patching xfstests-bld to add ARM64 xattr syscall support"
+        # utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
         print "Fetching all repos.."
         utils.system('./get-all')
 
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfstests-dev'))
-        commit = "4cabd42a78d242650b1053520af308011061343e"
+        commit = "82eda8820ddd68dab0bc35199a53a08f58b1d26c"
         print "Using xfs from known stable commit point " + commit
         utils.system('git reset --hard ' + commit)
         print "Patching xfstests-dev to add minimal support for ZFS"
         utils.system('patch -p1 < %s/0001-xfstests-add-minimal-support-for-zfs.patch' % self.bindir)
-        print "Patching xfstests-dev to ensure xfstests_statx is defined"
-        utils.system('patch -p1 < %s/0006-xfstests-dev-ensure-xfstests_statx-is-defined.patch' % self.bindir)
 
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "getting xfs tests source"
         utils.system('./get-all')
 
-        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfsprogs-dev'))
-        print "Patching xfsprogs-dev to disable blkid"
-        utils.system('patch -p1 < %s/0005-Disable-blkid-by-setting-enable_blkid-no.patch' % self.bindir)
+#        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfsprogs-dev'))
+#        print "Patching xfsprogs-dev to disable blkid"
+#        utils.system('patch -p1 < %s/0005-Disable-blkid-by-setting-enable_blkid-no.patch' % self.bindir)
 
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "Building xfstests"

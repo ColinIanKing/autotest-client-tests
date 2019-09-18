@@ -37,7 +37,6 @@ class ubuntu_xfstests_btrfs(test.test):
             'python-xattr',
             'quota',
             'bc',
-            'btrfs-tools',
             'attr',
             'texinfo',
             'texlive',
@@ -57,6 +56,8 @@ class ubuntu_xfstests_btrfs(test.test):
 
         if series not in ['precise', 'trusty']:
             pkgs.append('libtool-bin')
+        if series in ['xenial', 'bionic', 'disco']:
+            pkgs.append('btrfs-tools')
 
         cmd = 'apt-get install --yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

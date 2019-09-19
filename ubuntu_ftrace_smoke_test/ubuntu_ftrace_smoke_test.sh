@@ -75,7 +75,7 @@ disable_tracing()
 {
 	echo 0 > /sys/kernel/debug/tracing/tracing_on >& /dev/null
 	sleep 1
-	echo "nop" >  /sys/kernel/debug/tracing/current_tracer >& /dev/null
+	echo "nop" > /sys/kernel/debug/tracing/current_tracer >& /dev/null
 	sleep 1
 }
 
@@ -96,7 +96,6 @@ timer_stop()
 {
 	kill -9 $timer_pid 2> /dev/null
 	wait $timer_pid 2> /dev/null
-
 }
 
 test_tracing_files_exist()
@@ -186,10 +185,10 @@ test_function_graph_tracer()
 	echo "function_graph" > /sys/kernel/debug/tracing/current_tracer
 	check $? "function_graph can be enabled"
 	echo 1 > /sys/kernel/debug/tracing/tracing_on
-	(dd if=/sys/kernel/debug/tracing/trace_pipe bs=1024 count=1024 2> /dev/null) > ${TMPFILE}.log
+	(dd if=/sys/kernel/debug/tracing/trace_pipe bs=1024 count=1024 conv=sync 2> /dev/null) > ${TMPFILE}.log
 	echo 0 > /sys/kernel/debug/tracing/tracing_on
 	n=$(grep irq ${TMPFILE}.log | grep "()" | wc -l ${TMPFILE}.log | cut -d' ' -f1)
-	threshold=32
+	threshold=16
 	if [ $n -lt $threshold ]; then
 		fail=1
 	else
@@ -210,11 +209,17 @@ test_function_tracer()
 	echo "function" > /sys/kernel/debug/tracing/current_tracer
 	check $? "function can be enabled"
 	echo 1 > /sys/kernel/debug/tracing/tracing_on
+	ping -f localhost -c 50 -i 0.2 >& /dev/null
+	for i in $(seq 25)
+	do
+		(ping -f localhost -c 50 -i 0.2 >& /dev/null) &
+	done
 	(dd if=/sys/kernel/debug/tracing/trace_pipe bs=1K count=1024 2> /dev/null) > ${TMPFILE}.log
+	(dd if=/dev/zero bs=4096 count=8192 | dd of=$TMPFILE bs=1024 conv=sync) >& /dev/null
 	echo 0 > /sys/kernel/debug/tracing/tracing_on
 	n=$(grep "irq" ${TMPFILE}.log | wc -l | cut -d' ' -f1)
 	cp ${TMPFILE}.log /tmp/cking.log
-	threshold=32
+	threshold=16
 	if [ $n -lt $threshold ]; then
 		fail=1
 	else

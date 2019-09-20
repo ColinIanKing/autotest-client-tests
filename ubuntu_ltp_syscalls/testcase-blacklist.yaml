@@ -18,6 +18,8 @@ kernel:
     4.13.0:
         'inotify07 inotify07':
             comment: 'the fix depends on ovl_inode code that was introduced in kernel v4.13 (LP: #1774387)'
+        'inotify08 inotify08':
+            comment: 'the fix depends on ovl_inode code that was introduced in kernel v4.13 (LP: #1775784)'
     5.2.0:
         'copy_file_range02 copy_file_range02':
             comment: 'copy_file_range02 will not get fixed < 5.2.0 (https://lwn.net/Articles/774114)'

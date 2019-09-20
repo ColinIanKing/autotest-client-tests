@@ -202,32 +202,13 @@ test_function_graph_tracer()
 
 test_function_tracer()
 {
-	timer_start 60
+	timer_start 10
 
 	disable_tracing
 
 	echo "function" > /sys/kernel/debug/tracing/current_tracer
 	check $? "function can be enabled"
-	echo 1 > /sys/kernel/debug/tracing/tracing_on
-	ping -f localhost -c 50 -i 0.2 >& /dev/null
-	for i in $(seq 25)
-	do
-		(ping -f localhost -c 50 -i 0.2 >& /dev/null) &
-	done
-	(dd if=/sys/kernel/debug/tracing/trace_pipe bs=1K count=1024 2> /dev/null) > ${TMPFILE}.log
-	(dd if=/dev/zero bs=4096 count=8192 | dd of=$TMPFILE bs=1024 conv=sync) >& /dev/null
-	echo 0 > /sys/kernel/debug/tracing/tracing_on
-	n=$(grep "irq" ${TMPFILE}.log | wc -l | cut -d' ' -f1)
-	cp ${TMPFILE}.log /tmp/cking.log
-	threshold=16
-	if [ $n -lt $threshold ]; then
-		fail=1
-	else
-		fail=0
-	fi
-	check $fail "irq traces found must be > $threshold, got $n"
 
-	rm -f $TMPFILE ${TMPFILE}.log
 	timer_stop
 }
 

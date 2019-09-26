@@ -21,6 +21,10 @@ class ubuntu_kernel_selftests(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
+        if self.flavour in ['aws', 'azure', 'gcp', 'gke']:
+            if not (self.flavour == 'aws' and self.series == 'trusty'):
+                pkgs.append('linux-modules-extra-' + self.flavour + '*')
+
         kv = platform.release().split(".")[:2]
         kv = int(kv[0])*100 + int(kv[1])
         if kv >= 415:
@@ -31,6 +35,7 @@ class ubuntu_kernel_selftests(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        self.flavour = platform.uname()[2].split('-')[-1]
         pass
 
     def download(self):

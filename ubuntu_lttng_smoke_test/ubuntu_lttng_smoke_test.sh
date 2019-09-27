@@ -172,6 +172,7 @@ test_lttng_context_switch()
 
 	sleep 2
 	(dd if=/dev/zero bs=4096 count=100000 | cat | cat | cat | dd bs=4096 > /dev/null) >& /dev/null
+	(dd if=/dev/zero bs=4096 count=100000 | cat | cat | cat | dd bs=4096 > /dev/null) >& /dev/null
 	sleep 2
 
 	lttng stop
@@ -194,13 +195,13 @@ test_lttng_context_switch()
 	cats=$(grep prev_comm $TMPFILE | grep cat | wc -l | cut -d' ' -f1)
 	echo "Found $dds dd and $cats context switches"
 
-	if [ $dds -lt 16 ]; then
+	if [ $dds -lt 1 ]; then
 		echo "FAILED (did not trace any dd context switches)"
 		inc_failed
 		rc=1
 		return 1
 	fi
-	if [ $cats -lt 16 ]; then
+	if [ $cats -lt 1 ]; then
 		echo "FAILED (did not trace any cat context switches)"
 		inc_failed
 		rc=1

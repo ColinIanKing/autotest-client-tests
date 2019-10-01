@@ -141,7 +141,7 @@ class ubuntu_xfstests_xfs(test.test):
         '''
         self.install_required_pkgs()
 
-        utils.system_output('useradd fsgqa || true', retain_output=True)
+        utils.system_output('useradd -m fsgqa || true', retain_output=True)
         utils.system_output('grep -q fsgqa /etc/sudoers || echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
 
         #

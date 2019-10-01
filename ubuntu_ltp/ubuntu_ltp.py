@@ -21,6 +21,7 @@ class ubuntu_ltp(test.test):
             'byacc',
             'flex',
             'git',
+            'keyutils',
             'libacl1-dev',
             'libaio-dev',
             'libcap-dev',

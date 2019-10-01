@@ -27,12 +27,15 @@ class ubuntu_xfstests_btrfs(test.test):
         series = platform.dist()[2]
 
         pkgs = [
+            'acl',
             'build-essential',
             'dump',
             'fio',
             'xfsdump',
             'autoconf',
+            'keyutils',
             'kpartx',
+            'thin-provisioning-tools',
             'libtool',
             'python-xattr',
             'quota',

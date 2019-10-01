@@ -26,7 +26,7 @@ class ubuntu_kernel_selftests(test.test):
                 pkgs.append('linux-modules-extra-' + self.flavour + '*')
 
         kv = platform.release().split(".")[:2]
-        kv = int(kv[0])*100 + int(kv[1])
+        kv = int(kv[0]) * 100 + int(kv[1])
         if kv >= 415:
             # extra packages for building bpf tests
             pkgs.extend(['clang', 'libcap-dev', 'libelf-dev', 'llvm'])
@@ -36,6 +36,7 @@ class ubuntu_kernel_selftests(test.test):
 
     def initialize(self):
         self.flavour = platform.uname()[2].split('-')[-1]
+        self.series = platform.dist()[2]
         pass
 
     def download(self):

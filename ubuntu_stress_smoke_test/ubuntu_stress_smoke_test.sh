@@ -75,11 +75,11 @@ not_exclude()
 set_max_oom_level()
 {
 	if [ -e /proc/self/oom_score_adj ]; then
-		echo -500 > /proc/self/oom_score_adj
-		echo -500 > /proc/$PPID/oom_score_adj
+		echo -900 > /proc/self/oom_score_adj
+		echo -900 > /proc/$PPID/oom_score_adj
 	elif [ -e /proc/self/oom_adj ]; then
-		echo -10 > /proc/self/oom_adj
-		echo -10 > /proc/$PPID/oom_adj
+		echo -14 > /proc/self/oom_adj
+		echo -14 > /proc/$PPID/oom_adj
 	fi
 	#
 	# Ensure oom killer kills the stressor hogs rather

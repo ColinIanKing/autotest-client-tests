@@ -10,12 +10,11 @@ class ubuntu_kernel_selftests(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
-        series = platform.dist()[2]
 
         pkgs = [
             'bc', 'build-essential', 'git', 'net-tools', 'pkg-config', 'kernel-wedge'
         ]
-        if not (arch == 's390x' and series in ['precise', 'trusty', 'vivid', 'xenial']):
+        if not (arch == 's390x' and self.series in ['precise', 'trusty', 'vivid', 'xenial']):
             pkgs.append('libnuma-dev')
             pkgs.append('libfuse-dev')
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'

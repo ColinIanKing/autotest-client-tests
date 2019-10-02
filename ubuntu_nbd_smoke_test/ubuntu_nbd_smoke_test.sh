@@ -47,6 +47,12 @@ do_tidy()
 	rm -f ${NBD_IMAGE_PATH}
 }
 
+do_tidy_files()
+{
+	rm -f ${LOG}
+	rm -rf ${MNT}
+}
+
 do_check()
 {
 	trap "exit 0" SIGINT SIGTERM
@@ -306,8 +312,10 @@ echo " "
 if [ -s $LOG ]; then
 	echo "Kernel issues: "
 	cat $LOG
+	do_tidy_files
 	exit 1
 else
 	echo "Kernel issues: NONE"
+	do_tidy_files
 fi
 echo " "

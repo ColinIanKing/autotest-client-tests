@@ -193,3 +193,6 @@ else
 	echo "Kernel issues: NONE"
 fi
 echo " "
+
+rm -f $LOG
+rm -rf $MNT

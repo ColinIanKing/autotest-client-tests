@@ -81,6 +81,13 @@ else:
 if release == '14.04':
 	blacklist.append('0061280d2c7240805cfd7b1f493da967c97c2f34.sh')
 
+# 9e622d6bea0202e9fe267955362c01918562c09b will take about 110 min on B-arm64
+# 361c093d7f99c3f6cbb07d5c580ce778ab418c42 will take about 120 min on X-arm64 (ThunderX)
+# These 2 are too expensive to run, and didn't catch any regression for years
+# So just blacklist them to save some precious SRU time
+blacklist.append('9e622d6bea0202e9fe267955362c01918562c09b.sh')
+blacklist.append('361c093d7f99c3f6cbb07d5c580ce778ab418c42.sh')
+
 #
 # This forces setup() to be run, it is in fact a no-op test
 #
@@ -104,9 +111,7 @@ for test in tests:
 	else:
 		if (os.access(test, os.X_OK)):
 			print "Invoking test: " + name
-            # 9e622d6bea0202e9fe267955362c01918562c09b will take about 110 min on B-arm64
-            # 361c093d7f99c3f6cbb07d5c580ce778ab418c42 will take about 120 min on X-arm64 (ThunderX)
-			results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=name.replace('.sh',''), timeout=60*20*7)
+			results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=name.replace('.sh',''), timeout=60*60)
 			run = run + 1
 
 print "Total of %d tests, %d invoked, %d skipped" % (run + skip, run, skip)

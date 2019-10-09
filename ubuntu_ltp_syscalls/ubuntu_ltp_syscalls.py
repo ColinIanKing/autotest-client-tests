@@ -70,6 +70,8 @@ class ubuntu_ltp_syscalls(test.test):
         os.chdir(os.path.join(self.srcdir, 'ltp'))
         print("Patching utimensat_tests for Xenial...")
         utils.system('patch -N -p1 < %s/0001-utimensat_tests-fix-for-xenial.patch' % self.bindir)
+        print("Patching fanotify09 for older kernels...")
+        utils.system('patch -N -p1 < %s/0001-UBUNTU-SAUCE-skip-fanotify09-test-2-for-older-kernel.patch' % self.bindir)
         utils.make('autotools')
         utils.configure()
         try:
@@ -90,9 +92,9 @@ class ubuntu_ltp_syscalls(test.test):
         with open(fn, 'r') as f:
             db = yaml.load(f)
         if self.flavour in db['flavour']:
-             _blacklist += list(db['flavour'][self.flavour].keys())
+            _blacklist += list(db['flavour'][self.flavour].keys())
         if self.flavour + '-' + self.series in db['flavour-series']:
-             _blacklist += list(db['flavour-series'][self.flavour + '-' + self.series].keys())
+            _blacklist += list(db['flavour-series'][self.flavour + '-' + self.series].keys())
         try:
             current_version = parse(self.kernel)
             for _kernel in db['kernel']:

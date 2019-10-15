@@ -33,6 +33,7 @@ class ubuntu_xfstests_ext4(test.test):
             'autopoint',
             'bc',
             'build-essential',
+            'dbench',
             'dump',
             'fio',
             'gettext',
@@ -58,9 +59,10 @@ class ubuntu_xfstests_ext4(test.test):
         pkgs.append(gcc)
 
         if series not in ['precise', 'trusty']:
+            pkgs.append('btrfs-progs')
             pkgs.append('libtool-bin')
-        if series in ['xenial', 'bionic', 'disco']:
-            pkgs.append('btrfs-tools')
+        if series not in ['precise', 'trusty', 'xenial']:
+            pkgs.append('duperemove')
 
         cmd = 'apt-get install --yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

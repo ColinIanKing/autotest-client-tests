@@ -130,7 +130,9 @@ class ubuntu_xfstests_ext4(test.test):
 
     def _run_suite(self):
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfstests-dev'))
-        output = utils.system_output('./check -g auto -x dangerous',
+        exclusion = os.path.join(self.srcdir, 'xfstests-bld', 'kvm-xfstests',
+                'test-appliance', 'files', 'root', 'fs', 'ext4', 'exclude')
+        output = utils.system_output('./check -E %s -g auto -x dangerous' % exclusion,
                                      ignore_status=True,
                                      retain_output=True)
 

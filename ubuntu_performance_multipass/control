@@ -1,0 +1,21 @@
+import os
+
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_multipass"
+CRITERIA = """
+Multipass Boot Performance Regression Tests
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_multipass'
+
+results = job.run_test_detail(name, tag='setup', test_name='setup')
+results = job.run_test_detail(name, tag='multipassboot', test_name='multipassboot', timeout=1800)
+print results
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

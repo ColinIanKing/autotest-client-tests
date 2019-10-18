@@ -99,12 +99,14 @@ class ubuntu_performance_pts(test.test):
             'php-xml',
             'gdb',
             'libssl-dev',
-            'libssl1.0-dev',
             'libpng-dev',
             'autoconf',
             'linux-tools-generic',
             'linux-tools-' + release
         ]
+        if series in ['bionic']:
+            pkgs.append('libssl1.0-dev')
+
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 

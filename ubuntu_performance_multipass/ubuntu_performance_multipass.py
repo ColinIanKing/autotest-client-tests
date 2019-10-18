@@ -69,7 +69,7 @@ class ubuntu_performance_multipass(test.test):
         pass
 
     def setup(self):
-        cmd = 'sudo snap install multipass'
+        cmd = 'sudo snap install --beta multipass --classic'
         self.results = utils.system_output(cmd, retain_output=True)
 
     def get_sysinfo(self):

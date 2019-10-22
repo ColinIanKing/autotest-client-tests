@@ -286,12 +286,14 @@ trap "do_tidy" SIGINT SIGTERM SIGHUP
 
 if [ $EUID -ne 0 ]; then
 	echo "This needs to be run as root"
+	do_tidy_files
 	exit 1
 fi
 
 modprobe nbd
 if [ $? -ne 0 ]; then
 	do_log "Cannot load Network Block Device module nbd.o"
+	do_tidy_files
 	exit 1
 fi
 
@@ -303,6 +305,7 @@ do_test
 modprobe -r nbd
 if [ $? -ne 0 ]; then
 	do_log "Cannot unload Network Block Device module nbd.o"
+	do_tidy_files
 	exit 1
 fi
 

@@ -34,7 +34,8 @@ do_tidy()
 	echo "Interrupted. Cleaning up.."
 	killall -9 stress-ng &> /dev/null
 	cd
-	umount $MNT
+	umount ${MNT}
+	rm -rf ${MNT}
 	exit 1
 }
 
@@ -111,7 +112,7 @@ do_test()
 	do_check $OPT $* &
 	pid=$!
 
-	cd $MNT
+	cd ${MNT}
 	${STRESS_NG} $*
 	rc=$?
 	case $rc in
@@ -134,6 +135,7 @@ do_test()
 	echo "umounting ramfs"
 	umount ${MNT}
 	kill -TERM $pid &> /dev/null
+	rm -rf ${MNT}
 
 	echo "================================================================================"
 }
@@ -174,8 +176,8 @@ if [ $memK -gt 256 ]; then
 	memK=256
 fi
 
-rm -f $LOG
-touch $LOG
+rm -f ${LOG}
+touch ${LOG}
 
 do_test $INFO $IONICE $SCHED -t $DURATION --link $N --symlink $N --lockf $N --seek $N --aio $N \
 	--aio-requests 32 --dentry $N --dir $N --fstat $N --io $N --dentries $N --lease $N \
@@ -194,5 +196,5 @@ else
 fi
 echo " "
 
-rm -f $LOG
-rm -rf $MNT
+rm -f ${LOG}
+rm -rf ${MNT}

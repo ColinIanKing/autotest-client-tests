@@ -19,7 +19,7 @@ tests = [
     'mm',         'ipc',             'sched',          'math',        'nptl',
     'pty',        'containers',      'fs_bind',        'controllers', 'filecaps',
     'cap_bounds', 'fcntl-locktests', 'connectors',     'power_management_tests',
-    'hugetlb',    'commands',        'hyperthreading', 'fs_ext4',     'can',
+    'hugetlb',    'commands',        'hyperthreading', 'can',
     'cpuhotplug', 'net.ipv6_lib',    'input',          'cve',         'crypto',
     'kernel_misc'
 ]

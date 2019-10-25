@@ -72,6 +72,11 @@ class ubuntu_ltp_syscalls(test.test):
         utils.system('patch -N -p1 < %s/0001-utimensat_tests-fix-for-xenial.patch' % self.bindir)
         print("Patching fanotify09 for older kernels...")
         utils.system('patch -N -p1 < %s/0001-UBUNTU-SAUCE-skip-fanotify09-test-2-for-older-kernel.patch' % self.bindir)
+
+        # Disable NTFS as we disable RW support
+        cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'
+        utils.system_output(cmd)
+
         utils.make('autotools')
         utils.configure()
         try:

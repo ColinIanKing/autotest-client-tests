@@ -45,6 +45,8 @@ class ubuntu_seccomp(test.test):
     #    Driven by the control file for each individual test.
     #
     def run_once(self, test_name):
+        if test_name == 'setup':
+            return
         os.chdir(os.path.join(self.srcdir, 'libseccomp', 'tests'))
 
         cmd = 'make check'

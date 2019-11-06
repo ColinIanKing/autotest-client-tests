@@ -152,7 +152,7 @@ test_enable_all_tracers()
 		if [ "$t" == "nop" ]; then
 			continue
 		fi
-		timer_start 30
+		timer_start 240
 		n=0
 		echo $t > /sys/kernel/debug/tracing/current_tracer
 		r=$?
@@ -178,7 +178,7 @@ test_enable_all_tracers()
 
 test_function_graph_tracer()
 {
-	timer_start 60
+	timer_start 240
 
 	disable_tracing
 
@@ -202,7 +202,7 @@ test_function_graph_tracer()
 
 test_function_tracer()
 {
-	timer_start 10
+	timer_start 240
 
 	disable_tracing
 

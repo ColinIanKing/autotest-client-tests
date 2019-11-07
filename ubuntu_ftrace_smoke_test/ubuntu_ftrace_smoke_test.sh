@@ -146,12 +146,18 @@ test_enable_all_tracers()
 	for t in $(cat /sys/kernel/debug/tracing/available_tracers)
 	do
 		#
-		#  The nop tracer does nothing and turns of tracing
-		#  so skip this
+		# The nop tracer does nothing and turns off tracing, 
+		# so skip it.  Also skip wakeup* tracers as these may
+		# not generate enough events on some architectures
 		#
-		if [ "$t" == "nop" ]; then
-			continue
-		fi
+		case "$t" in
+			nop|wakeup*)
+				continue
+				;;
+			*)
+				;;
+		esac
+
 		timer_start 240
 		n=0
 		echo $t > /sys/kernel/debug/tracing/current_tracer

@@ -221,8 +221,9 @@ class ubuntu_performance_multipass(test.test):
 	    boot_results = []
             keys = []
             for i in range(test_iterations):
-                [ kernel, result ] = self.multipass_boot('test', release)
-                if result != None:
+                ret = self.multipass_boot('test%d%s' % (i, release), release)
+                if ret != None:
+                     [ kernel, result ] = ret
                      boot_results.append(result)
                      keys = keys + result.keys()
 

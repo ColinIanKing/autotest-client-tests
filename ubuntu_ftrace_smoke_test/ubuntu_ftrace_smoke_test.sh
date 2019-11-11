@@ -22,6 +22,7 @@
 #  if basic functionality works
 #
 TMPFILE=/tmp/ftrace-kernel-trace-$$.tmp
+TMPFILE2=/tmp/ftrace-kernel-trace2-$$.tmp
 
 passed=0
 failed=0
@@ -141,12 +142,11 @@ test_available_tracers_exist()
 
 test_enable_all_tracers()
 {
-	TMPFILE=/tmp/tracing-$$.log
 	disable_tracing
 	for t in $(cat /sys/kernel/debug/tracing/available_tracers)
 	do
 		#
-		# The nop tracer does nothing and turns off tracing, 
+		# The nop tracer does nothing and turns off tracing,
 		# so skip it.  Also skip wakeup* tracers as these may
 		# not generate enough events on some architectures
 		#
@@ -164,16 +164,46 @@ test_enable_all_tracers()
 		r=$?
 		if [ $r -eq 0 ]; then
 			echo 1 > /sys/kernel/debug/tracing/tracing_on
+
+			touch $TMPFILE2
 			#
 			#  Force some activity
 			#
-			(dd if=/dev/zero bs=1024 count=4096 | dd of=$TMPFILE bs=1024 conv=sync) >& /dev/null
+			(dd if=/dev/zero bs=1024 count=4096 | dd of=$TMPFILE bs=1024 conv=sync) >& /dev/null &
 			pid=$!
-			n=$(dd if=/sys/kernel/debug/tracing/trace bs=1024 count=64 2> /dev/null | wc -l)
+			(dd if=/sys/kernel/debug/tracing/trace bs=1024 count=64 of=$TMPFILE2 conv=sync) >& /dev/null &
+			pid_trace=$!
+			count=0
+			while true
+			do
+				n=$(wc -l ${TMPFILE2} | cut -d' ' -f1)
+				if [ $n -gt 0 ]; then
+					echo " - tracer $t got enough data"
+					break
+				fi
+				if [ ! -d /proc/$pid -a ! -d /proc/$pid_trace ]; then
+					echo " - tracer $t data copying processes ended"
+					break;
+				fi
+				count=$((count + 1))
+				if [ $count -gt 180 ]; then
+					echo " - tracer $t timed out"
+					break;
+				fi
+				sleep 1
+			done
+
+			echo " - tracer $t completed"
 			kill -9 $pid 2> /dev/null
 			wait $pid 2> /dev/null
-			rm -f $TMPFILE
+
+			kill -9 $pid_trace 2> /dev/null
+			wait $pid_trace 2> /dev/null
+
+			rm -f ${TMPFILE} ${TMPFILE2}
+			echo " - tracer $t being turned off"
 			echo 0 > /sys/kernel/debug/tracing/tracing_on
+			echo " - tracer nop being set as current tracer"
 			echo nop > /sys/kernel/debug/tracing/current_tracer
 		fi
 		disable_tracing
@@ -184,17 +214,45 @@ test_enable_all_tracers()
 
 test_function_graph_tracer()
 {
+	threshold=16
+	count=0
 	timer_start 240
 
 	disable_tracing
 
 	echo "function_graph" > /sys/kernel/debug/tracing/current_tracer
-	check $? "function_graph can be enabled"
+	check $? "tracer function_graph can be enabled"
 	echo 1 > /sys/kernel/debug/tracing/tracing_on
-	(dd if=/sys/kernel/debug/tracing/trace_pipe bs=1024 count=1024 conv=sync 2> /dev/null) > ${TMPFILE}.log
+	dd if=/sys/kernel/debug/tracing/trace_pipe bs=1024 count=1024 conv=sync of=${TMPFILE}.log 2> /dev/null &
+	pid=$!
+	while true
+	do
+		if [ ! -d /proc/$pid ]; then
+			echo " - tracer $t data copying processes ended"
+			break;
+		fi
+
+		n=$(grep irq ${TMPFILE}.log | grep "()" | wc -l ${TMPFILE}.log | cut -d' ' -f1)
+		if [ $n -gt $threshold ]; then
+			echo " - tracer $t got enough data"
+			break;
+		fi
+
+		sleep 1
+
+		count=$((count + 1))
+		if [ $count -gt 180 ]; then
+			echo " - tracer $t timed out"
+			break;
+		fi
+	done
+	echo " - tracer function_graph completed"
+	kill -9 $pid 2> /dev/null
+	wait $pid 2> /dev/null
+
+	echo " - tracer function_graph being turned off"
 	echo 0 > /sys/kernel/debug/tracing/tracing_on
 	n=$(grep irq ${TMPFILE}.log | grep "()" | wc -l ${TMPFILE}.log | cut -d' ' -f1)
-	threshold=16
 	if [ $n -lt $threshold ]; then
 		fail=1
 	else
@@ -213,7 +271,7 @@ test_function_tracer()
 	disable_tracing
 
 	echo "function" > /sys/kernel/debug/tracing/current_tracer
-	check $? "function can be enabled"
+	check $? "tracer function can be enabled"
 
 	timer_stop
 }

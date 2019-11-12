@@ -44,6 +44,7 @@ class ubuntu_zfs_fstest(test.test):
         tarball = utils.unmap_url(self.bindir, 'fstest.tar.bz2', self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
 
+        os.remove(self.srcdir + '/tests/chown/00.t')
         os.chdir(self.srcdir)
         print "Building fstest.."
         try:

@@ -61,6 +61,11 @@ class ubuntu_ltp(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'ltp'))
+
+        # Disable NTFS as we disable RW support
+        cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'
+        utils.system_output(cmd)
+
         utils.make('autotools')
         utils.configure()
         try:

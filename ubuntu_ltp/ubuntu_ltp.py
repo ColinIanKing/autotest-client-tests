@@ -63,8 +63,6 @@ class ubuntu_ltp(test.test):
         os.chdir(os.path.join(self.srcdir, 'ltp'))
         print("Patching controllers/cpuset (lp:1836188)")
         utils.system('patch -N -p1 < %s/001-controllers-cpuset-improve-the-node-number-calculati.patch' % self.bindir)
-        print("Patching kernel_misc/ltp_acpi (lp:1829982)")
-        utils.system('patch -N -p1 < %s/002-device-drivers-acpi-ltp_acpi_cmd-skip-pm2-register-t.patch' % self.bindir)
 
         # Disable NTFS as we disable RW support
         cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'

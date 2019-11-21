@@ -17,7 +17,8 @@ ntimes = 10
 #
 stream_bin = 'stream_mp'
 
-if 'TEST_CONFIG' in os.environ and 'config' in os.environ['TEST_CONFIG']:
+if (os.uname()[1] == 'akis') or \
+   ('TEST_CONFIG' in os.environ and 'config' in os.environ['TEST_CONFIG']):
     stream_size = 2000000000
 else:
     stream_size = 200000000

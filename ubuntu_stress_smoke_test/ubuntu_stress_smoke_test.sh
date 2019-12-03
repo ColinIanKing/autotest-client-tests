@@ -134,8 +134,12 @@ echo "Number of CPUs Online: $(getconf _NPROCESSORS_ONLN)"
 echo " "
 set_max_oom_level
 
+dmesg -c > /dev/null
+
 count=0
 s1=$(secs_now)
+dmesg -w &
+pid=$!
 for s in ${STRESSORS}
 do
 	if not_exclude $s "$EXCLUDE"
@@ -202,6 +206,9 @@ do
 done
 s2=$(secs_now)
 dur=$((s2 - $s1))
+
+kill -9 $pid >& /dev/null
+wait $pid
 
 echo " "
 echo "Summary:"

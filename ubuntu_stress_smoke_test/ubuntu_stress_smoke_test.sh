@@ -22,10 +22,6 @@ EXCLUDE="rdrand numa quota apparmor cpu-online kcmp copy-file exec "
 EXCLUDE+="spawn remap stack oom-pipe resources opcode sockfd vforkmany sockpair "
 EXCLUDE+="bind-mount funccall ioport watchdog mlockmany idle-page clone "
 #
-# Exclude af-alg for the moment, see LP #1854968
-#
-EXCLUDE+="af-alg "
-#
 # Tests that are not kernel specific
 #
 EXCLUDE+="atomic bsearch heapsort hsearch longjmp lsearch matrix memcpy nop qsort "

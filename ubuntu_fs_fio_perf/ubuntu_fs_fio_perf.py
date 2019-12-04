@@ -108,6 +108,10 @@ class ubuntu_fs_fio_perf(test.test):
         os.chdir(self.srcdir)
         utils.system('rm -rf fs-test-proto')
         utils.system('git clone --depth=1 git://kernel.ubuntu.com/cking/fs-test-proto.git')
+        # Print test suite HEAD SHA1 commit id for future reference
+        os.chdir(os.path.join(self.srcdir, 'fs-test-proto'))
+        sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
+        print("Test suite HEAD SHA1: {}".format(sha1))
 
         #
         #  Nuke any existing parition info and setup partition

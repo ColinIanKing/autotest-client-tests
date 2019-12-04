@@ -35,6 +35,10 @@ class ubuntu_qrt_kernel_panic(test.test):
         os.chdir(self.srcdir)
         cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
         self.results = utils.system_output(cmd, retain_output=True)
+        # Print test suite HEAD SHA1 commit id for future reference
+        os.chdir(os.path.join(self.srcdir, 'qa-regression-testing'))
+        sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
+        print("Test suite HEAD SHA1: {}".format(sha1))
 
     def run_once(self, test_name):
         scripts = os.path.join(self.srcdir, 'qa-regression-testing', 'scripts')

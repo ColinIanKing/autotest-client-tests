@@ -40,7 +40,11 @@ class ubuntu_stress_btrfs(test.test):
         cmd = 'git clone --depth=1 git://kernel.ubuntu.com/cking/stress-ng 2>&1'
         self.results = utils.system_output(cmd, retain_output=True)
 
+        # Print test suite HEAD SHA1 commit id for future reference
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
+        sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
+        print("Test suite HEAD SHA1: {}".format(sha1))
+
         try:
             nprocs = '-j' + str(multiprocessing.cpu_count())
         except:

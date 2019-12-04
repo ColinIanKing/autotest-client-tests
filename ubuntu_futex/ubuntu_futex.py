@@ -52,6 +52,11 @@ class ubuntu_futex(test.test):
         cmd = 'git clone --depth=1 https://git.kernel.org/pub/scm/linux/kernel/git/dvhart/futextest.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
+        # Print test suite HEAD SHA1 commit id for future reference
+        os.chdir(os.path.join(self.srcdir, 'futextest'))
+        sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
+        print("Test suite HEAD SHA1: {}".format(sha1))
+
         os.chdir(os.path.join(self.srcdir, 'futextest', 'functional'))
         cmd = 'sed -i s/lpthread/pthread/ Makefile'
         self.results = utils.system_output(cmd, retain_output=True)

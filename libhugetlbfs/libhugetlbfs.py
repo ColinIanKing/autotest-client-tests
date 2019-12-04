@@ -59,8 +59,11 @@ class libhugetlbfs(test.test):
         cmd = 'git clone --depth=1 -b next https://github.com/libhugetlbfs/libhugetlbfs.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
-        # apply SAUCE patches
+        # Print test suite HEAD SHA1 commit id for future reference
         os.chdir(os.path.join(self.srcdir, 'libhugetlbfs'))
+        sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
+        print("Test suite HEAD SHA1: {}".format(sha1))
+        # apply SAUCE patches
         utils.system('patch -p1 < %s/001-fix-fallocate-test-before-kernel-4.3.patch' % self.bindir)
 
         # build for the underlying arch only (i.e. only 64 bit on 64 bit etc)

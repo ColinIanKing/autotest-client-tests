@@ -51,7 +51,10 @@ class ubuntu_kvm_unit_tests(test.test):
         os.chdir(self.srcdir)
         cmd = 'git clone --depth=1 git://kernel.ubuntu.com/ubuntu/kvm-unit-tests/ -b disco'
         self.results = utils.system_output(cmd, retain_output=True)
-        os.chdir('kvm-unit-tests')
+        # Print test suite HEAD SHA1 commit id for future reference
+        os.chdir(os.path.join(self.srcdir, 'kvm-unit-tests'))
+        sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
+        print("Test suite HEAD SHA1: {}".format(sha1))
 
         # patch run_tests.sh to get rid of the color output
         utils.system('patch -p1 < %s/runtime_show.patch' % self.bindir)

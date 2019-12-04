@@ -1,6 +1,9 @@
 #!/bin/bash 
 
 SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
+dmesg -c > /dev/null
+dmesg -w &
+pid=$!
 
 #
 # Stress test duration in seconds
@@ -133,13 +136,11 @@ echo "Number of CPUs: $(getconf _NPROCESSORS_CONF)"
 echo "Number of CPUs Online: $(getconf _NPROCESSORS_ONLN)"
 echo " "
 set_max_oom_level
-
-dmesg -c > /dev/null
+sleep 15
+sync
 
 count=0
 s1=$(secs_now)
-dmesg -w &
-pid=$!
 for s in ${STRESSORS}
 do
 	if not_exclude $s "$EXCLUDE"

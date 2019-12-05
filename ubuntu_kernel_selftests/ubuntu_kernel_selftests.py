@@ -108,6 +108,16 @@ class ubuntu_kernel_selftests(test.test):
                 utils.system(cmd)
 
             #
+            # this test breaks 5.0+ (and maybe earlier), disable it for now
+            # 5/12/2019, LP#1854968
+            #
+            print "Disabling l2tp.sh"
+            fn = 'linux/tools/testing/selftests/net/l2tp.sh'
+            if os.path.exists(fn):
+                cmd = 'chmod -x ' + fn
+                utils.system(cmd)
+
+            #
             # update fix CPU hotplug test, new and old versions
             #
             print "Updating CPU hotplug test"

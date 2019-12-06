@@ -98,7 +98,7 @@ class ubuntu_performance_lkp(test.test):
             os.environ["https_proxy"] = "http://squid.internal:3128"
             os.environ["http_proxy"] = "http://squid.internal:3128"
 
-        utils.system_output('apt-get install git', retain_output=True)
+        utils.system_output('apt-get install --yes --force-yes git', retain_output=True)
 
         os.chdir(self.srcdir)
 

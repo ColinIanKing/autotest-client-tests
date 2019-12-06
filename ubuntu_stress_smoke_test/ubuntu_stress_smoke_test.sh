@@ -1,9 +1,9 @@
 #!/bin/bash 
 
 SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
-dmesg -c > /dev/null
-dmesg -w &
-pid=$!
+#dmesg -c > /dev/null
+#dmesg -w &
+#pid=$!
 
 #
 # Stress test duration in seconds
@@ -208,8 +208,8 @@ done
 s2=$(secs_now)
 dur=$((s2 - $s1))
 
-kill -9 $pid >& /dev/null
-wait $pid
+#kill -9 $pid >& /dev/null
+#wait $pid
 
 echo " "
 echo "Summary:"

@@ -142,12 +142,20 @@ class ubuntu_performance_stream(test.test):
                 for field in fields:
                     if chunks[0] == field + ':':
                         values[field] = {}
-                        values[field]['average_rate'] = chunks[1]
-                        values[field]['average_time'] = chunks[2]
+                        values[field]['average_rate'] = fields[field] / float(chunks[2])
+                        values[field]['average_time'] = float(chunks[2])
         return values
 
     def run_stream(self):
-        fields = [ 'Copy', 'Scale', 'Add', 'Triad' ]
+        #
+        #  Memory scaling factors, converting to MB/s to MiB/s
+        #
+        fields = {
+            'Copy':  (15258.8 * 2.0 * 1024.0 * 1024.0) / 1000000.0,
+            'Scale': (15258.8 * 2.0 * 1024.0 * 1024.0) / 1000000.0,
+            'Add':   (15258.8 * 3.0 * 1024.0 * 1024.0) / 1000000.0,
+            'Triad': (15258.8 * 3.0 * 1024.0 * 1024.0) / 1000000.0
+        }
         stats = [ 'average_rate', 'average_time' ]
         values = {}
         stream_exe_path = os.path.join(self.srcdir, stream_bin)
@@ -170,7 +178,7 @@ class ubuntu_performance_stream(test.test):
             print "Test %d of %d:" % (i + 1, test_iterations)
             for field in fields:
                 for stat in stats:
-                    print "stream%s_%s_for_%s_%dM[%d] %s" % (config, stat, field.lower(), size , i, values[i][field][stat])
+                    print "stream%s_%s_for_%s_%dM[%d] %f" % (config, stat, field.lower(), size , i, values[i][field][stat])
 
         #
         #  Compute min/max/average:
@@ -179,7 +187,7 @@ class ubuntu_performance_stream(test.test):
         print "Collated Performance Metrics:"
         for field in fields:
             for stat in stats:
-                v = [ float(values[i][field][stat]) for i in values ]
+                v = [ values[i][field][stat] for i in values ]
                 maximum = max(v)
                 minimum = min(v)
                 average = sum(v) / float(len(v))

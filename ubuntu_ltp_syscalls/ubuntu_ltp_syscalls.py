@@ -116,6 +116,10 @@ class ubuntu_ltp_syscalls(test.test):
 
         return _blacklist
 
+    def should_stop_timesyncd(self, test):
+        # trusty does not have systemd-timesyncd
+        return test in ['leapsec01','stime01','settimeofday01','clock_settime'] and self.series != 'trusty'
+
     # run_once
     #
     #    Driven by the control file for each individual test.
@@ -147,16 +151,16 @@ class ubuntu_ltp_syscalls(test.test):
                     if 'getrandom02' in line and LTP_TIMEOUT_MUL > 1:
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
 
-                    # Stop timesyncd when testing leap sec.
-                    if 'leapsec01' in line and self.series != 'trusty':
+                    # Stop timesyncd when testing time change
+                    if self.should_stop_timesyncd(line):
                         utils.run('systemctl stop systemd-timesyncd')
 
                     cmd = '/opt/ltp/runltp -f /tmp/target -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
                     utils.run(cmd, ignore_status=True, verbose=False)
                     # /dev/loop# creation will be taken care by the runltp
 
-                    # Stop timesyncd when testing leap sec. Restart it now that it's done.
-                    if 'leapsec01' in line and self.series != 'trusty':
+                    # Stop timesyncd when testing time change. Restart it now that it's done.
+                    if self.should_stop_timesyncd(line):
                         utils.run('systemctl start systemd-timesyncd')
 
                     # Restore the timeout multiplier

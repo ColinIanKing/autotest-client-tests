@@ -118,6 +118,7 @@ class ubuntu_performance_lkp(test.test):
             self.results += utils.system_output('git checkout -b stable ' + commit, retain_output=True)
             #
             # New distros use libarchive-tools and not bsdtar so edit the package name
+            # https://github.com/intel/lkp-tests/issues/50
             #
             self.results += utils.system_output('find distro -type f -exec sed -i "s/bsdtar/libarchive-tools/" {} \;')
 

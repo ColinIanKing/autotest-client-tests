@@ -32,7 +32,7 @@ EXCLUDE+="rdrand str tsc vecmath wcs zlib matrix-3d "
 #
 # Tests that are known to cause breakage
 #
-EXCLUDE+="xattr efivar "
+EXCLUDE+="xattr efivar sysinfo "
 #
 # Tests that should be skipped on KVM kernels
 #

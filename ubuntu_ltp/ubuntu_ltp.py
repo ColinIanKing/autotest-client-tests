@@ -101,7 +101,7 @@ class ubuntu_ltp(test.test):
         LTP_TIMEOUT_MUL = 1
         if utils.system_output('virt-what', verbose=False):
             print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL=3 for the following tests:")
-            print("memcg_test_3 (lp:1836694), zram01 (bug 1852976)")
+            print("memcg_test_3 (lp:1836694)")
             LTP_TIMEOUT_MUL = 3
         with open(fn , 'r') as f:
             for line in f:
@@ -111,7 +111,9 @@ class ubuntu_ltp(test.test):
 
                     if 'memcg_test_3' in line and LTP_TIMEOUT_MUL > 1:
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
-                    elif 'zram01' in line and LTP_TIMEOUT_MUL > 1:
+                    elif 'zram01' in line:
+                        print("set timeout multiplier LTP_TIMEOUT_MUL=3 for zram01 (bug 1852976)")
+                        LTP_TIMEOUT_MUL = 3
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
 
                     cmd = '/opt/ltp/runltp -f /tmp/target -S /tmp/skip -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)

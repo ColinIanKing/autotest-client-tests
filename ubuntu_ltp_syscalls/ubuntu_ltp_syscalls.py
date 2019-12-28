@@ -118,7 +118,10 @@ class ubuntu_ltp_syscalls(test.test):
 
     def should_stop_timesyncd(self, test):
         # trusty does not have systemd-timesyncd
-        return test in ['leapsec01','stime01','settimeofday01','clock_settime'] and self.series != 'trusty'
+        testname = test.split()
+        if len(testname) < 1:
+            return False
+        return testname[0] in ['leapsec01','stime01','settimeofday01','clock_settime'] and self.series != 'trusty'
 
     # run_once
     #

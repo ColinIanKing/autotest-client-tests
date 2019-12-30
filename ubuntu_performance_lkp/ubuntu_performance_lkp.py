@@ -114,8 +114,9 @@ class ubuntu_performance_lkp(test.test):
 
         if not os.path.isdir("lkp-tests"):
             self.results += utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
-            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
-            self.results += utils.system_output('git checkout -b stable ' + commit, retain_output=True)
+
+        os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+        self.results += utils.system_output('git checkout -B stable ' + commit, retain_output=True)
 
         utils.system_output('make install', retain_output=True)
         utils.system_output('yes "" | lkp install', retain_output=True)

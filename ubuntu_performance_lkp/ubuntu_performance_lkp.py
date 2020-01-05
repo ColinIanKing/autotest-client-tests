@@ -123,8 +123,8 @@ class ubuntu_performance_lkp(test.test):
 
         for lkp_job in lkp_jobs:
             print "setting up " + lkp_job
-            print utils.system_output('yes "" | lkp install jobs/%s || true' % lkp_job, retain_output=True)
             print utils.system_output('lkp split jobs/%s || true' % lkp_job, retain_output=True)
+            print utils.system_output('yes "" | lkp install %s || true' % lkp_jobs[lkp_job][0], retain_output=True)
 
     def run_aim9(self, lkp_job, lkp_jobs, test_name):
         values = []

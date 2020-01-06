@@ -1,3 +1,5 @@
+import os
+
 AUTHOR = "Ubuntu"
 NAME = "ubuntu_performance_lkp"
 CRITERIA = """
@@ -83,12 +85,18 @@ lkp_jobs = {
           'vm-scalability-300s-mremap-xread-rand-mt.yaml' ],
 }
 
-results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs)
+if (os.uname()[1] == 'akis') or \
+   ('TEST_CONFIG' in os.environ and 'config' in os.environ['TEST_CONFIG']):
+    lkp_commit = '7078336702a53c99f3a17ad1ca2af9a3323a818c'
+else:
+    lkp_commit = 'ef0e92c3bdb9c2647139a51c8bee0538cf452cb4'
+
+results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs, lkp_commit = lkp_commit)
 print results
 
 for lkp_job in sorted(lkp_jobs):
     print "JOB '%s'" % lkp_job
     for sub_job in lkp_jobs[lkp_job]:
-        results = job.run_test_detail(name, tag=sub_job, lkp_job = lkp_job, sub_job = sub_job, lkp_jobs = lkp_jobs)
+        results = job.run_test_detail(name, tag=sub_job, lkp_job = lkp_job, sub_job = sub_job, lkp_jobs = lkp_jobs, lkp_commit = lkp_commit)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

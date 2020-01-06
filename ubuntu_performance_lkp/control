@@ -37,7 +37,7 @@ lkp_jobs = {
           'aim9-tcp_test-300s.yaml',
           'aim9-udp_test-300s.yaml' ],
     'cassandra.yaml':
-        [ 'cassandra-cs-localhost-300s-3.yaml' ],
+        [ 'cassandra-cs-localhost-1SSD-300s-ext4-3.yaml' ],
     'dbench.yaml':
         [ 'dbench-100%.yaml' ],
     'ebizzy.yaml':
@@ -88,6 +88,7 @@ lkp_jobs = {
 if (os.uname()[1] == 'akis') or \
    ('TEST_CONFIG' in os.environ and 'config' in os.environ['TEST_CONFIG']):
     lkp_commit = '7078336702a53c99f3a17ad1ca2af9a3323a818c'
+    lkp_jobs['cassandra.yaml'] = [ 'cassandra-cs-localhost-300s-3.yaml' ]
 else:
     lkp_commit = 'ef0e92c3bdb9c2647139a51c8bee0538cf452cb4'
 

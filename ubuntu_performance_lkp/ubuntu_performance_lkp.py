@@ -123,14 +123,15 @@ class ubuntu_performance_lkp(test.test):
 
         if not os.path.isdir("lkp-tests"):
             self.results += utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
-            os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
-            self.results += utils.system_output('git checkout -b stable ' + commit, retain_output=True)
-            #
-            # New distros use libarchive-tools and not bsdtar so edit the package name
-            # https://github.com/intel/lkp-tests/issues/50
-            #
-            if not self.get_codename() in [ 'precise', 'trusty', 'xenial' ]:
-                self.results += utils.system_output('find distro -type f -exec sed -i "s/bsdtar/libarchive-tools/" {} \;')
+
+        os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
+        self.results += utils.system_output('git checkout -B stable ' + commit, retain_output=True)
+        #
+        # New distros use libarchive-tools and not bsdtar so edit the package name
+        # https://github.com/intel/lkp-tests/issues/50
+        #
+        if not self.get_codename() in [ 'precise', 'trusty', 'xenial' ]:
+            self.results += utils.system_output('find distro -type f -exec sed -i "s/bsdtar/libarchive-tools/" {} \;')
 
         utils.system_output('make install', retain_output=True)
         utils.system_output('yes "" | lkp install', retain_output=True)

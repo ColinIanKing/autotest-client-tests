@@ -40,10 +40,12 @@ lkp_jobs = {
         [ 'dbench-100%.yaml' ],
     'ebizzy.yaml':
         [ 'ebizzy-10s-100x-200%.yaml' ],
-    'hackbench.yaml':
-        [ 'hackbench-100.yaml',
-          'hackbench-8.yaml',
-          'hackbench-perf.yaml' ],
+    'hackbench-100.yaml':
+        [ 'hackbench-100-socket-process-100%.yaml' ],
+    'hackbench-8.yaml':
+        [ 'hackbench-8-socket-process-800%.yaml' ],
+    'hackbench-perf.yaml':
+        [ 'hackbench-perf-socket-process-1600%.yaml' ],
     'iperf.yaml':
         [ 'iperf-cs-localhost-udp-300s.yaml',
           'iperf-cs-localhost-tcp-300s.yaml' ],

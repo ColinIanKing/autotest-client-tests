@@ -12,7 +12,7 @@ class ubuntu_seccomp(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'git', 'libtool', 'build-essential', 'autoconf',
+            'build-essential', 'git', 'libtool', 'build-essential', 'autoconf', 'valgrind',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

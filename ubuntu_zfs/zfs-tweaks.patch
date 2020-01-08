@@ -18,7 +18,7 @@ index f027b75..91cb0d5 100755
 +++ b/test/test-runner/cmd/run.py
 @@ -1,4 +1,4 @@
 -#!/usr/bin/python2.6
-+#!/usr/bin/python
++#!/usr/bin/python2
  
  #
  # This file and its contents are supplied under the terms of the

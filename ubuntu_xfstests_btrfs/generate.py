@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #
 # Read the test definitions and output text which can be included in control.ubuntu. 

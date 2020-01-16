@@ -19,7 +19,7 @@ class qrt(test.test):
         if test_name == 'setup':
             return
 
-        cmd = 'python ./%s -v' % test_name
+        cmd = 'python2 ./%s -v' % test_name
         self.results = utils.system_output(cmd, retain_output=True)
 
 

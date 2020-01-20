@@ -121,7 +121,7 @@ class ubuntu_ltp_syscalls(test.test):
         testname = test.split()
         if len(testname) < 1:
             return False
-        return testname[0] in ['leapsec01','stime01','settimeofday01','clock_settime'] and self.series != 'trusty'
+        return testname[0] in ['leapsec01','stime01','settimeofday01','clock_settime01'] and self.series != 'trusty'
 
     # run_once
     #

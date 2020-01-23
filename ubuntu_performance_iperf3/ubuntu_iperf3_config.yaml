@@ -1,0 +1,48 @@
+setup:
+        server_iface: enp93s0
+        client_iface: enp230s0
+        server_ip: 192.168.5.1
+        client_ip: 192.168.5.2
+        start_port: 5001
+test01:
+        numinstances: 8
+        serveroptions:
+                interval: 0
+        clientoptions:
+                interval: 0
+                time: 60
+                json:
+                logfile: '/tmp/test01.out.json'
+                title: config6
+test02:
+        numinstances: 8
+        serveroptions:
+                interval: 0
+        clientoptions:
+                interval: 0
+                time: 60
+                json:
+                logfile: '/tmp/test02.out.json'
+                reverse:
+                title: config6
+test03:
+        numinstances: 1
+        serveroptions:
+                interval: 0
+        clientoptions:
+                interval: 0
+                time: 60
+                json:
+                logfile: '/tmp/test03.out.json'
+                title: config6
+test04:
+        numinstances: 1
+        serveroptions:
+                interval: 0
+        clientoptions:
+                interval: 0
+                time: 60
+                json:
+                logfile: '/tmp/test04.out.json'
+                reverse:
+                title: config6

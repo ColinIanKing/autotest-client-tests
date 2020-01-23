@@ -1,0 +1,17 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_iperf3"
+CRITERIA = """
+Test throughput on Mellanox NIC with ports connected back to back"
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_performance_iperf3'
+
+results = job.run_test_detail('ubuntu_performance_iperf3', test_name='ubuntu-performance-iperf3', tag='ubuntu-performance-iperf3', timeout=5400) # 90 min. timeout
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

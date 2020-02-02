@@ -1,0 +1,38 @@
+From 95a2510bb1f2844adb3615feda50d49a9b903fae Mon Sep 17 00:00:00 2001
+From: Murphy Zhou <jencce.kernel@gmail.com>
+Date: Wed, 9 Oct 2019 13:34:34 +0800
+Subject: [PATCH] generic/001: remove unnecessary backslash
+
+Awk 5.0.1 is complaining about this backslash and causing false alarm
+like this:
+    warning: regexp escape sequence '\#' is not a known regexp operator
+
+This fix works fine with Awk 3.1.7 , 4.0.2 , 4.2.1 and 5.0.1. This
+backslash is not necessary.
+
+Signed-off-by: Murphy Zhou <jencce.kernel@gmail.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Eryu Guan <guaneryu@gmail.com>
+(cherry-picked from https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git
+95a2510bb1f2844adb3615feda50d49a9b903fae)
+Signed-off-by: Paolo Pisati <paolo.pisati@canonical.com>
+---
+ tests/generic/001 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/generic/001 b/tests/generic/001
+index 046e54e3..3a047754 100755
+--- a/tests/generic/001
++++ b/tests/generic/001
+@@ -177,7 +177,7 @@ _chain()
+ {
+     $AWK_PROG -v full_file=$seqres.full -v verify=$verify <$tmp.config '
+ BEGIN	{ nfile = 0 }
+-/^\#/	{ next }
++/^#/	{ next }
+ 	{ file[nfile] = $1
+ 	  size[nfile] = $2
+ 	  link[nfile] = 0
+-- 
+2.24.0
+

@@ -105,6 +105,9 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system('git reset --hard ' + commit)
         print "Patching xfstests-dev to add minimal support for ZFS"
         utils.system('patch -p1 < %s/0001-xfstests-add-minimal-support-for-zfs.patch' % self.bindir)
+        print "Patching xfstests-dev: fix warning with Awk 5.0.1"
+        utils.system('patch -p1 < %s/0006-generic-001-remove-unnecessary-backslash.patch' % self.bindir)
+
 
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print "getting xfs tests source"

@@ -112,8 +112,22 @@ class ubuntu_performance_stream(test.test):
     def initialize(self):
         pass
 
+    def get_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(('5.5.5.5', 1))
+            ipaddr = s.getsockname()[0]
+        except:
+            ipaddr = '127.0.0.1'
+        finally:
+            s.close()
+        return ipaddr
+
     def setup(self):
         release = platform.release()
+        if "192.168." not in self.get_ip():
+            os.environ["https_proxy"] = "http://squid.internal:3128"
+            os.environ["http_proxy"] = "http://squid.internal:3128"
 
         pkgs = [
             'linux-tools-generic',

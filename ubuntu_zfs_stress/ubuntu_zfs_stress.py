@@ -66,13 +66,8 @@ class ubuntu_zfs_stress(test.test):
             nprocs = ''
         utils.make(nprocs)
 
-        cmd = 'ls -al ' + self.bindir
-        self.results = utils.system_output(cmd, retain_output=True)
-
         os.chdir(self.srcdir)
-
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
-
         utils.system('modprobe zfs')
 
     def run_once(self, test_name):

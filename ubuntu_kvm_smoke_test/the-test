@@ -31,7 +31,7 @@ fi
 
 # On ppc64el, we need to disable SMT in order for libvirt use of KVM to work.
 if [ "${ARCHITECTURE}" = "ppc64el" ] ; then
-	ppc64_cpu --smt=off
+    sudo ppc64_cpu --smt=off
 fi
 
 # Download a release image that can be used to create the KVM instance.
@@ -48,3 +48,8 @@ if [ "$RESULT" != "$DISTRO" ]; then
     exit 1
 fi
 uvt-kvm destroy $SUT
+
+# On ppc64el, we need to turn SMT back on after the test.
+if [ "${ARCHITECTURE}" = "ppc64el" ] ; then
+    sudo ppc64_cpu --smt=on
+fi

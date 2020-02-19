@@ -2,6 +2,7 @@
 #
 import os
 import platform
+import re
 from autotest.client                        import test, utils
 from autotest.client.shared                 import error
 
@@ -47,6 +48,14 @@ class ubuntu_kernel_selftests(test.test):
     def extract(self):
         os.system("rm -rf linux/")
         utils.system("dpkg-source -x linux*dsc linux")
+
+    def summary(self, pattern):
+        failures = list(re.finditer(pattern, self.results))
+        if failures:
+            for i in failures:
+                print('Sub test case: {} failed.').format(i.group('case'))
+            return True
+        return False
 
     def setup(self):
         self.install_required_pkgs()
@@ -167,8 +176,17 @@ class ubuntu_kernel_selftests(test.test):
         cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
         self.results = utils.system_output(cmd, retain_output=True)
 
-        if self.results.rfind('[FAIL]\n') != -1:
+        print('========== Summary ===========')
+
+        # Old pattern for Xenial
+        pattern = re.compile('selftests: (?P<case>[\w\-\.]+) \[FAIL\]')
+        if self.summary(pattern):
+            raise error.TestError('Test failed for ' + test_name)
+        # If the test was not end by previous check, check again with new pattern
+        pattern = re.compile('not ok [\d\.]* selftests: ({}: )?(?P<case>[\w\-\.]+)(?!.*SKIP)'.format(test_name))
+        if self.summary(pattern):
             raise error.TestError('Test failed for ' + test_name)
 
+        print('No failed cases reported')
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

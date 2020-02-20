@@ -179,7 +179,7 @@ class ubuntu_kernel_selftests(test.test):
         print('========== Summary ===========')
 
         # Old pattern for Xenial
-        pattern = re.compile('selftests: (?P<case>[\w\-\.]+) \[FAIL\]$')
+        pattern = re.compile('selftests: (?P<case>[\w\-\.]+) \[FAIL\]\n')
         if self.summary(pattern):
             raise error.TestError('Test failed for ' + test_name)
         # If the test was not end by previous check, check again with new pattern

@@ -8,9 +8,17 @@ import platform
 class ubuntu_stress_smoke_test(test.test):
     version = 1
 
+    def get_codename(self):
+        try:
+            for line in open('/etc/lsb-release').read().split('\n'):
+                if line.startswith('DISTRIB_CODENAME='):
+                    return line.split('=')[1].replace('"','')
+            return 'unknown'
+        except:
+            return 'unknown'
+
     def install_required_pkgs(self):
         arch   = platform.processor()
-        series = platform.dist()[2]
 
         pkgs = [
             'apparmor',
@@ -23,6 +31,11 @@ class ubuntu_stress_smoke_test(test.test):
             'libkeyutils-dev',
             'zlib1g-dev',
         ]
+
+        codename = self.get_codename()
+        cgroup_tool = 'cgroup-bin' if codename in [ 'precise', 'trusty' ] else 'cgroup-tools'
+        pkgs.append(cgroup_tool)
+
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 

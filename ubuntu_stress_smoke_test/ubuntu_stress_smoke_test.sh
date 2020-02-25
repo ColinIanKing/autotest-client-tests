@@ -1,9 +1,13 @@
 #!/bin/bash 
 
 SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
-#dmesg -c > /dev/null
-#dmesg -w &
-#pid=$!
+CGROUP_MEM=/sys/fs/cgroup/memory/stress-ng-test
+MEMORY=$((512 * 1024 * 1024))
+
+if [ ! -d ${CGROUP_MEM} ]; then
+	mkdir ${CGROUP_MEM}
+fi
+echo $MEMORY > ${CGROUP_MEM}/memory.limit_in_bytes
 
 #
 # Stress test duration in seconds
@@ -148,7 +152,7 @@ do
 		count=$((count + 1))
 		dmesg -c >& /dev/null
 		echo "$s STARTING"
-		./stress-ng -v -t ${DURATION} --${s} ${INSTANCES} ${STRESS_OPTIONS} &> ${TMP_FILE}
+		cgexec -g memory:stress-ng-test ./stress-ng -v -t ${DURATION} --${s} ${INSTANCES} ${STRESS_OPTIONS} >& ${TMP_FILE}
 		ret=$?
 		echo "$s RETURNED $ret"
 
@@ -197,6 +201,10 @@ do
 			echo " "
 			rc=1
 			;;
+		137)
+			echo "$s OOMED (out of memory kills detected)"
+			oomed="$oomed $s"
+			;;
 		*)
 			echo "$s BADRET (unknown return status $ret)"
 			badret="$badret $s"
@@ -229,5 +237,7 @@ rm ${SWPIMG}
 if [ -e ${SYS_ZSWAP_ENABLED} ]; then
 	echo ${ORIGINAL_SYS_ZSWAP_SETTING} > ${SYS_ZSWAP_ENABLED}
 fi
+
+rmdir ${CGROUP_MEM} >& /dev/null
 
 exit $rc

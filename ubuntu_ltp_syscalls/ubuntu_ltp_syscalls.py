@@ -30,6 +30,7 @@ class ubuntu_ltp_syscalls(test.test):
             'libselinux1-dev',
             'libssl-dev',
             'libtirpc-dev',
+            'pkg-config',
             'quota',
             'virt-what',
             'xfslibs-dev',

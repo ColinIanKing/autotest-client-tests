@@ -31,13 +31,11 @@ class ubuntu_ltp(test.test):
             'libselinux1-dev',
             'libssl-dev',
             'libtirpc-dev',
+            'pkg-config',
             'quota',
             'virt-what',
             'xfslibs-dev',
             'xfsprogs',
-            'pkg-config',
-            'libtirpc-dev',
-            'libtirpc1',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)

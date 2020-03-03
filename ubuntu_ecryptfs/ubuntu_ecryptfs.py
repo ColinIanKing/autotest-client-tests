@@ -11,10 +11,14 @@ class ubuntu_ecryptfs(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'bzr', 'build-essential', 'libglib2.0-dev', 'intltool', 'keyutils', 'libkeyutils-dev', 'libpam0g-dev', 'libnss3-dev', 'libtool', 'acl', 'xfsprogs', 'btrfs-tools', 'libattr1-dev'
+            'bzr', 'build-essential', 'libglib2.0-dev', 'intltool', 'keyutils', 'libkeyutils-dev', 'libpam0g-dev', 'libnss3-dev', 'libtool', 'acl', 'xfsprogs', 'libattr1-dev'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
+        if series in ['precise', 'trusty', 'xenial']:
+            pkgs.append('btrfs-tools')
+        else:
+            pkgs.append('btrfs-progs')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

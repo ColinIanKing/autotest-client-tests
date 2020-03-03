@@ -4,6 +4,7 @@ import os
 import glob
 from autotest.client                        import test, utils
 import multiprocessing
+import platform
 from autotest.client.shared import error
 
 class ubuntu_generic_fstest(test.test):
@@ -17,10 +18,15 @@ class ubuntu_generic_fstest(test.test):
     # if you change setup, be sure to increment version
     #
     def setup(self):
+        series = platform.dist()[2]
         self.job.require_gcc()
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 
-        pkgs = [ 'btrfs-tools', 'xfsprogs', 'jfsutils' ]
+        pkgs = [ 'xfsprogs', 'jfsutils' ]
+        if series in ['precise', 'trusty', 'xenial']:
+            pkgs.append('btrfs-tools')
+        else:
+            pkgs.append('btrfs-progs')
         for pkg in pkgs:
             print "Installing package " + pkg
             utils.system_output('apt-get install ' + pkg + ' --yes --force-yes ', retain_output=True)

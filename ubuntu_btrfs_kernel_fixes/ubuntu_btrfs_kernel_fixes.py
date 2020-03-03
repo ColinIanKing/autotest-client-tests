@@ -33,10 +33,14 @@ class ubuntu_btrfs_kernel_fixes(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'xfsprogs', 'btrfs-tools', 'git', 'acl', 'libattr1-dev',
+            'build-essential', 'xfsprogs', 'git', 'acl', 'libattr1-dev',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
+        if series in ['precise', 'trusty', 'xenial']:
+            pkgs.append('btrfs-tools')
+        else:
+            pkgs.append('btrfs-progs')
 
         if self.which('sysbench') is None:
             pkgs.append('sysbench')

@@ -37,7 +37,6 @@ class xfstests(test.test):
             'python-xattr',
             'quota',
             'bc',
-            'btrfs-tools',
             'attr',
             'texinfo',
             'texlive',
@@ -56,6 +55,10 @@ class xfstests(test.test):
 
         if series not in ['precise', 'trusty']:
             pkgs.append('libtool-bin')
+        if series in ['precise', 'trusty', 'xenial']:
+            pkgs.append('btrfs-tools')
+        else:
+            pkgs.append('btrfs-progs')
 
         cmd = 'apt-get install --yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

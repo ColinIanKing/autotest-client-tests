@@ -12,10 +12,14 @@ class tiobench(test.test):
         series = platform.dist()[2]
 
         pkgs = [
-            'build-essential', 'gnuplot', 'xfsdump', 'xfsprogs', 'btrfs-tools',
+            'build-essential', 'gnuplot', 'xfsdump', 'xfsprogs',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
+        if series in ['precise', 'trusty', 'xenial']:
+            pkgs.append('btrfs-tools')
+        else:
+            pkgs.append('btrfs-progs')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

@@ -4,6 +4,7 @@ import os
 import platform
 from autotest.client                        import test, utils
 import platform
+from autotest.client                        import canonical
 
 class ubuntu_zfs_xfs_generic(test.test):
     version = 5
@@ -68,22 +69,7 @@ class ubuntu_zfs_xfs_generic(test.test):
         utils.system_output('useradd fsgqa || true', retain_output=True)
         utils.system_output('grep -q fsgqa /etc/sudoers || echo \"fsgqa    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
 
-        # Hacky way to use proxy settings, ideally this should be done on deployment stage
-        #
-        print "Setup the http/https proxy"
-        proxysets = [{'addr': 'squid.internal', 'desc': 'Running in the Canonical CI environment'},
-                  {'addr': '91.189.89.216', 'desc': 'Running in the Canonical enablement environment'},
-                  {'addr': '10.245.64.1', 'desc': 'Running in the Canonical enablement environment'}]
-        for proxy in proxysets:
-            cmd = 'nc -w 2 ' + proxy['addr'] + ' 3128'
-            try:
-                utils.system_output(cmd, retain_output=False)
-                print proxy['desc']
-                os.environ['http_proxy'] = 'http://' + proxy['addr'] + ':3128'
-                os.environ['https_proxy'] = 'http://' + proxy['addr'] + ':3128'
-                break
-            except:
-                pass
+        canonical.setup_proxy()
 
         print "Fetching xfstests.."
         os.chdir(self.srcdir)

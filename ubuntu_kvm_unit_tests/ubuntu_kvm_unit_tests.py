@@ -5,6 +5,7 @@ import re
 import platform
 from autotest.client            import test, utils, os_dep
 from autotest.client.shared     import error
+from autotest.client            import canonical
 
 class ubuntu_kvm_unit_tests(test.test):
     version = 1
@@ -26,25 +27,7 @@ class ubuntu_kvm_unit_tests(test.test):
         pass
 
     def setup(self):
-        # Hacky way to use proxy settings, ideally this should be done on deployment stage
-        #
-        self.install_required_pkgs()
-        self.job.require_gcc()
-        proxysets = [
-                {'addr': 'squid.internal', 'desc': 'Running in the Canonical CI environment'},
-                {'addr': '91.189.89.216',  'desc': 'Running in the Canonical enablement environment'},
-                {'addr': '10.245.64.1',    'desc': 'Running in the Canonical enablement environment'}
-            ]
-        for proxy in proxysets:
-            cmd = 'nc -w 2 ' + proxy['addr'] + ' 3128'
-            try:
-                utils.system_output(cmd, retain_output=False)
-                print proxy['desc']
-                os.environ['http_proxy'] = 'http://' + proxy['addr'] + ':3128'
-                os.environ['https_proxy'] = 'http://' + proxy['addr'] + ':3128'
-                break
-            except:
-                pass
+        canonical.setup_proxy()
 
         arch = platform.processor()
         opt = []

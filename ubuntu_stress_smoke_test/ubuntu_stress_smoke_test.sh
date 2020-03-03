@@ -93,7 +93,7 @@ set_max_oom_level()
 	# than the wrong random process (e.g. autotest!)
 	#
 	if [ -e /proc/sys/vm/oom_kill_allocating_task ]; then
-		echo 1 > /proc/sys/vm/oom_kill_allocating_task
+		echo 0 > /proc/sys/vm/oom_kill_allocating_task
 	fi
 }
 

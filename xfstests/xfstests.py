@@ -35,7 +35,6 @@ class xfstests(test.test):
             'autoconf',
             'kpartx',
             'libtool',
-            'python-xattr',
             'quota',
             'bc',
             'attr',

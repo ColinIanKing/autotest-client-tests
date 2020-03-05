@@ -48,7 +48,6 @@ class ubuntu_xfstests_ext4(test.test):
             'libssl-dev',
             'libtool',
             'pkg-config',
-            'python-xattr',
             'quota',
             'texinfo',
             'texlive',

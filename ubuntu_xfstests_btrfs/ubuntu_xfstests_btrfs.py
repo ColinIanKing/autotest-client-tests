@@ -48,7 +48,6 @@ class ubuntu_xfstests_btrfs(test.test):
             'libssl-dev',
             'libtool',
             'pkg-config',
-            'python-xattr',
             'quota',
             'texinfo',
             'texlive',

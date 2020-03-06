@@ -9,7 +9,7 @@ MIN_DISK=$((8))
 
 SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
 CGROUP_MEM=/sys/fs/cgroup/memory/stress-ng-test
-MEMORY=$((512 * 1024 * 1024))
+MEMORY=$((1024 * 1024 * 1024))
 
 if [ ! -d ${CGROUP_MEM} ]; then
 	mkdir ${CGROUP_MEM}
@@ -189,10 +189,19 @@ fi
 #
 SWPIMG=$PWD/swap.img
 
+#
+#  Create 1GB swap file
+#
+swapoff ${SWPIMG} >& /dev/null
 dd if=/dev/zero of=${SWPIMG} bs=1M count=1024
+if [ $? -ne 0 ]; then
+	echo "FAILED: Count not create 1GB swap file, file system:"
+	df
+	exit 1
+fi
 chmod 0600 ${SWPIMG}
 mkswap ${SWPIMG}
-swapon -a ${SWPIMG}
+swapon ${SWPIMG}
 
 echo " "
 echo "Machine Configuration"
@@ -248,6 +257,8 @@ do
 			failed="$failed $s"
 			cat ${TMP_FILE}
 			echo " "
+			dmesg
+			echo " "
 			rc=1
 			;;
 		3)
@@ -276,6 +287,8 @@ do
 		*)
 			echo "$s BADRET (unknown return status $ret)"
 			badret="$badret $s"
+			dmesg
+			echo " "
 			;;
 		esac
 		rm -f ${TMP_FILE}

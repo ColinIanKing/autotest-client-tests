@@ -28,6 +28,8 @@ class ubuntu_kvm_unit_tests(test.test):
 
     def setup(self):
         canonical.setup_proxy()
+        self.install_required_pkgs()
+        self.job.require_gcc()
 
         arch = platform.processor()
         opt = []

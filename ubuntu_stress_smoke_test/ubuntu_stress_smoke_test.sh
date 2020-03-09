@@ -3,7 +3,7 @@
 # Maximum machine age in years
 MAX_AGE=5
 # minimum required memory in MB
-MIN_MEM=$((4 * 1024))
+MIN_MEM=$((3 * 1024))
 # minimum free disk required in GB
 MIN_DISK=$((8))
 

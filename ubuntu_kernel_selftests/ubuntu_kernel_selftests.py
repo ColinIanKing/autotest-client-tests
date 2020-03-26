@@ -158,6 +158,16 @@ class ubuntu_kernel_selftests(test.test):
                 'kprobe/probepoint.tc',
                 'kprobe/kprobe_module.tc',
             ]
+
+            #
+            # Ftrace 'Kprobe event user-memory access' test depends on
+            # HAVE_FUNCTION_ARG_ACCESS_API, but ppc64 doesn't support it:
+            # disable it to avoid an unresolved result (and thus a failure).
+            #
+            arch = platform.processor()
+            if arch in ['ppc64le', 's390x']:
+                filenames.append('kprobe/kprobe_args_user.tc')
+
             for fn in filenames:
                 fn = 'linux/tools/testing/selftests/ftrace/test.d/' + fn
                 if os.path.exists(fn):

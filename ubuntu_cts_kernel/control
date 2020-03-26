@@ -18,7 +18,7 @@ These test regressions of specific kernel bugs.
 from autotest.client import utils
 
 ifname = 'eth0'
-cmd = 'ip route | grep default | grep -oP "dev \K\w+"'
+cmd = 'ip route | grep default | grep via | grep -oP "dev \K\w+"'
 
 try:
     ifname = utils.system_output(cmd, retain_output=False)

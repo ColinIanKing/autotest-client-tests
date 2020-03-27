@@ -34,6 +34,15 @@ class ubuntu_performance_lkp(test.test):
     ]
     systemctl = "systemctl"
 
+    def get_codename(self):
+        try:
+            for line in open('/etc/lsb-release').read().split('\n'):
+                if line.startswith('DISTRIB_CODENAME='):
+                    return line.split('=')[1].replace('"','')
+            return 'unknown'
+        except:
+            return 'unknown'
+
     def stop_services(self):
         stopped_services = []
         for service in self.systemd_services:
@@ -120,7 +129,8 @@ class ubuntu_performance_lkp(test.test):
             # New distros use libarchive-tools and not bsdtar so edit the package name
             # https://github.com/intel/lkp-tests/issues/50
             #
-            self.results += utils.system_output('find distro -type f -exec sed -i "s/bsdtar/libarchive-tools/" {} \;')
+            if not self.get_codename() in [ 'precise', 'trusty', 'xenial' ]:
+                self.results += utils.system_output('find distro -type f -exec sed -i "s/bsdtar/libarchive-tools/" {} \;')
 
         utils.system_output('make install', retain_output=True)
         utils.system_output('yes "" | lkp install', retain_output=True)

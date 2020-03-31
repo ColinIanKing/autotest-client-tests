@@ -11,6 +11,21 @@ SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
 CGROUP_MEM=/sys/fs/cgroup/memory/stress-ng-test
 MEMORY=$((1024 * 1024 * 1024))
 
+MEMFREE_KB=$(grep "MemFree" /proc/meminfo  | awk '{ print $2}')
+MEMFREE=$((MEMFREE_KB * 1024))
+MEMFREE_90PC=$((MEMFREE * 90 / 100))
+MEMFREE_LESS_512MB=$((MEMFREE - (512 * 1024 * 1024)))
+if [ $MEMFREE_90PC -gt $MEMFREE_LESS_512MB ]; then
+	MEMORY=$MEMFREE_LESS_512MB
+else
+	MEMORY=$MEMFREE_90PC
+fi
+if [ $MEMORY -lt $((512 * 1024 * 1024)) ]; then
+	MEMORY=$((512 * 1024 * 1024))
+fi
+echo "Free memory: $((MEMFREE / (1024 * 1024))) MB"
+echo "Memory used: $((MEMORY / (1024 * 1024))) MB"
+
 if [ ! -d ${CGROUP_MEM} ]; then
 	mkdir ${CGROUP_MEM}
 fi
@@ -78,25 +93,38 @@ check_machine()
 	skip=0
 	case "$processor" in
 	i386 | i486 | i586 | i686 | x86_64)
-		vendor=$(dmidecode -t 0x000e | grep Vendor: | cut -f2)
+		datecheck=1
+		vendor=$(dmidecode -t 0x0000 | grep Vendor: | awk '{ print $2}')
+		if [ -z "$vendor" ]; then
+			vendor=$(dmidecode -t 0x000e | grep Vendor: | awk '{ print $2}')
+		fi
+
 		case "$vendor" in
 		unknown | Unknown)
 			check_message "Unknown BIOS vendor, ignoring machine"
 			skip=1
+			datecheck=0
+			;;
+		SeaBIOS)
+			echo "SeaBIOS BIOS, using a VM, no date checking"
+			datecheck=0
 			;;
 		*)
 			;;
 		esac
-		year=$(date +%Y)
-		year=$((year - $MAX_AGE))
-		date=$(dmidecode -t 0x0000 | grep "Release Date:" | cut -d'/' -f3)
-		if [ -z "$date" ]; then
-			date=$(dmidecode -t 0x000e | grep "Release Date:" | cut -d'/' -f3)
-		fi
-		if [ ! -z "$date" ]; then
-			if [ $date -lt $year  ]; then
-				check_message "BIOS indicates machine is more then $MAX_AGE years old"
-				skip=1
+
+		if [ $datecheck -eq 1 ]; then
+			year=$(date +%Y)
+			year=$((year - $MAX_AGE))
+			date=$(dmidecode -t 0x0000 | grep "Release Date:" | cut -d'/' -f3)
+			if [ -z "$date" ]; then
+				date=$(dmidecode -t 0x000e | grep "Release Date:" | cut -d'/' -f3)
+			fi
+			if [ ! -z "$date" ]; then
+				if [ $date -lt $year  ]; then
+					check_message "BIOS indicates machine is more then $MAX_AGE years old"
+					skip=1
+				fi
 			fi
 		fi
 		;;

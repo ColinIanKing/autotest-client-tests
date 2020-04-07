@@ -13,7 +13,7 @@ class ubuntu_kernel_selftests(test.test):
         arch   = platform.processor()
 
         pkgs = [
-            'bc', 'build-essential', 'git', 'net-tools', 'pkg-config', 'kernel-wedge'
+            'bc', 'build-essential', 'devscripts', 'git', 'net-tools', 'pkg-config', 'kernel-wedge'
         ]
         if not (arch == 's390x' and self.series in ['precise', 'trusty', 'vivid', 'xenial']):
             pkgs.append('libnuma-dev')

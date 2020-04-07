@@ -64,7 +64,7 @@ class ubuntu_performance_misc(test.test):
         resource.setrlimit(resource.RLIMIT_NOFILE, res)
 
     def install_required_pkgs(self):
-        pkgs = [ 'eventstat' ]
+        pkgs = [ 'eventstat', 'forkstat' ]
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
@@ -112,6 +112,14 @@ class ubuntu_performance_misc(test.test):
     def parse_vmstat_context_switches(self, output):
 	return self.parse_vmstat_generic(output, 'cs')
 
+    def parse_forks(self, output):
+        forks = 0
+        for line in output.splitlines():
+            words = line.split()
+            if len(words) > 3 and words[1] == 'fork' and  words[3] == 'child':
+                forks = forks + 1
+        return float(forks)
+
     def run_once(self, test_name):
         if test_name == 'setup':
             return self.get_sysinfo()
@@ -128,6 +136,9 @@ class ubuntu_performance_misc(test.test):
 	elif test_name == 'context-switches':
 	    cmd = 'vmstat 60 2 -n  | grep -v ^procs'
             self.parser = self.parse_vmstat_context_switches
+	elif test_name == 'forks':
+	    cmd = 'forkstat -D 60 -e fork | grep fork'
+            self.parser = self.parse_forks
         else:
             return
 

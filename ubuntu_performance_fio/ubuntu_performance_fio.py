@@ -8,6 +8,11 @@ import subprocess
 import resource
 import shutil
 from autotest.client import test, utils
+from autotest.client.shared import error
+
+TEST_FILESYSTEM = os.getenv('TEST_FILESYSTEM')
+TEST_DRIVE_DEV  = os.getenv('TEST_DRIVE_DEV')
+TEST_MNT = '/mnt/autotest-fio'
 
 #
 #  Number of test iterations to get min/max/average stats
@@ -96,13 +101,83 @@ class ubuntu_performance_fio(test.test):
             'build-essential',
             'libaio-dev',
             'linux-tools-generic',
-            'linux-tools-' + release
+            'linux-tools-' + release,
+            'xfsprogs',
+            'btrfs-progs',
+            'jfsutils',
+            'zfsutils-linux'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
+
+    def setup_drive(self):
+        if TEST_FILESYSTEM == None or TEST_DRIVE_DEV == None:
+            print("No test drive information provided, running on %s" % os.getcwd())
+            return True
+        for line in open('/proc/mounts').readlines():
+            words = line.split()
+            if len(words) > 2 and TEST_DRIVE_DEV in words[0]:
+                raise error.TestError("Device %s seems to be mounted on %s, aborting" % (TEST_DRIVE_DEV, words[1]))
+                return False
+
+        print("Testing on device %s with file system %s\n" % (TEST_DRIVE_DEV, TEST_FILESYSTEM))
+
+        if os.path.exists(TEST_MNT):
+            os.rmdir(TEST_MNT)
+
+        os.mkdir(TEST_MNT)
+        self.results = utils.system_output('dd if=/dev/zero of=%s bs=1M count=64' % TEST_DRIVE_DEV)
+        if TEST_FILESYSTEM == 'ext4':
+            cmd = 'mkfs.ext4 -F ' + TEST_DRIVE_DEV
+            self.results += utils.system_output(cmd)
+            self.results += utils.system_output('mount ' + TEST_DRIVE_DEV + ' ' + TEST_MNT)
+        elif TEST_FILESYSTEM == 'xfs':
+            cmd = 'mkfs.xfs -f ' + TEST_DRIVE_DEV
+            self.results += utils.system_output(cmd)
+            self.results += utils.system_output('mount ' + TEST_DRIVE_DEV + ' ' + TEST_MNT)
+        elif TEST_FILESYSTEM == 'btrfs':
+            cmd = 'mkfs.btrfs -f ' + TEST_DRIVE_DEV
+            self.results += utils.system_output(cmd)
+            self.results += utils.system_output('mount ' + TEST_DRIVE_DEV + ' ' + TEST_MNT)
+        elif TEST_FILESYSTEM == 'jfs':
+            cmd = 'mkfs.jfs ' + TEST_DRIVE_DEV
+            self.results += utils.system_output(cmd)
+            self.results += utils.system_output('mount ' + TEST_DRIVE_DEV + ' ' + TEST_MNT)
+        elif TEST_FILESYSTEM == 'zfs':
+            cmd = 'zpool create -f fiopool ' + TEST_DRIVE_DEV
+            self.results += utils.system_output(cmd)
+            cmd = 'zfs create fiopool/test'
+            self.results += utils.system_output(cmd)
+            cmd = 'zfs set mountpoint=' + TEST_MNT + ' fiopool/test'
+            self.results += utils.system_output(cmd)
+        else:
+            raise error.TestError("Unknown file system TEST_FILESYSTEM=%s, aborting" % TEST_FILESYSTEM)
+
+        return True
+
+    def cleanup_drive(self):
+        if TEST_FILESYSTEM == None or TEST_DRIVE_DEV == None:
+            return
+        self.results = utils.system_output('umount ' + TEST_MNT)
+        if os.path.exists(TEST_MNT):
+            os.rmdir(TEST_MNT)
+        if TEST_FILESYSTEM == 'zfs':
+            self.results += utils.system_output('zpool destroy fiopool')
+        for i in xrange(60):
+            mounted = False
+            for line in open('/proc/mounts').readlines():
+                words = line.split()
+                if len(words) > 2 and TEST_MNT in words[1]:
+                    mounted = True
+                    break
+            if not mounted:
+                return
+            time.sleep(1.0)
+
+        raise error.TestError("Failed to unmount %s filesystem from %s, aborting" % (TEST_FILESYSTEM, TEST_MNT))
 
     def initialize(self):
         pass
@@ -188,6 +263,8 @@ class ubuntu_performance_fio(test.test):
             "(sec)" : 1000000.0,
         }
 
+        self.setup_drive()
+
         #
         #  Edit various fio configs to use dynamic settings
         #  relevant to this test location and test size
@@ -205,12 +282,17 @@ class ubuntu_performance_fio(test.test):
         file_size = "%dM" % (file_size_mb)
 
         for line in fin:
-            line = line.replace("DIRECTORY", test_dir)
+            if TEST_FILESYSTEM == None or TEST_DRIVE_DEV == None:
+                line = line.replace("DIRECTORY", test_dir)
+            else:
+                line = line.replace("DIRECTORY", TEST_MNT)
             line = line.replace("SIZE", file_size)
             #
-            #  ramdisk can't do O_DIRECT, so skip this
+            #  zfs and ramdisk can't do O_DIRECT, so skip this
             #
             if media == 'ramdisk' and "direct=1" in line:
+                continue
+            if TEST_FILESYSTEM == 'zfs' and "direct=1" in line:
                 continue
             fout.write(line)
         fin.close()
@@ -264,6 +346,7 @@ class ubuntu_performance_fio(test.test):
         values['latency_stddev'] = stdev
 
         self.fio_clean_files(testname)
+        self.cleanup_drive()
 
         return values
 
@@ -350,6 +433,5 @@ class ubuntu_performance_fio(test.test):
         else:
             print 'cannot execute "%s", required %dMB, only got %dMB on disc' % (test_name, file_size_mb, free_mb)
         print
-
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

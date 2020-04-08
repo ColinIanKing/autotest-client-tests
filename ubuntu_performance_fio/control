@@ -13,47 +13,70 @@ DOC = ""
 name = 'ubuntu_performance_fio'
 
 tests = [
-	'rd-100,wr-0,rand,blk-8k,jobs-4,iodepth-32',
-	'rd-100,wr-0,rand,blk-8k,jobs-8,iodepth-32',
-	'rd-100,wr-0,rand,blk-8k,jobs-16,iodepth-32',
+    'rd-100,wr-0,rand,blk-8k,jobs-4,iodepth-32',
+    'rd-100,wr-0,rand,blk-8k,jobs-8,iodepth-32',
+    'rd-100,wr-0,rand,blk-8k,jobs-16,iodepth-32',
 
-	'rd-100,wr-0,rand,blk-128k,jobs-4,iodepth-8',
-	'rd-100,wr-0,rand,blk-128k,jobs-8,iodepth-8',
-	'rd-100,wr-0,rand,blk-128k,jobs-16,iodepth-8',
+    'rd-100,wr-0,rand,blk-128k,jobs-4,iodepth-8',
+    'rd-100,wr-0,rand,blk-128k,jobs-8,iodepth-8',
+    'rd-100,wr-0,rand,blk-128k,jobs-16,iodepth-8',
 
-	'rd-100,wr-0,seq,blk-128k,jobs-4,iodepth-8',
-	'rd-100,wr-0,seq,blk-128k,jobs-8,iodepth-8',
-	'rd-100,wr-0,seq,blk-128k,jobs-16,iodepth-8',
+    'rd-100,wr-0,seq,blk-128k,jobs-4,iodepth-8',
+    'rd-100,wr-0,seq,blk-128k,jobs-8,iodepth-8',
+    'rd-100,wr-0,seq,blk-128k,jobs-16,iodepth-8',
 
-	'rd-0,wr-100,rand,blk-8k,jobs-4,iodepth-32',
-	'rd-0,wr-100,rand,blk-8k,jobs-8,iodepth-32',
-	'rd-0,wr-100,rand,blk-8k,jobs-16,iodepth-32',
+    'rd-0,wr-100,rand,blk-8k,jobs-4,iodepth-32',
+    'rd-0,wr-100,rand,blk-8k,jobs-8,iodepth-32',
+    'rd-0,wr-100,rand,blk-8k,jobs-16,iodepth-32',
 
-	'rd-0,wr-100,seq,blk-128k,jobs-16,iodepth-8',
-	'rd-0,wr-100,seq,blk-128k,jobs-4,iodepth-8',
-	'rd-0,wr-100,seq,blk-128k,jobs-8,iodepth-8',
+    'rd-0,wr-100,seq,blk-128k,jobs-16,iodepth-8',
+    'rd-0,wr-100,seq,blk-128k,jobs-4,iodepth-8',
+    'rd-0,wr-100,seq,blk-128k,jobs-8,iodepth-8',
 
-	'rd-75,wr-25,rand,blk-8k,jobs-16,iodepth-32',
-	'rd-75,wr-25,rand,blk-8k,jobs-4,iodepth-32',
-	'rd-75,wr-25,rand,blk-8k,jobs-8,iodepth-32',
+    'rd-75,wr-25,rand,blk-8k,jobs-16,iodepth-32',
+    'rd-75,wr-25,rand,blk-8k,jobs-4,iodepth-32',
+    'rd-75,wr-25,rand,blk-8k,jobs-8,iodepth-32',
 ]
 
 results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup', media='')
 
-media_types = [ 'ramdisk', 'dataset' ]
-#
-# Spec states that config1 should not run ramdisk tests
-#
-if 'TEST_CONFIG' in os.environ:
-	if  os.environ['TEST_CONFIG'] == 'config1':
-		media_types = [ 'dataset' ]
-
-#
-#  Media is 'ramdisk' (/dev/shm) or 'dataset' (normally a raid device)
-#
-for media_type in media_types:
+if 'TEST_DRIVE_DEV' in os.environ and 'TEST_FILESYSTEM' in os.environ:
+    #
+    #  Normal ubuntu kernel team regression fio tests (for graphana profile data)
+    #
     for test in tests:
-	results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + media_type + '-' + test, media=media_type, timeout=120*60)
+        device = os.environ['TEST_DRIVE_DEV']
+        devname = device.replace('/dev/', '')
+        devname = devname.replace('/', '-')
+        hostname = os.uname()[1]
+        model = utils.system_output('lsblk ' + device + ' -io MODEL -n').splitlines()
+        if len(model) > 0:
+            model = model[0].rstrip()
+        else:
+            model = 'unknown'
+        model = model.replace(' ', '').replace('-', '')
+        model = model.lower()
+        media = hostname + '-' + devname + '-' + model + '-' + os.environ['TEST_FILESYSTEM']
+        meida = media
+        tag = 'ubuntu-performance-fio-' + media + '-' + test.replace(',','-')
+        results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag=tag, media=media, timeout=120*60)
+else:
+    #
+    #  Legacy fio tests for large host testing
+    #
+    media_types = [ 'ramdisk', 'dataset' ]
+    #
+    # Spec states that config1 should not run ramdisk tests
+    #
+    if 'TEST_CONFIG' in os.environ:
+        if  os.environ['TEST_CONFIG'] == 'config1':
+            media_types = [ 'dataset' ]
+    #
+    #  Media is 'ramdisk' (/dev/shm) or 'dataset' (normally a raid device)
+    #
+    for media_type in media_types:
+        for test in tests:
+            results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + media_type + '-' + test, media=media_type, timeout=120*60)
 
 print results
 

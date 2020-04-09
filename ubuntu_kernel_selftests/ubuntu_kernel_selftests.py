@@ -29,11 +29,7 @@ class ubuntu_kernel_selftests(test.test):
         kv = int(kv[0]) * 100 + int(kv[1])
         if kv >= 415:
             # extra packages for building bpf tests
-            pkgs.extend(['libcap-dev', 'libelf-dev'])
-            if self.series == 'focal':
-                pkgs.extend(['clang-9', 'llvm-9'])
-            else:
-                pkgs.extend(['clang', 'llvm'])
+            pkgs.extend(['clang', 'libcap-dev', 'libelf-dev', 'llvm'])
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

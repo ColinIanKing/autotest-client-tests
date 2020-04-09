@@ -48,6 +48,8 @@ fi
 
 sleep 60 # Give things a minute to settle before creating new partitions
 
+[[ $DEVICE =~ ^/dev/loop[0-9]{1,}$ ]] && DEVICE=${DEVICE}p
+
 for i in `seq 1 5`
 do
     sudo mkfs.$FS $FS_OPT ${DEVICE}$i

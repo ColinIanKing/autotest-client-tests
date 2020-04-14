@@ -1,0 +1,258 @@
+From b191705686d2a9b7ba5a2fa9f3dd4699e76d2d99 Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Tue, 14 Apr 2020 18:32:49 +0000
+Subject: [PATCH] Rename gettid to sys_gettid to avoid name clash
+
+Newer systems provide gettid in glibc causing a name clash. Avoid this
+by renaming the gettid wrapper to sys_gettid and renaming all gettid
+calls to this.
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ fio-3.10/backend.c         | 2 +-
+ fio-3.10/gettime-thread.c  | 2 +-
+ fio-3.10/gettime.c         | 2 +-
+ fio-3.10/idletime.c        | 2 +-
+ fio-3.10/iolog.c           | 2 +-
+ fio-3.10/log.c             | 2 +-
+ fio-3.10/os/os-dragonfly.h | 2 +-
+ fio-3.10/os/os-freebsd.h   | 2 +-
+ fio-3.10/os/os-linux.h     | 2 +-
+ fio-3.10/os/os-mac.h       | 2 +-
+ fio-3.10/os/os-netbsd.h    | 2 +-
+ fio-3.10/os/os-openbsd.h   | 2 +-
+ fio-3.10/os/os-solaris.h   | 2 +-
+ fio-3.10/os/os-windows.h   | 2 +-
+ fio-3.10/os/os.h           | 2 +-
+ fio-3.10/rate-submit.c     | 6 +++---
+ 16 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/fio-3.10/backend.c b/fio-3.10/backend.c
+index bb8bd13..2602112 100644
+--- a/fio-3.10/backend.c
++++ b/fio-3.10/backend.c
+@@ -1547,7 +1547,7 @@ static void *thread_main(void *data)
+ 		setsid();
+ 		td->pid = getpid();
+ 	} else
+-		td->pid = gettid();
++		td->pid = sys_gettid();
+ 
+ 	fio_local_clock_init();
+ 
+diff --git a/fio-3.10/gettime-thread.c b/fio-3.10/gettime-thread.c
+index 0a2cc6c..49147f9 100644
+--- a/fio-3.10/gettime-thread.c
++++ b/fio-3.10/gettime-thread.c
+@@ -40,7 +40,7 @@ static void *gtod_thread_main(void *data)
+ 	struct fio_sem *sem = data;
+ 	int ret;
+ 
+-	ret = fio_setaffinity(gettid(), fio_gtod_cpumask);
++	ret = fio_setaffinity(sys_gettid(), fio_gtod_cpumask);
+ 
+ 	fio_sem_up(sem);
+ 
+diff --git a/fio-3.10/gettime.c b/fio-3.10/gettime.c
+index c0f2638..e120913 100644
+--- a/fio-3.10/gettime.c
++++ b/fio-3.10/gettime.c
+@@ -586,7 +586,7 @@ static void *clock_thread_fn(void *data)
+ 
+ 	fio_cpu_set(&cpu_mask, t->cpu);
+ 
+-	if (fio_setaffinity(gettid(), cpu_mask) == -1) {
++	if (fio_setaffinity(sys_gettid(), cpu_mask) == -1) {
+ 		int __err = errno;
+ 
+ 		log_err("clock setaffinity failed: %s\n", strerror(__err));
+diff --git a/fio-3.10/idletime.c b/fio-3.10/idletime.c
+index 2f59f51..37397f6 100644
+--- a/fio-3.10/idletime.c
++++ b/fio-3.10/idletime.c
+@@ -61,7 +61,7 @@ static int set_cpu_affinity(struct idle_prof_thread *ipt)
+ 
+ 	fio_cpu_set(&ipt->cpu_mask, ipt->cpu);
+ 
+-	if (fio_setaffinity(gettid(), ipt->cpu_mask)) {
++	if (fio_setaffinity(sys_gettid(), ipt->cpu_mask)) {
+ 		log_err("fio: fio_setaffinity failed\n");
+ 		fio_cpuset_exit(&ipt->cpu_mask);
+ 		return -1;
+diff --git a/fio-3.10/iolog.c b/fio-3.10/iolog.c
+index 26c3458..96e54a5 100644
+--- a/fio-3.10/iolog.c
++++ b/fio-3.10/iolog.c
+@@ -1418,7 +1418,7 @@ static int gz_init_worker(struct submit_worker *sw)
+ 	if (!fio_option_is_set(&td->o, log_gz_cpumask))
+ 		return 0;
+ 
+-	if (fio_setaffinity(gettid(), td->o.log_gz_cpumask) == -1) {
++	if (fio_setaffinity(sys_gettid(), td->o.log_gz_cpumask) == -1) {
+ 		log_err("gz: failed to set CPU affinity\n");
+ 		return 1;
+ 	}
+diff --git a/fio-3.10/log.c b/fio-3.10/log.c
+index 6c36813..e996eb4 100644
+--- a/fio-3.10/log.c
++++ b/fio-3.10/log.c
+@@ -48,7 +48,7 @@ void log_prevalist(int type, const char *fmt, va_list args)
+ 	int len;
+ 	pid_t pid;
+ 
+-	pid = gettid();
++	pid = sys_gettid();
+ 	if (fio_debug_jobp && *fio_debug_jobp != -1U
+ 	    && pid != *fio_debug_jobp)
+ 		return;
+diff --git a/fio-3.10/os/os-dragonfly.h b/fio-3.10/os/os-dragonfly.h
+index e80ad8c..8752a80 100644
+--- a/fio-3.10/os/os-dragonfly.h
++++ b/fio-3.10/os/os-dragonfly.h
+@@ -203,7 +203,7 @@ static inline unsigned long long os_phys_mem(void)
+ 	return mem;
+ }
+ 
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	return (int) lwp_gettid();
+ }
+diff --git a/fio-3.10/os/os-freebsd.h b/fio-3.10/os/os-freebsd.h
+index 97bc8ae..7bf3614 100644
+--- a/fio-3.10/os/os-freebsd.h
++++ b/fio-3.10/os/os-freebsd.h
+@@ -96,7 +96,7 @@ static inline unsigned long long os_phys_mem(void)
+ 	return mem;
+ }
+ 
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	long lwpid;
+ 
+diff --git a/fio-3.10/os/os-linux.h b/fio-3.10/os/os-linux.h
+index 6b63d12..da5e8c6 100644
+--- a/fio-3.10/os/os-linux.h
++++ b/fio-3.10/os/os-linux.h
+@@ -126,7 +126,7 @@ static inline int ioprio_set(int which, int who, int ioprio_class, int ioprio)
+ 	return syscall(__NR_ioprio_set, which, who, ioprio);
+ }
+ 
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	return syscall(__NR_gettid);
+ }
+diff --git a/fio-3.10/os/os-mac.h b/fio-3.10/os/os-mac.h
+index 92a60ee..034f943 100644
+--- a/fio-3.10/os/os-mac.h
++++ b/fio-3.10/os/os-mac.h
+@@ -91,7 +91,7 @@ static inline unsigned long long os_phys_mem(void)
+ 	return mem;
+ }
+ 
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	return mach_thread_self();
+ }
+diff --git a/fio-3.10/os/os-netbsd.h b/fio-3.10/os/os-netbsd.h
+index 682a11c..52df34f 100644
+--- a/fio-3.10/os/os-netbsd.h
++++ b/fio-3.10/os/os-netbsd.h
+@@ -66,7 +66,7 @@ static inline unsigned long long os_phys_mem(void)
+ 	return mem;
+ }
+ 
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	return (int) _lwp_self();
+ }
+diff --git a/fio-3.10/os/os-openbsd.h b/fio-3.10/os/os-openbsd.h
+index b4c02c9..dd59b84 100644
+--- a/fio-3.10/os/os-openbsd.h
++++ b/fio-3.10/os/os-openbsd.h
+@@ -66,7 +66,7 @@ static inline unsigned long long os_phys_mem(void)
+ 	return mem;
+ }
+ 
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	return (int)(intptr_t) pthread_self();
+ }
+diff --git a/fio-3.10/os/os-solaris.h b/fio-3.10/os/os-solaris.h
+index 2425ab9..c126155 100644
+--- a/fio-3.10/os/os-solaris.h
++++ b/fio-3.10/os/os-solaris.h
+@@ -180,7 +180,7 @@ static inline int fio_cpuset_exit(os_cpu_mask_t *mask)
+ 	return 0;
+ }
+ 
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	return pthread_self();
+ }
+diff --git a/fio-3.10/os/os-windows.h b/fio-3.10/os/os-windows.h
+index aad446e..926201e 100644
+--- a/fio-3.10/os/os-windows.h
++++ b/fio-3.10/os/os-windows.h
+@@ -163,7 +163,7 @@ static inline unsigned long long os_phys_mem(void)
+ 	return (unsigned long long) pages * (unsigned long long) pagesize;
+ }
+ 
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	return GetCurrentThreadId();
+ }
+diff --git a/fio-3.10/os/os.h b/fio-3.10/os/os.h
+index becc410..7987c8d 100644
+--- a/fio-3.10/os/os.h
++++ b/fio-3.10/os/os.h
+@@ -366,7 +366,7 @@ static inline int CPU_COUNT(os_cpu_mask_t *mask)
+ #endif
+ 
+ #ifndef FIO_HAVE_GETTID
+-static inline int gettid(void)
++static inline int sys_gettid(void)
+ {
+ 	return getpid();
+ }
+diff --git a/fio-3.10/rate-submit.c b/fio-3.10/rate-submit.c
+index 2f02fe2..5c612a6 100644
+--- a/fio-3.10/rate-submit.c
++++ b/fio-3.10/rate-submit.c
+@@ -17,7 +17,7 @@ static int io_workqueue_fn(struct submit_worker *sw,
+ 	struct thread_data *td = sw->priv;
+ 	int ret;
+ 
+-	dprint(FD_RATE, "io_u %p queued by %u\n", io_u, gettid());
++	dprint(FD_RATE, "io_u %p queued by %u\n", io_u, sys_gettid());
+ 
+ 	io_u_set(td, io_u, IO_U_F_NO_FILE_PUT);
+ 
+@@ -33,7 +33,7 @@ static int io_workqueue_fn(struct submit_worker *sw,
+ 		io_u_clear(td, io_u, IO_U_F_FLIGHT);
+ 	} while (1);
+ 
+-	dprint(FD_RATE, "io_u %p ret %d by %u\n", io_u, ret, gettid());
++	dprint(FD_RATE, "io_u %p ret %d by %u\n", io_u, ret, sys_gettid());
+ 
+ 	io_queue_event(td, io_u, &ret, ddir, NULL, 0, NULL);
+ 
+@@ -109,7 +109,7 @@ static int io_workqueue_init_worker_fn(struct submit_worker *sw)
+ 	if (ioengine_load(td))
+ 		goto err;
+ 
+-	td->pid = gettid();
++	td->pid = sys_gettid();
+ 
+ 	INIT_FLIST_HEAD(&td->io_log_list);
+ 	INIT_FLIST_HEAD(&td->io_hist_list);
+-- 
+2.20.1
+

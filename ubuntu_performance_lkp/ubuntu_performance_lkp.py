@@ -14,7 +14,6 @@ import resource
 # Number of test iterations to get min/max/average stats
 #
 test_iterations = 3
-commit='7078336702a53c99f3a17ad1ca2af9a3323a818c'
 
 class ubuntu_performance_lkp(test.test):
     version = 7
@@ -109,7 +108,7 @@ class ubuntu_performance_lkp(test.test):
             s.close()
         return ipaddr
 
-    def setup(self, lkp_jobs):
+    def setup(self, lkp_jobs, lkp_commit):
         self.install_required_pkgs()
         self.job.require_gcc()
 
@@ -125,7 +124,9 @@ class ubuntu_performance_lkp(test.test):
             self.results += utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
-        self.results += utils.system_output('git checkout -B stable ' + commit, retain_output=True)
+
+        if lkp_commit:
+            self.results += utils.system_output('git checkout -B stable ' + commit, retain_output=True)
         #
         # New distros use libarchive-tools and not bsdtar so edit the package name
         # https://github.com/intel/lkp-tests/issues/50
@@ -555,10 +556,10 @@ class ubuntu_performance_lkp(test.test):
         print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
         print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
 
-    def run_once(self, lkp_job, sub_job, lkp_jobs):
+    def run_once(self, lkp_job, sub_job, lkp_jobs, lkp_commit = None):
         if lkp_job == 'setup':
             self.get_sysinfo()
-            self.setup(lkp_jobs)
+            self.setup(lkp_jobs, lkp_commit)
             return
 
         job_funcs = {

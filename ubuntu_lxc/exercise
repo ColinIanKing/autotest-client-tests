@@ -149,4 +149,7 @@ summary
 
 [ "$TEST_FAIL" != "0" ] && exit 1
 
+# Remove the reboot container if it got left behind (lp:1788574)
+sudo lxc-destroy reboot &>/dev/null || true
+
 exit 0

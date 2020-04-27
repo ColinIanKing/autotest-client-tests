@@ -1,0 +1,165 @@
+#!/bin/sh
+#
+# Copyright (C) 2016 Canonical
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+
+HERE=$(pwd)
+VDEV_PATH=$1
+VDEV0=${VDEV_PATH}/pool0-$$.img
+POOL=pool-smoke-$$
+ZFSENC_TYPES="aes-128-ccm,32,32 aes-192-ccm,32,32 aes-256-ccm,32,32 aes-128-gcm,32,32 aes-192-gcm,32,32 aes-256-gcm,32,32"
+ZFSVER=$(zfs -V | head -1 | cut -d'-' -f2 | tr '.' ' ' | awk {'print $1 * 10000 + $2 * 100 + $3}')
+
+if [ $ZFSVER -lt 803 ]; then
+	echo "ZFS version is less than 0.8.3, skipping test"
+	zfs -V | tr '\n' ' '
+	echo ""
+	exit 0
+fi
+
+echo "VDEVs in $VDEV_PATH"
+dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
+
+zpool create ${POOL} ${VDEV0}
+ret=$?
+if [ $ret -ne 0 ]; then
+	echo "FAILED\nzpool create failed, exit code=$ret"
+	rm -f ${VDEV0}
+	exit 1
+fi
+
+#
+# And populate with some sample encrypted ZFS file systems
+#
+for enctype in ${ZFSENC_TYPES}
+do
+	enc=$(echo $enctype | cut -d',' -f1)
+	sz_raw=$(echo $enctype | cut -d',' -f2)
+	sz_hex=$(echo $enctype | cut -d',' -f3)
+
+	fs=fs-${enc}-rawkey
+	echo -n "kernel smoke test, create and destroy ZFS encrypted filesystem using $enc with rawkey: "
+	head -c $sz_raw /dev/urandom > ${HERE}/key
+	zfs create -o encryption=$enc -o keyformat=raw -o keylocation=file://${HERE}/key ${POOL}/$fs
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "FAILED\nzfs create $enc raw key encrypted filesystem failed, exit code=$ret"
+		zpool destroy ${POOL}
+		rm -f ${VDEV0}
+		exit 1
+	fi
+	for I in $(seq 100)
+	do
+		dd if=/dev/urandom of=/${POOL}/$fs/$I bs=16 count=512 > /dev/null 2>&1
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "FAILED\nwrite to file ${POOL}/$fs/$I on encrypted filesystem failed, exit code=$ret"
+			zpool destroy ${POOL}
+			rm -f ${VDEV0}
+			exit 1
+		fi
+	done
+	zfs destroy ${POOL}/$fs
+	ret=$?
+	if [ $ret -ne 0 ]; then
+	echo "FAILED\nzfs destroy filesystem $fs failed, exit code=$ret"
+		zpool destroy ${POOL}
+		rm -f ${VDEV0}
+		exit 1
+	fi
+	echo "PASSED"
+
+	fs=fs-${enc}-hexkey
+	echo -n "kernel smoke test, create and destroy ZFS encrypted filesystem using $enc with hexkey: "
+	head -c $sz_hex /dev/urandom | od -A n -v -t x1 | tr -d ' \n' > ${HERE}/key
+	zfs create -o encryption=$enc -o  keyformat=hex -o keylocation=file://${HERE}/key ${POOL}/$fs
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "FAILED\nzfs create $enc hex key encrypted filesystem failed, exit code=$ret"
+		zpool destroy ${POOL}
+		rm -f ${VDEV0}
+		exit 1
+	fi
+	for I in $(seq 100)
+	do
+		dd if=/dev/urandom of=/${POOL}/$fs/$I bs=16 count=512 > /dev/null 2>&1
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "FAILED\nwrite to file ${POOL}/$fs/$I on encrypted filesystem failed, exit code=$ret"
+			zpool destroy ${POOL}
+			rm -f ${VDEV0}
+			exit 1
+		fi
+	done
+	zfs destroy ${POOL}/$fs
+	ret=$?
+	if [ $ret -ne 0 ]; then
+	echo "FAILED\nzfs destroy filesystem $fs failed, exit code=$ret"
+		zpool destroy ${POOL}
+		rm -f ${VDEV0}
+		exit 1
+	fi
+	echo "PASSED"
+
+	fs=fs-${enc}-pbkdf2iters
+	echo -n "kernel smoke test, create and destroy ZFS encrypted filesystem using $enc with 1000000 pbkdf2iters: "
+	key=$(head -c $sz_hex /dev/urandom | od -A n -v -t x1 | tr -d ' \n')
+	echo "$key\n$key\n" | zfs create -o encryption=$enc -o keyformat=passphrase -o keylocation=prompt -o pbkdf2iters=1000000 ${POOL}/$fs
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "FAILED\nzfs create $enc passphrase encrypted filesystem failed, exit code=$ret"
+		zpool destroy ${POOL}
+		rm -f ${VDEV0}
+		exit 1
+	fi
+	for I in $(seq 100)
+	do
+		dd if=/dev/urandom of=/${POOL}/$fs/$I bs=16 count=512 > /dev/null 2>&1
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "FAILED\nwrite to file ${POOL}/$fs/$I on encrypted filesystem failed, exit code=$ret"
+			zpool destroy ${POOL}
+			rm -f ${VDEV0}
+			exit 1
+		fi
+	done
+	zfs destroy ${POOL}/$fs
+	ret=$?
+	if [ $ret -ne 0 ]; then
+	echo "FAILED\nzfs destroy filesystem $fs failed, exit code=$ret"
+		zpool destroy ${POOL}
+		rm -f ${VDEV0}
+		exit 1
+	fi
+	echo "PASSED"
+done
+
+zpool destroy ${POOL}
+ret=$?
+if [ $ret -ne 0 ]; then
+	echo "FAILED\nzpool destroy failed, exit code=$ret"
+	#
+	# destroy failed, try to clean up, but this
+	# wil probably fail
+	#
+	rm -f ${VDEV0}
+	exit 1
+fi
+
+dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
+rm -f ${VDEV0}
+exit 0

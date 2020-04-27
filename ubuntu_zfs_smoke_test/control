@@ -24,7 +24,8 @@ tests = [
 	'kernel-smoke-test-snapshot',
 	'kernel-smoke-test-clone',
 	'kernel-smoke-test-send-receive',
-	'kernel-smoke-test-scrub'
+	'kernel-smoke-test-scrub',
+	'kernel-smoke-test-encrypt',
 	]
 
 import os

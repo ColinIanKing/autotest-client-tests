@@ -1,0 +1,22 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_performance_zfs_encryption"
+CRITERIA = """
+Performance test zfs encryption
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Benchmark'
+TEST_TYPE = "client"
+DOC = ""
+
+tests = [
+	'setup',
+	'performance-test-encryption',
+	]
+
+import os
+import ctypes
+
+for t in tests:
+    results = job.run_test_detail('ubuntu_performance_zfs_encryption', test_name=t, tag=t)

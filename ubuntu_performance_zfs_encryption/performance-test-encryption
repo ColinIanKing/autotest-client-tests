@@ -1,0 +1,189 @@
+#!/bin/sh
+#
+# Copyright (C) 2016 Canonical
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+
+HERE=$(pwd)
+TMPFS_MNT=${HERE}/tmpfs
+VDEV_PATH=$1
+VDEV0=/dev/ram0
+VDEV0=/dev/ram1
+POOL=pool-smoke-$$
+ZFSENC_TYPES="aes-128-ccm,32,32 aes-192-ccm,32,32 aes-256-ccm,32,32 aes-128-gcm,32,32 aes-192-gcm,32,32 aes-256-gcm,32,32"
+ZFSVER=$(zfs -V | head -1 | cut -d'-' -f2 | tr '.' ' ' | awk {'print $1 * 10000 + $2 * 100 + $3}')
+ITERATIONS=10
+
+if [ $ZFSVER -lt 803 ]; then
+	echo "ZFS version is less than 0.8.3, skipping test"
+	zfs -V | tr '\n' ' '
+	echo ""
+	exit 0
+fi
+
+echo "VDEVs in $VDEV_PATH"
+
+if [ -e /dev/ram0 ]; then
+	sudo rmmod brd
+fi
+
+#
+# 2 x 1GB block ram disk devices for ZFS
+#
+modprobe brd rd_nr=2 rd_size=1048576
+
+zpool create ${POOL} ${VDEV0} ${VDEV1}
+ret=$?
+if [ $ret -ne 0 ]; then
+	echo "FAILED\nzpool create failed, exit code=$ret"
+	sudo rmmod brd
+	exit 1
+fi
+
+zpool list
+
+#
+# And populate with some sample encrypted ZFS file systems
+#
+for enctype in ${ZFSENC_TYPES}
+do
+	enc=$(echo $enctype | cut -d',' -f1)
+	sz_raw=$(echo $enctype | cut -d',' -f2)
+	sz_hex=$(echo $enctype | cut -d',' -f3)
+
+	fs=fs-${enc}-rawkey
+	echo "kernel smoke test, create and destroy ZFS encrypted filesystem using $enc with rawkey"
+	head -c $sz_raw /dev/urandom > ${HERE}/key
+	zfs create -o encryption=$enc -o keyformat=raw -o keylocation=file://${HERE}/key ${POOL}/$fs
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		echo "FAILED\nzfs create $enc raw key encrypted filesystem failed, exit code=$ret"
+		zpool destroy ${POOL}
+		sudo rmmod brd
+		exit 1
+	fi
+
+	wr_duration_total=0
+	wr_rate_total=0
+	wr_user_secs_total=0
+	wr_kern_secs_total=0
+
+	rd_duration_total=0
+	rd_rate_total=0
+	rd_user_secs_total=0
+	rd_kern_secs_total=0
+
+	for I in $(seq $ITERATIONS)
+	do
+		#
+		# Write a 500MB encrypted file to ZFS
+		#
+		(/usr/bin/time dd if=/dev/urandom of=/${POOL}/$fs/$I bs=1024 count=512000 2>&1)> ${HERE}/tmp.log
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "FAILED: write to file ${POOL}/$fs/$I on encrypted filesystem failed, exit code=$ret"
+			zpool destroy ${POOL}
+			sudo rmmod brd
+			exit 1
+		fi
+		#cat ${HERE}/tmp.log
+		wr_duration=$(grep copied ${HERE}/tmp.log | cut -d, -f 3 | awk '{ print $1}')
+		wr_rate=$(grep copied ${HERE}/tmp.log | cut -d, -f 4 | awk '{ print $1}')
+		wr_user_secs=$(grep elapsed ${HERE}/tmp.log | awk '{print $1 + 0}')
+		wr_kern_secs=$(grep elapsed ${HERE}/tmp.log | awk '{print $2 + 0}')
+
+		wr_duration_total=$(echo "scale=5; $wr_duration_total + $wr_duration" | bc)
+		wr_rate_total=$(echo "scale=5; $wr_rate_total + $wr_rate" | bc)
+		wr_user_secs_total=$(echo "scale=5; $wr_user_secs_total + $wr_user_secs" | bc)
+		wr_kern_secs_total=$(echo "scale=5; $wr_kern_secs_total + $wr_kern_secs" | bc)
+		echo -n "$I of $ITERATIONS WR: $wr_duration $wr_rate $wr_user_secs $wr_kern_secs "
+		rm ${HERE}/tmp.log
+
+		#
+		# Read a 500MB encrypted file from ZFS
+		#
+		(/usr/bin/time dd if=/${POOL}/$fs/$I of=/dev/null bs=1024 count=512000 2>&1)> ${HERE}/tmp.log
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "FAILED: read from file ${POOL}/$fs/$I on encrypted filesystem failed, exit code=$ret"
+			zpool destroy ${POOL}
+			sudo rmmod brd
+			exit 1
+		fi
+		#cat ${HERE}/tmp.log
+		rd_duration=$(grep copied ${HERE}/tmp.log | cut -d, -f 3 | awk '{ print $1}')
+		rd_rate=$(grep copied ${HERE}/tmp.log | cut -d, -f 4 | awk '{ print $1}')
+		rd_user_secs=$(grep elapsed ${HERE}/tmp.log | awk '{print $1 + 0}')
+		rd_kern_secs=$(grep elapsed ${HERE}/tmp.log | awk '{print $2 + 0}')
+
+		rd_duration_total=$(echo "scale=5; $rd_duration_total + $rd_duration" | bc)
+		rd_rate_total=$(echo "scale=5; $rd_rate_total + $rd_rate" | bc)
+		rd_user_secs_total=$(echo "scale=5; $rd_user_secs_total + $rd_user_secs" | bc)
+		rd_kern_secs_total=$(echo "scale=5; $rd_kern_secs_total + $rd_kern_secs" | bc)
+		echo "RD: $rd_duration $rd_rate $rd_user_secs $rd_kern_secs"
+		rm ${HERE}/tmp.log
+
+		rm /${POOL}/$fs/$I
+	done
+	name=$(echo ${enc} | tr '-' '_')
+
+	wr_duration_average=$(echo "scale=4; $wr_duration_total / $ITERATIONS" | bc)
+	wr_rate_average=$(echo "scale=4; $wr_rate_total / $ITERATIONS" | bc)
+	wr_user_secs_average=$(echo "scale=4; $wr_user_secs_total / $ITERATIONS" | bc)
+	wr_kern_secs_average=$(echo "scale=4; $wr_kern_secs_total / $ITERATIONS" | bc)
+
+	rd_duration_average=$(echo "scale=4; $rd_duration_total / $ITERATIONS" | bc)
+	rd_rate_average=$(echo "scale=4; $rd_rate_total / $ITERATIONS" | bc)
+	rd_user_secs_average=$(echo "scale=4; $rd_user_secs_total / $ITERATIONS" | bc)
+	rd_kern_secs_average=$(echo "scale=4; $rd_kern_secs_total / $ITERATIONS" | bc)
+
+	echo " "
+	echo "zfs_encryption_${name}_wr_duration_seconds_average $wr_duration_average"
+	echo "zfs_encryption_${name}_wr_rate_mbytes_per_second_average $wr_rate_average"
+	echo "zfs_encryption_${name}_wr_user_time_average $wr_user_secs_average"
+	echo "zfs_encryption_${name}_wr_kern_time_average $wr_kern_secs_average"
+	echo " "
+	echo "zfs_encryption_${name}_rd_duration_seconds_average $rd_duration_average"
+	echo "zfs_encryption_${name}_rd_rate_mbytes_per_second_average $rd_rate_average"
+	echo "zfs_encryption_${name}_rd_user_time_average $rd_user_secs_average"
+	echo "zfs_encryption_${name}_rd_kern_time_average $rd_kern_secs_average"
+	echo " "
+
+	zfs destroy ${POOL}/$fs
+	ret=$?
+	if [ $ret -ne 0 ]; then
+	echo "FAILED\nzfs destroy filesystem $fs failed, exit code=$ret"
+		zpool destroy ${POOL}
+		sudo rmmod brd
+		exit 1
+	fi
+done
+
+zpool destroy ${POOL}
+ret=$?
+if [ $ret -ne 0 ]; then
+	echo "FAILED\nzpool destroy failed, exit code=$ret"
+	#
+	# destroy failed, try to clean up, but this
+	# wil probably fail
+	#
+	rm -f ${VDEV0}
+	exit 1
+fi
+
+dd if=/dev/zero of=${VDEV0} bs=1M count=512 > /dev/null 2>&1
+sudo rmmod brd
+exit 0

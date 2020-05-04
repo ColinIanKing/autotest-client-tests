@@ -24,7 +24,7 @@ VDEV0=/dev/ram0
 VDEV0=/dev/ram1
 POOL=pool-smoke-$$
 ZFSENC_TYPES="aes-128-ccm,32,32 aes-192-ccm,32,32 aes-256-ccm,32,32 aes-128-gcm,32,32 aes-192-gcm,32,32 aes-256-gcm,32,32"
-ZFSVER=$(zfs -V | head -1 | cut -d'-' -f2 | tr '.' ' ' | awk {'print $1 * 10000 + $2 * 100 + $3}')
+ZFSVER=$(modinfo zfs | grep ^version | awk '{print$2}' | cut -d'-' -f1 | tr '.' ' ' | awk {'print $1 * 10000 + $2 * 100 + $3}')
 ITERATIONS=10
 
 if [ $ZFSVER -lt 803 ]; then

@@ -18,8 +18,9 @@ class ubuntu_zram_smoke_test(test.test):
         if flavour in ['aws', 'azure', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + flavour + '*')
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
-        self.results = utils.system_output(cmd, retain_output=True)
+        if pkgs:
+            cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+            self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
         pass

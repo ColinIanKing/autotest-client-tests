@@ -33,7 +33,10 @@ class ubuntu_sysdig_smoke_test(test.test):
         print self.results
 
     def cleanup(self):
-        cmd = 'modprobe -r sysdig_probe'
+        cmd = 'modprobe -r sysdig_probe || true'
         self.results = utils.system_output(cmd, retain_output=False)
+        cmd = 'apt-get remove --purge sysdig-dkms -y'
+        self.results = utils.system_output(cmd, retain_output=False)
+
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

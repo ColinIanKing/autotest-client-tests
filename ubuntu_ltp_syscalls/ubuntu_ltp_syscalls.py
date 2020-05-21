@@ -100,7 +100,10 @@ class ubuntu_ltp_syscalls(test.test):
         _blacklist = []
         fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
         with open(fn, 'r') as f:
-            db = yaml.load(f)
+            try:
+                db = yaml.load(f, Loader=yaml.FullLoader)
+            except AttributeError:
+                db = yaml.load(f)
         if self.flavour in db['flavour']:
             _blacklist += list(db['flavour'][self.flavour].keys())
         if self.flavour + '-' + self.series in db['flavour-series']:

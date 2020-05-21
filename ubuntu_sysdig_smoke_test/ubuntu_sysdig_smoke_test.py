@@ -8,7 +8,7 @@ class ubuntu_sysdig_smoke_test(test.test):
 
     def install_required_pkgs(self):
         pkgs = [
-            'sysdig'
+            'sysdig', 'sysdig-dkms'
         ]
 
         cmd = 'apt-get install --yes ' + ' '.join(pkgs)

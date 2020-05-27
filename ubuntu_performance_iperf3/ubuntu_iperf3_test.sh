@@ -68,14 +68,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Install script dependencies if they don't already exist
-for package in gdb jq python-yaml iperf3 numactl; do
+for package in gdb jq python3-yaml iperf3 numactl; do
 	if [ $(dpkg-query -W -f='${Status}' $package 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
 		sudo apt install -y "${package}"
 	fi
 done
 
 # setup environment variables
-python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < ${test_config} > /tmp/iperf3-config.json
+python3 -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < ${test_config} > /tmp/iperf3-config.json
 content=$(cat /tmp/iperf3-config.json | jq  '.setup' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]")
 export $content
 server_numa_node="$(cat /sys/class/net/$server_iface/device/numa_node)"

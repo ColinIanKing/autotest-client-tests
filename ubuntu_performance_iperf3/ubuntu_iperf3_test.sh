@@ -176,14 +176,14 @@ while IFS='' read -r tests; do
 		fi
 		for i in $(jq -r '.end.sum_received.bits_per_second' $iperf3_log); do
 			bps_rx=("${bps_rx[@]}" "$i")
-			bps_rx_tot=$(($bps_rx_tot + $i))
+			bps_rx_tot=$(bc -l <<< "$bps_rx_tot + $i")
 		done
 		for j in $(jq -r '.end.sum_sent.bits_per_second' $iperf3_log); do
 			bps_tx=("${bps_tx[@]}" "$j")
-			bps_tx_tot=$(($bps_tx_tot + $j))
+			bps_tx_tot=$(bc -l <<< "$bps_tx_tot + $j")
 		done
-		avg_bps_tx=$(($bps_tx_tot/${#bps_tx[@]}))
-		avg_bps_rx=$(($bps_rx_tot/${#bps_rx[@]}))
+		avg_bps_tx=$(bc -l <<< "$bps_tx_tot/${#bps_tx[@]}")
+		avg_bps_rx=$(bc -l <<< "$bps_rx_tot/${#bps_rx[@]}")
 		min_bps_tx=$(echo "${bps_tx[*]}" | tr ' ' '\n' | sort -nr | tail -n1)
 		min_bps_rx=$(echo "${bps_rx[*]}" | tr ' ' '\n' | sort -nr | tail -n1)
 		max_bps_tx=$(echo "${bps_tx[*]}" | tr ' ' '\n' | sort -nr | head -n1)

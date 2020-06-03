@@ -13,7 +13,7 @@ class ubuntu_ecryptfs(test.test):
         pkgs = [
             'bzr', 'build-essential', 'libglib2.0-dev', 'intltool', 'keyutils', 'libkeyutils-dev', 'libpam0g-dev', 'libnss3-dev', 'libtool', 'acl', 'xfsprogs', 'libattr1-dev'
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
         if series in ['precise', 'trusty', 'xenial']:
             pkgs.append('btrfs-tools')

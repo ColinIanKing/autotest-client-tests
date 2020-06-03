@@ -25,7 +25,7 @@ class ipv6connect(test.test):
         pkgs = [
             'build-essential',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

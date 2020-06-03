@@ -36,7 +36,7 @@ class ubuntu_ltp_syscalls(test.test):
             'xfslibs-dev',
             'xfsprogs',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         if self.flavour in ['aws', 'azure', 'gcp', 'gke']:

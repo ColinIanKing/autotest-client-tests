@@ -23,7 +23,7 @@ class ubuntu_lxc(test.test):
                 'lxc',
                 'texinfo',
             ]
-            gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
+            gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
             pkgs.append(gcc)
 
         pkgs.append('liblxc1')

@@ -107,7 +107,7 @@ class ubuntu_performance_pts(test.test):
         if series in ['bionic']:
             pkgs.append('libssl1.0-dev')
 
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x'] else 'gcc-multilib'
+        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         for p in pkgs:

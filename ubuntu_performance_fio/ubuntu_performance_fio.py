@@ -188,7 +188,8 @@ class ubuntu_performance_fio(test.test):
 
         os.chdir(self.srcdir)
         self.results = utils.system_output('unxz < %s | tar xf - ' % os.path.join(self.bindir, 'fio-3.10.tar.xz'), retain_output=True)
-        self.results += utils.system_output('patch -p1 < %s' % os.path.join(self.bindir,'0001-Rename-gettid-to-sys_gettid-to-avoid-name-clash.patch'), retain_output=True)
+        if platform.linux_distribution()[2] not in "bionic":
+            self.results += utils.system_output('patch -p1 < %s' % os.path.join(self.bindir,'0001-Rename-gettid-to-sys_gettid-to-avoid-name-clash.patch'), retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'fio-3.10'))
         self.results += utils.system_output('make', retain_output=True)
 

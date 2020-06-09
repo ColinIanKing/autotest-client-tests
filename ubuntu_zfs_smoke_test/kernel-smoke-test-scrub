@@ -80,20 +80,35 @@ if [ $ret -ne 0 ]; then
 	exit 1
 fi
 
+resilvering=0
+
 #
-#  Wait 300 seconds for resilver to complete
+# Initial first check
+#
+n=$(zpool status | grep "resilvering" | wc -l)
+if [ $n -gt 0 ]; then
+	resilvering=1
+fi
+
+#
+#  Wait a short while for resilvering to kick in
+#
+sleep 5
+
+#
+#  Wait 600 seconds for resilver to complete
 #
 i=0
 while true
 do
-	n=$(zpool status | grep "resilvered" | wc -l)
-	if [ $n -gt 0 ]; then
+	n=$(zpool status | grep "resilvering" | wc -l)
+	if [ $n -eq 0 ]; then
 		break
 	fi
+	resilvering=1
 	i=$((i + 1))
-	echo $i
 	sleep 1
-	if [ $i -gt 300 ]; then
+	if [ $i -gt 600 ]; then
 		break
 	fi
 done
@@ -139,4 +154,9 @@ fi
 
 rm -f ${VDEV0} ${VDEV1} ${VDEV2} ${VDEV3}
 echo "PASSED"
+if [ $resilvering -eq 1 ]; then
+	echo "NOTE: Resilvering detected + completed and srub completed"
+else
+	echo "NOTE: Resilvering not detected (too fast to detect) and scrub completed"
+fi
 exit 0

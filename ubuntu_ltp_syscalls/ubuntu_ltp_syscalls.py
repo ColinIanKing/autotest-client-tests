@@ -134,6 +134,8 @@ class ubuntu_ltp_syscalls(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
+        # Check if systemd-timesyncd is running before the test, if not, do not try to stop / start it
+        skip_timesyncd = 'inactive' in utils.system_output('systemctl status systemd-timesyncd', ignore_status=True)
         fn = '/tmp/syscalls-' + time.strftime("%h%d-%H%M")
         log_failed = fn + '.failed'
         log_output = fn + '.output'
@@ -159,7 +161,7 @@ class ubuntu_ltp_syscalls(test.test):
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
 
                     # Stop timesyncd when testing time change
-                    if self.should_stop_timesyncd(line):
+                    if not skip_timesyncd and self.should_stop_timesyncd(line):
                         utils.run('systemctl stop systemd-timesyncd')
 
                     cmd = '/opt/ltp/runltp -f /tmp/target -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
@@ -167,7 +169,7 @@ class ubuntu_ltp_syscalls(test.test):
                     # /dev/loop# creation will be taken care by the runltp
 
                     # Stop timesyncd when testing time change. Restart it now that it's done.
-                    if self.should_stop_timesyncd(line):
+                    if not skip_timesyncd and self.should_stop_timesyncd(line):
                         utils.run('systemctl start systemd-timesyncd')
 
                     # Restore the timeout multiplier

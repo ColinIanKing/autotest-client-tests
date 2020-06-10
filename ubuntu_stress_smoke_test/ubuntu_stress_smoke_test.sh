@@ -297,6 +297,18 @@ do
 			echo "$s SKIPPED (stressor not implemented on this arch)"
 			skipped="$skipped $s"
 			;;
+		5)
+			echo "$s SKIPPED (premature signal killed stressor)"
+			skipped="$skipped $s"
+			;;
+		6)
+			echo "$s SKIPPED (premature child exit, this is a bug in the stress test)"
+			skipped="$skipped $s"
+			;;
+		7)
+			echo "$s PASSED (child bogo-ops metrics were not accurate)"
+			passed="$passed $s"
+			;;
 		88)
 			echo "$s OOMED (out of memory kills detected)"
 			oomed="$oomed $s"

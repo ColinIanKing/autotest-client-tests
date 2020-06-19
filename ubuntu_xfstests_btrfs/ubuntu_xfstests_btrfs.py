@@ -47,6 +47,7 @@ class ubuntu_xfstests_btrfs(test.test):
             'libblkid-dev',
             'libssl-dev',
             'libtool',
+            'patchutils',
             'pkg-config',
             'quota',
             'texinfo',

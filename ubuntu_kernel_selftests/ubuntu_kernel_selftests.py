@@ -177,6 +177,17 @@ class ubuntu_kernel_selftests(test.test):
                 if os.path.exists(fn):
                     os.remove(fn)
 
+            #
+            # ptrace/vmaccess was introduced in 5.7-rc1 and is broken ATM,
+            # see https://lkml.org/lkml/2020/4/9/648
+            #
+            fn = 'linux/tools/testing/selftests/ptrace/vmaccess.c'
+            mk = 'linux/tools/testing/selftests/ptrace/Makefile'
+            if os.path.exists(fn):
+                print "Disabling ptrace/vmacces"
+                cmd = 'sed -i "s/ vmaccess//" ' + mk
+                utils.system(cmd)
+
     def run_once(self, test_name):
         if test_name == 'setup':
             return

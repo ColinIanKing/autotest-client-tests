@@ -126,7 +126,7 @@ class ubuntu_performance_lkp(test.test):
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
 
         if lkp_commit:
-            self.results += utils.system_output('git checkout -B stable ' + commit, retain_output=True)
+            self.results += utils.system_output('git checkout -B stable ' + lkp_commit, retain_output=True)
         #
         # New distros use libarchive-tools and not bsdtar so edit the package name
         # https://github.com/intel/lkp-tests/issues/50

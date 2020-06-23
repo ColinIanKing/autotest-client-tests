@@ -201,7 +201,7 @@ class ubuntu_kernel_selftests(test.test):
         if self.summary(pattern):
             raise error.TestError('Test failed for ' + test_name)
         # If the test was not end by previous check, check again with new pattern
-        pattern = re.compile('not ok [\d\.]* selftests: *({}: )?(?P<case>[\w\-\.]+)(?!.*SKIP)'.format(test_name))
+        pattern = re.compile('not ok [\d\.]* selftests: *({}.*: )?(?P<case>[\w\-\.]+)(?!.*SKIP)'.format(test_name))
         if self.summary(pattern):
             raise error.TestError('Test failed for ' + test_name)
 

@@ -364,10 +364,10 @@ class ubuntu_performance_fio(test.test):
         for i in range(test_iterations):
             print "Test %d of %d:" % (i + 1, test_iterations)
             values[i] = self.run_fio(testname, ramdisk_bytes, media)
-            print "fio_%s%s_%s_file_size_mb %s" % (media, config, testname, values[i]['file_size_mb'])
-            print "fio_%s%s_%s_bandwidth_kb_per_sec %.2f" % (media, config, testname, values[i]['bandwidth_kb_per_sec'])
-            print "fio_%s%s_%s_latency_usec_average %.2f" % (media, config, testname, values[i]['latency_usec_average'])
-            print "fio_%s%s_%s_latency_stddev %.2f" % (media, config, testname, values[i]['latency_stddev'])
+            print "fio_%s%s_%s_file_size_mb[%d] %s" % (media, config, testname, i, values[i]['file_size_mb'])
+            print "fio_%s%s_%s_bandwidth_kb_per_sec[%d] %.2f" % (media, config, testname, i, values[i]['bandwidth_kb_per_sec'])
+            print "fio_%s%s_%s_latency_usec_average[%d] %.2f" % (media, config, testname, i, values[i]['latency_usec_average'])
+            print "fio_%s%s_%s_latency_stddev[%d] %.2f" % (media, config, testname, i, values[i]['latency_stddev'])
 
         #
         #  Compute min/max/average:

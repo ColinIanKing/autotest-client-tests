@@ -1,1 +1,8 @@
-1
+Reason:
+sysbench in the package requirement for s390x is only available on X.
+On newer releases, the package build will be stopped with
+  "Missing build dependencies: libluajit-5.1-dev"
+
+This is not a bug for sysbench as libluajit-5.1-dev is a non-optional
+build-dep for it.
+lp:1809860

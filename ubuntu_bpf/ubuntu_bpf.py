@@ -9,7 +9,6 @@ class ubuntu_bpf(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
-        series = platform.dist()[2]
 
         pkgs = [
             'build-essential',
@@ -20,7 +19,7 @@ class ubuntu_bpf(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if series == 'focal':
+        if self.series == 'focal':
             pkgs.extend(['clang-9', 'llvm-9'])
         else:
             pkgs.extend(['clang', 'llvm'])
@@ -29,11 +28,12 @@ class ubuntu_bpf(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        self.series = platform.dist()[2]
+        self.kv = platform.release()
         pass
 
     def download(self):
-        kv = platform.release()
-        cmd = "dpkg -S /lib/modules/" + kv + "/kernel | cut -d: -f 1 | cut -d, -f 1"
+        cmd = "dpkg -S /lib/modules/" + self.kv + "/kernel | cut -d: -f 1 | cut -d, -f 1"
         pkg = os.popen(cmd).readlines()[0].strip()
         utils.system("apt-get source --download-only " + pkg)
 
@@ -55,8 +55,7 @@ class ubuntu_bpf(test.test):
         #
         # llvm10 breaks bpf test_maps, revert to llvm9 instead
         #
-        series = platform.dist()[2]
-        if series == 'focal':
+        if self.series == 'focal':
             os.environ["CLANG"] = "clang-9"
             os.environ["LLC"] = "llc-9"
             os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"

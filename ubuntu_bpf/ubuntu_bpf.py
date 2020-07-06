@@ -52,6 +52,9 @@ class ubuntu_bpf(test.test):
         self.extract()
         os.chdir(self.srcdir)
 
+        #
+        # llvm10 breaks bpf test_maps, revert to llvm9 instead
+        #
         series = platform.dist()[2]
         if series == 'focal':
             os.environ["CLANG"] = "clang-9"
@@ -64,16 +67,6 @@ class ubuntu_bpf(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
-
-        #
-        # llvm10 breaks bpf test_maps, revert to llvm9 instead
-        #
-        series = platform.dist()[2]
-        if series == 'focal':
-            os.environ["CLANG"] = "clang-9"
-            os.environ["LLC"] = "llc-9"
-            os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
-            os.environ["LLVM_READELF"] = "llvm-readelf-9"
 
         os.chdir(os.path.join(self.srcdir, 'linux/tools/testing/selftests/bpf'))
         cmd = './%s' % test_name

@@ -20,7 +20,11 @@ class ubuntu_bpf(test.test):
         pkgs.append(gcc)
 
         if self.series == 'focal':
-            pkgs.extend(['clang-9', 'llvm-9'])
+            if self.kv.startwith('5.6.0'):
+                # Specical case of F-oem-5.6 (lp:1879360)
+                pkgs.extend(['clang-10', 'llvm-10'])
+            else:
+                pkgs.extend(['clang-9', 'llvm-9'])
         else:
             pkgs.extend(['clang', 'llvm'])
 
@@ -56,10 +60,16 @@ class ubuntu_bpf(test.test):
         # llvm10 breaks bpf test_maps, revert to llvm9 instead
         #
         if self.series == 'focal':
-            os.environ["CLANG"] = "clang-9"
-            os.environ["LLC"] = "llc-9"
-            os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
-            os.environ["LLVM_READELF"] = "llvm-readelf-9"
+            if self.kv.startwith('5.6.0'):
+                os.environ["CLANG"] = "clang-10"
+                os.environ["LLC"] = "llc-10"
+                os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-10"
+                os.environ["LLVM_READELF"] = "llvm-readelf-10"
+            else:
+                os.environ["CLANG"] = "clang-9"
+                os.environ["LLC"] = "llc-9"
+                os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
+                os.environ["LLVM_READELF"] = "llvm-readelf-9"
 
         utils.make('-C linux/tools/testing/selftests TARGETS=bpf clean all')
 

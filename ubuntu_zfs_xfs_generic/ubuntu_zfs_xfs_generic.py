@@ -32,6 +32,7 @@ class ubuntu_zfs_xfs_generic(test.test):
             'kpartx',
             'ksh',
             'libtool',
+            'patchutils',
             'pax',
             'pkg-config',
             'texinfo',

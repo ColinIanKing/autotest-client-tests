@@ -179,6 +179,7 @@ while IFS='' read -r tests; do
 		i=0
 		for log in "${logfiles[@]}"; do
 			bps=$(jq -r '.end.sum_received.bits_per_second' "${log}")
+			printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec_minimum %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "receiver_rate" $(bc -l <<< "scale=2; ${bps}/1000000")
 			bps_rx=("${bps_rx[@]}" "$bps")
 			bps_rx_tot=$(bc -l <<< "$bps_rx_tot + $bps")
 			let ++i
@@ -186,6 +187,7 @@ while IFS='' read -r tests; do
 		i=0
 		for log in "${logfiles[@]}"; do
 		        bps=$(jq -r '.end.sum_sent.bits_per_second' "${log}")
+			printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec_minimum %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "sender_rate" $(bc -l <<< "scale=2; ${bps}/1000000")
 			bps_tx=("${bps_tx[@]}" "$bps")
 			bps_tx_tot=$(bc -l <<< "$bps_tx_tot + $bps")
 			let ++i

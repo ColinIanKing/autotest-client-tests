@@ -199,7 +199,6 @@ while IFS='' read -r tests; do
 		err_bps_tx=$(bc -l <<< "scale=5; ($max_bps_tx-$min_bps_tx)/$avg_bps_tx*100")
 		err_bps_rx=$(bc -l <<< "scale=5; ($max_bps_rx-$min_bps_rx)/$avg_bps_rx*100")
 		# Max throughput for Mellanox nic on DGX2 is 100G, 
-		# pass criteria as per spec 1.2 is 90% throughput rate.
 		expected_throughput=$(bc -l <<< "scale=5; 100000000000*0.90")
 
 		# Sender information

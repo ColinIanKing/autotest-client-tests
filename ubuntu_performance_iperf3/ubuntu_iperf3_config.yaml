@@ -12,7 +12,6 @@ test01:
                 interval: 0
                 time: 60
                 json:
-                logfile: '/tmp/test01.out.json'
                 title: config6
 test02:
         numinstances: 8
@@ -22,7 +21,6 @@ test02:
                 interval: 0
                 time: 60
                 json:
-                logfile: '/tmp/test02.out.json'
                 reverse:
                 title: config6
 test03:
@@ -33,7 +31,6 @@ test03:
                 interval: 0
                 time: 60
                 json:
-                logfile: '/tmp/test03.out.json'
                 title: config6
 test04:
         numinstances: 1
@@ -43,6 +40,5 @@ test04:
                 interval: 0
                 time: 60
                 json:
-                logfile: '/tmp/test04.out.json'
                 reverse:
                 title: config6

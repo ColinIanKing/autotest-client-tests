@@ -22,7 +22,7 @@ set -E
 
 cleanup_on_exit() {
 	rm -f /tmp/iperf3-config.json &>/dev/null || true
-	rm -f ${iperf3_log} || true
+	rm -f "${logfiles[@]}" || true
 	killall -9 iperf3 &>/dev/null || true
 	sudo ip link set dev $client_iface down &>/dev/null || true
 	sudo ip netns exec 2xgd ip link set $server_iface netns 1 &>/dev/null || true
@@ -115,11 +115,11 @@ while IFS='' read -r tests; do
 	iperf3_instances=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg nt "numinstances" '.[$test][$nt]')
 	server_args=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg so "serveroptions" '.[$test][$so]' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" | sed 's/[^ ]* */--&/g' | sed 's/=null/ /' | tr '"\r\n' ' ')
 	client_args=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg co "clientoptions" '.[$test][$co]' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" | sed 's/[^ ]* */--&/g' | sed 's/=null/ /' |  tr '"\r\n' ' ')
-	iperf3_log=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg co "clientoptions" '.[$test][$co]' | jq -r '.logfile')
 
 	echo " ++ Running $tests: $iperf3_instances iperf3 instances with client options: $client_args ++"
 
 	pids=()
+	logfiles=()
 	count=0
 	if [ $iperf3_instances -gt 1 ]; then
 		# Start server in background as a daemon
@@ -130,17 +130,19 @@ while IFS='' read -r tests; do
 
 		# Start Client 
 		for port in $(seq $start_port 100 $end_port); do
-			numactl -m $client_numa_node  -N $client_numa_node iperf3 ${client_args} -c $server_ip -B $client_ip  -p $port &
+			logfiles[${count}]="$(mktemp)"
+			numactl -m $client_numa_node  -N $client_numa_node iperf3 ${client_args} -c $server_ip -B $client_ip  -p $port --logfile "${logfiles[${count}]}" &
 
 			pids[${count}]=$!
 			let ++count
 		done
 	else
+		logfiles[0]="$(mktemp)"
 		# Start server in background as a daemon
 		numactl -m $server_numa_node -N $server_numa_node sudo ip netns exec 2xgd iperf3 -s ${server_args} -B $server_ip -p $start_port -D
 
 		# Start Client 
-		numactl -m $client_numa_node -N $client_numa_node iperf3 ${client_args} -c $server_ip -B $client_ip -p $start_port
+		numactl -m $client_numa_node -N $client_numa_node iperf3 ${client_args} -c $server_ip -B $client_ip -p $start_port --logfile "${logfiles[0]}"
 		pids[0]=$!
 	fi
 
@@ -155,7 +157,7 @@ while IFS='' read -r tests; do
 
 	# Print test results. All calculations and information printed
 	# are based on autotest ubuntu_performance_iperf (iperf2) tests.
-	protocol=$(jq -r '.start.test_start.protocol' $iperf3_log | uniq)
+	protocol=$(jq -r '.start.test_start.protocol' "${logfiles[0]}" | uniq)
 	if [ "${protocol}" == "TCP" ]; then
 		bps_rx=()
 		bps_tx=()
@@ -169,18 +171,24 @@ while IFS='' read -r tests; do
 		min_bps_tx=0
 		err_bps_rx=0
 		err_bps_tx=0
-		config_title=$(jq -r '.title' $iperf3_log | uniq)
+		config_title=$(jq -r '.title' "${logfiles[0]}" | uniq)
 		direction="forward"
-		if [ $(jq -r '.start.test_start.reverse' $iperf3_log | uniq) -ne 0 ]; then
+		if [ $(jq -r '.start.test_start.reverse' "${logfiles[0]}" | uniq) -ne 0 ]; then
 			direction="reverse"
 		fi
-		for i in $(jq -r '.end.sum_received.bits_per_second' $iperf3_log); do
-			bps_rx=("${bps_rx[@]}" "$i")
-			bps_rx_tot=$(bc -l <<< "$bps_rx_tot + $i")
+		i=0
+		for log in "${logfiles[@]}"; do
+			bps=$(jq -r '.end.sum_received.bits_per_second' "${log}")
+			bps_rx=("${bps_rx[@]}" "$bps")
+			bps_rx_tot=$(bc -l <<< "$bps_rx_tot + $bps")
+			let ++i
 		done
-		for j in $(jq -r '.end.sum_sent.bits_per_second' $iperf3_log); do
-			bps_tx=("${bps_tx[@]}" "$j")
-			bps_tx_tot=$(bc -l <<< "$bps_tx_tot + $j")
+		i=0
+		for log in "${logfiles[@]}"; do
+		        bps=$(jq -r '.end.sum_sent.bits_per_second' "${log}")
+			bps_tx=("${bps_tx[@]}" "$bps")
+			bps_tx_tot=$(bc -l <<< "$bps_tx_tot + $bps")
+			let ++i
 		done
 		avg_bps_tx=$(bc -l <<< "$bps_tx_tot/${#bps_tx[@]}")
 		avg_bps_rx=$(bc -l <<< "$bps_rx_tot/${#bps_rx[@]}")
@@ -222,6 +230,6 @@ while IFS='' read -r tests; do
 			printf "%s\n" "PASS: test passes specified performance thresholds"
 		fi
 		
-		rm -f "${iperf3_log}" || true
+		rm -f "${logfiles[@]}" || true
 	fi
 done < <(jq -r 'keys[]' /tmp/iperf3-config.json)

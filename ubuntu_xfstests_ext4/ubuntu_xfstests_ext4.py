@@ -173,7 +173,7 @@ class ubuntu_xfstests_ext4(test.test):
         os.chdir(self.srcdir)
         utils.system('git clone https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
-        commit_bld = '5e2a748d93c8df4d7aec7db2f405b5f5cf6cd5e5'
+        commit_bld = 'a4df7d7b31125901cb1fe9b092f495b6aa950448'
         print "Using head commit for xfstests-bld" + commit_bld
         utils.system('git reset --hard ' + commit_bld)
         # print "Patching xfstests-bld to add ARM64 xattr syscall support"
@@ -186,9 +186,10 @@ class ubuntu_xfstests_ext4(test.test):
             utils.system('patch -p1 < %s/0005-build-all-remove-static-linking-flags-to-fix-build-i.patch' % self.bindir)
         print "Fetching all repos.."
         utils.system('./get-all')
-        commit = "82eda8820ddd68dab0bc35199a53a08f58b1d26c"
+
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfstests-dev'))
+        commit = '82eda8820ddd68dab0bc35199a53a08f58b1d26c'
         print "Using xfs from known stable commit point " + commit
-        os.chdir('xfstests-dev')
         utils.system('git reset --hard ' + commit)
         print "Patching xfstests.."
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))

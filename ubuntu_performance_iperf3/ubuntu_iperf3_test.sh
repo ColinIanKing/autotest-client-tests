@@ -18,6 +18,7 @@
 # Author: Manoj Iyer <manoj.iyer@canonical.com>
 #
 
+set -e
 set -E
 
 cleanup_on_exit() {

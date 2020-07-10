@@ -20,7 +20,7 @@ class ubuntu_bpf(test.test):
         pkgs.append(gcc)
 
         if self.series == 'focal':
-            if self.kv.startwith('5.6.0'):
+            if self.kv.startswith('5.6.0'):
                 # Specical case of F-oem-5.6 (lp:1879360)
                 pkgs.extend(['clang-10', 'llvm-10'])
             else:

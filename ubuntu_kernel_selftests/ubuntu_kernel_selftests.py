@@ -43,7 +43,7 @@ class ubuntu_kernel_selftests(test.test):
         self.flavour = platform.uname()[2].split('-')[-1]
         self.series = platform.dist()[2]
         self.kv = platform.release().split(".")[:2]
-        self.kv = int(self.kv[0]) * 100 + int(self.kv[1])
+        self.kv = int(self.kv[0]) * 100 + (int(self.kv[1]) if int(self.kv[1]) > 10 else int(self.kv[1]) * 10)
         pass
 
     def download(self):

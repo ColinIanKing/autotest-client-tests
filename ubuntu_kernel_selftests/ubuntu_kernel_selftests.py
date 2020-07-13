@@ -33,7 +33,17 @@ class ubuntu_kernel_selftests(test.test):
 
         if self.kv >= 415:
             # extra packages for building bpf tests
-            pkgs.extend(['clang', 'libcap-dev', 'libelf-dev', 'llvm'])
+            pkgs.extend(['libcap-dev', 'libelf-dev'])
+            if self.kv in [540, 530]:
+                # special case for B-5.4 (lp:1882559) / B-5.3 (lp:1845860)
+                # clang on F is clang-10 but we need clang-9 (see commit 95f91d59642)
+                # clang on E is clang-9, so it's ok to just check kv here
+                pkgs.extend(['clang-9', 'llvm-9'])
+            elif self.kv == 560:
+                # special case for F-oem-5.6 (lp:1879360)
+                pkgs.extend(['clang-10', 'llvm-10'])
+            else:
+                pkgs.extend(['clang', 'llvm'])
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
@@ -195,6 +205,16 @@ class ubuntu_kernel_selftests(test.test):
         os.chdir(self.srcdir)
         if test_name == "net" and self.kv >= 415:
             # net selftests use a module built by bpf selftests, bpf is available since bionic kernel
+            if self.kv == 560:
+                os.environ["CLANG"] = "clang-10"
+                os.environ["LLC"] = "llc-10"
+                os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-10"
+                os.environ["LLVM_READELF"] = "llvm-readelf-10"
+            elif self.kv in [540, 530]:
+                os.environ["CLANG"] = "clang-9"
+                os.environ["LLC"] = "llc-9"
+                os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
+                os.environ["LLVM_READELF"] = "llvm-readelf-9"
             cmd = "make -C linux/tools/testing/selftests TARGETS=bpf"
             utils.system(cmd)
         cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name

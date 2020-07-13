@@ -26,8 +26,8 @@ class ubuntu_bpf(test.test):
             else:
                 pkgs.extend(['clang-9', 'llvm-9'])
         elif self.series == 'bionic':
-            if self.kv.startswith('5.4.0'):
-                # Special case for B-5.4 (lp:1882559)
+            if self.kv.startswith('5.4.0') or self.kv.startswith('5.3.0'):
+                # Special case for B-5.4 (lp:1882559) B-5.3 (lp:1845860)
                 pkgs.extend(['clang-9', 'llvm-9'])
             else:
                 pkgs.extend(['clang', 'llvm'])
@@ -77,7 +77,7 @@ class ubuntu_bpf(test.test):
                 os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
                 os.environ["LLVM_READELF"] = "llvm-readelf-9"
         elif self.series == 'bionic':
-            if self.kv.startswith('5.4.0'):
+            if self.kv.startswith('5.4.0') or self.kv.startswith('5.3.0'):
                 os.environ["CLANG"] = "clang-9"
                 os.environ["LLC"] = "llc-9"
                 os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"

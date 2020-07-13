@@ -10,8 +10,6 @@ class ubuntu_kernel_selftests(test.test):
     version = 1
 
     def install_required_pkgs(self):
-        arch   = platform.processor()
-
         pkgs = [
             'bc',
             'build-essential',
@@ -23,19 +21,17 @@ class ubuntu_kernel_selftests(test.test):
             'net-tools',
             'pkg-config'
         ]
-        if not (arch == 's390x' and self.series in ['precise', 'trusty', 'vivid', 'xenial']):
+        if not (self.arch == 's390x' and self.series in ['precise', 'trusty', 'vivid', 'xenial']):
             pkgs.append('libnuma-dev')
             pkgs.append('libfuse-dev')
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
+        gcc = 'gcc' if self.arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         if self.flavour in ['aws', 'azure', 'gcp', 'gke']:
             if not (self.flavour == 'aws' and self.series == 'trusty'):
                 pkgs.append('linux-modules-extra-' + self.flavour + '*')
 
-        kv = platform.release().split(".")[:2]
-        kv = int(kv[0]) * 100 + int(kv[1])
-        if kv >= 415:
+        if self.kv >= 415:
             # extra packages for building bpf tests
             pkgs.extend(['clang', 'libcap-dev', 'libelf-dev', 'llvm'])
 
@@ -43,13 +39,15 @@ class ubuntu_kernel_selftests(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        self.arch = platform.processor()
         self.flavour = platform.uname()[2].split('-')[-1]
         self.series = platform.dist()[2]
+        self.kv = platform.release().split(".")[:2]
+        self.kv = int(self.kv[0]) * 100 + int(self.kv[1])
         pass
 
     def download(self):
-        kv = platform.release()
-        cmd = "dpkg -S /lib/modules/" + kv + "/kernel | cut -d: -f 1 | cut -d, -f 1"
+        cmd = "dpkg -S /lib/modules/" + platform.release() + "/kernel | cut -d: -f 1 | cut -d, -f 1"
         pkg = os.popen(cmd).readlines()[0].strip()
         utils.system("apt-get source --download-only " + pkg)
 
@@ -168,8 +166,7 @@ class ubuntu_kernel_selftests(test.test):
             # HAVE_FUNCTION_ARG_ACCESS_API, but ppc64 doesn't support it:
             # disable it to avoid an unresolved result (and thus a failure).
             #
-            arch = platform.processor()
-            if arch in ['ppc64le', 's390x']:
+            if self.arch in ['ppc64le', 's390x']:
                 filenames.append('kprobe/kprobe_args_user.tc')
 
             for fn in filenames:
@@ -196,9 +193,7 @@ class ubuntu_kernel_selftests(test.test):
         utils.system(cmd)
 
         os.chdir(self.srcdir)
-        kv = platform.release().split(".")[:2]
-        kv = int(kv[0])*100 + int(kv[1])
-        if test_name == "net" and kv >= 415:
+        if test_name == "net" and self.kv >= 415:
             # net selftests use a module built by bpf selftests, bpf is available since bionic kernel
             cmd = "make -C linux/tools/testing/selftests TARGETS=bpf"
             utils.system(cmd)

@@ -21,6 +21,8 @@
 set -e
 set -E
 
+test_iterations=3
+
 cleanup_on_exit() {
 	rm -f /tmp/iperf3-config.json &>/dev/null || true
 	rm -f "${logfiles[@]}" || true
@@ -105,135 +107,142 @@ echo " ++ Client interface $client_iface settings ++"
 ip link show $client_iface
 
 # Run the tests
-while IFS='' read -r tests; do
-	if [ "$tests" == "setup" ]; then
-		continue
-	fi
+do_iteration() {
+	local iteration="$1"
+	while IFS='' read -r tests; do
+		if [ "$tests" == "setup" ]; then
+			continue
+		fi
 
-	unset iperf3_instances
-	unset server_args
-	unset client_args
-	iperf3_instances=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg nt "numinstances" '.[$test][$nt]')
-	server_args=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg so "serveroptions" '.[$test][$so]' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" | sed 's/[^ ]* */--&/g' | sed 's/=null/ /' | tr '"\r\n' ' ')
-	client_args=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg co "clientoptions" '.[$test][$co]' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" | sed 's/[^ ]* */--&/g' | sed 's/=null/ /' |  tr '"\r\n' ' ')
+		unset iperf3_instances
+		unset server_args
+		unset client_args
+		iperf3_instances=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg nt "numinstances" '.[$test][$nt]')
+		server_args=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg so "serveroptions" '.[$test][$so]' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" | sed 's/[^ ]* */--&/g' | sed 's/=null/ /' | tr '"\r\n' ' ')
+		client_args=$(cat /tmp/iperf3-config.json | jq --arg test "${tests}" --arg co "clientoptions" '.[$test][$co]' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" | sed 's/[^ ]* */--&/g' | sed 's/=null/ /' |  tr '"\r\n' ' ')
 
-	echo " ++ Running $tests: $iperf3_instances iperf3 instances with client options: $client_args ++"
+		echo " ++ Running $tests iteration $iteration: $iperf3_instances iperf3 instances with client options: $client_args ++"
 
-	pids=()
-	logfiles=()
-	count=0
-	if [ $iperf3_instances -gt 1 ]; then
-		# Start server in background as a daemon
-		end_port=$((start_port+$(((iperf3_instances-1)*100))))
-		for port in $(seq $start_port 100 $end_port); do
-			numactl -m $server_numa_node -N $server_numa_node sudo ip netns exec 2xgd iperf3 -s ${server_args} -B $server_ip -p $port -D
+		pids=()
+		logfiles=()
+		count=0
+		if [ $iperf3_instances -gt 1 ]; then
+			# Start server in background as a daemon
+			end_port=$((start_port+$(((iperf3_instances-1)*100))))
+			for port in $(seq $start_port 100 $end_port); do
+				numactl -m $server_numa_node -N $server_numa_node sudo ip netns exec 2xgd iperf3 -s ${server_args} -B $server_ip -p $port -D
+			done
+
+			# Start Client 
+			for port in $(seq $start_port 100 $end_port); do
+				logfiles[${count}]="$(mktemp)"
+				numactl -m $client_numa_node  -N $client_numa_node iperf3 ${client_args} -c $server_ip -B $client_ip  -p $port --logfile "${logfiles[${count}]}" &
+
+				pids[${count}]=$!
+				let ++count
+			done
+		else
+			logfiles[0]="$(mktemp)"
+			# Start server in background as a daemon
+			numactl -m $server_numa_node -N $server_numa_node sudo ip netns exec 2xgd iperf3 -s ${server_args} -B $server_ip -p $start_port -D
+
+			# Start Client 
+			numactl -m $client_numa_node -N $client_numa_node iperf3 ${client_args} -c $server_ip -B $client_ip -p $start_port --logfile "${logfiles[0]}"
+			pids[0]=$!
+		fi
+
+		# Wait for clients to finish
+		for pid in ${pids[*]}; do
+			wait $pid
 		done
+		# Purge any iperf3 before we loop around to next test.
+		# and we can ignore it if nothing is killed.
+		sleep 5s; sync; 
+		killall -9 iperf3 &>/dev/null || true
 
-		# Start Client 
-		for port in $(seq $start_port 100 $end_port); do
-			logfiles[${count}]="$(mktemp)"
-			numactl -m $client_numa_node  -N $client_numa_node iperf3 ${client_args} -c $server_ip -B $client_ip  -p $port --logfile "${logfiles[${count}]}" &
-
-			pids[${count}]=$!
-			let ++count
+		# Print test results. All calculations and information printed
+		# are based on autotest ubuntu_performance_iperf (iperf2) tests.
+		protocol=$(jq -r '.start.test_start.protocol' "${logfiles[0]}" | uniq)
+		if [ "${protocol}" != "TCP" ]; then
+			echo "FAILED\nUnsupported protocol ${protocol}"
+			exit 1
+		fi
+		bps_rx=()
+		bps_tx=()
+		bps_rx_tot=0
+		bps_tx_tot=0
+		avg_bps_rx=0
+		avg_bps_tx=0
+		max_bps_rx=0
+		min_bps_rx=0
+		max_bps_tx=0
+		min_bps_tx=0
+		err_bps_rx=0
+		err_bps_tx=0
+		config_title=$(jq -r '.title' "${logfiles[0]}" | uniq)
+		direction="forward"
+		if [ $(jq -r '.start.test_start.reverse' "${logfiles[0]}" | uniq) -ne 0 ]; then
+			direction="reverse"
+		fi
+		i=0
+		for log in "${logfiles[@]}"; do
+			bps=$(jq -r '.end.sum_received.bits_per_second' "${log}")
+			printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec_minimum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "scale=2; ${bps}/1000000")
+			bps_rx=("${bps_rx[@]}" "$bps")
+			bps_rx_tot=$(bc -l <<< "$bps_rx_tot + $bps")
+			let ++i
 		done
-	else
-		logfiles[0]="$(mktemp)"
-		# Start server in background as a daemon
-		numactl -m $server_numa_node -N $server_numa_node sudo ip netns exec 2xgd iperf3 -s ${server_args} -B $server_ip -p $start_port -D
+		i=0
+		for log in "${logfiles[@]}"; do
+		        bps=$(jq -r '.end.sum_sent.bits_per_second' "${log}")
+			printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec_minimum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "scale=2; ${bps}/1000000")
+			bps_tx=("${bps_tx[@]}" "$bps")
+			bps_tx_tot=$(bc -l <<< "$bps_tx_tot + $bps")
+			let ++i
+		done
+		avg_bps_tx=$(bc -l <<< "$bps_tx_tot/${#bps_tx[@]}")
+		avg_bps_rx=$(bc -l <<< "$bps_rx_tot/${#bps_rx[@]}")
+		min_bps_tx=$(echo "${bps_tx[*]}" | tr ' ' '\n' | sort -nr | tail -n1)
+		min_bps_rx=$(echo "${bps_rx[*]}" | tr ' ' '\n' | sort -nr | tail -n1)
+		max_bps_tx=$(echo "${bps_tx[*]}" | tr ' ' '\n' | sort -nr | head -n1)
+		max_bps_rx=$(echo "${bps_rx[*]}" | tr ' ' '\n' | sort -nr | head -n1)
+		err_bps_tx=$(bc -l <<< "scale=5; ($max_bps_tx-$min_bps_tx)/$avg_bps_tx*100")
+		err_bps_rx=$(bc -l <<< "scale=5; ($max_bps_rx-$min_bps_rx)/$avg_bps_rx*100")
+		# Max throughput for Mellanox nic on DGX2 is 100G, 
+		expected_throughput=$(bc -l <<< "scale=5; 100000000000*0.90")
 
-		# Start Client 
-		numactl -m $client_numa_node -N $client_numa_node iperf3 ${client_args} -c $server_ip -B $client_ip -p $start_port --logfile "${logfiles[0]}"
-		pids[0]=$!
-	fi
-
-	# Wait for clients to finish
-	for pid in ${pids[*]}; do
-		wait $pid
-	done
-	# Purge any iperf3 before we loop around to next test.
-	# and we can ignore it if nothing is killed.
-	sleep 5s; sync; 
-	killall -9 iperf3 &>/dev/null || true
-
-	# Print test results. All calculations and information printed
-	# are based on autotest ubuntu_performance_iperf (iperf2) tests.
-	protocol=$(jq -r '.start.test_start.protocol' "${logfiles[0]}" | uniq)
-	if [ "${protocol}" != "TCP" ]; then
-		echo "FAILED\nUnsupported protocol ${protocol}"
-		exit 1
-	fi
-	bps_rx=()
-	bps_tx=()
-	bps_rx_tot=0
-	bps_tx_tot=0
-	avg_bps_rx=0
-	avg_bps_tx=0
-	max_bps_rx=0
-	min_bps_rx=0
-	max_bps_tx=0
-	min_bps_tx=0
-	err_bps_rx=0
-	err_bps_tx=0
-	config_title=$(jq -r '.title' "${logfiles[0]}" | uniq)
-	direction="forward"
-	if [ $(jq -r '.start.test_start.reverse' "${logfiles[0]}" | uniq) -ne 0 ]; then
-		direction="reverse"
-	fi
-	i=0
-	for log in "${logfiles[@]}"; do
-		bps=$(jq -r '.end.sum_received.bits_per_second' "${log}")
-		printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec_minimum %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "receiver_rate" $(bc -l <<< "scale=2; ${bps}/1000000")
-		bps_rx=("${bps_rx[@]}" "$bps")
-		bps_rx_tot=$(bc -l <<< "$bps_rx_tot + $bps")
-		let ++i
-	done
-	i=0
-	for log in "${logfiles[@]}"; do
-	        bps=$(jq -r '.end.sum_sent.bits_per_second' "${log}")
-		printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec_minimum %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "sender_rate" $(bc -l <<< "scale=2; ${bps}/1000000")
-		bps_tx=("${bps_tx[@]}" "$bps")
-		bps_tx_tot=$(bc -l <<< "$bps_tx_tot + $bps")
-		let ++i
-	done
-	avg_bps_tx=$(bc -l <<< "$bps_tx_tot/${#bps_tx[@]}")
-	avg_bps_rx=$(bc -l <<< "$bps_rx_tot/${#bps_rx[@]}")
-	min_bps_tx=$(echo "${bps_tx[*]}" | tr ' ' '\n' | sort -nr | tail -n1)
-	min_bps_rx=$(echo "${bps_rx[*]}" | tr ' ' '\n' | sort -nr | tail -n1)
-	max_bps_tx=$(echo "${bps_tx[*]}" | tr ' ' '\n' | sort -nr | head -n1)
-	max_bps_rx=$(echo "${bps_rx[*]}" | tr ' ' '\n' | sort -nr | head -n1)
-	err_bps_tx=$(bc -l <<< "scale=5; ($max_bps_tx-$min_bps_tx)/$avg_bps_tx*100")
-	err_bps_rx=$(bc -l <<< "scale=5; ($max_bps_rx-$min_bps_rx)/$avg_bps_rx*100")
-	# Max throughput for Mellanox nic on DGX2 is 100G, 
-	expected_throughput=$(bc -l <<< "scale=5; 100000000000*0.90")
-
-	# Sender information
-	printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_minimum %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate"  $(bc -l <<< "scale=2; ${min_bps_tx}/1000000")
-	printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" $(bc -l <<< "scale=2; ${max_bps_tx}/1000000")
-	printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_average %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" $(bc -l <<< "scale=2; ${avg_bps_tx}/1000000")
-	printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum_error %.2f%%\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${err_bps_tx}"
-	# Sum of Mbps rates for all instances of iperf3 should be 
-	# greater than 90% of expected throughput.
-	if (( $(echo "${expected_throughput} > ${bps_tx_tot}" | bc -l) )); then
-		printf "FAIL: average bitrate of %.2f Mbit/sec by is less than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_tx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
-	else
-		printf "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_tx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
-		printf "%s\n" "PASS: test passes specified performance thresholds"
-	fi
+		# Sender information
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_minimum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "scale=2; ${min_bps_tx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "scale=2; ${max_bps_tx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_average[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "scale=2; ${avg_bps_tx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum_error[%d] %.2f%%\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" "${err_bps_tx}"
+		# Sum of Mbps rates for all instances of iperf3 should be 
+		# greater than 90% of expected throughput.
+		if (( $(echo "${expected_throughput} > ${bps_tx_tot}" | bc -l) )); then
+			printf "FAIL: average bitrate of %.2f Mbit/sec by is less than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_tx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
+		else
+			printf "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_tx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
+			printf "%s\n" "PASS: test passes specified performance thresholds"
+		fi
 		
-	# Receiver information
-	printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_minimum %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" $(bc -l <<< "scale=2; ${min_bps_rx}/1000000")
-	printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" $(bc -l <<< "scale=2; ${max_bps_rx}/1000000")
-	printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_average %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" $(bc -l <<< "scale=2; ${avg_bps_rx}/1000000")
-	printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum_error %.2f%%\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${err_bps_rx}"
-	# Sum of Mbps rates for all instances of iperf3 should be 
-	# greater than 90% of expected throughput.
-	if (( $(echo "${expected_throughput} > ${bps_rx_tot}" | bc -l) )); then
-		printf "FAIL: average bitrate of %.2f Mbit/sec by is less than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_rx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
-	else
-		printf "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_rx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
-		printf "%s\n" "PASS: test passes specified performance thresholds"
-	fi
+		# Receiver information
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_minimum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "scale=2; ${min_bps_rx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "scale=2; ${max_bps_rx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_average[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "scale=2; ${avg_bps_rx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum_error[%d] %.2f%%\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" "${err_bps_rx}"
+		# Sum of Mbps rates for all instances of iperf3 should be 
+		# greater than 90% of expected throughput.
+		if (( $(echo "${expected_throughput} > ${bps_rx_tot}" | bc -l) )); then
+			printf "FAIL: average bitrate of %.2f Mbit/sec by is less than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_rx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
+		else
+			printf "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_rx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
+			printf "%s\n" "PASS: test passes specified performance thresholds"
+		fi
 
-	rm -f "${logfiles[@]}" || true
-done < <(jq -r 'keys[]' /tmp/iperf3-config.json)
+		rm -f "${logfiles[@]}" || true
+	done < <(jq -r 'keys[]' /tmp/iperf3-config.json)
+}
+
+for i in $(seq $test_iterations); do
+	do_iteration $i
+done

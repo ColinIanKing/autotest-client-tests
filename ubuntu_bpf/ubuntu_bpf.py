@@ -66,7 +66,7 @@ class ubuntu_bpf(test.test):
         # llvm10 breaks bpf test_maps, revert to llvm9 instead
         #
         if self.series == 'focal':
-            if self.kv.startwith('5.6.0'):
+            if self.kv.startswith('5.6.0'):
                 os.environ["CLANG"] = "clang-10"
                 os.environ["LLC"] = "llc-10"
                 os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-10"

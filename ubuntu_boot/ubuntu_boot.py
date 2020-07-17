@@ -39,6 +39,7 @@ class ubuntu_boot(test.test):
         with open('/proc/sys/kernel/tainted') as f:
             content = f.read()
             if content != '0\n':
+                print('ERROR: kernel tainted flag != 0: {}'.format(content))
                 test_passed = False
         return test_passed
 

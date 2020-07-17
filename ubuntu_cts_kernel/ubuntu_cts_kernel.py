@@ -10,7 +10,7 @@ class ubuntu_cts_kernel(test.test):
         major_kernel_version = platform.uname()[2].split('-')[0]
 
         pkgs = [
-            'coreutils', 'apparmor', 'openvswitch-switch',
+            'coreutils', 'apparmor', 'openvswitch-switch', 'linux-tools-common',
         ]
         if series == 'precise':
             pkgs.append('iproute')

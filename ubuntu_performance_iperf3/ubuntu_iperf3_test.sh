@@ -24,6 +24,11 @@ set -E
 test_iterations=3
 
 cleanup_on_exit() {
+	local rc=${?}
+	trap - EXIT # prevent reinvocations
+	if [ "${rc}" -ne 0 ]; then
+		echo "ERROR: Script failed (${rc})" >&2
+	fi
 	rm -f /tmp/iperf3-config.json &>/dev/null || true
 	rm -f "${logfiles[@]}" || true
 	killall -9 iperf3 &>/dev/null || true

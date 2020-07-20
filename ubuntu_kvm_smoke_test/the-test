@@ -11,12 +11,21 @@ SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogL
 DISTRO="`lsb_release -c | awk '{print$2}'`"
 ARCHITECTURE="$1"
 
+function cleanup {
+    uvt-kvm destroy $SUT
+    # On ppc64el, we need to turn SMT back on after the test.
+    if [ "${ARCHITECTURE}" = "ppc64el" ] ; then
+        sudo ppc64_cpu --smt=on
+    fi
+}
+trap cleanup EXIT
+
 if [ -z "$ARCHITECTURE" ]; then
     echo "** Architecture not specified, please run this script with a given arch."
     exit 1
 fi
 
-# Assume that if kvm-ok fails, we are not suppring kvm on this instance type
+# Assume that if kvm-ok fails, we are not supporting kvm on this instance type
 #
 kvm-ok
 if [ $? != 0 ]; then
@@ -46,10 +55,4 @@ RESULT=`ssh $SSH_OPTIONS ubuntu@\`uvt-kvm ip $SUT\` lsb_release -c | cut -d$'\t'
 if [ "$RESULT" != "$DISTRO" ]; then
     echo "** ERROR: The codename returned from lsb_release -c was (" $RESULT ") and we were expecting '$DISTRO'"
     exit 1
-fi
-uvt-kvm destroy $SUT
-
-# On ppc64el, we need to turn SMT back on after the test.
-if [ "${ARCHITECTURE}" = "ppc64el" ] ; then
-    sudo ppc64_cpu --smt=on
 fi

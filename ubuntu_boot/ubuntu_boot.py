@@ -12,10 +12,10 @@ class ubuntu_boot(test.test):
         # Let's check for /var/log/syslog instead
         logfile = '/var/log/syslog'
         patterns = [
-            'kernel: \[ *\d+\.\d+\] BUG:',
-            'kernel: \[ *\d+\.\d+\] Oops:',
-            'kernel: \[ *\d+\.\d+\] kernel BUG at',
-            'kernel: \[ *\d+\.\d+\] WARNING:'
+            'kernel: \[ *\d+\.\d+\] BUG:.*',
+            'kernel: \[ *\d+\.\d+\] Oops:.*',
+            'kernel: \[ *\d+\.\d+\] kernel BUG at.*',
+            'kernel: \[ *\d+\.\d+\] WARNING:.*'
         ]
         test_passed = True
         print('Checking error message in {}:'.format(logfile))
@@ -25,8 +25,12 @@ class ubuntu_boot(test.test):
                 for pat in patterns:
                     print('Scanning for pattern "{}"'.format(pat))
                     if re.search(pat, content):
-                        print('Pattern found, Log NOT clean.')
+                        print('Pattern found. Matching lines as follows:')
+                        for item in re.finditer(pat, content):
+                            print(item.group(0))
                         test_passed = False
+                    else:
+                        print('PASSED, log clean.')
         else:
             print('Log file was not found.')
             test_passed = False

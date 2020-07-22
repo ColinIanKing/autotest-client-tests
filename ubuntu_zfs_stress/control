@@ -1,3 +1,5 @@
+import platform
+
 AUTHOR = "Ubuntu"
 NAME = "ubuntu_zfs_stress"
 CRITERIA = """
@@ -12,6 +14,9 @@ DOC = ""
 
 name = 'ubuntu_zfs_stress'
 
-results = job.run_test_detail('ubuntu_zfs_stress', test_name='zfs-stress', tag='zfs-stress', timeout=60*60*5) # 5hr. timeout
+if platform.machine() in ['riscv64', 'riscv']:
+    print("Test skipped as it takes too long to run on this platform\n")
+else:
+    results = job.run_test_detail('ubuntu_zfs_stress', test_name='zfs-stress', tag='zfs-stress', timeout=60*60*5) # 5hr. timeout
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

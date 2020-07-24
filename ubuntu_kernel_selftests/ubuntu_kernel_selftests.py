@@ -27,7 +27,7 @@ class ubuntu_kernel_selftests(test.test):
         gcc = 'gcc' if self.arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if self.flavour in ['aws', 'azure', 'gcp', 'gke']:
+        if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke']:
             if not (self.flavour == 'aws' and self.series == 'trusty'):
                 pkgs.append('linux-modules-extra-' + self.flavour + '*')
 
@@ -50,7 +50,7 @@ class ubuntu_kernel_selftests(test.test):
 
     def initialize(self):
         self.arch = platform.processor()
-        self.flavour = platform.uname()[2].split('-')[-1]
+        self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
         self.series = platform.dist()[2]
         self.kv = platform.release().split(".")[:2]
         self.kv = int(self.kv[0]) * 100 + (int(self.kv[1]) if int(self.kv[1]) > 10 else int(self.kv[1]) * 10)

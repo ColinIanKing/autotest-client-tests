@@ -3,6 +3,7 @@
 import multiprocessing
 import os
 import platform
+import re
 import time
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
@@ -40,14 +41,14 @@ class ubuntu_ltp(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if self.flavour in ['aws', 'azure', 'gcp', 'gke']:
+        if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + self.flavour + '*')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.flavour = platform.uname()[2].split('-')[-1]
+        self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
         pass
 
     # setup

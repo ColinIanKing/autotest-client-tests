@@ -2,6 +2,7 @@
 #
 import os
 import platform
+import re
 from autotest.client                        import test, utils
 
 class ubuntu_quota_smoke_test(test.test):
@@ -15,8 +16,8 @@ class ubuntu_quota_smoke_test(test.test):
             'quota',
         ]
 
-        flavour = platform.uname()[2].split('-')[-1]
-        if flavour in ['aws', 'azure', 'gcp', 'gke']:
+        flavour = re.split('-\d*-', platform.uname()[2])[-1]
+        if flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + flavour + '*')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)

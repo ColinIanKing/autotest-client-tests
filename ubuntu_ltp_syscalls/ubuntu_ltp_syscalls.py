@@ -3,6 +3,7 @@
 import multiprocessing
 import os
 import platform
+import re
 import time
 import yaml
 from autotest.client                        import test, utils
@@ -39,7 +40,7 @@ class ubuntu_ltp_syscalls(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if self.flavour in ['aws', 'azure', 'gcp', 'gke']:
+        if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke']:
             if not (self.flavour == 'aws' and self.series == 'trusty'):
                 pkgs.append('linux-modules-extra-' + self.flavour + '*')
         if self.flavour not in ['kvm']:
@@ -53,7 +54,7 @@ class ubuntu_ltp_syscalls(test.test):
 
     def initialize(self):
         self.series = platform.dist()[2]
-        self.flavour = platform.uname()[2].split('-')[-1]
+        self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
         self.kernel = platform.uname()[2].split('-')[0]
         pass
 

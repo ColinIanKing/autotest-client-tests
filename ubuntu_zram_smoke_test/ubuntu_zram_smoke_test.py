@@ -3,6 +3,7 @@
 from autotest.client                        import test, utils
 import os
 import platform
+import re
 
 class ubuntu_zram_smoke_test(test.test):
     version = 1
@@ -14,8 +15,8 @@ class ubuntu_zram_smoke_test(test.test):
         pkgs = [
         ]
 
-        flavour = platform.uname()[2].split('-')[-1]
-        if flavour in ['aws', 'azure', 'gcp', 'gke']:
+        flavour = re.split('-\d*-', platform.uname()[2])[-1]
+        if flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke']:
              pkgs.append('linux-modules-extra-' + flavour + '*')
 
         if pkgs:

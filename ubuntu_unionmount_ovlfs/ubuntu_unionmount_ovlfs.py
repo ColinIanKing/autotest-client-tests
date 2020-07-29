@@ -2,15 +2,11 @@
 #
 import os
 from autotest.client                        import test, utils
-import platform
 
 class ubuntu_unionmount_ovlfs(test.test):
     version = 1
 
     def install_required_pkgs(self):
-        arch   = platform.processor()
-        series = platform.dist()[2]
-
         pkgs = [
             'git', 'python3',
         ]

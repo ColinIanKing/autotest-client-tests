@@ -19,7 +19,10 @@ class ubuntu_unionmount_ovlfs(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        pass
+        if not os.path.exists('/lower'):
+            os.mkdir('/lower')
+        if not os.path.exists('/upper'):
+            os.mkdir('/upper')
 
     # setup
     #
@@ -27,10 +30,6 @@ class ubuntu_unionmount_ovlfs(test.test):
     #
     def setup(self):
         self.install_required_pkgs()
-        if not os.path.exists('/lower'):
-            os.mkdir('/lower')
-        if not os.path.exists('/upper'):
-            os.mkdir('/upper')
         os.chdir(self.srcdir)
         cmd = 'git clone --depth=1 https://github.com/amir73il/unionmount-testsuite.git'
         self.results = utils.system_output(cmd, retain_output=True)
@@ -57,5 +56,19 @@ class ubuntu_unionmount_ovlfs(test.test):
         elif test_name == 'overlayfs':
             cmd = './run --ov'
             self.results = utils.system_output(cmd, retain_output=True)
+
+    def cleanup(self, test_name):
+        if test_name == 'setup':
+            return
+        print("Clean up after the test...")
+        if os.path.ismount('/lower'):
+            utils.run('umount /lower')
+        if os.path.ismount('/upper'):
+            utils.run('umount /upper')
+        if os.path.ismount('/mnt'):
+            utils.run('umount /mnt')
+        # We didn't create /mnt, so do not remove it here
+        os.rmdir('/lower')
+        os.rmdir('/upper')
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

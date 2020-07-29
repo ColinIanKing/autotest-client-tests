@@ -195,6 +195,21 @@ class ubuntu_kernel_selftests(test.test):
                 cmd = 'sed -i "s/ vmaccess//" ' + mk
                 utils.system(cmd)
 
+            #
+            # memory hotplug test will fail on arm platforms from 5.6+
+            # as it was enabled in 5.6 but needs memory that does not
+            # have boot time pages in the regions to be offlined and
+            # current test hardware cannot guarantee that constraint
+            # so disable it for arm platforms for now
+            #
+            if self.arch.startswith('arm') or self.arch == 'aarch64':
+                print("Disabling memory hotplug test on ARM platform")
+                fn = 'linux/tools/testing/selftests/memory-hotplug/mem-on-off-test.sh'
+                if os.path.exists(fn):
+                    cmd = 'chmod -x ' + fn
+                    utils.system(cmd)
+
+
     def run_once(self, test_name):
         if test_name == 'setup':
             return

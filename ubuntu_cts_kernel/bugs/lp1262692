@@ -4,6 +4,13 @@
 
 set -e # Exit with a non-zero exit code if any errors occure
 
+function cleanup {
+    ip link del testdummy0
+    ovs-vsctl del-br integbr
+    modprobe -r dummy
+}
+trap cleanup EXIT
+
 ip link add testdummy0 type dummy
 ovs-vsctl add-br integbr
 ifconfig testdummy0 192.168.234.21 netmask 255.255.255.0
@@ -12,7 +19,3 @@ ovs-vsctl add-port integbr tsp0 -- set interface tsp0 type=internal
 ifconfig tsp0 192.168.15.2 netmask 255.255.255.0
 iptables -F
 iptables -F -t nat
-# Cleanup
-sudo ip link del testdummy0
-ovs-vsctl del-br integbr
-

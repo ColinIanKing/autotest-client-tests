@@ -4,6 +4,12 @@
 
 set -e # Exit with a non-zero exit code if any errors occure
 
+function cleanup {
+    kill $(pidof sleep1)
+    rm sleep1
+}
+trap cleanup EXIT
+
 PWD=`pwd`
 cp /bin/sleep ./sleep1
 ./sleep1 10000000 < ./sleep1 &
@@ -13,5 +19,3 @@ done
 # Cleanup
 echo "${PWD}/sleep1 { /** mrwk, }" | apparmor_parser -R > /dev/null
 trap 'exit 0' TERM
-kill $(pidof sleep1)
-rm sleep1

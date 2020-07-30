@@ -4,7 +4,10 @@
 
 set -e # Exit with a non-zero exit code if any errors occure
 
+function cleanup {
+    ip netns del foobar
+}
+trap cleanup EXIT
+
 ip netns add foobar
 ip netns exec foobar iptables -A OUTPUT -m recent --rcheck --rsource
-ip netns del foobar
-exit 0

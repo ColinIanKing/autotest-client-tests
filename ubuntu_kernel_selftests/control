@@ -10,18 +10,29 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
 DOC = ""
 
+import multiprocessing
+
 name = 'ubuntu_kernel_selftests'
 
 tests = [ 'setup','breakpoints','cpu-hotplug','efivarfs','memfd','memory-hotplug','mount','net','ptrace','seccomp','timers','powerpc','user','ftrace' ]
 
 #
-#  The seccomp tests on 4.19+ on non-x86 are known to be fail and
+#  The seccomp tests on 4.19+ on non-x86 are known to fail and
 #  need fixing up. For now, disable them.
 #
 release = platform.release().split(".")[:2]
 release = int(release[0])*100 + int(release[1])
 if 'seccomp' in tests and release > 418 and platform.machine() not in ['x86_64', 'ppc64le']:
 	tests.remove('seccomp')
+
+#
+#  The net tests on 4.17+ are known to fail because of a requirement
+#  of the msg_zerocopy test to pin processes to CPUs 2,3,4. Until
+#  fix https://lkml.org/lkml/2020/8/4/438 lands in the kernel this
+#  should be disabled to resolve failures with the problematic test.
+#
+if 'net' in tests and release > 416 and multiprocessing.cpu_count() < 4:
+	tests.remove('net')
 
 for test in tests:
     results = job.run_test_detail('ubuntu_kernel_selftests', test_name=test, tag=test, timeout=60*30)

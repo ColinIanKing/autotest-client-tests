@@ -191,15 +191,6 @@ class ubuntu_xfstests_btrfs(test.test):
         utils.system('git reset --hard ' + commit)
         print "Patching xfstests.."
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
-
-        #
-        # Older toolchains can't handle -Wimplicit-fallthrough and the
-        # makefile detection seems to fail on some toochains; for now
-        # just remove this warning, it's not critical for these tests.
-        #
-        file = os.path.join(self.srcdir, 'xfstests-bld', 'fsverity', 'Makefile')
-        utils.system("sed -i '/-Wimplicit-fallthrough/d' " + file)
-
         print "Building xfstests"
         utils.system('pwd')
         try:

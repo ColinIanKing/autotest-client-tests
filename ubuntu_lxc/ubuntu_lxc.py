@@ -31,7 +31,11 @@ class ubuntu_lxc(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.series = platform.dist()[2]
+        try:
+            self.series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            self.series = distro.codename()
         pass
 
     def setup(self):

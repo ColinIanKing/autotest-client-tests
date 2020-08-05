@@ -8,7 +8,11 @@ class ubuntu_zfs_smoke_test(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
-        series = platform.dist()[2]
+        try:
+            series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            series = distro.codename()
 
         pkgs = [
             'xfsprogs', 'git', 'acl', 'libattr1-dev',

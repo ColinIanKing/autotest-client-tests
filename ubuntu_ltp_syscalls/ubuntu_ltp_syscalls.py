@@ -53,7 +53,11 @@ class ubuntu_ltp_syscalls(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
-        self.series = platform.dist()[2]
+        try:
+            self.series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            self.series = distro.codename()
         self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
         self.kernel = platform.uname()[2].split('-')[0]
         pass

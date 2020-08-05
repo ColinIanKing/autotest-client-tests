@@ -11,7 +11,6 @@ class hwclock(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
-        series = platform.dist()[2]
 
         pkgs = [
             'virt-what',
@@ -31,7 +30,11 @@ class hwclock(test.test):
         Set hwclock back to a date in 2004 and verify if the changes took
         effect in the system.
         """
-        series = platform.dist()[2]
+        try:
+            series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            series = distro.codename()
         self.virt = utils.system_output('virt-what', retain_output=True)
         #
         #  Only run if on bare metal, if what is not empty we

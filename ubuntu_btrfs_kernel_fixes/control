@@ -13,7 +13,11 @@ DOC = ""
 import platform
 
 kernel = ".".join(platform.release().split(".")[:2])
-release = platform.dist()[1]
+try:
+    release = platform.dist()[1]
+except AttributeError:
+    import distro
+    release = distro.version()
 #
 #  Ugly, but necessary for now :-(
 #

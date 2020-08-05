@@ -10,7 +10,11 @@ class ubuntu_zfs_fstest(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
-        series = platform.dist()[2]
+        try:
+            series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            series = distro.codename()
 
         pkgs = [
             'build-essential',
@@ -38,7 +42,6 @@ class ubuntu_zfs_fstest(test.test):
     def setup(self):
         self.install_required_pkgs()
         self.job.require_gcc()
-        series = platform.dist()[2]
 
         print "Extracting fstest tarball.."
         tarball = utils.unmap_url(self.bindir, 'fstest.tar.bz2', self.tmpdir)

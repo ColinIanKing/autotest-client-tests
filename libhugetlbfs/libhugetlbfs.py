@@ -10,7 +10,11 @@ class libhugetlbfs(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
-        series = platform.dist()[2]
+        try:
+            series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            series = distro.codename()
 
         pkgs = [
             'build-essential',

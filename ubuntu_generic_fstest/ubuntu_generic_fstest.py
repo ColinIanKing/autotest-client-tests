@@ -18,7 +18,11 @@ class ubuntu_generic_fstest(test.test):
     # if you change setup, be sure to increment version
     #
     def setup(self):
-        series = platform.dist()[2]
+        try:
+            series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            series = distro.codename()
         self.job.require_gcc()
         utils.system_output('rm -f /etc/*/S99autotest || true', retain_output=True)
 

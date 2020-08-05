@@ -51,7 +51,11 @@ class ubuntu_kernel_selftests(test.test):
     def initialize(self):
         self.arch = platform.processor()
         self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
-        self.series = platform.dist()[2]
+        try:
+            self.series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            self.series = distro.codename()
         self.kv = platform.release().split(".")[:2]
         self.kv = int(self.kv[0]) * 100 + int(self.kv[1])
         pass

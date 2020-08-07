@@ -110,14 +110,14 @@ skip = 0
 for test in tests:
 	name = os.path.basename(test)
 	if name in blacklist:
-		print "Skipping blacklisted test: " + name
+		print("Skipping blacklisted test: " + name)
 		skip = skip + 1
 	else:
 		if (os.access(test, os.X_OK)):
-			print "Invoking test: " + name
+			print("Invoking test: " + name)
 			results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name=test, tag=name.replace('.sh',''), timeout=60*60)
 			run = run + 1
 
-print "Total of %d tests, %d invoked, %d skipped" % (run + skip, run, skip)
+print("Total of %d tests, %d invoked, %d skipped" % (run + skip, run, skip))
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

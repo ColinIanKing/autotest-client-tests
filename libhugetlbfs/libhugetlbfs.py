@@ -78,7 +78,7 @@ class libhugetlbfs(test.test):
         os.chdir(os.path.join(self.srcdir, 'libhugetlbfs'))
         self.results = utils.system_output('BUILDTYPE=NATIVEONLY make check', retain_output=True)
 
-        print self.results
+        print(self.results)
 
         n = self.results.find('FAIL:')
         if n > 0:

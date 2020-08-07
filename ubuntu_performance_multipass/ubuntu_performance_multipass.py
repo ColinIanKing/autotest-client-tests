@@ -46,7 +46,7 @@ class ubuntu_performance_multipass(test.test):
                 if result.returncode == 0:
                     stopped_services.append(service)
                 else:
-                    print "WARNING: could not stop %s" % (service)
+                    print("WARNING: could not stop %s" % (service))
         return stopped_services
 
     def start_services(self, services):
@@ -55,7 +55,7 @@ class ubuntu_performance_multipass(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode != 0:
-                print "WARNING: could not start %s" % (service)
+                print("WARNING: could not start %s" % (service))
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -73,16 +73,16 @@ class ubuntu_performance_multipass(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def get_sysinfo(self):
-        print 'date_ctime "' + time.ctime() + '"'
-        print 'date_ns %-30.0f' % (time.time() * 1000000000)
-        print 'kernel_version ' + platform.uname()[2]
-        print 'hostname ' + platform.node()
-        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
-        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
-        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
-        print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
-        print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
-        print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
+        print('date_ctime "' + time.ctime() + '"')
+        print('date_ns %-30.0f' % (time.time() * 1000000000))
+        print('kernel_version ' + platform.uname()[2])
+        print('hostname ' + platform.node())
+        print('virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True))
+        print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
+        print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
+        print('page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True))
+        print('pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
+        print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))
 
     #
     #  multipass_run_cmd - run a command, discard output and return True if it fails

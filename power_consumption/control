@@ -15,7 +15,7 @@ for uarg in args:
     argdict[key] = val
 
 # for debugging if needed
-print "argdict = ", argdict
+print("argdict = " + argdict)
 
 # take the input arguments and get them into the test environment
 #os.environ['METER_ADDR'] = argdict['METER_ADDR']

@@ -173,31 +173,31 @@ class ubuntu_xfstests_ext4(test.test):
 
         canonical.setup_proxy()
 
-        print "Fetching xfstests.."
+        print("Fetching xfstests..")
         os.chdir(self.srcdir)
         utils.system('git clone https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         commit_bld = 'a4df7d7b31125901cb1fe9b092f495b6aa950448'
-        print "Using head commit for xfstests-bld " + commit_bld
+        print("Using head commit for xfstests-bld " + commit_bld)
         utils.system('git reset --hard ' + commit_bld)
-        # print "Patching xfstests-bld to add ARM64 xattr syscall support"
+        # print("Patching xfstests-bld to add ARM64 xattr syscall support")
         # utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
         #
         #  Fix build link issues with newer toolchains (this is an ugly hack)
         #
         if float(platform.linux_distribution()[1]) > 18.04:
-            print "Patching xfstest-blkd to fix static linking issue"
+            print("Patching xfstest-blkd to fix static linking issue")
             utils.system('patch -p1 < %s/0005-build-all-remove-static-linking-flags-to-fix-build-i.patch' % self.bindir)
-        print "Fetching all repos.."
+        print("Fetching all repos..")
         utils.system('./get-all')
 
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfstests-dev'))
         commit = '82eda8820ddd68dab0bc35199a53a08f58b1d26c'
-        print "Using xfs from known stable commit point " + commit
+        print("Using xfs from known stable commit point " + commit)
         utils.system('git reset --hard ' + commit)
-        print "Patching xfstests.."
+        print("Patching xfstests..")
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
-        print "Building xfstests"
+        print("Building xfstests")
         utils.system('pwd')
         try:
             nprocs = '-j' + str(multiprocessing.cpu_count())

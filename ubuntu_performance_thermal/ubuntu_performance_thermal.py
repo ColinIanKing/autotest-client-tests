@@ -43,7 +43,7 @@ class ubuntu_performance_thermal(test.test):
                 if result.returncode == 0:
                     stopped_services.append(service)
                 else:
-                    print "WARNING: could not stop %s" % (service)
+                    print("WARNING: could not stop %s" % (service))
         return stopped_services
 
     def start_services(self, services):
@@ -52,7 +52,7 @@ class ubuntu_performance_thermal(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode != 0:
-                print "WARNING: could not start %s" % (service)
+                print("WARNING: could not start %s" % (service))
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -109,17 +109,17 @@ class ubuntu_performance_thermal(test.test):
                     stddev = 0.0
                 percent_stddev = (stddev / average) * 100.0
 
-                print
-                print "%s_%s" % (test_full_name, name), "%.3f " * len(bogoops) % tuple(bogoops)
-                print "%s_%s_minimum %.3f" % (test_full_name, name, minimum)
-                print "%s_%s_maximum %.3f" % (test_full_name, name, maximum)
-                print "%s_%s_average %.3f" % (test_full_name, name, average)
-                print "%s_%s_maximum_error %.3f%%" % (test_full_name, name, max_err)
-                print "%s_%s_stddev %.3f" % (test_full_name, name, stddev)
-                print "%s_%s_percent_stddev %.3f" % (test_full_name, name, percent_stddev)
+                print("")
+                print("%s_%s " % (test_full_name, name) + "%.3f " * len(bogoops) % tuple(bogoops))
+                print("%s_%s_minimum %.3f" % (test_full_name, name, minimum))
+                print("%s_%s_maximum %.3f" % (test_full_name, name, maximum))
+                print("%s_%s_average %.3f" % (test_full_name, name, average))
+                print("%s_%s_maximum_error %.3f%%" % (test_full_name, name, max_err))
+                print("%s_%s_stddev %.3f" % (test_full_name, name, stddev))
+                print("%s_%s_percent_stddev %.3f" % (test_full_name, name, percent_stddev))
 
                 if max_err > 5.0:
-                    print "FAIL: maximum error is greater than 5%"
+                    print("FAIL: maximum error is greater than 5%")
                     test_pass = False
         return test_pass
 
@@ -144,7 +144,7 @@ class ubuntu_performance_thermal(test.test):
         test_pass = self.parse(self.results, test_pass, test_full_name, 'BogoOps:', 'bogoops')
         test_pass = self.parse(self.results, test_pass, test_full_name, 'BogoOpsPerKelvin:', 'bogoops_per_kelvin')
         if test_pass:
-            print "PASS: test passes specified performance thresholds"
-        print
+            print("PASS: test passes specified performance thresholds")
+        print("")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

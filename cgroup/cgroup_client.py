@@ -20,10 +20,10 @@ def test_smoke(args):
     """
     SIGSTOP the process and after SIGCONT exits.
     """
-    print "TEST: smoke"
-    print "TEST: wait for input"
+    print("TEST: smoke")
+    print("TEST: wait for input")
     raw_input()
-    print "PASS: smoke"
+    print("PASS: smoke")
 
 
 def test_memfill(args):
@@ -36,8 +36,8 @@ def test_memfill(args):
         size = int(args[0])
         if len(args) > 1:
             f = open(args[1], 'w', 0)
-    print "TEST: memfill (%dM)" % size
-    print "Redirecting to: %s" % f.name
+    print("TEST: memfill (%dM)" % size)
+    print("Redirecting to: %s" % f.name)
     f.write("TEST: memfill (%dM)\n" % size)
     f.write("TEST: wait for input\n")
     raw_input()
@@ -60,8 +60,8 @@ def test_cpu(args):
     """
     Stress the CPU.
     """
-    print "TEST: cpu"
-    print "TEST: wait for input"
+    print("TEST: cpu")
+    print("TEST: wait for input")
     raw_input()
     while True:
         for i in range(1000, 10000):
@@ -82,13 +82,13 @@ def test_devices_read():
     """
     Inf read from /dev/zero
     """
-    print "TEST: devices read"
-    print "TEST: wait for input"
+    print("TEST: devices read")
+    print("TEST: wait for input")
     raw_input()
 
     dev = open("/dev/zero", 'r')
     while True:
-        print "TEST: tick"
+        print("TEST: tick")
         dev.flush()
         dev.read(1024 * 1024)
         time.sleep(1)
@@ -98,8 +98,8 @@ def test_devices_write():
     """
     Inf write into /dev/null device
     """
-    print "TEST: devices write"
-    print "TEST: wait for input"
+    print("TEST: devices write")
+    print("TEST: wait for input")
     raw_input()
 
     dev = open("/dev/null", 'w')
@@ -107,7 +107,7 @@ def test_devices_write():
     for _ in range(1024 * 1024):
         buf += '\x00'
     while True:
-        print "TEST: tick"
+        print("TEST: tick")
         dev.write(buf)
         dev.flush()
         time.sleep(1)
@@ -118,7 +118,7 @@ def main():
     Main (infinite) loop.
     """
     if len(sys.argv) < 2:
-        print "FAIL: Incorrect usage (%s)" % sys.argv
+        print("FAIL: Incorrect usage (%s)" % sys.argv)
         return -1
     args = sys.argv[2:]
     if sys.argv[1] == "smoke":
@@ -130,7 +130,7 @@ def main():
     elif sys.argv[1] == "devices":
         test_devices(args)
     else:
-        print "FAIL: No test specified (%s)" % sys.argv
+        print("FAIL: No test specified (%s)" % sys.argv)
 
 if __name__ == "__main__":
     main()

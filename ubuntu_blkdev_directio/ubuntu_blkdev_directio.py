@@ -41,6 +41,6 @@ class ubuntu_blkdev_directio(test.test):
         #
         # FIXME: comment this out on production
         #
-        #print self.results
+        #print(self.results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

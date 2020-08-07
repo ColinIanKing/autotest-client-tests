@@ -78,6 +78,6 @@ else:
         for test in tests:
             results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + media_type + '-' + test, media=media_type, timeout=120*60)
 
-print results
+print(results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -16,6 +16,6 @@ name = 'ubuntu_performance_multipass'
 
 results = job.run_test_detail(name, tag='setup', test_name='setup')
 results = job.run_test_detail(name, tag='multipassboot', test_name='multipassboot', timeout=1800)
-print results
+print(results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

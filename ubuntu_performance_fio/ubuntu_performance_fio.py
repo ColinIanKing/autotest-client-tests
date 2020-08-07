@@ -59,7 +59,7 @@ class ubuntu_performance_fio(test.test):
                 if result.returncode == 0:
                     stopped_services.append(service)
                 else:
-                    print "WARNING: could not stop %s" % (service)
+                    print("WARNING: could not stop %s" % (service))
         return stopped_services
 
     def start_services(self, services):
@@ -68,7 +68,7 @@ class ubuntu_performance_fio(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode != 0:
-                print "WARNING: could not start %s" % (service)
+                print("WARNING: could not start %s" % (service))
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -83,14 +83,14 @@ class ubuntu_performance_fio(test.test):
         result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
         result.communicate()
         if result.returncode != 0:
-            print "WARNING: could not set CPUs to performance mode '%s'" % mode
+            print("WARNING: could not set CPUs to performance mode '%s'" % mode)
 
     def set_swap_on(self, swap_on):
         cmd = "/sbin/swapon -a" if swap_on else "/sbin/swapoff -a"
         result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
         result.communicate()
         if result.returncode != 0:
-            print "WARNING: could not set swap %s" % ("on" if swap_on else "off")
+            print("WARNING: could not set swap %s" % ("on" if swap_on else "off"))
 
     def install_required_pkgs(self):
         arch    = platform.processor()
@@ -197,7 +197,7 @@ class ubuntu_performance_fio(test.test):
         os.chdir(os.path.join(self.srcdir, 'fio-3.10'))
         self.results += utils.system_output('make', retain_output=True)
 
-        print self.results
+        print(self.results)
 
     def get_filesystem_free_mbytes(self):
         fd = os.open(self.bindir, os.O_RDONLY)
@@ -206,20 +206,20 @@ class ubuntu_performance_fio(test.test):
         return statvfs.f_bsize * statvfs.f_bavail / (1024.0 * 1024.0)
 
     def get_sysinfo(self):
-        print
-        print 'date_ctime "' + time.ctime() + '"'
-        print 'date_ns %-30.0f' % (time.time() * 1000000000)
-        print 'kernel_version ' + platform.uname()[2]
-        print 'hostname ' + platform.node()
-        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
-        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
-        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
-        print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
-        print 'pages_availble ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
-        print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
-        print 'free_disk_mb %.2f' % (self.get_filesystem_free_mbytes())
-	print 'run_from_path %s' % (os.getcwd())
-        print
+        print('')
+        print('date_ctime "' + time.ctime() + '"')
+        print('date_ns %-30.0f' % (time.time() * 1000000000))
+        print('kernel_version ' + platform.uname()[2])
+        print('hostname ' + platform.node())
+        print('virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True))
+        print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
+        print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
+        print('page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True))
+        print('pages_availble ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
+        print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))
+        print('free_disk_mb %.2f' % (self.get_filesystem_free_mbytes()))
+	print('run_from_path %s' % (os.getcwd()))
+        print('')
 
     def print_stats(self, benchmark, results, fields):
         return
@@ -231,7 +231,7 @@ class ubuntu_performance_fio(test.test):
         time.sleep(5)
         cmd = 'rm -f ' + os.path.join(self.srcdir, testname) + '.*.*'
         results = utils.system_output(cmd, retain_output=True)
-        print results
+        print(results)
 
     def drop_cache(self):
         #
@@ -244,7 +244,7 @@ class ubuntu_performance_fio(test.test):
         f.close()
 
     def mk_ramdisk(self, ramdisk_bytes, mount_point):
-        #print "ramfs device size: %.2f MB" % (float(ramdisk_bytes) / (1024.0 * 1024.0))
+        #print("ramfs device size: %.2f MB" % (float(ramdisk_bytes) / (1024.0 * 1024.0)))
         cmd = 'mount -t ramfs none %s -o maxsize=%d' % (mount_point, ramdisk_bytes)
         utils.system_output(cmd, retain_output=True)
 
@@ -366,19 +366,19 @@ class ubuntu_performance_fio(test.test):
             config = ''
 
         for i in range(test_iterations):
-            print "Test %d of %d:" % (i + 1, test_iterations)
+            print("Test %d of %d:" % (i + 1, test_iterations))
             values[i] = self.run_fio(testname, ramdisk_bytes, media)
-            print "fio_%s%s_%s_file_size_mb[%d] %s" % (media, config, testname, i, values[i]['file_size_mb'])
-            print "fio_%s%s_%s_bandwidth_kb_per_sec[%d] %.2f" % (media, config, testname, i, values[i]['bandwidth_kb_per_sec'])
-            print "fio_%s%s_%s_latency_usec_average[%d] %.2f" % (media, config, testname, i, values[i]['latency_usec_average'])
-            print "fio_%s%s_%s_latency_stddev[%d] %.2f" % (media, config, testname, i, values[i]['latency_stddev'])
+            print("fio_%s%s_%s_file_size_mb[%d] %s" % (media, config, testname, i, values[i]['file_size_mb']))
+            print("fio_%s%s_%s_bandwidth_kb_per_sec[%d] %.2f" % (media, config, testname, i, values[i]['bandwidth_kb_per_sec']))
+            print("fio_%s%s_%s_latency_usec_average[%d] %.2f" % (media, config, testname, i, values[i]['latency_usec_average']))
+            print("fio_%s%s_%s_latency_stddev[%d] %.2f" % (media, config, testname, i, values[i]['latency_stddev']))
 
         #
         #  Compute min/max/average:
         #
         fields = [ 'bandwidth_kb_per_sec', 'latency_usec_average' ]
-        print
-        print "Collated Performance Metrics:"
+        print("")
+        print("Collated Performance Metrics:")
         for field in fields:
             v = [ float(values[i][field]) for i in values ]
             maximum = max(v)
@@ -387,19 +387,19 @@ class ubuntu_performance_fio(test.test):
             max_err = (maximum - minimum) / average * 100.0
             str = field.lower().replace("-", "_").replace(",","_")
 
-            print
-            print "fio_%s%s_%s_%s_minimum %.5f" % (media, config, testname, str, minimum)
-            print "fio_%s%s_%s_%s_maximum %.5f" % (media, config, testname, str, maximum)
-            print "fio_%s%s_%s_%s_average %.5f" % (media, config, testname, str, average)
-            print "fio_%s%s_%s_%s_maximum_error %.2f%%" % (media, config, testname, str, max_err)
+            print("")
+            print("fio_%s%s_%s_%s_minimum %.5f" % (media, config, testname, str, minimum))
+            print("fio_%s%s_%s_%s_maximum %.5f" % (media, config, testname, str, maximum))
+            print("fio_%s%s_%s_%s_average %.5f" % (media, config, testname, str, average))
+            print("fio_%s%s_%s_%s_maximum_error %.2f%%" % (media, config, testname, str, max_err))
 
             if max_err > 5.0:
-                print "FAIL: maximum error is greater than 5%"
+                print("FAIL: maximum error is greater than 5%")
                 test_pass = False
 
-        print
+        print("")
         if test_pass:
-            print "PASS: test passes specified performance thresholds"
+            print("PASS: test passes specified performance thresholds")
 
 
     def run_once(self, test_name, media):
@@ -421,7 +421,7 @@ class ubuntu_performance_fio(test.test):
             ramdisk_bytes = max_ramdisk_bytes
 
         #if mem_mb > file_size_mb:
-        #    print "\nNOTE: file size of %.2f MB should be at least twice the free memory size of %.2f MB when using non-direct I/O" % (file_size_mb, mem_mb)
+        #    print("\nNOTE: file size of %.2f MB should be at least twice the free memory size of %.2f MB when using non-direct I/O" % (file_size_mb, mem_mb))
 
         free_mb = self.get_filesystem_free_mbytes()
         if free_mb > file_size_mb:
@@ -437,7 +437,7 @@ class ubuntu_performance_fio(test.test):
             self.set_rlimit_nofile(self.oldres)
             self.start_services(self.stopped_services)
         else:
-            print 'cannot execute "%s", required %dMB, only got %dMB on disc' % (test_name, file_size_mb, free_mb)
-        print
+            print('cannot execute "%s", required %dMB, only got %dMB on disc' % (test_name, file_size_mb, free_mb))
+        print("")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

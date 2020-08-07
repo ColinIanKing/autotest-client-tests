@@ -53,7 +53,7 @@ class ubuntu_performance_pts(test.test):
                 if result.returncode == 0:
                     stopped_services.append(service)
                 else:
-                    print "WARNING: could not stop %s" % (service)
+                    print("WARNING: could not stop %s" % (service))
         return stopped_services
 
     def start_services(self, services):
@@ -62,7 +62,7 @@ class ubuntu_performance_pts(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode != 0:
-                print "WARNING: could not start %s" % (service)
+                print("WARNING: could not start %s" % (service))
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -77,14 +77,14 @@ class ubuntu_performance_pts(test.test):
         result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
         result.communicate()
         if result.returncode != 0:
-            print "WARNING: could not set CPUs to performance mode '%s'" % mode
+            print("WARNING: could not set CPUs to performance mode '%s'" % mode)
 
     def set_swap_on(self, swap_on):
         cmd = "/sbin/swapon -a" if swap_on else "/sbin/swapoff -a"
         result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
         result.communicate()
         if result.returncode != 0:
-            print "WARNING: could not set swap %s" % ("on" if swap_on else "off")
+            print("WARNING: could not set swap %s" % ("on" if swap_on else "off"))
 
     def install_required_pkgs(self):
         arch    = platform.processor()
@@ -140,19 +140,19 @@ class ubuntu_performance_pts(test.test):
         self.results += utils.system_output('phoronix-test-suite enterprise-setup', retain_output=True)
         self.results += utils.system_output('yes n | phoronix-test-suite batch-setup', retain_output=True)
 
-        print self.results
+        print(self.results)
 
     def get_sysinfo(self, test_name, subtest):
-        print 'date_ctime "' + time.ctime() + '"'
-        print 'date_ns %-30.0f' % (time.time() * 1000000000)
-        print 'kernel_version ' + platform.uname()[2]
-        print 'hostname ' + platform.node()
-        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
-        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
-        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
-        print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
-        print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
-        print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
+        print('date_ctime "' + time.ctime() + '"')
+        print('date_ns %-30.0f' % (time.time() * 1000000000))
+        print('kernel_version ' + platform.uname()[2])
+        print('hostname ' + platform.node())
+        print('virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True))
+        print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
+        print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
+        print('page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True))
+        print('pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
+        print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))
 
     def get_stats(self, results, fields):
         values = {}
@@ -191,11 +191,11 @@ class ubuntu_performance_pts(test.test):
 
             values[i] = self.get_stats(results, fields)
             if values[i] != {}:
-                print
-                print "Test %d of %d:" % (i + 1, test_iterations)
+                print("")
+                print("Test %d of %d:" % (i + 1, test_iterations))
                 for field in fields:
                     if field in values[i]:
-                        print benchmark + "_" + field.lower() + "[%d] %s" % (i, values[i][field])
+                        print(benchmark + "_" + field.lower() + "[%d] %s" % (i, values[i][field]))
 
         #
         #  Compute min/max/average:
@@ -210,22 +210,22 @@ class ubuntu_performance_pts(test.test):
             average = sum(v) / float(len(v))
             max_err = (maximum - minimum) / average * 100.0
 
-            print
-            print benchmark + "_" + field.lower() + "_minimum", minimum
-            print benchmark + "_" + field.lower() + "_maximum", maximum
-            print benchmark + "_" + field.lower() + "_average", average
-            print benchmark + "_" + field.lower() + "_maximum_error %.2f%%" % (max_err)
-            print
+            print("")
+            print(benchmark + "_" + field.lower() + "_minimum " + minimum)
+            print(benchmark + "_" + field.lower() + "_maximum " + maximum)
+            print(benchmark + "_" + field.lower() + "_average " + average)
+            print(benchmark + "_" + field.lower() + "_maximum_error %.2f%%" % (max_err))
+            print("")
 
             if max_err > 5.0:
-                print "FAIL: maximum error is greater than 5%"
+                print("FAIL: maximum error is greater than 5%")
                 test_pass = False
 
             if test_pass:
-                print "PASS: test passes specified performance thresholds"
+                print("PASS: test passes specified performance thresholds")
 
         if not test_run:
-            print "NOTRUN: test not run, no data"
+            print("NOTRUN: test not run, no data")
 
     def run_john_the_ripper_blowfish(self, test_name, tag):
         cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; %s phoronix-test-suite batch-benchmark john-the-ripper-1.6.2' % force_times_to_run
@@ -268,7 +268,7 @@ class ubuntu_performance_pts(test.test):
         self.print_stats(test_name, cmd)
 
     def run_once(self, test_name, subtest):
-        print "Testing " + subtest
+        print("Testing " + subtest)
         run_funcs = {
             'setup': self.get_sysinfo,
             'cloverleaf': self.run_generic,
@@ -303,6 +303,6 @@ class ubuntu_performance_pts(test.test):
             self.set_cpu_governor('powersave')
             self.set_rlimit_nofile(self.oldres)
             self.start_services(self.stopped_services)
-        print
+        print("")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

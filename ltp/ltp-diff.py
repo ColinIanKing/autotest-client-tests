@@ -21,9 +21,9 @@ from autotest.client.shared import utils
 
 
 def usage():
-    print "\nUsage: \n\
+    print("\nUsage: \n\
 ltp-diff results1 results2 ... locationN \n\
-Note: location[1,2,N] may be local files or URLs of LTP results\n"
+Note: location[1,2,N] may be local files or URLs of LTP results\n")
     sys.exit(1)
 
 
@@ -45,7 +45,7 @@ def get_results(results_files):
             results = fh.readlines()
             fh.close()
         except Exception:
-            print "ERROR: reading results resource [%s]" % (file)
+            print("ERROR: reading results resource [%s]" % (file))
             usage()
         for line in results:
             try:
@@ -68,10 +68,10 @@ def compare_results(runs):
     Return 0 if all test results match.
     """
     rc = 0
-    print "LTP Test Results to Compare"
+    print("LTP Test Results to Compare")
     for i in range(len(runs)):
-        print "  Run[%d]: %d" % (i, len(runs[i].keys()))
-    print ""
+        print("  Run[%d]: %d" % (i, len(runs[i].keys())))
+    print("")
     header = 0
     all_testnames = testnames.keys()
     all_testnames.sort()
@@ -90,8 +90,8 @@ def compare_results(runs):
         if differ:
             if header == 0:
                 # Print the differences header only once
-                print "Tests with Inconsistent Results across Runs"
-                print "  %-35s:\t%s" % ("Testname,Sequence", "Run Results")
+                print("Tests with Inconsistent Results across Runs")
+                print("  %-35s:\t%s" % ("Testname,Sequence", "Run Results"))
                 header = 1
 
             # Print info if results differ
@@ -103,9 +103,9 @@ def compare_results(runs):
                 all_results += runs[i][testname]
                 if i + 1 < len(runs):
                     all_results += "/"
-            print all_results
+            print(all_results)
     if rc == 0:
-        print "All LTP results are identical"
+        print("All LTP results are identical")
     return rc
 
 

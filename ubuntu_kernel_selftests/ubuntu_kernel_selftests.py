@@ -140,7 +140,7 @@ class ubuntu_kernel_selftests(test.test):
             # this test breaks 5.0+ (and maybe earlier), disable it for now
             # 5/12/2019, LP#1854968
             #
-            print "Disabling l2tp.sh"
+            print("Disabling l2tp.sh")
             fn = 'linux/tools/testing/selftests/net/l2tp.sh'
             if os.path.exists(fn):
                 cmd = 'chmod -x ' + fn
@@ -149,7 +149,7 @@ class ubuntu_kernel_selftests(test.test):
             #
             # update fix CPU hotplug test, new and old versions
             #
-            print "Updating CPU hotplug test"
+            print("Updating CPU hotplug test")
             fn="linux/tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh"
             if os.path.exists(fn) and 'present_cpus=' not in open(fn).read():
                 cmd = 'cp %s/cpu-on-off-test.sh %s' % (self.bindir, fn)
@@ -195,7 +195,7 @@ class ubuntu_kernel_selftests(test.test):
             fn = 'linux/tools/testing/selftests/ptrace/vmaccess.c'
             mk = 'linux/tools/testing/selftests/ptrace/Makefile'
             if os.path.exists(fn):
-                print "Disabling ptrace/vmacces"
+                print("Disabling ptrace/vmacces")
                 cmd = 'sed -i "s/ vmaccess//" ' + mk
                 utils.system(cmd)
 

@@ -32,15 +32,15 @@ class ubuntu_generic_fstest(test.test):
         else:
             pkgs.append('btrfs-progs')
         for pkg in pkgs:
-            print "Installing package " + pkg
+            print("Installing package " + pkg)
             utils.system_output('apt-get install ' + pkg + ' --yes --force-yes ', retain_output=True)
 
-        print "Extracting fstest tarball.."
+        print("Extracting fstest tarball..")
         tarball = utils.unmap_url(self.bindir, 'fstest.tar.bz2', self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
 
         os.chdir(self.srcdir)
-        print "Building fstest.."
+        print("Building fstest..")
         utils.system('make')
 
     def run_once(self, test_name):
@@ -63,7 +63,7 @@ class ubuntu_generic_fstest(test.test):
                 'jfs'   : [ 'ext3', 'mkfs.jfs -f' ] }
 
         if test_name not in mkfs:
-            print 'SKIPPING: file system ' + test_name + ' not known to test'
+            print('SKIPPING: file system ' + test_name + ' not known to test')
             return
 
         #
@@ -92,7 +92,7 @@ class ubuntu_generic_fstest(test.test):
         #
         tests = sorted([os.path.join(r,f) for r,d,fs in os.walk('tests') for f in fs if f.endswith('.t')])
 
-        print "Testing file system " + test_name + " on dev " + loopdev
+        print("Testing file system " + test_name + " on dev " + loopdev)
         utils.system(mkfs_cmd + ' ' + loopdev)
         utils.system('mkdir -p /mnt/fstest')
         utils.system('mount ' + loopdev + ' /mnt/fstest')
@@ -117,24 +117,24 @@ class ubuntu_generic_fstest(test.test):
         #
         failed =  ""
         for test in tests:
-            print
+            print("")
             if test in skip:
-                print test_name + ': ' + test + ': SKIPPED (tests known to have issues)'
+                print(test_name + ': ' + test + ': SKIPPED (tests known to have issues)')
             else:
-                print test_name + ': ' + test + ':'
+                print(test_name + ': ' + test + ':')
                 cmd = 'prove --nocolor -q -r %s' % os.path.join(self.srcdir, test)
                 self.results = utils.system_output(cmd, retain_output=True, ignore_status=True)
-                print self.results
+                print(self.results)
 
                 # parse output and raise test failure if 'prove' failed
                 if self.results.find('Result: FAIL') != -1:
                     failed = failed + ' ' + test
 
-        print
+        print("")
         if failed != "":
             raise error.TestFail('Tests failed for ' + test + ' for file system ' + test_name)
         else:
-            print 'Tests all passed for file system ' + test_name
+            print('Tests all passed for file system ' + test_name)
 
         os.chdir(self.srcdir)
         utils.system('umount ' + loopdev)

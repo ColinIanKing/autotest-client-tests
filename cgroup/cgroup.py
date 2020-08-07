@@ -434,7 +434,7 @@ class cgroup(test.test):
             """ returns the time of all cpu stress execution """
             stress_cmd = ("for i in `seq 1 128`; do for i in `seq 1 128`;"
                           "do A=$((1024/34)); done; done")
-            print "Running %d*'%s'" % (no_cpus, stress_cmd)
+            print("Running %d*'%s'" % (no_cpus, stress_cmd))
             threads = []
             start = time.time()
             for _ in xrange(80):

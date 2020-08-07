@@ -11,9 +11,9 @@ TEST_TYPE = "client"
 DOC = ""
 
 results = job.run_test_detail('ubuntu_zfs_fstest', test_name='setup', tag='setup')
-print "Invoking zfs fstest functional tests.."
+print("Invoking zfs fstest functional tests..")
 results = job.run_test_detail('ubuntu_zfs_fstest', test_name='zfs-tests', tag='zfs-tests', timeout=10*60)
 
-print "Done!"
+print("Done!")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

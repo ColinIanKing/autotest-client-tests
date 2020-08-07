@@ -24,6 +24,6 @@ results = job.run_test_detail(name, tag='setup', test_name='setup')
 
 for test in sorted(tests):
         results = job.run_test_detail(name, tag=test, test_name=test, timeout=600)
-        print results
+        print(results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -10,6 +10,6 @@ class ubuntu_bpf_jit(test.test):
         cmd = '%s/ubuntu_bpf_jit.sh' % (self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
 
-        print self.results
+        print(self.results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

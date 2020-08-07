@@ -58,9 +58,9 @@ class ubuntu_performance_stream(test.test):
                 result.communicate()
                 if result.returncode == 0:
                     stopped_services.append(service)
-                    print "stopped service %s" % (service)
+                    print("stopped service %s" % (service))
                 else:
-                    print "WARNING: could not stop %s" % (service)
+                    print("WARNING: could not stop %s" % (service))
         return stopped_services
 
     def start_services(self, services):
@@ -69,9 +69,9 @@ class ubuntu_performance_stream(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode == 0:
-                print "restarted service %s" % (service)
+                print("restarted service %s" % (service))
             else:
-                print "WARNING: could not start %s" % (service)
+                print("WARNING: could not start %s" % (service))
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -86,14 +86,14 @@ class ubuntu_performance_stream(test.test):
         result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
         result.communicate()
         if result.returncode != 0:
-            print "WARNING: could not set CPUs to performance mode '%s'" % mode
+            print("WARNING: could not set CPUs to performance mode '%s'" % mode)
 
     def set_swap_on(self, swap_on):
         cmd = "/sbin/swapon -a" if swap_on else "/sbin/swapoff -a"
         result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
         result.communicate()
         if result.returncode != 0:
-            print "WARNING: could not set swap %s" % ("on" if swap_on else "off")
+            print("WARNING: could not set swap %s" % ("on" if swap_on else "off"))
 
     def install_required_pkgs(self):
         arch   = platform.processor()
@@ -176,19 +176,19 @@ class ubuntu_performance_stream(test.test):
             results = utils.system_output(stream_exe_path, retain_output=True)
             values[i] = self.get_stats(results, fields)
 
-            print results
+            print(results)
 
-            print
-            print "Test %d of %d:" % (i + 1, test_iterations)
+            print("")
+            print("Test %d of %d:" % (i + 1, test_iterations))
             for field in fields:
                 for stat in stats:
-                    print "stream%s_%s_for_%s_%dM[%d] %f" % (config, stat, field.lower(), size , i, values[i][field][stat])
+                    print("stream%s_%s_for_%s_%dM[%d] %f" % (config, stat, field.lower(), size , i, values[i][field][stat]))
 
         #
         #  Compute min/max/average:
         #
-        print
-        print "Collated Performance Metrics:"
+        print("")
+        print("Collated Performance Metrics:")
         for field in fields:
             for stat in stats:
                 v = [ values[i][field][stat] for i in values ]
@@ -197,18 +197,18 @@ class ubuntu_performance_stream(test.test):
                 average = sum(v) / float(len(v))
                 max_err = (maximum - minimum) / average * 100.0
 
-                print
-                print "stream%s_%s_%s_minimum %.5f" % (config, stat, field.lower(), minimum)
-                print "stream%s_%s_%s_maximum %.5f" % (config, stat, field.lower(), maximum)
-                print "stream%s_%s_%s_average %.5f" % (config, stat, field.lower(), average)
-                print "stream%s_%s_%s_maximum_error %.2f%%" % (config, stat, field.lower(), max_err)
+                print("")
+                print("stream%s_%s_%s_minimum %.5f" % (config, stat, field.lower(), minimum))
+                print("stream%s_%s_%s_maximum %.5f" % (config, stat, field.lower(), maximum))
+                print("stream%s_%s_%s_average %.5f" % (config, stat, field.lower(), average))
+                print("stream%s_%s_%s_maximum_error %.2f%%" % (config, stat, field.lower(), max_err))
                 if max_err > 5.0:
-                    print "FAIL: maximum error is greater than 5%"
+                    print("FAIL: maximum error is greater than 5%")
                     test_pass = False
 
-        print
+        print("")
         if test_pass:
-            print "PASS: test passes specified performance thresholds"
+            print("PASS: test passes specified performance thresholds")
 
     def get_sysinfo(self):
         page_size = int(utils.system_output('getconf PAGE_SIZE', retain_output=True))
@@ -219,23 +219,23 @@ class ubuntu_performance_stream(test.test):
         #
         memory_required = float(4 * 8 * stream_size)
 
-        print 'date_ctime "' + time.ctime() + '"'
-        print 'date_ns %-30.0f' % (time.time() * 1000000000)
-        print 'kernel_version ' + platform.uname()[2]
-        print 'hostname ' + platform.node()
-        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
-        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
-        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
-        print 'page_size ', page_size
-        print 'pages_availble ', pages_available
-        print 'memory_available %.2f MB' % (memory_available / (1024 * 1024))
-        print 'memory_required %.2f MB' % (memory_required / (1024 * 1024))
-        print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
-        print 'ntimes %d' % ntimes
-        print 'stream_size %d ' % stream_size
+        print('date_ctime "' + time.ctime() + '"')
+        print('date_ns %-30.0f' % (time.time() * 1000000000))
+        print('kernel_version ' + platform.uname()[2])
+        print('hostname ' + platform.node())
+        print('virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True))
+        print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
+        print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
+        print('page_size ' + page_size)
+        print('pages_availble ' + pages_available)
+        print('memory_available %.2f MB' % (memory_available / (1024 * 1024)))
+        print('memory_required %.2f MB' % (memory_required / (1024 * 1024)))
+        print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))
+        print('ntimes %d' % ntimes)
+        print('stream_size %d ' % stream_size)
 
         if memory_required > memory_available:
-                print 'WARNING: Not enough memory available to run stream for %d elements without swapping, skipping test' % stream_size
+                print('WARNING: Not enough memory available to run stream for %d elements without swapping, skipping test' % stream_size)
 		return False
 	return True
 
@@ -245,7 +245,7 @@ class ubuntu_performance_stream(test.test):
 
         enough_ram = self.get_sysinfo()
         if enough_ram:
-            print
+            print("")
             self.stopped_services = self.stop_services()
             self.oldres = self.set_rlimit_nofile((500000, 500000))
             self.set_cpu_governor('performance')
@@ -257,6 +257,6 @@ class ubuntu_performance_stream(test.test):
             self.set_cpu_governor('powersave')
             self.set_rlimit_nofile(self.oldres)
             self.start_services(self.stopped_services)
-        print
+        print("")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

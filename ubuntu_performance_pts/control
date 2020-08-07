@@ -47,6 +47,6 @@ if os.uname()[1] == 'ivysaur':
 for j in jobs:
     results += job.run_test_detail(name, test_name=j[0], tag=name + '_' + j[1], subtest=j[1], timeout=j[2] * 60)
 
-# print results
+# print(results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -55,7 +55,7 @@ class ubuntu_performance_lkp(test.test):
                 if result.returncode == 0:
                     stopped_services.append(service)
                 else:
-                    print "WARNING: could not stop %s" % (service)
+                    print("WARNING: could not stop %s" % (service))
         return stopped_services
 
     def start_services(self, services):
@@ -64,7 +64,7 @@ class ubuntu_performance_lkp(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode != 0:
-                print "WARNING: could not start %s" % (service)
+                print("WARNING: could not start %s" % (service))
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -142,15 +142,15 @@ class ubuntu_performance_lkp(test.test):
         utils.system_output('yes "" | lkp install', retain_output=True)
 
         for lkp_job in lkp_jobs:
-            print "setting up " + lkp_job
-            print utils.system_output('lkp split jobs/%s || true' % lkp_job, retain_output=True)
-            print utils.system_output('yes "" | lkp install %s || true' % lkp_jobs[lkp_job][0], retain_output=True)
+            print("setting up " + lkp_job)
+            print(utils.system_output('lkp split jobs/%s || true' % lkp_job, retain_output=True))
+            print(utils.system_output('yes "" | lkp install %s || true' % lkp_jobs[lkp_job][0], retain_output=True))
 
 
     def run_aim9(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -166,7 +166,7 @@ class ubuntu_performance_lkp(test.test):
             # ------------------------------------------------------------------------------------------------------------
             found_dashes = False;
             for line in self.results.splitlines():
-                print line
+                print(line)
                 chunks = line.split()
                 if len(chunks) > 0 and '---------' in chunks[0]:
                     found_dashes = True;
@@ -174,13 +174,13 @@ class ubuntu_performance_lkp(test.test):
                     values.append(float(chunks[5]))
                     found_dashes = False
 
-        print "%s_bogoops" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_bogoops " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('bogoops', values) ]
 
     def run_cassandra(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -198,13 +198,13 @@ class ubuntu_performance_lkp(test.test):
                     if (self.is_number(val)):
                         values.append(float(val))
 
-        print "%s_rows_per_second" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_rows_per_second " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('rows_per_sec', values) ]
 
     def run_dbench(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -220,12 +220,12 @@ class ubuntu_performance_lkp(test.test):
                    and self.is_number(chunks[1]):
                     values.append(float(chunks[1]))
 
-        print "%s_throughput_mb_per_second" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_throughput_mb_per_second " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('throughput', values) ]
 
     def run_hackbench(self, lkp_job, lkp_jobs, test_name):
         values = []
-        print "Testing %s: 1 of 1" % lkp_job
+        print("Testing %s: 1 of 1" % lkp_job)
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
         cmd = 'sudo lkp run %s' % lkp_job
         self.results = utils.system_output(cmd, retain_output=True)
@@ -242,13 +242,13 @@ class ubuntu_performance_lkp(test.test):
             if len(chunks) == 2 and chunks[0] == "Time:":
                 values.append(float(chunks[1]))
 
-        print "%s_seconds" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_seconds " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('duration', values) ]
 
     def run_iperf(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -266,13 +266,13 @@ class ubuntu_performance_lkp(test.test):
 
             values.append(sum(intervals) / len(intervals))
 
-        #print "%s_bits_per_second_second" % (test_name), "%.3f " * len(values) % tuple(values)
+        #print("%s_bits_per_second_second " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('bitrate', values) ]
 
     def run_linpack(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -307,12 +307,12 @@ class ubuntu_performance_lkp(test.test):
                     values.append(float(chunks[4]))
 
 
-        print "%s_gflops" % (test_name), "%.4f " * len(values) % tuple(values)
+        print("%s_gflops " % (test_name) + "%.4f " * len(values) % tuple(values))
         return [ ('gflops', values) ]
 
     def run_perf_bench_futex(self, lkp_job, lkp_jobs, test_name):
         values = []
-        print "Testing %s: 1 of 1" % lkp_job
+        print("Testing %s: 1 of 1" % lkp_job)
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
         cmd = 'sudo lkp run %s' % lkp_job
         self.results = utils.system_output(cmd, retain_output=True)
@@ -341,13 +341,13 @@ class ubuntu_performance_lkp(test.test):
                and chunks[6] == "ops/sec" and self.is_number(chunks[5]):
                 values.append(float(chunks[5]))
 
-        print "%s_ops_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_ops_per_sec " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('futex_rate', values) ]
 
     def run_pxz(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -362,13 +362,13 @@ class ubuntu_performance_lkp(test.test):
                 if len(chunks) >= 2 and chunks[0] == "throughput:" and self.is_number(chunks[1]):
                     values.append(float(chunks[1]))
 
-        print "%s_throughput" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_throughput " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('throughput', values) ]
 
     def run_schbench(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -383,7 +383,7 @@ class ubuntu_performance_lkp(test.test):
                 if len(chunks) >= 2 and chunks[0] == "*99.0000th:" and self.is_number(chunks[1]):
                     values.append(float(chunks[1]))
 
-        print "%s_99th_percentile" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_99th_percentile " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('99th_percentile', values) ]
 
     def run_sockperf(self, lkp_job, lkp_jobs, test_name):
@@ -410,7 +410,7 @@ class ubuntu_performance_lkp(test.test):
 
         data = {}
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -439,7 +439,7 @@ class ubuntu_performance_lkp(test.test):
     def run_sysbench_threads(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -454,13 +454,13 @@ class ubuntu_performance_lkp(test.test):
                 if len(chunks) >= 3 and chunks[0] == "95th" and self.is_number(chunks[2]):
                     values.append(float(chunks[2]))
 
-        print "%s_95th_percentile" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_95th_percentile " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('95th_percentile', values) ]
 
     def run_thrulay(self, lkp_job, lkp_jobs, test_name):
         values_throughput = []
         values_latency = []
-        print "Testing %s: 1 of 1" % (lkp_job)
+        print("Testing %s: 1 of 1" % (lkp_job))
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
         cmd = 'sudo lkp run %s' % lkp_job
         self.results = utils.system_output(cmd, retain_output=True)
@@ -477,13 +477,13 @@ class ubuntu_performance_lkp(test.test):
                 values_throughput.append(float(chunks[4]))
                 values_latency.append(float(chunks[5]))
 
-        #print "%s_throughput" % (test_name), "%.3f " * len(values_throughput) % tuple(values_throughput)
-        #print "%s_latency" % (test_name), "%.3f " * len(values_latency) % tuple(values_latency)
+        #print("%s_throughput " % (test_name) + "%.3f " * len(values_throughput) % tuple(values_throughput))
+        #print("%s_latency " % (test_name) + "%.3f " * len(values_latency) % tuple(values_latency))
         return [ ('throughput', values_throughput), ('latency', values_latency) ]
 
     def run_ebizzy(self, lkp_job, lkp_jobs, test_name):
         values = []
-        print "Testing %s: 1 of 1" % lkp_job
+        print("Testing %s: 1 of 1" % lkp_job)
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
         cmd = 'sudo lkp run %s' % lkp_job
         self.results = utils.system_output(cmd, retain_output=True)
@@ -498,13 +498,13 @@ class ubuntu_performance_lkp(test.test):
             if len(chunks) >= 2 and chunks[1] == "records/s" and self.is_number(chunks[0]):
                 values.append(float(chunks[0]))
 
-        print "%s_records_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_records_per_sec " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('record_rate', values) ]
 
     def run_unixbench(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -521,13 +521,13 @@ class ubuntu_performance_lkp(test.test):
                    chunks[5] == "Only)" and self.is_number(chunks[6]):
                     values.append(float(chunks[6]))
 
-        print "%s_score" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_score " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('score', values) ]
 
     def run_vm_scalability(self, lkp_job, lkp_jobs, test_name):
         values = []
         for i in range(test_iterations):
-            print "Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations)
+            print("Testing %s: %d of %d" % (lkp_job, i + 1, test_iterations))
             os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
             cmd = 'sudo lkp run %s' % lkp_job
             self.results = utils.system_output(cmd, retain_output=True)
@@ -545,20 +545,20 @@ class ubuntu_performance_lkp(test.test):
                 if len(chunks) >= 8 and chunks[1] == "bytes" and chunks[4] == "usecs" and chunks[7] == "KB/s":
                     values.append(float(chunks[6]))
 
-        print "%s_kb_per_sec" % (test_name), "%.3f " * len(values) % tuple(values)
+        print("%s_kb_per_sec " % (test_name) + "%.3f " * len(values) % tuple(values))
         return [ ('rate', values) ]
 
     def get_sysinfo(self):
-        print 'date_ctime "' + time.ctime() + '"'
-        print 'date_ns %-30.0f' % (time.time() * 1000000000)
-        print 'kernel_version ' + platform.uname()[2]
-        print 'hostname ' + platform.node()
-        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
-        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
-        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
-        print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
-        print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
-        print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
+        print('date_ctime "' + time.ctime() + '"')
+        print('date_ns %-30.0f' % (time.time() * 1000000000))
+        print('kernel_version ' + platform.uname()[2])
+        print('hostname ' + platform.node())
+        print('virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True))
+        print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
+        print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
+        print('page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True))
+        print('pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
+        print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))
 
     def run_once(self, lkp_job, sub_job, lkp_jobs, lkp_commit = None):
         if lkp_job == 'setup':
@@ -591,7 +591,7 @@ class ubuntu_performance_lkp(test.test):
         test_pass = True
         test_run  = False
 
-        print
+        print("")
         if lkp_job in job_funcs:
             self.stopped_services = self.stop_services()
             self.oldres = self.set_rlimit_nofile((500000, 500000))
@@ -601,7 +601,7 @@ class ubuntu_performance_lkp(test.test):
             self.set_rlimit_nofile(self.oldres)
             self.start_services(self.stopped_services)
         else:
-            print "Cannot find running/parser for %s, please fix ubuntu_performance_lkp.py" % lkp_job
+            print("Cannot find running/parser for %s, please fix ubuntu_performance_lkp.py" % lkp_job)
             return
 
         for (label, values) in ret_values:
@@ -619,23 +619,23 @@ class ubuntu_performance_lkp(test.test):
             else:
                 stddev = 0.0
             percent_stddev = (stddev / average) * 100.0 if average > 0 else 0.0
-            print "%s_%s_minimum %.3f" % (test_name, label, minimum)
-            print "%s_%s_maximum %.3f" % (test_name, label, maximum)
-            print "%s_%s_average %.3f" % (test_name, label, average)
-            print "%s_%s_maximum_error %.3f%%" % (test_name, label, max_err)
-            print "%s_%s_stddev %.3f" % (test_name, label, stddev)
-            print "%s_%s_percent_stddev %.3f" % (test_name, label, percent_stddev)
+            print("%s_%s_minimum %.3f" % (test_name, label, minimum))
+            print("%s_%s_maximum %.3f" % (test_name, label, maximum))
+            print("%s_%s_average %.3f" % (test_name, label, average))
+            print("%s_%s_maximum_error %.3f%%" % (test_name, label, max_err))
+            print("%s_%s_stddev %.3f" % (test_name, label, stddev))
+            print("%s_%s_percent_stddev %.3f" % (test_name, label, percent_stddev))
 
             if max_err > 5.0:
-                print "FAIL: maximum error is greater than 5%"
+                print("FAIL: maximum error is greater than 5%")
                 test_pass = False
 
         if test_run:
             if test_pass:
-                print "PASS: test passes specified performance thresholds"
-                print
+                print("PASS: test passes specified performance thresholds")
+                print("")
         else:
-                print "NOTRUN: test not run on this sytem"
-                print
+                print("NOTRUN: test not run on this sytem")
+                print("")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

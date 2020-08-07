@@ -55,9 +55,9 @@ class ubuntu_performance_iperf(test.test):
                 result.communicate()
                 if result.returncode == 0:
                     stopped_services.append(service)
-                    print "stopped service %s" % (service)
+                    print("stopped service %s" % (service))
                 else:
-                    print "WARNING: could not stop %s" % (service)
+                    print("WARNING: could not stop %s" % (service))
         return stopped_services
 
     def start_services(self, services):
@@ -66,9 +66,9 @@ class ubuntu_performance_iperf(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode == 0:
-                print "restarted service %s" % (service)
+                print("restarted service %s" % (service))
             else:
-                print "WARNING: could not start %s" % (service)
+                print("WARNING: could not start %s" % (service))
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -83,21 +83,21 @@ class ubuntu_performance_iperf(test.test):
         result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
         result.communicate()
         if result.returncode != 0:
-            print "WARNING: could not set CPUs to performance mode '%s'" % mode
+            print("WARNING: could not set CPUs to performance mode '%s'" % mode)
 
     def set_swap_on(self, swap_on):
         cmd = "/sbin/swapon -a" if swap_on else "/sbin/swapoff -a"
         result = subprocess.Popen(cmd, shell=True, stdout=None, stderr=None)
         result.communicate()
         if result.returncode != 0:
-            print "WARNING: could not set swap %s" % ("on" if swap_on else "off")
+            print("WARNING: could not set swap %s" % ("on" if swap_on else "off"))
 
     def initialize(self):
         pass
 
     def get_setting(self, name):
         addr = os.environ.get(name)
-        print "%s: %s" % (name, addr)
+        print("%s: %s" % (name, addr))
         if addr == None:
             raise error.TestError("ERROR: Environment variable '" + name +"' is not set")
 
@@ -146,7 +146,7 @@ class ubuntu_performance_iperf(test.test):
             raise error.TestError("ERROR: Interface " + interface + " bitrate not found")
             return ("NONE", 0)
 
-        print "Interface %s bitrate: %f Mb/sec" % (interface, rate)
+        print("Interface %s bitrate: %f Mb/sec" % (interface, rate))
         return (interface, rate)
 
     def setup(self):
@@ -193,8 +193,8 @@ class ubuntu_performance_iperf(test.test):
             config = ''
 
         for i in range(test_iterations):
-            print "Test %d of %d:" % (i + 1, test_iterations)
-            print "  Starting %d iperf3 instances on %s" % (clients, test_server)
+            print("Test %d of %d:" % (i + 1, test_iterations))
+            print("  Starting %d iperf3 instances on %s" % (clients, test_server))
             port_end = port_start + (port_step * clients)
             for port in xrange(port_start, port_end, port_step):
                 cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
@@ -215,12 +215,12 @@ class ubuntu_performance_iperf(test.test):
                 p = subprocess.Popen(cmd.split(), stdout=file(filename, "ab"))
                 proc[port] = (p, filename)
 
-            print "  Waiting for iperf3 to complete"
+            print("  Waiting for iperf3 to complete")
             for port in xrange(port_start, port_end, port_step):
                 if proc[port][0].wait() > 0:
                     proc[port][0].wait()
 
-            print "  Terminating iperf3 instances on %s" % test_server
+            print("  Terminating iperf3 instances on %s" % test_server)
             cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
             cmd += " killall -9 iperf3'"
             self.results = utils.system_output(cmd, retain_output=True)
@@ -263,8 +263,8 @@ class ubuntu_performance_iperf(test.test):
         #
         #  Compute min/max/average:
         #
-        print
-        print "Collated Performance Metrics:"
+        print("")
+        print("Collated Performance Metrics:")
         for field in fields:
             v = [ float(values[i][field]) for i in values ]
             maximum = max(v)
@@ -272,34 +272,34 @@ class ubuntu_performance_iperf(test.test):
             average = sum(v) / float(len(v))
             max_err = (maximum - minimum) / average * 100.0
 
-            print
-            print "iperf3%s_clients%d_%s_%s_mbit_per_sec_minimum %.5f" % (config, clients, direction, field.lower(), minimum)
-            print "iperf3%s_clients%d_%s_%s_mbit_per_sec_maximum %.5f" % (config, clients, direction, field.lower(), maximum)
-            print "iperf3%s_clients%d_%s_%s_mbit_per_sec_average %.5f" % (config, clients, direction, field.lower(), average)
-            print "iperf3%s_clients%d_%s_%s_mbit_per_sec_maximum_error %.2f%%" % (config, clients, direction, field.lower(), max_err)
+            print("")
+            print("iperf3%s_clients%d_%s_%s_mbit_per_sec_minimum %.5f" % (config, clients, direction, field.lower(), minimum))
+            print("iperf3%s_clients%d_%s_%s_mbit_per_sec_maximum %.5f" % (config, clients, direction, field.lower(), maximum))
+            print("iperf3%s_clients%d_%s_%s_mbit_per_sec_average %.5f" % (config, clients, direction, field.lower(), average))
+            print("iperf3%s_clients%d_%s_%s_mbit_per_sec_maximum_error %.2f%%" % (config, clients, direction, field.lower(), max_err))
             if max_err > 5.0:
-                print "FAIL: maximum error is greater than 5%"
+                print("FAIL: maximum error is greater than 5%")
                 test_pass = False
 
             threshold = rate * 0.90
             if average < threshold:
-                print "FAIL: average bitrate of %.2f Mbit/sec is less than minimum threshold of %.2f Mbit/sec" % (average, threshold)
+                print("FAIL: average bitrate of %.2f Mbit/sec is less than minimum threshold of %.2f Mbit/sec" % (average, threshold))
                 test_pass = False
             else:
-                print "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec" % (average, threshold)
+                print("bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec" % (average, threshold))
 
-        print
+        print("")
         if test_pass:
-            print "PASS: test passes specified performance thresholds"
+            print("PASS: test passes specified performance thresholds")
 
     def get_sysinfo(self):
-        print 'date_ctime "' + time.ctime() + '"'
-        print 'date_ns %-30.0f' % (time.time() * 1000000000)
-        print 'kernel_version ' + platform.uname()[2]
-        print 'hostname ' + platform.node()
-        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
-        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
-        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
+        print('date_ctime "' + time.ctime() + '"')
+        print('date_ns %-30.0f' % (time.time() * 1000000000))
+        print('kernel_version ' + platform.uname()[2])
+        print('hostname ' + platform.node())
+        print('virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True))
+        print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
+        print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
         return True
 
     def run_once(self, test_name, clients):
@@ -320,6 +320,6 @@ class ubuntu_performance_iperf(test.test):
         self.set_cpu_governor('powersave')
         self.set_rlimit_nofile(self.oldres)
         self.start_services(self.stopped_services)
-        print
+        print("")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -20,7 +20,7 @@ def step_test():
 
 
 def step0():
-    print 'step0 is the coolest!'
+    print('step0 is the coolest!')
 
 
 def step1():
@@ -28,9 +28,9 @@ def step1():
 
 
 def step2():
-    print 'screw you step0, I am the coolest. -step2'
+    print('screw you step0, I am the coolest. -step2')
     job.next_step('step3')
 
 
 def step3():
-    print 'at least I can run.  unlike step1.'
+    print('at least I can run.  unlike step1.')

@@ -21,7 +21,7 @@ key values = [ 'warnings', 'errors' ]
 # Later one can check that number of errors is not higher than before the patch.
 #kern = job.kernel('3.9.4')
 #kern.config()
-print job.resultdir
+print(job.resultdir)
 #job.run_test('smatch', kernel=kern, build_target='fs/ext4/', tag='ext4-clean')
 #kern.patch('/tmp/my-patches')
 #job.run_test('smatch', kernel=kern, build_target='fs/ext4/', tag='ext4-w-fixes')

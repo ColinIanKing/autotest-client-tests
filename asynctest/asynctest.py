@@ -13,10 +13,10 @@ class asynctest(test.test):
         x = utils.AsyncJob("sleep 1 && echo hi && sleep 1 && echo hi && sleep 1 && echo hi && sleep 1")
         y = utils.AsyncJob("sleep 100")
         time.sleep(2)
-        print "Process 1 stdout is now %s" % x.get_stdout()
+        print("Process 1 stdout is now %s" % x.get_stdout())
         res = x.wait_for()
-        print "Process 1 result object is: %s" % res
+        print("Process 1 result object is: %s" % res)
 
         t = time.time()
         y.wait_for(timeout=1)
-        print "Process 2 took %d to be killed" % (time.time() - t)
+        print("Process 2 took %d to be killed" % (time.time() - t))

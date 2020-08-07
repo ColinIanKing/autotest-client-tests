@@ -56,6 +56,6 @@ class ubuntu_nbd_smoke_test(test.test):
         #
         # FIXME: comment this out on production
         #
-        #print self.results
+        #print(self.results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

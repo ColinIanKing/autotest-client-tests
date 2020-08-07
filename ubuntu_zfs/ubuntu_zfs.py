@@ -61,17 +61,17 @@ class ubuntu_zfs(test.test):
 
         utils.system_output('useradd zfs-tests || true', retain_output=True)
         utils.system_output('echo \"zfs-tests    ALL=(ALL)NOPASSWD: ALL\" >> /etc/sudoers', retain_output=True)
-        print "Extracting zfs-test tarball.."
+        print("Extracting zfs-test tarball..")
         tarball = utils.unmap_url(self.bindir, 'zfs-tests.tar.bz2', self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
         utils.system_output('rsync -arv %s/tests %s/' % (self.bindir, self.srcdir))
 
         os.chdir(self.srcdir)
 
-        print "Patching zfs-test tarball.."
+        print("Patching zfs-test tarball..")
         utils.system('patch -p1 < %s/zfs-tweaks.patch' % self.bindir)
 
-        print "Building zfs-test tarball.."
+        print("Building zfs-test tarball..")
         utils.system('./autogen.sh')
         utils.configure('')
         utils.system('SRCDIR=%s make' % self.srcdir)
@@ -84,7 +84,7 @@ class ubuntu_zfs(test.test):
         os.chdir(self.srcdir)
         cmd = 'RUNFILE="-c %s/linux.run" make test' % self.srcdir
         #cmd = 'LINUX=linux make test'
-        print "Running: " + cmd
+        print("Running: " + cmd)
         self.results = utils.system_output(cmd, retain_output=True)
 
         # parse output and raise test failure if 'prove' failed

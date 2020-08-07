@@ -12,8 +12,8 @@ for tn in range(1,276):
     tns = '%03d' % tn
     p = subprocess.Popen(['grep', '_supported_fs', 'xfstests/'+tns ], stdout=subprocess.PIPE)
     out, err = p.communicate()
-    #print ('%s: %s' % (tns, out))
+    #print('%s: %s' % (tns, out))
     fstypes = out.split()[1:]
     if len(fstypes) == 0:
         fstypes = "['generic']"
-    print "\t    '" + tns + "' : %s," % fstypes
+    print("\t    '" + tns + "' : %s," % fstypes)

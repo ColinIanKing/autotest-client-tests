@@ -43,19 +43,19 @@ class ubuntu_zfs_fstest(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
 
-        print "Extracting fstest tarball.."
+        print("Extracting fstest tarball..")
         tarball = utils.unmap_url(self.bindir, 'fstest.tar.bz2', self.tmpdir)
         utils.extract_tarball_to_dir(tarball, self.srcdir)
 
         os.remove(self.srcdir + '/tests/chown/00.t')
         os.chdir(self.srcdir)
-        print "Building fstest.."
+        print("Building fstest..")
         try:
             nprocs = '-j' + str(multiprocessing.cpu_count())
         except:
             nprocs = ''
         utils.make(nprocs)
-        print "Loading zfs driver.."
+        print("Loading zfs driver..")
         utils.system('modprobe zfs')
 
     def run_once(self, test_name):
@@ -74,14 +74,14 @@ class ubuntu_zfs_fstest(test.test):
         os.chdir('/pool/test')
 
         cmd = 'prove --nocolor -q -r %s' % self.srcdir
-        print "Running: " + cmd
+        print("Running: " + cmd)
         self.results = utils.system_output(cmd, retain_output=True)
-        print self.results
+        print(self.results)
         os.chdir(self.srcdir)
         utils.system('zfs destroy pool/test')
         utils.system('zpool destroy pool')
         utils.system('dd if=/dev/zero of=' + tmp_pool + ' bs=1M count=128 >& /dev/null')
         utils.system('rm -f ' + tmp_pool)
-        print "Done!"
+        print("Done!")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

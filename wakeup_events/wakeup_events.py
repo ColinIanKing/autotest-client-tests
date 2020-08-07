@@ -40,7 +40,8 @@ class wakeup_events(test.test):
             split = line.split('\t')
             keylist[split[0]] = split[1]
 
-        print sys.stderr, keylist
+        from __future__ import print_function
+        print(sys.stderr, keylist)
         self.write_perf_keyval(keylist)
 
 # vi:set ts=4 sw=4 expandtab:

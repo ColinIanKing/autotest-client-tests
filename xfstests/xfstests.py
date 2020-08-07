@@ -166,35 +166,35 @@ class xfstests(test.test):
 
         canonical.setup_proxy()
 
-        print "Fetching xfstests.."
+        print("Fetching xfstests..")
         os.chdir(self.srcdir)
         utils.system('git clone https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
-        print "Using head commit d6e3c3559cf05b5ef078f91a97e9639c3688ead0"
+        print("Using head commit d6e3c3559cf05b5ef078f91a97e9639c3688ead0")
         utils.system('git reset --hard d6e3c3559cf05b5ef078f91a97e9639c3688ead0')
-        print "Patching git repo sources for xfstests-bld"
+        print("Patching git repo sources for xfstests-bld")
         utils.system('patch -p1 < %s/0002-config-use-http-https-protocol-for-firewall.patch' % self.bindir)
-        print "Patching xfsprogs release version for lp:1753987"
+        print("Patching xfsprogs release version for lp:1753987")
         utils.system('patch -p1 < %s/0003-config-use-the-latest-xfsprogs-release.patch' % self.bindir)
-        print "Patching xfstests-bld to add ARM64 xattr syscall support"
+        print("Patching xfstests-bld to add ARM64 xattr syscall support")
         utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)
         #
         #  Fix build link issues with newer toolchains (this is an ugly hack)
         #
         if float(platform.linux_distribution()[1]) > 18.04:
-            print "Patching xfstest-blkd to fix static linking issue"
+            print("Patching xfstest-blkd to fix static linking issue")
             utils.system('patch -p1 < %s/0005-build-all-remove-static-linking-flags-to-fix-build-i.patch' % self.bindir)
-        print "Fetching all repos.."
+        print("Fetching all repos..")
         utils.system('./get-all')
         commit = "204860fa5c454e2b3b75fb3c8fc15dd9b6115a70"
-        print "Using xfs from known stable commit point " + commit
+        print("Using xfs from known stable commit point " + commit)
         os.chdir('xfstests-dev')
         utils.system('git reset --hard ' + commit)
-        print "Patching xfstests.."
+        print("Patching xfstests..")
         utils.system('patch -N -p1 < %s/0001-xfstests-disable-the-broken-btrfs-130-test.patch' % self.bindir)
         utils.system('patch -N -p1 < %s/0006-src-statx.h-ensure-xfstests_statx-is-declared.patch' % self.bindir)
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
-        print "Building xfstests"
+        print("Building xfstests")
         utils.system('pwd')
         try:
             nprocs = '-j' + str(multiprocessing.cpu_count())

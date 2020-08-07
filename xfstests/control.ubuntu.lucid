@@ -73,7 +73,7 @@ for uarg in args:
     argdict[key] = val
 
 # for debugging if needed
-#print "argdict = ", argdict
+#print("argdict = " + argdict)
 
 # You can use a real block device, such as /dev/sdc1
 #device='/dev/sdb1'

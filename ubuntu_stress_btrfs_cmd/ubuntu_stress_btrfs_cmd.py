@@ -85,6 +85,6 @@ class ubuntu_stress_btrfs_cmd(test.test):
         cmd = 'DEV=%s MNT=%s LOG=%s STRESS_NG=%s %s/ubuntu_stress_btrfs_cmd.sh 2>&1' % (dev, mnt, log, stress_ng, self.bindir)
         self.results = utils.system_output(cmd, retain_output=True)
 
-        #print self.results
+        #print(self.results)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

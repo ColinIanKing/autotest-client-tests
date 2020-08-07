@@ -133,7 +133,7 @@ class ubuntu_fs_fio_perf(test.test):
         # as this is really quite destructive!
         #
         if not os.uname()[1] in self.valid_clients:
-            print "unknown host"
+            print("unknown host")
             return
 
         date_start = time.strftime("%Y-%m-%d")

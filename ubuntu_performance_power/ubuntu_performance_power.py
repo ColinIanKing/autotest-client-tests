@@ -44,7 +44,7 @@ class ubuntu_performance_power(test.test):
                 if result.returncode == 0:
                     stopped_services.append(service)
                 else:
-                    print "WARNING: could not stop %s" % (service)
+                    print("WARNING: could not stop %s" % (service))
         return stopped_services
 
     def start_services(self, services):
@@ -53,7 +53,7 @@ class ubuntu_performance_power(test.test):
             result = subprocess.Popen(cmd, shell=True)
             result.communicate()
             if result.returncode != 0:
-                print "WARNING: could not start %s" % (service)
+                print("WARNING: could not start %s" % (service))
 
     def set_rlimit_nofile(self, newres):
         oldres = resource.getrlimit(resource.RLIMIT_NOFILE)
@@ -96,16 +96,16 @@ class ubuntu_performance_power(test.test):
         self.results = utils.system_output('make', retain_output=True)
 
     def get_sysinfo(self):
-        print 'date_ctime "' + time.ctime() + '"'
-        print 'date_ns %-30.0f' % (time.time() * 1000000000)
-        print 'kernel_version ' + platform.uname()[2]
-        print 'hostname ' + platform.node()
-        print 'virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True)
-        print 'cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True)
-        print 'cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True)
-        print 'page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True)
-        print 'pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True)
-        print 'pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True)
+        print('date_ctime "' + time.ctime() + '"')
+        print('date_ns %-30.0f' % (time.time() * 1000000000))
+        print('kernel_version ' + platform.uname()[2])
+        print('hostname ' + platform.node())
+        print('virtualization ' + utils.system_output('systemd-detect-virt || true', retain_output=True))
+        print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
+        print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
+        print('page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True))
+        print('pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
+        print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))
 
     def parse(self, results, test_pass, test_full_name, field, name):
         for line in self.results.splitlines():
@@ -123,17 +123,17 @@ class ubuntu_performance_power(test.test):
                     stddev = 0.0
                 percent_stddev = (stddev / average) * 100.0
 
-                print
-                print "%s_%s" % (test_full_name, name), "%.3f " * len(watts) % tuple(watts)
-                print "%s_%s_minimum %.3f" % (test_full_name, name, minimum)
-                print "%s_%s_maximum %.3f" % (test_full_name, name, maximum)
-                print "%s_%s_average %.3f" % (test_full_name, name, average)
-                print "%s_%s_maximum_error %.3f%%" % (test_full_name, name, max_err)
-                print "%s_%s_stddev %.3f" % (test_full_name, name, stddev)
-                print "%s_%s_percent_stddev %.3f" % (test_full_name, name, percent_stddev)
+                print("")
+                print("%s_%s " % (test_full_name, name) + "%.3f " * len(watts) % tuple(watts))
+                print("%s_%s_minimum %.3f" % (test_full_name, name, minimum))
+                print("%s_%s_maximum %.3f" % (test_full_name, name, maximum))
+                print("%s_%s_average %.3f" % (test_full_name, name, average))
+                print("%s_%s_maximum_error %.3f%%" % (test_full_name, name, max_err))
+                print("%s_%s_stddev %.3f" % (test_full_name, name, stddev))
+                print("%s_%s_percent_stddev %.3f" % (test_full_name, name, percent_stddev))
 
                 if max_err > 5.0:
-                    print "FAIL: maximum error is greater than 5%"
+                    print("FAIL: maximum error is greater than 5%")
                     test_pass = False
         return test_pass
 
@@ -156,8 +156,8 @@ class ubuntu_performance_power(test.test):
         test_pass = self.parse(self.results, test_pass, test_full_name, 'BogoOps:', 'bogoops')
         test_pass = self.parse(self.results, test_pass, test_full_name, 'BogoOpsPerWatt:', 'bogoops_per_watt')
         if test_pass:
-            print "PASS: test passes specified performance thresholds"
-        print
+            print("PASS: test passes specified performance thresholds")
+        print("")
 
         self.set_rlimit_nofile(self.oldres)
         self.start_services(self.stopped_services)

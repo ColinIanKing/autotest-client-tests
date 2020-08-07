@@ -29,7 +29,7 @@ else:
 #
 
 # for debugging if needed
-#print "argdict = ", argdict
+#print("argdict = " + argdict)
 
 # Job configuration, instead of editing xfstests config files, set them
 # right here as environment variables

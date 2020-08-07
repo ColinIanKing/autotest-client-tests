@@ -15,7 +15,7 @@ DOC = ""
 #
 results = job.run_test_detail('ubuntu_generic_fstest', test_name='setup')
 
-print "Invoking fstest functional tests.."
+print("Invoking fstest functional tests..")
 
 #
 #  xfs test fail POSIX tests chown/00.t 141, 145, 159, 153
@@ -24,6 +24,6 @@ tests = [ 'ext2', 'ext3', 'ext4', 'xfs', 'btrfs', 'jfs' ]
 for t in tests:
 	results = job.run_test_detail('ubuntu_generic_fstest', test_name=t, tag=t, timeout=5*60)
 
-print "Done!"
+print("Done!")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

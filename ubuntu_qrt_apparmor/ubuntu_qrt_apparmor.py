@@ -33,10 +33,8 @@ class ubuntu_qrt_apparmor(test.test):
             'libgtk2.0-dev',
             'libpam-apparmor',
             'netcat',
-            'pyflakes',
             'python3',
             'python3-all-dev',
-            'python-pexpect',
             'quilt',
             'sudo',
         ]
@@ -52,6 +50,13 @@ class ubuntu_qrt_apparmor(test.test):
         else:
             for p in ['python3-libapparmor', 'ruby', 'apparmor-easyprof']:
                 pkgs.append(p)
+
+        if series in ['precise', 'trusty', 'xenial', 'bionic', 'focal']:
+            pkgs.append('pyflakes')
+            pkgs.append('python-pexpect')
+        else:
+            pkgs.append('pyflakes3')
+            pkgs.append('python3-pexpect')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

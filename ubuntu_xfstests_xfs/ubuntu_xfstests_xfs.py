@@ -176,7 +176,7 @@ class ubuntu_xfstests_xfs(test.test):
         utils.system('git clone https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         commit_bld = 'a4df7d7b31125901cb1fe9b092f495b6aa950448'
-        print "Using head commit for xfstests-bld" + commit_bld
+        print "Using head commit for xfstests-bld " + commit_bld
         utils.system('git reset --hard ' + commit_bld)
         # print "Patching xfstests-bld to add ARM64 xattr syscall support"
         # utils.system('patch -p1 < %s/0004-Add-syscalls-for-ARM64-platforms-LP-1755499.patch' % self.bindir)

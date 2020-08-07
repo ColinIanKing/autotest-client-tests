@@ -82,7 +82,7 @@ class ubuntu_zfs_xfs_generic(test.test):
 
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         commit_bld = 'a4df7d7b31125901cb1fe9b092f495b6aa950448'
-        print "Using head commit for xfstests-bld" + commit_bld
+        print "Using head commit for xfstests-bld " + commit_bld
         utils.system('git reset --hard ' + commit_bld)
 
         # print "Patching xfstests-bld to add ARM64 xattr syscall support"

@@ -11,6 +11,8 @@ flavour-series:
             comment: 'no extra module for Trusty AWS (lp: 1841410)'
         'quotactl03 quotactl03':
             comment: 'no extra module for Trusty AWS (lp: 1841410)'
+        'quotactl06 quotactl06':
+            comment: 'no extra module for Trusty AWS (lp: 1841410)'
 kernel:
     4.5.0:
         'fanotify07 fanotify07':

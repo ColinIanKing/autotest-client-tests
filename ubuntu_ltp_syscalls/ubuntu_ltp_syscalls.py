@@ -78,8 +78,6 @@ class ubuntu_ltp_syscalls(test.test):
         sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
         print("Test suite HEAD SHA1: {}".format(sha1))
 
-        print("Patching utimensat_tests for Xenial...")
-        utils.system('patch -N -p1 < %s/0001-utimensat_tests-fix-for-xenial.patch' % self.bindir)
         print("Patching fanotify09 for older kernels...")
         utils.system('patch -N -p1 < %s/0001-UBUNTU-SAUCE-skip-fanotify09-test-2-for-older-kernel.patch' % self.bindir)
 

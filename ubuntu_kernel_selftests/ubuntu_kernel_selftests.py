@@ -213,6 +213,12 @@ class ubuntu_kernel_selftests(test.test):
                     cmd = 'chmod -x ' + fn
                     utils.system(cmd)
 
+            # net/txtimestamp.sh is very fragile, disable it
+            #
+            fn = 'linux/tools/testing/selftests/net/Makefile'
+            if os.path.exists(fn):
+                cmd = 'sed -i "/^TEST_PROGS += txtimestamp.sh$/d" ' + fn
+                utils.system(cmd)
 
     def run_once(self, test_name):
         if test_name == 'setup':

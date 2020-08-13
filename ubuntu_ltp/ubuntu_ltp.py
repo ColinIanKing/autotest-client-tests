@@ -134,7 +134,7 @@ class ubuntu_ltp(test.test):
 
         num_failed = sum(1 for line in open(log_failed))
         print("== Test Suite Summary ==")
-        print("{} test cases failed").format(num_failed)
+        print("{} test cases failed".format(num_failed))
 
         if num_failed > 0:
             cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"

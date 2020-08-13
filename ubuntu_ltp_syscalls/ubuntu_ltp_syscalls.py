@@ -182,8 +182,8 @@ class ubuntu_ltp_syscalls(test.test):
         num_failed = sum(1 for line in open(log_failed))
         num_blacklisted = len(blacklisted) if blacklisted else 0
         print("== Test Suite Summary ==")
-        print("{} test cases failed").format(num_failed)
-        print("{} test cases blacklisted").format(num_blacklisted)
+        print("{} test cases failed".format(num_failed))
+        print("{} test cases blacklisted".format(num_blacklisted))
 
         if num_failed > 0:
             cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"

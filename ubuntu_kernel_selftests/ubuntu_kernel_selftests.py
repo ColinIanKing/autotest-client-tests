@@ -73,7 +73,7 @@ class ubuntu_kernel_selftests(test.test):
         failures = list(re.finditer(pattern, self.results))
         if failures:
             for i in failures:
-                print('Sub test case: {} failed.').format(i.group('case'))
+                print('Sub test case: {} failed.'.format(i.group('case')))
             return True
         return False
 

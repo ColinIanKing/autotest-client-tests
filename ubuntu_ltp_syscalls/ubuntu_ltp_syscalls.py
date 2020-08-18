@@ -5,7 +5,6 @@ import os
 import platform
 import re
 import time
-import yaml
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
 
@@ -102,12 +101,19 @@ class ubuntu_ltp_syscalls(test.test):
             # Compatibility fix for release < xenial and release > groovy (no python-packaging on groovy)
             from distutils.version import StrictVersion
         _blacklist = []
-        fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
-        with open(fn, 'r') as f:
-            try:
-                db = yaml.load(f, Loader=yaml.FullLoader)
-            except AttributeError:
-                db = yaml.load(f)
+        # Use testcase-blacklist.yaml if yaml module is available
+        # On newer release this module does not exist with python2
+        # Use testcaseblacklist.py instea
+        try:
+            import yaml
+            fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
+            with open(fn, 'r') as f:
+                try:
+                    db = yaml.load(f, Loader=yaml.FullLoader)
+                except AttributeError:
+                    db = yaml.load(f)
+        except ImportError:
+            from testcaseblacklist import db
         if self.flavour in db['flavour']:
             _blacklist += list(db['flavour'][self.flavour].keys())
         if self.flavour + '-' + self.series in db['flavour-series']:

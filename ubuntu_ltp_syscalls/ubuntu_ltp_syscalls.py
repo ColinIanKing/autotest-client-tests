@@ -47,6 +47,7 @@ class ubuntu_ltp_syscalls(test.test):
             pkgs.append('nfs-kernel-server')
         if self.series not in ['trusty']:
             pkgs.append('haveged')
+        if self.series not in ['trusty', 'groovy']:
             pkgs.append('python-packaging')
 
         cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
@@ -98,7 +99,7 @@ class ubuntu_ltp_syscalls(test.test):
         try:
             from packaging.version          import parse
         except ImportError:
-            # Compatibility fix for release < xenial
+            # Compatibility fix for release < xenial and release > groovy (no python-packaging on groovy)
             from distutils.version import StrictVersion
         _blacklist = []
         fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')

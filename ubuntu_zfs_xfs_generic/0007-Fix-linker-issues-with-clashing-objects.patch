@@ -1,0 +1,49 @@
+From 0119a94c9d9d3e939411297840c98f08952531a1 Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Tue, 18 Aug 2020 16:18:13 +0100
+Subject: [PATCH] Fix linker issues with clashing objects
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Fix gcc-10.2 linker issues, make clashing objects weak to resolve
+linking problems.
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ libxlog/util.c            | 4 ++--
+ mdrestore/xfs_mdrestore.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libxlog/util.c b/libxlog/util.c
+index a85d70c9..069d068b 100644
+--- a/libxlog/util.c
++++ b/libxlog/util.c
+@@ -7,10 +7,10 @@
+ #include "libxfs.h"
+ #include "libxlog.h"
+ 
+-int print_exit;
++int print_exit __attribute__((weak));
+ int print_skip_uuid;
+ int print_record_header;
+-libxfs_init_t x;
++libxfs_init_t x __attribute__((weak));
+ 
+ /*
+  * Return 1 for dirty, 0 for clean, -1 for errors
+diff --git a/mdrestore/xfs_mdrestore.c b/mdrestore/xfs_mdrestore.c
+index 3375e080..26a47c5b 100644
+--- a/mdrestore/xfs_mdrestore.c
++++ b/mdrestore/xfs_mdrestore.c
+@@ -7,7 +7,7 @@
+ #include "libxfs.h"
+ #include "xfs_metadump.h"
+ 
+-char 		*progname;
++char		*progname __attribute__((weak));
+ static int	show_progress = 0;
+ static int	show_info = 0;
+ static int	progress_since_warning = 0;
+-- 
+2.27.0
+

@@ -99,15 +99,22 @@ class ubuntu_zfs_xfs_generic(test.test):
         print("Patching xfstests-dev: fix warning with Awk 5.0.1")
         utils.system('patch -p1 < %s/0006-generic-001-remove-unnecessary-backslash.patch' % self.bindir)
 
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfsprogs-dev'))
+        print("Patching xfstests-dev: fix linker issues with modern gcc")
+        utils.system('patch -p1 < %s/0007-Fix-linker-issues-with-clashing-objects.patch' % self.bindir)
 
-        os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
-        print("getting xfs tests source")
-        utils.system('./get-all')
+        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'fio'))
+        print("Patching fio: fix linker issues with modern gcc")
+        utils.system('patch -p1 < %s/0008-Fix-linker-issues-by-making-tsc_reliable-a-weak-refe.patch' % self.bindir)
 
-#        os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfsprogs-dev'))
-#        print("Patching xfsprogs-dev to disable blkid")
-#        utils.system('patch -p1 < %s/0005-Disable-blkid-by-setting-enable_blkid-no.patch' % self.bindir)
+#       os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
+#       print("getting xfs tests source")
+#       utils.system('./get-all')
 
+#       os.chdir(os.path.join(self.srcdir, 'xfstests-bld', 'xfsprogs-dev'))
+#       print("Patching xfsprogs-dev to disable blkid")
+#       utils.system('patch -p1 < %s/0005-Disable-blkid-by-setting-enable_blkid-no.patch' % self.bindir)
+#
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print("Building xfstests")
         utils.system('./build-all')

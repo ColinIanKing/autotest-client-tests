@@ -1,0 +1,26 @@
+From e143d7f6912e54154ea88c970f1178acf1add0f1 Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Tue, 18 Aug 2020 16:42:02 +0100
+Subject: [PATCH] Fix linker issues by making tsc_reliable a weak reference
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ t/arch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/arch.c b/t/arch.c
+index bd28a848..d63fdba3 100644
+--- a/t/arch.c
++++ b/t/arch.c
+@@ -1,5 +1,5 @@
+ #include "../arch/arch.h"
+ 
+ unsigned long arch_flags = 0;
+-bool tsc_reliable;
++bool tsc_reliable __attribute__((weak));
+ int arch_random;
+-- 
+2.27.0
+

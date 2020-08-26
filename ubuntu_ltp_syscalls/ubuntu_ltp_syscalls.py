@@ -71,11 +71,14 @@ class ubuntu_ltp_syscalls(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
-        cmd = 'git clone --depth=1 https://github.com/linux-test-project/ltp.git'
+        cmd = 'git clone https://github.com/linux-test-project/ltp.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
         # Print test suite HEAD SHA1 commit id for future reference
         os.chdir(os.path.join(self.srcdir, 'ltp'))
+        if self.series in ['trusty']:
+            print("Use a fixed SHA1 for ESM series - 221688d")
+            utils.system_output('git reset 221688d25485436b5dcec67efe77b67f8cf0f2dd --hard', retain_output=False, verbose=False)
         sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
         print("Test suite HEAD SHA1: {}".format(sha1))
 

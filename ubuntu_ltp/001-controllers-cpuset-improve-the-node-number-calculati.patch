@@ -1,4 +1,4 @@
-From abadee5d8c8061ae89c0e0a20a5b7d2e76450c72 Mon Sep 17 00:00:00 2001
+From 80aa8793ebb3c1be5e4743ee6fc90bc19acdaeb7 Mon Sep 17 00:00:00 2001
 From: Po-Hsu Lin <po-hsu.lin@canonical.com>
 Date: Wed, 23 Oct 2019 12:18:00 +0800
 Subject: [PATCH] controllers/cpuset: improve the node number calculation for
@@ -48,10 +48,10 @@ Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
  1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/testcases/kernel/controllers/cpuset/cpuset_funcs.sh b/testcases/kernel/controllers/cpuset/cpuset_funcs.sh
-index 935a41ed0..2665afd31 100755
+index 6706561b2..90d05eb8e 100755
 --- a/testcases/kernel/controllers/cpuset/cpuset_funcs.sh
 +++ b/testcases/kernel/controllers/cpuset/cpuset_funcs.sh
-@@ -28,12 +28,19 @@
+@@ -28,13 +28,20 @@
  
  NR_CPUS=`tst_ncpus`
  if [ -f "/sys/devices/system/node/has_high_memory" ]; then
@@ -61,6 +61,7 @@ index 935a41ed0..2665afd31 100755
 -	N_NODES="`cat /sys/devices/system/node/has_normal_memory`"
 +	N_NODES="`cat /sys/devices/system/node/has_normal_memory | tr ',' ' '`"
  fi
+ mem_string="$N_NODES"
 -N_NODES=${N_NODES#*-*}
 -N_NODES=$(($N_NODES + 1))
 +count=0
@@ -76,5 +77,5 @@ index 935a41ed0..2665afd31 100755
  CPUSET="/dev/cpuset"
  CPUSET_TMP="/tmp/cpuset_tmp"
 -- 
-2.17.1
+2.25.1
 

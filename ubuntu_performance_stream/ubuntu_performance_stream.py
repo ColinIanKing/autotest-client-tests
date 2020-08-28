@@ -227,7 +227,7 @@ class ubuntu_performance_stream(test.test):
         print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
         print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
         print('page_size ' + page_size)
-        print('pages_availble ' + pages_available)
+        print('pages_available ' + pages_available)
         print('memory_available %.2f MB' % (memory_available / (1024 * 1024)))
         print('memory_required %.2f MB' % (memory_required / (1024 * 1024)))
         print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))

@@ -215,7 +215,7 @@ class ubuntu_performance_fio(test.test):
         print('cpus_online ' + utils.system_output('getconf _NPROCESSORS_ONLN', retain_output=True))
         print('cpus_total ' + utils.system_output('getconf _NPROCESSORS_CONF', retain_output=True))
         print('page_size ' + utils.system_output('getconf PAGE_SIZE', retain_output=True))
-        print('pages_availble ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
+        print('pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
         print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))
         print('free_disk_mb %.2f' % (self.get_filesystem_free_mbytes()))
 	print('run_from_path %s' % (os.getcwd()))

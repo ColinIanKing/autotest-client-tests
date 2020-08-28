@@ -211,9 +211,9 @@ class ubuntu_performance_pts(test.test):
             max_err = (maximum - minimum) / average * 100.0
 
             print("")
-            print(benchmark + "_" + field.lower() + "_minimum " + minimum)
-            print(benchmark + "_" + field.lower() + "_maximum " + maximum)
-            print(benchmark + "_" + field.lower() + "_average " + average)
+            print(benchmark + "_" + field.lower() + "_minimum %.2f" % (minimum))
+            print(benchmark + "_" + field.lower() + "_maximum %.2f" % (maximum))
+            print(benchmark + "_" + field.lower() + "_average %.2f" % (average))
             print(benchmark + "_" + field.lower() + "_maximum_error %.2f%%" % (max_err))
             print("")
 

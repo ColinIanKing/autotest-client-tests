@@ -87,7 +87,12 @@ class ubuntu_qrt_apparmor(test.test):
         if test_name == 'setup':
             return
 
-        cmd = 'python2 ./%s -v' % test_name
+        inter = 'python3'
+        series = platform.dist()[2]
+        if series in ['precise', 'trusty', 'xenial', 'bionic', 'focal']:
+            inter = 'python2'
+
+        cmd = '%s ./%s -v' % (inter, test_name)
         self.results = utils.system_output(cmd, retain_output=True)
 
 

@@ -8,11 +8,6 @@ class ubuntu_qrt_apparmor(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
-        try:
-            series = platform.dist()[2]
-        except AttributeError:
-            import distro
-            series = distro.codename()
 
         pkgs = [
             'apparmor',
@@ -41,17 +36,17 @@ class ubuntu_qrt_apparmor(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if series == 'precise':
+        if self.series == 'precise':
             for p in ['python-libapparmor', 'ruby1.8']:
                 pkgs.append(p)
-        elif series in ['trusty', 'xenial', 'bionic', 'cosmic']:
+        elif self.series in ['trusty', 'xenial', 'bionic', 'cosmic']:
             for p in ['python-libapparmor', 'python3-libapparmor', 'ruby', 'apparmor-easyprof']:
                 pkgs.append(p)
         else:
             for p in ['python3-libapparmor', 'ruby', 'apparmor-easyprof']:
                 pkgs.append(p)
 
-        if series in ['precise', 'trusty', 'xenial', 'bionic', 'focal']:
+        if self.series in ['precise', 'trusty', 'xenial', 'bionic', 'focal']:
             pkgs.append('pyflakes')
             pkgs.append('python-pexpect')
         else:
@@ -62,6 +57,11 @@ class ubuntu_qrt_apparmor(test.test):
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
+        try:
+            self.series = platform.dist()[2]
+        except AttributeError:
+            import distro
+            self.series = distro.codename()
         pass
 
     def setup(self):
@@ -88,8 +88,7 @@ class ubuntu_qrt_apparmor(test.test):
             return
 
         inter = 'python3'
-        series = platform.dist()[2]
-        if series in ['precise', 'trusty', 'xenial', 'bionic', 'focal']:
+        if self.series in ['precise', 'trusty', 'xenial', 'bionic', 'focal']:
             inter = 'python2'
 
         cmd = '%s ./%s -v' % (inter, test_name)

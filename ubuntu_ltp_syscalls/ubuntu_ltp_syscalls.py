@@ -83,7 +83,10 @@ class ubuntu_ltp_syscalls(test.test):
         print("Test suite HEAD SHA1: {}".format(sha1))
 
         print("Patching fanotify09 for older kernels...")
-        utils.system('patch -N -p1 < %s/0001-UBUNTU-SAUCE-skip-fanotify09-test-2-for-older-kernel.patch' % self.bindir)
+        if self.series in ['trusty']:
+            utils.system('patch -N -p1 < %s/0001-T-skip-fanotify09-test-2-for-older-kernel.patch' % self.bindir)
+        else:
+            utils.system('patch -N -p1 < %s/0001-skip-fanotify09-test-2-for-older-kernel.patch' % self.bindir)
 
         # Disable NTFS as we disable RW support
         cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'

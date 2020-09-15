@@ -12,7 +12,7 @@ DOC = ""
 
 name = 'ubuntu_performance_iperf'
 
-results = job.run_test_detail('ubuntu_performance_iperf', test_name='setup', tag='setup', clients=0)
+results = job.run_test_detail('ubuntu_performance_iperf', test_name='setup', tag='setup', clients=0, timeout=60*30)
 results = job.run_test_detail('ubuntu_performance_iperf', test_name='ubuntu-performance-iperf', tag='ubuntu-performance-iperf-1', clients=1, timeout=60*30)
 results = job.run_test_detail('ubuntu_performance_iperf', test_name='ubuntu-performance-iperf', tag='ubuntu-performance-iperf-8', clients=8, timeout=60*30)
 

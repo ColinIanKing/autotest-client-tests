@@ -12,6 +12,6 @@ DOC = ""
 
 name = 'ubuntu_lttng_smoke_test'
 
-results = job.run_test_detail('ubuntu_lttng_smoke_test', test_name='lttng-smoke-test', tag='lttng-smoke-test')
+results = job.run_test_detail('ubuntu_lttng_smoke_test', test_name='lttng-smoke-test', tag='lttng-smoke-test', timeout=60*20)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

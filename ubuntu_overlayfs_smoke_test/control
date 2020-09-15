@@ -12,6 +12,6 @@ DOC = ""
 
 name = 'ubuntu_overlayfs_smoke_test'
 
-results = job.run_test_detail('ubuntu_overlayfs_smoke_test', test_name='overlayfs-smoke-test', tag='overlayfs-smoke-test')
+results = job.run_test_detail('ubuntu_overlayfs_smoke_test', test_name='overlayfs-smoke-test', tag='overlayfs-smoke-test', timeout=60*30)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

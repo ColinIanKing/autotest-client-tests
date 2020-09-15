@@ -8,6 +8,6 @@ TEST_CATEGORY = 'Smoke'
 DOC = '''
 '''
 
-job.run_test_detail('ubuntu_boot', test_name='kernel_tainted', tag='kernel_tainted')
-job.run_test_detail('ubuntu_boot', test_name='log_check', tag='log_check')
-job.run_test_detail('ubuntu_boot', test_name='boot_smoke_test', tag='boot_smoke_test')
+job.run_test_detail('ubuntu_boot', test_name='kernel_tainted', tag='kernel_tainted', timeout=60*5)
+job.run_test_detail('ubuntu_boot', test_name='log_check', tag='log_check', timeout=60*5)
+job.run_test_detail('ubuntu_boot', test_name='boot_smoke_test', tag='boot_smoke_test', timeout=60*5)

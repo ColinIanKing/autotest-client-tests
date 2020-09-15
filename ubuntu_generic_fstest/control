@@ -13,7 +13,7 @@ DOC = ""
 #
 # This forces setup() to be run, it is in fact a no-op test
 #
-results = job.run_test_detail('ubuntu_generic_fstest', test_name='setup')
+results = job.run_test_detail('ubuntu_generic_fstest', test_name='setup', timeout=60*30)
 
 print("Invoking fstest functional tests..")
 

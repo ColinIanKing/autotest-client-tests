@@ -20,7 +20,7 @@ BLACKLIST = [
 FS_BLACKLIST = {
 }
 
-result = job.run_test_detail('ubuntu_ecryptfs', test_name='setup', fs_type=None, tag='setup.all')
+result = job.run_test_detail('ubuntu_ecryptfs', test_name='setup', fs_type=None, tag='setup.all', timeout=60*20)
 
 for dir in ['/mnt/upper', '/mnt/lower', '/mnt/image']:
     if not os.path.isdir(dir):

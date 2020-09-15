@@ -36,5 +36,5 @@ except CmdError:
     BUGS.remove('lp1262692')
 
 for bug in BUGS:
-    result = job.run_test_detail(name, bug=bug, tag=bug, ifname=ifname)
+    result = job.run_test_detail(name, bug=bug, tag=bug, ifname=ifname, timeout=60*10)
 

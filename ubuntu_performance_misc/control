@@ -20,7 +20,7 @@ tests = [ 'kernel-wakeups',
           'context-switches',
           'forks' ]
 
-results = job.run_test_detail(name, tag='setup', test_name='setup')
+results = job.run_test_detail(name, tag='setup', test_name='setup', timeout=60*20)
 
 for test in sorted(tests):
         results = job.run_test_detail(name, tag=test, test_name=test, timeout=600)

@@ -14,4 +14,4 @@ Should just gather data
 """
 
 test = 'ubuntu_fs_fio_perf'
-job.run_test_detail(test, test_name=test, tag=test)
+job.run_test_detail(test, test_name=test, tag=test, timeout=60*10)

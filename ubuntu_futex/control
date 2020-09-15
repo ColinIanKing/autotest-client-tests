@@ -12,6 +12,6 @@ DOC = ""
 
 name = 'ubuntu_futex'
 
-results = job.run_test_detail('ubuntu_futex', test_name='futex', tag='futex')
+results = job.run_test_detail('ubuntu_futex', test_name='futex', tag='futex', timeout=60*20)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

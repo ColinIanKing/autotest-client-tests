@@ -21,4 +21,4 @@ than a few Megs. It is a sequential workload. This test stresses the aio
 interface not the disk, or kernel.
 """
 
-job.run_test('aiostress')
+job.run_test('aiostress', timeout=10*60)

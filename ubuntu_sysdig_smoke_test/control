@@ -12,6 +12,6 @@ DOC = ""
 
 name = 'ubuntu_sysdig_smoke_test'
 
-results = job.run_test_detail('ubuntu_sysdig_smoke_test', test_name='sysdig-smoke-test', tag='sysdig-smoke-test')
+results = job.run_test_detail('ubuntu_sysdig_smoke_test', test_name='sysdig-smoke-test', tag='sysdig-smoke-test', timeout=60*30)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

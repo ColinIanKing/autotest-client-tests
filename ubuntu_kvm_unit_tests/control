@@ -18,7 +18,7 @@ BLACKLIST = [
     "vmware_backdoors"
 ]
 
-job.run_test_detail(NAME, test_name='setup', tag='setup')
+job.run_test_detail(NAME, test_name='setup', tag='setup', timeout=60*30)
 
 tests_dir = os.path.join(job.bindir, 'tmp', NAME, 'src', 'kvm-unit-tests', 'tests')
 tests_list = os.listdir(tests_dir)
@@ -27,6 +27,6 @@ for test in tests_list:
     if test in BLACKLIST:
         print("BLACKLISTED: " + test)
         continue
-    job.run_test_detail(NAME, test_name=test, tag=test)
+    job.run_test_detail(NAME, test_name=test, tag=test, timeout=60*30)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

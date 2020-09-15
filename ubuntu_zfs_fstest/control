@@ -10,7 +10,7 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
 DOC = ""
 
-results = job.run_test_detail('ubuntu_zfs_fstest', test_name='setup', tag='setup')
+results = job.run_test_detail('ubuntu_zfs_fstest', test_name='setup', tag='setup', timeout=30*60)
 print("Invoking zfs fstest functional tests..")
 results = job.run_test_detail('ubuntu_zfs_fstest', test_name='zfs-tests', tag='zfs-tests', timeout=10*60)
 

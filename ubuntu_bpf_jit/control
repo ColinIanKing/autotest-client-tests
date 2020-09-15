@@ -12,6 +12,6 @@ DOC = ""
 
 name = 'ubuntu_bpf_jit'
 
-results = job.run_test_detail('ubuntu_bpf_jit', test_name='ubuntu-bpf-jit', tag='ubuntu-bjf-jit')
+results = job.run_test_detail('ubuntu_bpf_jit', test_name='ubuntu-bpf-jit', tag='ubuntu-bjf-jit', timeout=60*20)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

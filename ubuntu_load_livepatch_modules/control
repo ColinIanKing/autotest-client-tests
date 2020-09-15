@@ -15,4 +15,4 @@ run this test to insert all modules patched by that livepatch.
 
 name = 'ubuntu_load_livepatch_modules'
 
-result = job.run_test_detail(name, tag=name)
+result = job.run_test_detail(name, tag=name, timeout=60*30)

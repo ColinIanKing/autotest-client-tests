@@ -15,7 +15,7 @@ hostname = os.uname()[1]
 
 name = 'ubuntu_performance_pts'
 
-results = job.run_test_detail(name, test_name='setup', tag='setup', subtest='setup')
+results = job.run_test_detail(name, test_name='setup', tag='setup', subtest='setup', timeout=60*30)
 
 jobs = [
     [ 'john-the-ripper', 'john-the-ripper-blowfish', 30 ],

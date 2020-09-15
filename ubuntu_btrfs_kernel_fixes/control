@@ -95,7 +95,7 @@ blacklist.append('361c093d7f99c3f6cbb07d5c580ce778ab418c42.sh')
 #
 # This forces setup() to be run, it is in fact a no-op test
 #
-results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name='setup')
+results = job.run_test_detail('ubuntu_btrfs_kernel_fixes', test_name='setup', timeout=60*20)
 
 #
 # setup has generated file containing all the available scripts to run

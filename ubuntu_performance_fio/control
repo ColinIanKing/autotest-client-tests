@@ -38,7 +38,7 @@ tests = [
     'rd-75,wr-25,rand,blk-8k,jobs-8,iodepth-32',
 ]
 
-results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup', media='')
+results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup', media='', timeout=60*30)
 
 if 'TEST_DRIVE_DEV' in os.environ and 'TEST_FILESYSTEM' in os.environ:
     #

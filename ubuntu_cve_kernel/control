@@ -17,5 +17,5 @@ name = 'ubuntu_cve_kernel'
 
 CVES=['CVE-2015-7550', 'CVE-2015-8543', 'CVE-2015-8660', 'CVE-2016-0728', 'CVE-2016-3134', 'CVE-2016-3135', 'CVE-2016-3672']
 for cve in CVES:
-    result = job.run_test_detail(name, cve=cve, tag=cve)
+    result = job.run_test_detail(name, cve=cve, tag=cve, timeout=60*15)
 

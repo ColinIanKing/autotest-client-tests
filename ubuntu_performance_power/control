@@ -28,7 +28,7 @@ tests = {
 }
 
 if os.path.exists("/sys/class/powercap/intel-rapl"):
-    results = job.run_test_detail(name, test_full_name='', test_name='setup', tag='setup', instances=0, options='')
+    results = job.run_test_detail(name, test_full_name='', test_name='setup', tag='setup', instances=0, options='', timeout=60*20)
     print("Estimated run time: %.0f minutes for %d benchmarks." % ((2 + (len(tests) * 7.50)), len(tests)))
 
     for test in sorted(tests):

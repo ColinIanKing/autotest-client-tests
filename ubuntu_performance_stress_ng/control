@@ -58,7 +58,7 @@ tests = {
     'pipe': 1.21
 }
 
-results = job.run_test_detail(name, test_name='setup', tag='setup', threshold=0.0)
+results = job.run_test_detail(name, test_name='setup', tag='setup', threshold=0.0, timeout=60*30)
 print("Estimated run time: %.0f minutes for %d benchmarks." % ((5 + (len(tests) * 3.05)), len(tests)))
 
 for test in sorted(tests):

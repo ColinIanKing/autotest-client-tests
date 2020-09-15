@@ -8,4 +8,4 @@ TEST_CATEGORY = 'Stress'
 DOC = '''
 '''
 
-job.run_test_detail('ubuntu_32_on_64', test_time=600)
+job.run_test_detail('ubuntu_32_on_64', test_time=600, timeout=60*20)

@@ -12,7 +12,7 @@ DOC = ""
 
 # This forces setup() to be run, it is in fact a no-op test
 #
-results = job.run_test_detail('ubuntu_zfs', test_name='setup')
+results = job.run_test_detail('ubuntu_zfs', test_name='setup', timeout=60*20)
 
 import os
 srcdir = os.path.join(job.bindir, 'tmp', NAME, 'src')

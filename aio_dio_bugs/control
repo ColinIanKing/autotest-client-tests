@@ -28,4 +28,4 @@ arglist = 1
 
 
 for test in tests:
-    results = job.run_test('aio_dio_bugs', test_name=test[name], tag=test[name], args=test[arglist])
+    results = job.run_test('aio_dio_bugs', test_name=test[name], tag=test[name], args=test[arglist], timeout=10*60)

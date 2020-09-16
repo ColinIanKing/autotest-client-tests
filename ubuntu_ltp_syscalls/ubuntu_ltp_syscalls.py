@@ -4,8 +4,8 @@ import multiprocessing
 import os
 import platform
 import re
+import sys
 import time
-import yaml
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
 
@@ -102,31 +102,27 @@ class ubuntu_ltp_syscalls(test.test):
         utils.make('install')
 
     def testcase_blacklist(self):
+        sys.path.append(os.path.dirname(__file__))
+        from testcase_blacklist import blacklist_db
         try:
             from packaging.version          import parse
         except ImportError:
             # Compatibility fix for release < xenial and release > groovy (no python-packaging on groovy)
             from distutils.version import StrictVersion
         _blacklist = []
-        fn = os.path.join(self.bindir, 'testcase-blacklist.yaml')
-        with open(fn, 'r') as f:
-            try:
-                db = yaml.load(f, Loader=yaml.FullLoader)
-            except AttributeError:
-                db = yaml.load(f)
-        if self.flavour in db['flavour']:
-            _blacklist += list(db['flavour'][self.flavour].keys())
-        if self.flavour + '-' + self.series in db['flavour-series']:
-            _blacklist += list(db['flavour-series'][self.flavour + '-' + self.series].keys())
+        if self.flavour in blacklist_db['flavour']:
+            _blacklist += list(blacklist_db['flavour'][self.flavour].keys())
+        if self.flavour + '-' + self.series in blacklist_db['flavour-series']:
+            _blacklist += list(blacklist_db['flavour-series'][self.flavour + '-' + self.series].keys())
         try:
             current_version = parse(self.kernel)
-            for _kernel in db['kernel']:
+            for _kernel in blacklist_db['kernel']:
                 if current_version < parse(_kernel):
-                    _blacklist += list(db['kernel'][_kernel].keys())
+                    _blacklist += list(blacklist_db['kernel'][_kernel].keys())
         except NameError:
-            for _kernel in db['kernel']:
+            for _kernel in blacklist_db['kernel']:
                 if StrictVersion(self.kernel) < StrictVersion(_kernel):
-                    _blacklist += list(db['kernel'][_kernel].keys())
+                    _blacklist += list(blacklist_db['kernel'][_kernel].keys())
 
         return _blacklist
 

@@ -7,4 +7,4 @@ TIME = 'MEDIUM'
 DOC='''
 Fsx is a file system regression test.
 '''
-job.run_test('fsx')
+job.run_test('fsx', timeout=60*15)

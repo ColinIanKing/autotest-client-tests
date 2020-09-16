@@ -9,4 +9,4 @@ Create many TCP connections to dual-stack sockets on IPv6 loopback, connecting
 to the IPv4, IPv6-mapped-IPv4 and IPv6 loopback address (different code paths).
 """
 
-job.run_test('ipv6connect')
+job.run_test('ipv6connect', timeout=60*15)

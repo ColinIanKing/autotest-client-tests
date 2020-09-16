@@ -12,4 +12,4 @@ DOC = """
 Create lots of VMAs mapped by lots of tasks.  To tickle objrmap and the
 virtual scan.
 """
-job.run_test('rmaptest')
+job.run_test('rmaptest', timeout=60*15)

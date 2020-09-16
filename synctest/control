@@ -12,4 +12,4 @@ On success, child is killed immediately while data sync is on.
 IPC occurs through semaphore and shared memory.
 
 '''
-job.run_test('synctest' ,len='100', loop='10')
+job.run_test('synctest' ,len='100', loop='10', timeout=60*30)

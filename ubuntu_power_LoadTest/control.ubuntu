@@ -10,5 +10,5 @@ This test runs a load test consisting of cycling though web pages, playing
 videos, etc. and measures battery power draw.
 '''
 
-job.run_test('ubuntu_power_LoadTest')
+job.run_test('ubuntu_power_LoadTest', timeout=60*60)
 

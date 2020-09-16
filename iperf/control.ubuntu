@@ -8,6 +8,6 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = 'client'
 TIME = "SHORT"
 
-result = job.run_test_detail('iperf', server_ip='10.245.80.28', client_ip='localhost', role='client', test_time=300, stream_list=[5], barriers=False)
+result = job.run_test_detail('iperf', server_ip='10.245.80.28', client_ip='localhost', role='client', test_time=300, stream_list=[5], barriers=False, timeout=60*30)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

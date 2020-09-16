@@ -15,4 +15,4 @@ Should just fail every time.
 """
 
 name = 'ubuntu_simple_py_example'
-job.run_test_detail(name, tag=name)
+job.run_test_detail(name, tag=name, timeout=60*10)

@@ -15,4 +15,4 @@ This test connects to a wireless network and navigates to www.msn.com
 """
 
 name = 'ubuntu_WiFi_SimpleConnection'
-job.run_test_detail(name, tag=name)
+job.run_test_detail(name, tag=name, timeout=60*15)

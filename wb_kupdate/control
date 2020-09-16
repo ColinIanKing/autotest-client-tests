@@ -41,4 +41,5 @@ job.run_test('wb_kupdate',
              remove_previous=remove_previous,
              sparse_file=sparse_file,
              old_cleanup=old_cleanup,
-             tag='wb_kupdate_execution')
+             tag='wb_kupdate_execution',
+             timeout=60*15)

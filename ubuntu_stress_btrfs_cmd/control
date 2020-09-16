@@ -12,6 +12,6 @@ DOC = ""
 
 name = 'ubuntu_stress_btrfs_cmd'
 
-results = job.run_test_detail('ubuntu_stress_btrfs_cmd', test_name='stress-btrfs-cmd', tag='stress-btrfs-cmd')
+results = job.run_test_detail('ubuntu_stress_btrfs_cmd', test_name='stress-btrfs-cmd', tag='stress-btrfs-cmd', timeout=60*60)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

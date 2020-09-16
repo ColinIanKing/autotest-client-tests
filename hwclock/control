@@ -9,4 +9,4 @@ DOC = """
 This test checks that we can set and read the hwclock successfully
 """
 
-job.run_test('hwclock')
+job.run_test('hwclock', timeout=60*15)

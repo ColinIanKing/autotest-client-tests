@@ -98,12 +98,12 @@ if (os.uname()[1] == 'akis') or \
 else:
     lkp_commit = 'ef0e92c3bdb9c2647139a51c8bee0538cf452cb4'
 
-results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs, lkp_commit = lkp_commit)
+results = job.run_test_detail(name, tag='setup', lkp_job = 'setup', sub_job = 'setup', lkp_jobs = lkp_jobs, lkp_commit = lkp_commit, timeout=60*30)
 print(results)
 
 for lkp_job in sorted(lkp_jobs):
     print("JOB '%s'" % lkp_job)
     for sub_job in lkp_jobs[lkp_job]:
-        results = job.run_test_detail(name, tag=sub_job, lkp_job = lkp_job, sub_job = sub_job, lkp_jobs = lkp_jobs, lkp_commit = lkp_commit)
+        results = job.run_test_detail(name, tag=sub_job, lkp_job = lkp_job, sub_job = sub_job, lkp_jobs = lkp_jobs, lkp_commit = lkp_commit, timeout=60*30)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

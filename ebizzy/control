@@ -8,4 +8,4 @@ DOC = """
 http://sourceforge.net/project/platformdownload.php?group_id=202378&sel_platform=3809
 """
 
-job.run_test('ebizzy', args = '-vv')
+job.run_test('ebizzy', args = '-vv', timeout=60*30)

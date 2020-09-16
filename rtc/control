@@ -12,4 +12,4 @@ TEST_CLASS = 'kernel'
 TEST_CATEGORY = 'Functional'
 TEST_TYPE = 'client'
 
-job.run_test('rtc')
+job.run_test('rtc', timeout=60*15)

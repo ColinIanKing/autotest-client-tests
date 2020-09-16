@@ -7,4 +7,4 @@ TEST_CATEGORY='Functional'
 DOC='''\
 Test signal passing to processes
 '''
-job.run_test('signaltest')
+job.run_test('signaltest', timeout=60*15)

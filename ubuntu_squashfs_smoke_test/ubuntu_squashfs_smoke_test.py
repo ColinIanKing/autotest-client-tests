@@ -18,7 +18,7 @@ class ubuntu_squashfs_smoke_test(test.test):
             'xfsprogs', 'git', 'acl', 'libattr1-dev', 'squashfs-tools', 'bc',
         ]
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

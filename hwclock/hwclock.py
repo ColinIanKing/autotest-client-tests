@@ -16,7 +16,7 @@ class hwclock(test.test):
             'virt-what',
         ]
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

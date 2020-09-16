@@ -24,7 +24,7 @@ class ubuntu_zram_smoke_test(test.test):
              pkgs.append('linux-modules-extra-' + flavour + '*')
 
         if pkgs:
-            cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+            cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
             self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

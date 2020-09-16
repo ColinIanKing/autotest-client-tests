@@ -49,7 +49,7 @@ class ubuntu_btrfs_kernel_fixes(test.test):
         if self.which('sysbench') is None:
             pkgs.append('sysbench')
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

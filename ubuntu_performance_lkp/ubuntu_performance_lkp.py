@@ -95,7 +95,7 @@ class ubuntu_performance_lkp(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
@@ -120,7 +120,7 @@ class ubuntu_performance_lkp(test.test):
             os.environ["https_proxy"] = "http://squid.internal:3128"
             os.environ["http_proxy"] = "http://squid.internal:3128"
 
-        utils.system_output('apt-get install --yes --force-yes git', retain_output=True)
+        utils.system_output('DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes git', retain_output=True)
 
         os.chdir(self.srcdir)
 

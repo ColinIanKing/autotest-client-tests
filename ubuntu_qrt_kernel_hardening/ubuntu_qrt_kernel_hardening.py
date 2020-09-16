@@ -17,7 +17,7 @@ class ubuntu_qrt_kernel_hardening(test.test):
             'git', 'libcap2-bin', 'gawk', 'execstack', 'exim4', 'libcap-dev',
         ]
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

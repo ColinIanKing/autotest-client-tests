@@ -19,7 +19,7 @@ class iperf(test.test):
             'sysstat', 'iperf'
         ]
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         utils.system(cmd)
 
     def initialize(self):

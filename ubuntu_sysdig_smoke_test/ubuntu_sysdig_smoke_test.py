@@ -11,7 +11,7 @@ class ubuntu_sysdig_smoke_test(test.test):
             'sysdig', 'sysdig-dkms'
         ]
 
-        cmd = 'apt-get install --yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

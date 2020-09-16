@@ -23,7 +23,7 @@ class ubuntu_kvm_smoke_test(test.test):
         if arch == 'aarch64' and series not in ['trusty', 'xenial']:
             pkgs.append('qemu-efi-aarch64')
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

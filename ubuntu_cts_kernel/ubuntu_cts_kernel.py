@@ -29,7 +29,7 @@ class ubuntu_cts_kernel(test.test):
         else:
             pkgs.append('linux-tools-%s' % platform.uname()[2])
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

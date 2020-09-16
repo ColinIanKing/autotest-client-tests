@@ -50,7 +50,7 @@ class ubuntu_ltp_syscalls(test.test):
         if self.series not in ['trusty', 'groovy']:
             pkgs.append('python-packaging')
 
-        cmd = 'apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

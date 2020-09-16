@@ -78,7 +78,7 @@ done
 # Install script dependencies if they don't already exist
 for package in gdb jq python3-yaml iperf3 numactl; do
 	if [ $(dpkg-query -W -f='${Status}' $package 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-		sudo apt install -y "${package}"
+		sudo DEBIAN_FRONTEND=noninteractive apt install -y "${package}"
 	fi
 done
 

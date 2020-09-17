@@ -141,7 +141,7 @@ class ubuntu_ltp_syscalls(test.test):
         if test_name == 'setup':
             return
         # Check if systemd-timesyncd is running before the test, if not, do not try to stop / start it
-        status_output = utils.system_output('systemctl status systemd-timesyncd', ignore_status=True)
+        status_output = utils.system_output('systemctl status systemd-timesyncd 2>&1', ignore_status=True)
         skip_timesyncd = 'inactive' in status_output or 'systemd-timesyncd.service could not be found' in status_output
         fn = '/tmp/syscalls-' + time.strftime("%h%d-%H%M")
         log_failed = fn + '.failed'

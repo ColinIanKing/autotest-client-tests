@@ -71,7 +71,14 @@ class ubuntu_performance_thermal(test.test):
             series = distro.codename()
 
         pkgs = [
+            'apparmor',
             'build-essential',
+            'libaio-dev',
+            'libapparmor-dev',
+            'libattr1-dev',
+            'libbsd-dev',
+            'libkeyutils-dev',
+            'zlib1g-dev'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -85,8 +92,6 @@ class ubuntu_performance_thermal(test.test):
     def setup(self):
         self.install_required_pkgs()
         self.job.require_gcc()
-        cmd = 'apt-get install zlib1g-dev libbsd-dev libattr1-dev libkeyutils-dev libapparmor-dev apparmor libaio-dev --assume-yes --allow-downgrades --allow-change-held-packages'
-        utils.system_output(cmd, retain_output=True)
         os.chdir(self.srcdir)
         self.results = utils.system_output('git clone git://kernel.ubuntu.com/cking/stress-ng', retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))

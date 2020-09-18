@@ -91,6 +91,7 @@ class ubuntu_performance_lkp(test.test):
 
         pkgs = [
             'build-essential',
+            'git'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -119,8 +120,6 @@ class ubuntu_performance_lkp(test.test):
         if "192.168." not in self.get_ip():
             os.environ["https_proxy"] = "http://squid.internal:3128"
             os.environ["http_proxy"] = "http://squid.internal:3128"
-
-        utils.system_output('DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes git', retain_output=True)
 
         os.chdir(self.srcdir)
 

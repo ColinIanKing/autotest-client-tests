@@ -97,6 +97,7 @@ class ubuntu_performance_stream(test.test):
 
     def install_required_pkgs(self):
         arch   = platform.processor()
+        release = platform.release()
         try:
             series = platform.dist()[2]
         except AttributeError:
@@ -106,6 +107,9 @@ class ubuntu_performance_stream(test.test):
         pkgs = [
             'gfortran',
             'libgomp1',
+            'linux-tools-generic',
+            'linux-tools-' + release
+
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -117,15 +121,6 @@ class ubuntu_performance_stream(test.test):
         pass
 
     def setup(self):
-        release = platform.release()
-
-        pkgs = [
-            'linux-tools-generic',
-            'linux-tools-' + release
-        ]
-        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
-        self.results = utils.system_output(cmd, retain_output=True)
-
         self.install_required_pkgs()
         self.job.require_gcc()
         stream_exe_path = os.path.join(self.srcdir, stream_bin)

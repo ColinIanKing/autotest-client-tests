@@ -13,4 +13,4 @@ bugfix it should see the writer making forward progress.
 """
 
 
-job.run_test('iosched_bugs', timeout=60*10)
+job.run_test('iosched_bugs', timeout=60*15)

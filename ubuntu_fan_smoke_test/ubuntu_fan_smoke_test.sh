@@ -60,6 +60,12 @@ if [ -n "$http_proxy" ]; then
             ;;
     esac
 
+    mkdir -p /etc/systemd/system/containerd.service.d
+    touch /etc/systemd/system/containerd.service.d/override.conf
+    echo -e "[Service]\nExecStartPre=" >> /etc/systemd/system/containerd.service.d/override.conf
+    systemctl daemon-reload
+    systemctl restart docker.service
+
     echo $EOPTS "[Service]\nEnvironment=\"HTTP_PROXY=$http_proxy\"\n" \
          > /etc/systemd/system/docker.service.d/http-proxy.conf
     systemctl daemon-reload

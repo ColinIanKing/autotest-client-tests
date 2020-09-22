@@ -21,7 +21,7 @@ class ubuntu_quota_smoke_test(test.test):
         ]
 
         flavour = re.split('-\d*-', platform.uname()[2])[-1]
-        if flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke']:
+        if flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke', 'gkeop']:
              pkgs.append('linux-modules-extra-' + flavour + '*')
 
         cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)

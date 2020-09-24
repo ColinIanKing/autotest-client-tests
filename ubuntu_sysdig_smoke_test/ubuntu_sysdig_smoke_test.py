@@ -12,7 +12,7 @@ class ubuntu_sysdig_smoke_test(test.test):
         ]
 
         cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
-        self.results = utils.system_output(cmd, retain_output=True)
+        self.results = utils.system_output(cmd, retain_output=True, ignore_status=True)
 
     def initialize(self):
         pass

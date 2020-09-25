@@ -52,6 +52,8 @@ class ubuntu_qrt_apparmor(test.test):
         else:
             pkgs.append('pyflakes3')
             pkgs.append('python3-pexpect')
+            pkgs.append('python3-notify2')
+            pkgs.append('python3-psutil')
 
         cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

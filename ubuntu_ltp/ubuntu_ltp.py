@@ -118,8 +118,8 @@ class ubuntu_ltp(test.test):
                     if 'memcg_test_3' in line and LTP_TIMEOUT_MUL > 1:
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
                     elif 'zram01' in line:
-                        print("set timeout multiplier LTP_TIMEOUT_MUL=3 for zram01 (bug 1852976)")
-                        LTP_TIMEOUT_MUL = 3
+                        print("set timeout multiplier LTP_TIMEOUT_MUL=5 for zram01 (bug 1852976, 1897556)")
+                        LTP_TIMEOUT_MUL = 5
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
 
                     cmd = '/opt/ltp/runltp -f /tmp/target -S /tmp/skip -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)

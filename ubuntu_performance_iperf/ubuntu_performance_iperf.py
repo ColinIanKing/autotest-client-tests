@@ -158,11 +158,11 @@ class ubuntu_performance_iperf(test.test):
             'linux-tools-generic',
             'linux-tools-' + release
         ]
-        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'yes "" | yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
         cmd = "su " + username + " -c 'ssh " + username + "@" + test_server
-        cmd += " sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes " + " ".join(pkgs) + "'"
+        cmd += " sudo yes "" | yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes " + " ".join(pkgs) + "'"
         self.results = utils.system_output(cmd, retain_output=True)
 
     def get_stats(self, results, fields):

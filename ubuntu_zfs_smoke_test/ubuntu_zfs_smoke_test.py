@@ -28,7 +28,7 @@ class ubuntu_zfs_smoke_test(test.test):
         else:
             pkgs.append('zfsutils-linux')
 
-        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

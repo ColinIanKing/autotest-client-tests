@@ -17,7 +17,7 @@ class ubuntu_docker_smoke_test(test.test):
             if platform.machine() in ['aarch64', 'ppc64le']:
                 print("Package docker.io is not available for this arch on Trusty.")
                 sys.exit(0)
-        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

@@ -55,7 +55,7 @@ class ubuntu_qrt_apparmor(test.test):
             pkgs.append('python3-notify2')
             pkgs.append('python3-psutil')
 
-        cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):

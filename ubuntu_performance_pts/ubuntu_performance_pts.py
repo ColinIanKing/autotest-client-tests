@@ -115,7 +115,7 @@ class ubuntu_performance_pts(test.test):
         pkgs.append(gcc)
 
         for p in pkgs:
-            cmd = 'DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' ' + p
+            cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' ' + p
             utils.system_output(cmd, retain_output=False)
 
     def initialize(self):

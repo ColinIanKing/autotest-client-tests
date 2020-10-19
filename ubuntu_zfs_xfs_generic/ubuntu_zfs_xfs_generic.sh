@@ -29,7 +29,9 @@ truncate -s 1G ${vdev2}
 truncate -s 1G ${vdev3}
 truncate -s 1G ${vdev4}
 
+zpool destroy $POOL &> /dev/null || true
 echo "Creating zfs pool $POOL.."
+
 zpool create $POOL mirror $vdev0 $vdev1 -f
 zpool add $POOL mirror $vdev2 $vdev3 -f
 zpool add $POOL log $vdev4 -f

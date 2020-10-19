@@ -182,6 +182,7 @@ do_test()
 	VDEV3=${VDEV_PATH}/block-dev-3
 	VDEV4=${VDEV_PATH}/block-dev-4
 
+	zpool destroy $POOL &> /dev/null || true
 	zpool create $POOL mirror $VDEV0 $VDEV1 -f
 	zpool add $POOL mirror $VDEV2 $VDEV3 -f
 	zpool add $POOL log $VDEV4 -f

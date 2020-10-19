@@ -37,7 +37,7 @@ else:
     #
     print("Invoking zfs xfs generic functional tests..\n")
     for test in tests:
-	    results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name=test, tag=test, timeout=60*40)
+	    results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name=test, tag=test, timeout=60*120)
 
     print("Done!\n")
 

@@ -47,7 +47,9 @@ do_log()
 do_tidy()
 {
 	echo "Interrupted. Cleaning up.."
-	killall -9 stress-ng &> /dev/null
+	killall -ALRM -r "stress-ng-.*" &> /dev/null
+	sleep 1
+	killall -KILL -r "stress-ng.*" &> /dev/null
 	cd
 	umount $MNT
 	rm -f $VFAT_IMAGE
@@ -101,6 +103,9 @@ do_terminate()
 	while true
 	do
 		if check_dead; then break; fi
+		killall -ALRM -r "stress-ng-.*" &> /dev/null
+		sleep 1
+		killall -ALRM  "stress-ng" &> /dev/null
 		kill -TERM $pid &> /dev/null
 		sleep 1
 		if check_dead; then break; fi
@@ -113,6 +118,7 @@ do_terminate()
 		killall -ALRM stress-ng &> /dev/null
 		sleep 1
 		if check_dead; then break; fi
+		killall -KILL -r "stress-ng-.*" &> /dev/null
 		killall -KILL stress-ng &> /dev/null
 		sleep 1
 		if check_dead; then break; fi
@@ -123,6 +129,52 @@ do_terminate()
 		fi
 	done
 }
+
+do_mount()
+{
+	local N=0
+	mount ${VFAT_IMAGE} ${MNT} -o ${OPT}
+
+	while true
+	do
+		if [ $(grep "$MNT" /proc/mounts | wc -l) -gt 0 ]; then
+			do_log "mounted ${MNT}"
+			break
+		fi
+		N=$((N+1))
+		if [ $N -gt 30 ]; then
+			do_log "mount vfat ${MNT} failed after $N attempts"
+			break
+		fi
+		sleep 1
+	done
+}
+
+do_umount()
+{
+	local N=0
+	local pid=$1
+
+	while true
+	do
+		umount ${MNT}
+
+		if [ $(grep "$MNT" /proc/mounts | wc -l) -eq 0 ]; then
+			do_log "unmounted ${MNT}"
+			break
+		fi
+		killall -KILL -r "stress-ng-.*" &> /dev/null
+		do_log "umount vfat ${MNT} failed (attempt $N)"
+		lsof ${MNT}
+		N=$((N+1))
+		if [ $N -gt 30 ]; then
+			do_log "umount vfat ${MNT} failed after $N attempts"
+			break
+		fi
+		sleep 1
+	done
+}
+
 
 do_test()
 {
@@ -160,7 +212,7 @@ do_test()
 
 	mkfs.vfat ${LOOP_DEV}
 	mkdir -p ${MNT}
-	mount ${VFAT_IMAGE} ${MNT} -o ${OPT}
+	do_mount
 
 	#
 	# Ensure clean state
@@ -239,11 +291,7 @@ do_test()
 
 	sleep 1
 	do_log "umounting vfat ${LOOP_DEV} ${MNT}"
-	umount ${MNT}
-	if [ $? -ne 0 ]; then
-		do_log "umount vfat ${MNT} failed"
-	fi
-	sleep 1
+	do_umount $sngpid
 	do_log "destroying loop ${LOOP_DEV}"
 	losetup -d ${LOOP_DEV}
 	if [ $? -ne 0 ]; then

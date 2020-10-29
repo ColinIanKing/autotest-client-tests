@@ -6,8 +6,18 @@ import platform
 import re
 import sys
 import time
+import signal
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
+
+# python is redefining the SIGXFSZ handler internally, blocking the delivery of
+# this signal to any forked task. Make sure to restore the default signal
+# handler for SIGXFSZ before running any test.
+try:
+    signal.signal(signal.SIGXFSZ, signal.SIG_DFL)
+except Exception, e:
+    print(e)
+    sys.stdout.flush()
 
 class ubuntu_ltp_syscalls(test.test):
     version = 1

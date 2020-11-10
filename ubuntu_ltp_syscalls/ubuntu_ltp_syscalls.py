@@ -57,7 +57,7 @@ class ubuntu_ltp_syscalls(test.test):
             pkgs.append('nfs-kernel-server')
         if self.series not in ['trusty']:
             pkgs.append('haveged')
-        if self.series not in ['trusty', 'groovy']:
+        if self.series not in ['trusty', 'groovy', 'hirsute']:
             pkgs.append('python-packaging')
 
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)

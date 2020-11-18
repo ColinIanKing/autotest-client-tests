@@ -177,6 +177,11 @@ class ubuntu_ltp_syscalls(test.test):
                     if 'getrandom02' in line and LTP_TIMEOUT_MUL > 1:
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
 
+                    # Set the timeout multiplier for ioctl_sg01 on Oracle (lp:1895281)
+                    if 'ioctl_sg01' in line and self.flavour == 'oracle':
+                        print("Running on Oracle, set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1895281) for ioctl_sg01")
+                        os.environ["LTP_TIMEOUT_MUL"] = '3'
+
                     # Stop timesyncd when testing time change
                     if not skip_timesyncd and self.should_stop_timesyncd(line):
                         utils.run('systemctl stop systemd-timesyncd')
@@ -190,8 +195,9 @@ class ubuntu_ltp_syscalls(test.test):
                         utils.run('systemctl start systemd-timesyncd')
 
                     # Restore the timeout multiplier
-                    if 'getrandom02' in line and 'LTP_TIMEOUT_MUL' in os.environ:
-                        del os.environ["LTP_TIMEOUT_MUL"]
+                    if 'LTP_TIMEOUT_MUL' in os.environ:
+                        if 'getrandom02' in line or 'ioctl_sg01' in line:
+                            del os.environ["LTP_TIMEOUT_MUL"]
 
         num_failed = sum(1 for line in open(log_failed))
         num_blacklisted = len(blacklisted) if blacklisted else 0

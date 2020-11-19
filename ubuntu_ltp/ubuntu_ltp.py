@@ -71,9 +71,6 @@ class ubuntu_ltp(test.test):
         sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
         print("Test suite HEAD SHA1: {}".format(sha1))
 
-        print("Patching controllers/cpuset (lp:1836188)")
-        utils.system('patch -N -p1 < %s/001-controllers-cpuset-improve-the-node-number-calculati.patch' % self.bindir)
-
         # Disable NTFS as we disable RW support
         cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'
         utils.system_output(cmd)

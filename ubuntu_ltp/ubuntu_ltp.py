@@ -118,16 +118,19 @@ class ubuntu_ltp(test.test):
                         print("set timeout multiplier LTP_TIMEOUT_MUL=5 for zram01 (bug 1852976, 1897556)")
                         LTP_TIMEOUT_MUL = 5
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
+                    elif 'ioctl_sg01' in line and self.flavour in ['azure', 'oracle']:
+                        print("Running on Azure / Oracle, set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1899413) for cve-2018-1000204 (ioctl_sg01)")
+                        os.environ["LTP_TIMEOUT_MUL"] = '3'
+
 
                     cmd = '/opt/ltp/runltp -f /tmp/target -S /tmp/skip -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
                     utils.run(cmd, ignore_status=True, verbose=False)
                     # /dev/loop# creation will be taken care by the runltp
 
                     # Restore the timeout multiplier
-                    if 'memcg_test_3' in line and 'LTP_TIMEOUT_MUL' in os.environ:
-                        del os.environ["LTP_TIMEOUT_MUL"]
-                    elif 'zram01' in line and 'LTP_TIMEOUT_MUL' in os.environ:
-                        del os.environ["LTP_TIMEOUT_MUL"]
+                    if 'LTP_TIMEOUT_MUL' in os.environ:
+                        if 'memcg_test_3' in line or 'zram01' in line or 'ioctl_sg01' in line:
+                            del os.environ["LTP_TIMEOUT_MUL"]
 
         num_failed = sum(1 for line in open(log_failed))
         print("== Test Suite Summary ==")

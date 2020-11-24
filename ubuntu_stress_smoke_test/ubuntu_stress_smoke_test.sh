@@ -60,6 +60,11 @@ EXCLUDE+="rdrand str tsc vecmath wcs zlib matrix-3d "
 #
 EXCLUDE+="xattr efivar sysinfo "
 #
+# Currenly a new stress test can causes problems with s390x on older kernels
+# https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1905438
+#
+EXCLUDE+="uprobe "
+#
 # Tests that should be skipped on KVM kernels
 #
 [ "$(uname -r | awk -F'-' '{print $NF}')" == "kvm" ] && EXCLUDE+="dnotify "

@@ -58,7 +58,7 @@ EXCLUDE+="rdrand str tsc vecmath wcs zlib matrix-3d "
 #
 # Tests that are known to cause breakage
 #
-EXCLUDE+="xattr efivar sysinfo "
+EXCLUDE+="xattr efivar sysinfo sysinval "
 #
 # Currenly a new stress test can causes problems with s390x on older kernels
 # https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1905438

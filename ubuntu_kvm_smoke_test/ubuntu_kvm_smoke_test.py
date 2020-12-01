@@ -17,6 +17,7 @@ class ubuntu_kvm_smoke_test(test.test):
         pkgs = [
             'cpu-checker',
             'uvtool',
+            'uvtool-libvirt',
         ]
         # qemu-efi-aarch64 is needed for ARM64 Bionic, which is only
         # available since Artful

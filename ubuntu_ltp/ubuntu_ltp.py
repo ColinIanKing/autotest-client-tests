@@ -12,7 +12,6 @@ class ubuntu_ltp(test.test):
     version = 1
 
     def install_required_pkgs(self):
-        arch   = platform.processor()
         try:
             series = platform.dist()[2]
         except AttributeError:
@@ -42,7 +41,7 @@ class ubuntu_ltp(test.test):
             'xfslibs-dev',
             'xfsprogs',
         ]
-        gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
+        gcc = 'gcc' if self.arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
         if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke', 'gkeop']:
@@ -53,6 +52,7 @@ class ubuntu_ltp(test.test):
 
     def initialize(self):
         self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
+        self.arch = platform.processor()
         pass
 
     # setup
@@ -108,6 +108,9 @@ class ubuntu_ltp(test.test):
         if self.flavour in ['azure', 'oracle']:
             print("Running on Azure / Oracle, set timeout multiplier LTP_TIMEOUT_MUL=3 for cve-2018-1000204 / ioctl_sg01 (lp:1899413)")
             timeout_cases['ioctl_sg01'] = '3'
+        if self.arch in ['ppc64le']:
+            print("Running on PowerPC, set timeout multiplier LTP_TIMEOUT_MUL=3 for fs_fill (lp:1878763)")
+            timeout_cases['fs_fill'] = '3'
 
         os.environ["LTP_TIMEOUT_MUL"] = '1'
         with open(fn , 'r') as f:

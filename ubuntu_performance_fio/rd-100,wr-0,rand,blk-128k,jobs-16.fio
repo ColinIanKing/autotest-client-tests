@@ -1,9 +1,10 @@
 [global]
-ioengine=libaio
+ioengine=sync
 thread=1
 norandommap=1
-randrepeat=0
-size=SIZE
+allrandrepeat=1
+clocksource=cpu
+size=32768M
 ramp_time=30
 disable_lat=0
 direct=1
@@ -13,9 +14,7 @@ time_based
 runtime=60
 group_reporting
 unlink=1
-[rd-0,wr-100,rand,blk-8k,jobs-8,iodepth-32]
-bs=8K
-rw=randwrite
-numjobs=8
-iodepth=32
-randseed=1762726
+[rd-100,wr-0,rand,blk-128k,jobs-16]
+bs=128K
+rw=randread
+numjobs=16

@@ -100,37 +100,33 @@ class ubuntu_ltp(test.test):
 
         fn = '/opt/ltp/runtest/%s' % (test_name)
 
-        print("Checking virt-what to see if we need to set LTP_TIMEOUT_MUL for memcg_test_3...")
-        LTP_TIMEOUT_MUL = 1
+        print("Setting LTP_TIMEOUT_MUL exceptions...")
+        timeout_cases = { 'zram01': '5'}
         if utils.system_output('virt-what', verbose=False):
-            print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL=3 for the following tests:")
-            print("memcg_test_3 (lp:1836694)")
-            LTP_TIMEOUT_MUL = 3
+            print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL=3 for memcg_test_3 (lp:1836694)")
+            timeout_cases['memcg_test_3'] = '3'
+        if self.flavour in ['azure', 'oracle']:
+            print("Running on Azure / Oracle, set timeout multiplier LTP_TIMEOUT_MUL=3 for cve-2018-1000204 / ioctl_sg01 (lp:1899413)")
+            timeout_cases['ioctl_sg01'] = '3'
+
+        os.environ["LTP_TIMEOUT_MUL"] = '1'
         with open(fn , 'r') as f:
             for line in f:
                 if line.strip() and not line.startswith('#'):
                     with open ('/tmp/target' , 'w') as t:
                         t.write(line)
 
-                    if 'memcg_test_3' in line and LTP_TIMEOUT_MUL > 1:
-                        os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
-                    elif 'zram01' in line:
-                        print("set timeout multiplier LTP_TIMEOUT_MUL=5 for zram01 (bug 1852976, 1897556)")
-                        LTP_TIMEOUT_MUL = 5
-                        os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
-                    elif 'ioctl_sg01' in line and self.flavour in ['azure', 'oracle']:
-                        print("Running on Azure / Oracle, set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1899413) for cve-2018-1000204 (ioctl_sg01)")
-                        os.environ["LTP_TIMEOUT_MUL"] = '3'
-
+                    for _case in timeout_cases:
+                        if _case in line:
+                            os.environ["LTP_TIMEOUT_MUL"] = timeout_cases[_case]
+                            break
 
                     cmd = '/opt/ltp/runltp -f /tmp/target -S /tmp/skip -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
                     utils.run(cmd, ignore_status=True, verbose=False)
                     # /dev/loop# creation will be taken care by the runltp
 
                     # Restore the timeout multiplier
-                    if 'LTP_TIMEOUT_MUL' in os.environ:
-                        if 'memcg_test_3' in line or 'zram01' in line or 'ioctl_sg01' in line:
-                            del os.environ["LTP_TIMEOUT_MUL"]
+                    os.environ["LTP_TIMEOUT_MUL"] = '1'
 
         num_failed = sum(1 for line in open(log_failed))
         print("== Test Suite Summary ==")

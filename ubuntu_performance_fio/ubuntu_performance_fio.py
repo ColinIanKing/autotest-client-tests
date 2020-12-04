@@ -22,7 +22,7 @@ test_iterations = 3
 #
 # Size of FIO files in MB
 #
-file_size_mb=2048
+file_size_mb=32768
 #
 # Max size of ramfs image (16GB)
 #
@@ -285,14 +285,14 @@ class ubuntu_performance_fio(test.test):
         file = testname + ".fio"
         fin = open(os.path.join(self.bindir, file), "r")
         fout = open(os.path.join(self.srcdir, file), "w")
-        file_size = "%dM" % (file_size_mb)
 
         for line in fin:
             if TEST_FILESYSTEM == None or TEST_DRIVE_DEV == None:
                 line = line.replace("DIRECTORY", test_dir)
             else:
                 line = line.replace("DIRECTORY", TEST_MNT)
-            line = line.replace("SIZE", file_size)
+	    if line.startswith("size="):
+	        file_size_mb = line.split("size=", 1)[1].rstrip('\n')
             #
             #  zfs and ramdisk can't do O_DIRECT, so skip this
             #

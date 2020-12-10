@@ -47,7 +47,7 @@ class ubuntu_kernel_selftests(test.test):
 
         if self.kv >= 510:
             # python3-docutils is needed for bpf selftests build
-            pkgs.extend(['pyhon3-docutils'])
+            pkgs.extend(['python3-docutils'])
 
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

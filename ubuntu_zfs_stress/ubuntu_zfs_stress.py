@@ -17,20 +17,9 @@ class ubuntu_zfs_stress(test.test):
             series = distro.codename()
 
         pkgs = [
-            'perl',
             'build-essential',
             'gdb',
             'git',
-            'ksh',
-            'autoconf',
-            'acl',
-            'dump',
-            'kpartx',
-            'pax',
-            'nfs-kernel-server',
-            'xfsprogs',
-            'libattr1-dev',
-            'libkeyutils-dev',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
@@ -39,9 +28,6 @@ class ubuntu_zfs_stress(test.test):
             utils.system_output('add-apt-repository ppa:zfs-native/stable -y', retain_output=True)
             utils.system_output('apt-get update || true', retain_output=True)
             pkgs.append('ubuntu-zfs')
-        elif series == 'wily':
-            pkgs.append('zfs-dkms')
-            pkgs.append('zfsutils-linux')
         else:
             pkgs.append('zfsutils-linux')
 

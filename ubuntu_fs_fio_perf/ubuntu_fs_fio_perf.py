@@ -2,6 +2,7 @@ import multiprocessing
 import os
 import platform
 from autotest.client import test, utils
+from autotest.client.shared import error
 import time
 
 gb = 1024 * 1024 * 1024

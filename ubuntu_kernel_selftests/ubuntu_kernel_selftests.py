@@ -244,7 +244,7 @@ class ubuntu_kernel_selftests(test.test):
                 os.environ["LLC"] = "llc-9"
                 os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
                 os.environ["LLVM_READELF"] = "llvm-readelf-9"
-            cmd = "make -C linux/tools/testing/selftests TARGETS=bpf SKIP_TARGETS="
+            cmd = "make -C linux/tools/testing/selftests TARGETS=bpf SKIP_TARGETS= KDIR=/usr/src/linux-headers-{}".format(platform.release())
             utils.system(cmd)
         cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
         self.results = utils.system_output(cmd, retain_output=True)

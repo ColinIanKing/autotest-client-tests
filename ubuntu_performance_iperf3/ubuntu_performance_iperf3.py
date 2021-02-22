@@ -24,7 +24,9 @@ class ubuntu_performance_iperf3(test.test):
     version = 0
 
     def install_required_pkgs(self):
-        pass
+        pkgs = ['dmidecode']
+        cmd = 'DEBIAN_FRONTEND=noninteractive apt install -y ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
         pass
@@ -33,7 +35,15 @@ class ubuntu_performance_iperf3(test.test):
         os.chdir(self.srcdir)
 
     def run_once(self, test_name):
-        config = 'ubuntu_iperf_config.yaml'
+        bpn = utils.system_output(
+            'dmidecode -s baseboard-product-name',
+            retain_output=True,
+        )
+        if bpn == 'NVIDIA DGX-2':
+            config = 'dgx2.yaml'
+        else:
+            raise KeyError("No iperf3 config file for server {}".format(bpn))
+
         #
         #  iperf3 performance tests on DGX2 Mellanox NIC.
         #

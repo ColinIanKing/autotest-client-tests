@@ -41,6 +41,8 @@ class ubuntu_performance_iperf3(test.test):
         )
         if bpn == 'NVIDIA DGX-2':
             config = 'dgx2.yaml'
+        elif bpn == 'DGXA100':
+            config = 'a100.yaml'
         else:
             raise KeyError("No iperf3 config file for server {}".format(bpn))
 

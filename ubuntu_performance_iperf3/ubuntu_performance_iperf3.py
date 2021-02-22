@@ -17,7 +17,6 @@
 #
 import os
 import shutil
-import platform
 from autotest.client                        import test, utils
 
 class ubuntu_performance_iperf3(test.test):

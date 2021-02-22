@@ -35,7 +35,8 @@ cleanup_on_exit() {
 	sudo ip link set dev $client_iface down &>/dev/null || true
 	sudo ip netns exec 2xgd ip link set $server_iface netns 1 &>/dev/null || true
 	sudo ip netns delete 2xgd &>/dev/null || true
-	sudo service irqbalance start &>/dev/null || true
+	[ ! -x /usr/sbin/irqbalance ] || \
+	    sudo service irqbalance start &>/dev/null || true
 	sudo /usr/bin/cpupower frequency-set -g powersave >/dev/null
 }
 trap cleanup_on_exit EXIT
@@ -91,7 +92,7 @@ client_numa_node="$(cat /sys/class/net/$client_iface/device/numa_node)"
 
 
 # Host tuning based on info in fastdata.es.net and Mellanox.
-sudo service irqbalance stop
+[ ! -x /usr/sbin/irqbalance ] || sudo service irqbalance stop
 sudo /usr/bin/cpupower frequency-set -g performance > /dev/null
 
 # Setup client/server ip address based on Spec.

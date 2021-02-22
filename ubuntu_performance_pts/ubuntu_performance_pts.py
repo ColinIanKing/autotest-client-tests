@@ -228,7 +228,7 @@ class ubuntu_performance_pts(test.test):
             print("NOTRUN: test not run, no data")
 
     def run_john_the_ripper_blowfish(self, test_name, tag):
-        cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; %s phoronix-test-suite batch-benchmark john-the-ripper-1.6.2' % force_times_to_run
+        cmd = 'export PRESET_OPTIONS="john-the-ripper.run-test=Blowfish"; %s phoronix-test-suite batch-benchmark john-the-ripper-1.7.2' % force_times_to_run
         self.print_stats('john_the_ripper_blowfish', cmd)
 
     def run_john_the_ripper_des(self, test_name, tag):

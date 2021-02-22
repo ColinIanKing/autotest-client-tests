@@ -33,17 +33,15 @@ class ubuntu_performance_iperf3(test.test):
         os.chdir(self.srcdir)
 
     def run_once(self, test_name):
+        config = 'ubuntu_iperf_config.yaml'
         #
         #  iperf3 performance tests on DGX2 Mellanox NIC.
         #
         shutil.copy(
-            os.path.join(self.bindir, 'ubuntu_iperf3_config.yaml'),
-            os.path.join(
-                os.path.sep, 'tmp',
-                'ubuntu_iperf3_config.yaml'
-            )
+            os.path.join(self.bindir, config),
+            os.path.join(os.path.sep, 'tmp', config)
         )
         cmd = self.bindir + \
-            '/ubuntu_iperf3_test.sh -c /tmp/ubuntu_iperf3_config.yaml'
+            '/ubuntu_iperf3_test.sh -c /tmp/{}'.format(config)
         self.results = utils.system_output(cmd, retain_output=True)
 # vi:set ts=4 sw=4 expandtab syntax=python:

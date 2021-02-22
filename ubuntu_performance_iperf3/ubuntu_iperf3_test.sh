@@ -31,6 +31,7 @@ cleanup_on_exit() {
 	fi
 	rm -f /tmp/iperf3-config.json &>/dev/null || true
 	rm -f "${logfiles[@]}" || true
+	[ -z "${mt_tmp}" ] || rm -rf "${mt_tmp}"
 	killall -9 iperf3 &>/dev/null || true
 	sudo ip link set dev $client_iface down &>/dev/null || true
 	sudo ip netns exec 2xgd ip link set $server_iface netns 1 &>/dev/null || true
@@ -83,6 +84,12 @@ for package in gdb jq python3-yaml iperf3 numactl; do
 	fi
 done
 
+mt_tmp="$(mktemp -d)"
+mlnx_tools="${mt_tmp}/mlnx-tools"
+git clone https://github.com/Mellanox/mlnx-tools "${mlnx_tools}"
+# Pin to a specific commit - we're looking for consistency, not latest/greatest
+(cd "${mlnx_tools}" && git reset --hard 17801d40)
+
 # setup environment variables
 python3 -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin, Loader=yaml.SafeLoader), sys.stdout, indent=4)' < ${test_config} > /tmp/iperf3-config.json
 content=$(cat /tmp/iperf3-config.json | jq  '.setup' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]")
@@ -94,6 +101,21 @@ client_numa_node="$(cat /sys/class/net/$client_iface/device/numa_node)"
 # Host tuning based on info in fastdata.es.net and Mellanox.
 [ ! -x /usr/sbin/irqbalance ] || sudo service irqbalance stop
 sudo /usr/bin/cpupower frequency-set -g performance > /dev/null
+for nic in $server_iface $client_iface; do
+    BDF="$(basename $(readlink /sys/class/net/${nic}/device))"
+    # Set MaxReadReq size to 4KB
+    sudo setpci -s $BDF 68.w=5000:f000
+    sudo setpci -s $BDF 68.w
+    rx_max="$(ethtool -g $nic | awk '/RX:/ {print $NF; exit}')"
+    sudo ethtool -G $nic rx ${rx_max} || [ $? -eq 80 ] # Already at max
+    tx_max="$(ethtool -g $nic | awk '/TX:/ {print $NF; exit}')"
+    sudo ethtool -G $nic tx ${tx_max} || [ $? -eq 80 ] # Already at max
+    sudo ethtool -g $nic
+    sudo ethtool -K $nic lro on
+    sudo ethtool -k $nic
+    sudo env PATH="${PATH}:${mlnx_tools}/ofed_scripts" set_irq_affinity.sh $nic
+    sudo ip link set dev ${nic} txqueuelen 20000
+done
 
 # Setup client/server ip address based on Spec.
 sudo ip netns add 2xgd

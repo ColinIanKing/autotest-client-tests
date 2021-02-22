@@ -36,8 +36,13 @@ class ubuntu_performance_iperf3(test.test):
         #
         #  iperf3 performance tests on DGX2 Mellanox NIC.
         #
-        shutil.copy(os.path.join(self.bindir, 'ubuntu_iperf3_config.yaml'),
-                    os.path.join('/tmp/', 'ubuntu_iperf3_config.yaml'))
+        shutil.copy(
+            os.path.join(self.bindir, 'ubuntu_iperf3_config.yaml'),
+            os.path.join(
+                os.path.sep, 'tmp',
+                'ubuntu_iperf3_config.yaml'
+            )
+        )
         cmd = self.bindir + \
             '/ubuntu_iperf3_test.sh -c /tmp/ubuntu_iperf3_config.yaml'
         self.results = utils.system_output(cmd, retain_output=True)

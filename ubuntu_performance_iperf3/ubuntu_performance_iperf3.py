@@ -17,7 +17,8 @@
 #
 import os
 import shutil
-from autotest.client                        import test, utils
+from autotest.client import test, utils
+
 
 class ubuntu_performance_iperf3(test.test):
     version = 0
@@ -35,8 +36,9 @@ class ubuntu_performance_iperf3(test.test):
         #
         #  iperf3 performance tests on DGX2 Mellanox NIC.
         #
-        shutil.copy(os.path.join(self.bindir, 'ubuntu_iperf3_config.yaml'), 
-                os.path.join('/tmp/', 'ubuntu_iperf3_config.yaml'))
-        cmd = self.bindir + '/ubuntu_iperf3_test.sh -c /tmp/ubuntu_iperf3_config.yaml'
+        shutil.copy(os.path.join(self.bindir, 'ubuntu_iperf3_config.yaml'),
+                    os.path.join('/tmp/', 'ubuntu_iperf3_config.yaml'))
+        cmd = self.bindir + \
+            '/ubuntu_iperf3_test.sh -c /tmp/ubuntu_iperf3_config.yaml'
         self.results = utils.system_output(cmd, retain_output=True)
 # vi:set ts=4 sw=4 expandtab syntax=python:

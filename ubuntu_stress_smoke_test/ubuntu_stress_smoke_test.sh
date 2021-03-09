@@ -54,7 +54,7 @@ EXCLUDE+="bind-mount funccall ioport watchdog mlockmany idle-page clone "
 # Tests that are not kernel specific
 #
 EXCLUDE+="atomic bsearch heapsort hsearch longjmp lsearch matrix memcpy nop qsort "
-EXCLUDE+="rdrand str tsc vecmath wcs zlib matrix-3d "
+EXCLUDE+="rdrand str tsc vecmath wcs zlib matrix-3d l1cache "
 #
 # Tests that are known to cause breakage
 #

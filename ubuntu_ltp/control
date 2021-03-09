@@ -15,12 +15,8 @@ name = 'ubuntu_ltp'
 results = job.run_test_detail('ubuntu_ltp', test_name='setup', tag='setup', timeout=30*60)
 
 tests = [
-    'fs',         'fs_perms_simple', 'fsx',            'dio',         'io',
-    'mm',         'ipc',             'sched',          'math',        'nptl',
-    'pty',        'containers',      'fs_bind',        'controllers', 'filecaps',
-    'cap_bounds', 'fcntl-locktests', 'connectors',     'power_management_tests',
-    'hugetlb',    'commands',        'hyperthreading', 'can',
-    'cpuhotplug', 'net.ipv6_lib',    'input',          'cve',         'crypto',
+    'fs',         'mm',           'controllers', 'commands',
+    'cpuhotplug', 'net.ipv6_lib', 'cve',         'crypto',
     'kernel_misc'
 ]
 for test in tests:

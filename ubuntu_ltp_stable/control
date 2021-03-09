@@ -1,0 +1,27 @@
+AUTHOR = "Ubuntu"
+NAME = "ltp"
+CRITERIA = """
+Use the upstream LTP repository
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+name = 'ubuntu_ltp_stable'
+
+results = job.run_test_detail('ubuntu_ltp_stable', test_name='setup', tag='setup', timeout=30*60)
+
+tests = [
+    'fs_perms_simple', 'fsx',             'dio',        'io',
+    'ipc',             'sched',           'math',       'nptl',
+    'pty',             'containers',      'fs_bind',    'filecaps',
+    'cap_bounds',      'fcntl-locktests', 'connectors', 'power_management_tests',
+    'hugetlb',         'hyperthreading',  'can',        'input'
+]
+for test in tests:
+    results = job.run_test_detail('ubuntu_ltp_stable', test_name=test, tag=test, timeout=60*60*2)
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

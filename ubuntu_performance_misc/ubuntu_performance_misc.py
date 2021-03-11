@@ -137,7 +137,7 @@ class ubuntu_performance_misc(test.test):
 	    cmd = 'vmstat 60 2 -n  | grep -v ^procs'
             self.parser = self.parse_vmstat_context_switches
 	elif test_name == 'forks':
-	    cmd = 'forkstat -D 60 -e fork | grep fork'
+	    cmd = 'forkstat -D 60 -e fork | grep fork || true'
             self.parser = self.parse_forks
         else:
             return

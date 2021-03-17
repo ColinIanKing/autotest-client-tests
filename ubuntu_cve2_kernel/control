@@ -1,0 +1,17 @@
+AUTHOR = 'cascardo@canonical.com (Thadeu Lima de Souza Cascardo)'
+NAME = 'ubuntu_cve2_kernel'
+TIME = 'SHORT'
+TEST_TYPE = 'client'
+TEST_CLASS = 'Kernel'
+TEST_CATEGORY = 'Functional'
+DOC = """
+List of CVE tests to be tested on as many supported arches and series as possible.
+
+Right now, this includes a single test for these 3 related CVEs:
+
+CVE-2021-27363
+CVE-2021-27364
+CVE-2021-27365
+"""
+
+result = job.run_test_detail('ubuntu_cve2_kernel')

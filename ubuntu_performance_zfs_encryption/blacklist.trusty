@@ -1,2 +1,3 @@
 Reason:
-This test is aimed to support releases greater than or equal to 20.04
+PHLin - @cking hello, a quick question, should we run ubuntu_performance_* tests on older releases? I found them failing on Xenial due to some build issue
+cking - @PHLin bionic (4.15) onwards were the targets

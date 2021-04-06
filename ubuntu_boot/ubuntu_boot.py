@@ -1,16 +1,27 @@
 import os
 import re
+import platform
 from autotest.client import test, utils
 from autotest.client.shared import error
 
 
 class ubuntu_boot(test.test):
     version = 1
+    def setup(self):
+        '''Centos Specific Boot Test Checks'''
+        self.centos = False
+        os_dist = platform.linux_distribution()[0].split(' ')[0]
+        if os_dist == 'CentOS':
+            self.centos = True
+
     def log_check(self):
         '''Test for checking error patterns in log files'''
         # dmesg will be cleared out in autotest with dmesg -c before the test starts
         # Let's check for /var/log/syslog instead
-        logfile = '/var/log/syslog'
+        if self.centos:
+            logfile = '/var/log/messages'
+        else:
+            logfile = '/var/log/syslog'
         patterns = [
             'kernel: \[ *\d+\.\d+\] BUG:.*',
             'kernel: \[ *\d+\.\d+\] Oops:.*',

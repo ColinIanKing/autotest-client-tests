@@ -14,6 +14,7 @@ class ubuntu_kernel_selftests(test.test):
             'bc',
             'build-essential',
             'devscripts',
+            'fuse',
             'git',
             'jq',
             'kernel-wedge',

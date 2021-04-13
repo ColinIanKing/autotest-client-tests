@@ -50,7 +50,7 @@ class ubuntu_ltp_syscalls(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke', 'gkeop']:
+        if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gcp-fips', 'gke', 'gkeop']:
             if not (self.flavour == 'aws' and self.series == 'trusty'):
                 pkgs.append('linux-modules-extra-' + self.flavour + '*')
         if self.flavour not in ['kvm']:

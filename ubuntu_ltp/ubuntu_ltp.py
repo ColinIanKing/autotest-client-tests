@@ -44,7 +44,7 @@ class ubuntu_ltp(test.test):
         gcc = 'gcc' if self.arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
-        if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke', 'gkeop']:
+        if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gcp-fips', 'gke', 'gkeop']:
              pkgs.append('linux-modules-extra-' + self.flavour + '*')
 
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)

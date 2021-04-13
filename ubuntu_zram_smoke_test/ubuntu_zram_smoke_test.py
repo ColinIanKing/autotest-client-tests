@@ -20,7 +20,7 @@ class ubuntu_zram_smoke_test(test.test):
         ]
 
         flavour = re.split('-\d*-', platform.uname()[2])[-1]
-        if flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gke', 'gkeop']:
+        if flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gcp-fips', 'gke', 'gkeop']:
              pkgs.append('linux-modules-extra-' + flavour + '*')
 
         if pkgs:

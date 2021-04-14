@@ -1,0 +1,4 @@
+Reason:
+LTTng-modules requires CONFIG_KPROBES on kernels >= 5.7.0
+Seth: The riscv architecture does not set CONFIG_HAVE_KPROBES, CONFIG_KPROBES depends on this and so it cannot be selected. In other words, there is currently no
+support for kprobes with riscv.

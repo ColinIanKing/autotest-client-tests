@@ -26,6 +26,14 @@ NBD_CONFIG=/tmp/nbd-$$.conf
 NBD_PORT=10809
 NBD_BLOCK_SIZE=512
 NBD_TIMEOUT=240
+#
+#  image size in MB
+#
+NBD_IMAGE_SIZE=64
+#
+#  large test file, must be less than image size
+#
+NBD_TEST_FILE_SIZE=$((NBD_IMAGE_SIZE * 2 / 3))
 
 do_log()
 {
@@ -84,7 +92,7 @@ do_test()
 	dmesg -c > /dev/null
 
 	do_log "creating backing nbd image ${NBD_IMAGE_PATH}"
-	dd if=/dev/zero of=${NBD_IMAGE_PATH} bs=1M count=128 >& /dev/null
+	dd if=/dev/zero of=${NBD_IMAGE_PATH} bs=1M count=${NBD_IMAGE_SIZE} >& /dev/null
 	if [ $? -ne 0 ]; then
 		do_log "dd onto ${NBD_IMAGE_PATH} failed"
 		do_tidy
@@ -107,6 +115,8 @@ do_test()
 	echo "Page size:    " $(getconf PAGE_SIZE)
 	echo "Pages avail:  " $(getconf _AVPHYS_PAGES)
 	echo "Pages total:  " $(getconf _PHYS_PAGES)
+	echo "Image size:    ${NBD_IMAGE_SIZE} MB"
+	echo "File size:     ${NBD_TEST_FILE_SIZE} MB"
 	echo "Free space:"
 	df -h
 	echo "--------------------------------------------------------------------------------"
@@ -252,9 +262,9 @@ do_test()
 
 	do_log "creating large file ${MNT}/largefile"
 
-	(dd if=/dev/zero of=${MNT}/largefile bs=1M count=100) >& /dev/null
+	(dd if=/dev/zero of=${MNT}/largefile bs=1M count=${NBD_TEST_FILE_SIZE}) >& /dev/null
 	if [ $? -ne 0 ]; then
-		do_log "failed to write 100MB to nbd mounted file system"
+		do_log "failed to write ${NBD_TEST_FILE_SIZE} MB to nbd mounted file system"
 		do_tidy
 		exit 1
 	fi
@@ -270,7 +280,7 @@ do_test()
 	do_log "removing file ${MNT}/largefile"
 	rm -f {MNT}/largefile
 	if [ $? -ne 0 ]; then
-		do_log "failed to remove 100MB file from nbd mounted file system"
+		do_log "failed to remove ${NBD_TEST_FILE_SIZE} MB file from nbd mounted file system"
 		do_tidy
 		exit 1
 	fi

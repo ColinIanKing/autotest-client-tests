@@ -8,6 +8,10 @@ from autotest.client.shared import error
 class ubuntu_boot(test.test):
     version = 1
     def setup(self):
+        pkgs = [ 'python3' ]
+        cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
+        self.results = utils.system_output(cmd, retain_output=True)
+
         '''Centos Specific Boot Test Checks'''
         self.centos = False
         os_dist = platform.linux_distribution()[0].split(' ')[0]
@@ -51,12 +55,8 @@ class ubuntu_boot(test.test):
         '''Test for checking kernel tatined flags'''
         test_passed = True
         print('Checking kernel tainted flags in /proc/sys/kernel/tainted')
-        with open('/proc/sys/kernel/tainted') as f:
-            content = f.read()
-            if content != '0\n':
-                print('ERROR: kernel tainted flag != 0: {}'.format(content))
-                test_passed = False
-        return test_passed
+        result = utils.system('python3 %s/kernel_taint_test.py' % self.bindir, ignore_status=True)
+        return result
 
     def run_once(self, test_name, exit_on_error=True):
         if test_name == 'log_check':
@@ -66,7 +66,7 @@ class ubuntu_boot(test.test):
                 print("GOOD: Log clean.")
             return
         elif test_name == 'kernel_tainted':
-            if not self.kernel_tainted():
+            if self.kernel_tainted():
                 raise error.TestFail()
             else:
                 print('GOOD: Kernel not tainted.')

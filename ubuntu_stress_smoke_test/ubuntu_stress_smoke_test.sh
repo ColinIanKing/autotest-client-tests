@@ -6,6 +6,8 @@ MAX_AGE=5
 MIN_MEM=$((3 * 1024))
 # minimum free disk required in GB
 MIN_DISK=$((8))
+# maximum bogo ops per stressor
+MAX_BOGO_OPS=5000
 
 SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
 CGROUP_MEM=/sys/fs/cgroup/memory/stress-ng-test
@@ -248,6 +250,8 @@ free
 echo " "
 echo "Number of CPUs: $(getconf _NPROCESSORS_CONF)"
 echo "Number of CPUs Online: $(getconf _NPROCESSORS_ONLN)"
+echo
+echo "Maximum bogo ops: ${MAX_BOGO_OPS}"
 echo " "
 set_max_oom_level
 sleep 15
@@ -262,7 +266,7 @@ do
 		count=$((count + 1))
 		dmesg -c >& /dev/null
 		echo "$s STARTING"
-		cgexec -g memory:stress-ng-test ./stress-ng -v -t ${DURATION} --${s} ${INSTANCES} ${STRESS_OPTIONS} >& ${TMP_FILE}
+		cgexec -g memory:stress-ng-test ./stress-ng -v -t ${DURATION} --${s} ${INSTANCES} --${s}-ops ${MAX_BOGO_OPS} ${STRESS_OPTIONS} >& ${TMP_FILE}
 		ret=$?
 		echo "$s RETURNED $ret"
 

@@ -173,19 +173,6 @@ class ubuntu_kernel_selftests(test.test):
             ]
 
             #
-            # Ftrace 'Kprobe event user-memory access' test depends on
-            # HAVE_FUNCTION_ARG_ACCESS_API, but ppc64 doesn't support it:
-            # disable it to avoid an unresolved result (and thus a failure).
-            #
-            if self.arch in ['ppc64le', 's390x']:
-                filenames.append('kprobe/kprobe_args_user.tc')
-
-            for fn in filenames:
-                fn = 'linux/tools/testing/selftests/ftrace/test.d/' + fn
-                if os.path.exists(fn):
-                    os.remove(fn)
-
-            #
             # ptrace/vmaccess was introduced in 5.7-rc1 and is broken ATM,
             # see https://lkml.org/lkml/2020/4/9/648
             #

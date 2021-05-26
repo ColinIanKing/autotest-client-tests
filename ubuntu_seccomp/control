@@ -13,6 +13,6 @@ DOC = ""
 name = 'ubuntu_seccomp'
 
 results = job.run_test_detail('ubuntu_seccomp', test_name='setup', tag='setup', timeout=60*20)
-results = job.run_test_detail('ubuntu_seccomp', test_name='seccomp', tag='seccomp', timeout=60*20)
+results = job.run_test_detail('ubuntu_seccomp', test_name='seccomp', tag='seccomp', timeout=60*40)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

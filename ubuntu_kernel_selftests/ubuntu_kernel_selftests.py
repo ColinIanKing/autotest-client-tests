@@ -43,8 +43,6 @@ class ubuntu_kernel_selftests(test.test):
             elif self.kv == 506:
                 # special case for F-oem-5.6 (lp:1879360)
                 pkgs.extend(['clang-10', 'llvm-10'])
-            elif self.kv >= 513:
-                pkgs.extend(['clang-13', 'llvm-13'])
             else:
                 pkgs.extend(['clang', 'llvm'])
 
@@ -214,12 +212,7 @@ class ubuntu_kernel_selftests(test.test):
         os.chdir(self.srcdir)
         if test_name == "net" and self.kv >= 415:
             # net selftests use a module built by bpf selftests, bpf is available since bionic kernel
-            if self.kv >= 513:
-                os.environ["CLANG"] = "clang-13"
-                os.environ["LLC"] = "llc-13"
-                os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-13"
-                os.environ["LLVM_READELF"] = "llvm-readelf-13"
-            elif self.kv == 506:
+            if self.kv == 506:
                 os.environ["CLANG"] = "clang-10"
                 os.environ["LLC"] = "llc-10"
                 os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-10"

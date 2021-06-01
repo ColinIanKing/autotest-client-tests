@@ -4,7 +4,7 @@
 # installed host can launch a kvm instance and that we can get
 # the lsb_release -c from that instance.
 #
-set -x
+set -ex
 SUT=bjf-test
 SSH_KEY="$HOME/.ssh/id_rsa"
 SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -i $SSH_KEY"
@@ -12,7 +12,7 @@ DISTRO="`lsb_release -c | awk '{print$2}'`"
 ARCHITECTURE="$1"
 
 function cleanup {
-    uvt-kvm destroy $SUT
+    uvt-kvm destroy $SUT &> /dev/null
     # On ppc64el, we need to turn SMT back on after the test.
     if [ "${ARCHITECTURE}" = "ppc64el" ] ; then
         sudo ppc64_cpu --smt=on

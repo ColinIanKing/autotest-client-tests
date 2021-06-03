@@ -140,8 +140,8 @@ test_sysdig_context_switch()
 
 		events=$(wc -l ${TMPFILE} | cut -d' ' -f1)
 		switches=$(grep switch ${TMPFILE} | wc -l | cut -d' ' -f1)
-		ddrdzero=$(grep read ${TMPFILE} | grep "/dev/zero" | wc -l | cut -d' ' -f1)
-		ddwrnull=$(grep write ${TMPFILE} | grep "/dev/null" | wc -l | cut -d' ' -f1)
+		ddrdzero=$(grep read ${TMPFILE} | wc -l | cut -d' ' -f1)
+		ddwrnull=$(grep write ${TMPFILE} | wc -l | cut -d' ' -f1)
 
 		if [ $switches -ge ${THRESHOLD} -a \
 		     $ddrdzero -ge ${THRESHOLD} -a \

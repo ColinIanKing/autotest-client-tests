@@ -45,7 +45,7 @@ fi
 
 # Download a release image that can be used to create the KVM instance.
 #
-image=`uvt-simplestreams-libvirt query | grep -P $DISTRO.*$ARCHITECTURE`
+image=`uvt-simplestreams-libvirt query | grep -P $DISTRO.*$ARCHITECTURE || true`
 [ -z "$image" ] && uvt-simplestreams-libvirt sync --source http://cloud-images.ubuntu.com/daily release=$DISTRO arch=$ARCHITECTURE
 
 uvt-kvm create $SUT release=$DISTRO arch=$ARCHITECTURE

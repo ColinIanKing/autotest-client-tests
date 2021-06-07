@@ -12,17 +12,14 @@ class ubuntu_boot(test.test):
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
-        '''Centos Specific Boot Test Checks'''
-        self.centos = False
-        os_dist = platform.linux_distribution()[0].split(' ')[0]
-        if os_dist == 'CentOS':
-            self.centos = True
-
     def log_check(self):
         '''Test for checking error patterns in log files'''
+        '''Centos Specific Boot Test Checks'''
+        os_dist = platform.linux_distribution()[0].split(' ')[0]
+
         # dmesg will be cleared out in autotest with dmesg -c before the test starts
         # Let's check for /var/log/syslog instead
-        if self.centos:
+        if os_dist == 'CentOS':
             logfile = '/var/log/messages'
         else:
             logfile = '/var/log/syslog'

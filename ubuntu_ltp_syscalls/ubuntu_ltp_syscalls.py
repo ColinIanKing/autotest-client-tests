@@ -71,7 +71,6 @@ class ubuntu_ltp_syscalls(test.test):
             self.series = distro.codename()
         self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
         self.kernel = platform.uname()[2].split('-')[0]
-        pass
 
     # setup
     #

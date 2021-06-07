@@ -4,7 +4,6 @@ import os
 import platform
 import shutil
 from autotest.client                        import test, utils
-import platform
 from autotest.client                        import canonical
 
 class ubuntu_zfs_xfs_generic(test.test):

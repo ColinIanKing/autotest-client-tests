@@ -3,7 +3,6 @@ import platform
 import shutil
 from autotest.client import test, utils
 from autotest.client.shared import software_manager
-import platform
 
 class ubuntu_qrt_kernel_aslr_collisions(test.test):
     version = 1

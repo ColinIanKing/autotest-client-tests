@@ -284,17 +284,17 @@ class ubuntu_performance_lkp(test.test):
             # parse text, find ops/sec in fields as follows:
             #
             # Maximum memory requested that can be used=1449646096, at the size=13460
-            # 
+            #
             # =================== Timing linear equation system solver ===================
-            # 
+            #
             # Size   LDA    Align. Time(s)    GFlops   Residual     Residual(norm) Check
             # 13460  13460  4      9.851      165.0621 1.255759e-10 2.452756e-02   pass
-            # 
+            #
             # Performance Summary (GFlops)
-            # 
+            #
             # Size   LDA    Align.  Average  Maximal
             # 13460  13460  4       165.0621 165.0621
-            # 
+            #
             # Residual checks PASSED
             #
             for line in self.results.splitlines():

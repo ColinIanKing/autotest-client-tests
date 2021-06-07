@@ -3,6 +3,7 @@ import os
 import sys
 import re
 import platform
+import shutil
 from autotest.client            import test, utils, os_dep
 from autotest.client.shared     import error
 from autotest.client            import canonical
@@ -38,6 +39,7 @@ class ubuntu_kvm_unit_tests(test.test):
         arch = platform.processor()
         opt = []
         os.chdir(self.srcdir)
+        shutil.rmtree('kvm-unit-tests', ignore_errors=True)
         cmd = 'git clone --depth=1 git://kernel.ubuntu.com/ubuntu/kvm-unit-tests/ -b disco'
         self.results = utils.system_output(cmd, retain_output=True)
         # Print test suite HEAD SHA1 commit id for future reference

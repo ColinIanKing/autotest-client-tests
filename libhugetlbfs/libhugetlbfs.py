@@ -1,6 +1,7 @@
 import re
 import os
 import platform
+import shutil
 from autotest.client import utils, test, os_dep
 from autotest.client.shared import error
 
@@ -60,6 +61,7 @@ class libhugetlbfs(test.test):
         self.job.require_gcc()
         # get the sources
         os.chdir(self.srcdir)
+        shutil.rmtree('libhugetlbfs', ignore_errors=True)
         cmd = 'git clone --depth=1 -b next https://github.com/libhugetlbfs/libhugetlbfs.git'
         self.results = utils.system_output(cmd, retain_output=True)
 

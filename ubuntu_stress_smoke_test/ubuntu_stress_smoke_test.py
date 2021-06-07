@@ -4,6 +4,7 @@ import multiprocessing
 import os
 from autotest.client                        import test, utils
 import platform
+import shutil
 
 class ubuntu_stress_smoke_test(test.test):
     version = 1
@@ -49,6 +50,7 @@ class ubuntu_stress_smoke_test(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
+        shutil.rmtree('stress-ng', ignore_errors=True)
         cmd = 'git clone --depth=1 git://kernel.ubuntu.com/cking/stress-ng'
         self.results = utils.system_output(cmd, retain_output=True)
 

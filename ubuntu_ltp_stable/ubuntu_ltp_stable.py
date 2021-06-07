@@ -4,6 +4,7 @@ import multiprocessing
 import os
 import platform
 import re
+import shutil
 import time
 from autotest.client                        import test, utils
 from autotest.client.shared     import error
@@ -63,6 +64,7 @@ class ubuntu_ltp_stable(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
+        shutil.rmtree('ltp', ignore_errors=True)
         cmd = 'git clone --depth=1 https://github.com/linux-test-project/ltp.git'
         self.results = utils.system_output(cmd, retain_output=True)
 

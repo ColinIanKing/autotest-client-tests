@@ -3,6 +3,7 @@
 import multiprocessing
 import os
 import platform
+import shutil
 from autotest.client                        import test, utils
 
 class ubuntu_stress_btrfs(test.test):
@@ -45,6 +46,7 @@ class ubuntu_stress_btrfs(test.test):
         self.job.require_gcc()
         utils.system('cp %s/ubuntu_stress_btrfs.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
+        shutil.rmtree('stress-ng', ignore_errors=True)
         cmd = 'git clone --depth=1 git://kernel.ubuntu.com/cking/stress-ng 2>&1'
         self.results = utils.system_output(cmd, retain_output=True)
 

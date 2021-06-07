@@ -2,6 +2,7 @@
 #
 import os
 import platform
+import shutil
 from autotest.client                        import test, utils
 
 class ubuntu_seccomp(test.test):
@@ -35,6 +36,7 @@ class ubuntu_seccomp(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
+        shutil.rmtree('libseccomp', ignore_errors=True)
         cmd = 'git clone --depth=1 https://github.com/seccomp/libseccomp.git'
         self.results = utils.system_output(cmd, retain_output=True)
 

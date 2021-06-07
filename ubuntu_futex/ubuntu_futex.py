@@ -2,6 +2,7 @@
 #
 import os
 import platform
+import shutil
 from autotest.client                        import test, utils
 from autotest.client                        import canonical
 
@@ -39,6 +40,7 @@ class ubuntu_futex(test.test):
         canonical.setup_proxy()
 
         os.chdir(self.srcdir)
+        shutil.rmtree('futextest', ignore_errors=True)
         cmd = 'git clone --depth=1 https://git.kernel.org/pub/scm/linux/kernel/git/dvhart/futextest.git'
         self.results = utils.system_output(cmd, retain_output=True)
 

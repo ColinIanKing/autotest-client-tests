@@ -1,6 +1,7 @@
 import multiprocessing
 import os, re, glob, logging
 import platform
+import shutil
 from autotest.client.shared import error
 from autotest.client import test, utils, os_dep
 from autotest.client import canonical
@@ -173,6 +174,7 @@ class ubuntu_xfstests_btrfs(test.test):
 
         print("Fetching xfstests..")
         os.chdir(self.srcdir)
+        shutil.rmtree('xfstests-bld', ignore_errors=True)
         utils.system('git clone https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         commit_bld = 'a4df7d7b31125901cb1fe9b092f495b6aa950448'

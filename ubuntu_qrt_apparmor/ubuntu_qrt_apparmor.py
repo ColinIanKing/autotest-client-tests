@@ -1,5 +1,6 @@
 import os
 import platform
+import shutil
 import time
 from autotest.client import test, utils
 
@@ -75,6 +76,7 @@ class ubuntu_qrt_apparmor(test.test):
         self.install_required_pkgs()
 
         os.chdir(self.srcdir)
+        shutil.rmtree('qa-regression-testing', ignore_errors=True)
         cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
         self.results = utils.system_output(cmd, retain_output=True)
         # Print test suite HEAD SHA1 commit id for future reference

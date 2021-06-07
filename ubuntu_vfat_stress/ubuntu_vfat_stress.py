@@ -3,6 +3,7 @@
 import multiprocessing
 import os
 import platform
+import shutil
 from autotest.client                        import test, utils
 
 class ubuntu_vfat_stress(test.test):
@@ -46,6 +47,7 @@ class ubuntu_vfat_stress(test.test):
 
         utils.system('cp %s/ubuntu_vfat_stress.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
+        shutil.rmtree('stress-ng', ignore_errors=True)
         cmd = 'git clone --depth=1 git://kernel.ubuntu.com/cking/stress-ng 2>&1'
         self.results = utils.system_output(cmd, retain_output=True)
 

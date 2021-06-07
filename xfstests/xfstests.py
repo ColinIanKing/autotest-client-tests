@@ -1,6 +1,7 @@
 import multiprocessing
 import os, re, glob, logging
 import platform
+import shutil
 from autotest.client.shared import error
 from autotest.client import test, utils, os_dep
 from autotest.client import canonical
@@ -168,6 +169,7 @@ class xfstests(test.test):
 
         print("Fetching xfstests..")
         os.chdir(self.srcdir)
+        shutil.rmtree('xfstests-bld', ignore_errors=True)
         utils.system('git clone https://github.com/tytso/xfstests-bld')
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))
         print("Using head commit d6e3c3559cf05b5ef078f91a97e9639c3688ead0")

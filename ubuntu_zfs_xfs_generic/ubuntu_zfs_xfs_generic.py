@@ -2,6 +2,7 @@
 #
 import os
 import platform
+import shutil
 from autotest.client                        import test, utils
 import platform
 from autotest.client                        import canonical
@@ -78,6 +79,7 @@ class ubuntu_zfs_xfs_generic(test.test):
 
         print("Fetching xfstests..")
         os.chdir(self.srcdir)
+        shutil.rmtree('xfstests-bld', ignore_errors=True)
         utils.system('git clone https://github.com/tytso/xfstests-bld')
 
         os.chdir(os.path.join(self.srcdir, 'xfstests-bld'))

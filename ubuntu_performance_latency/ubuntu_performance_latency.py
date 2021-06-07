@@ -5,6 +5,7 @@ from autotest.client                        import test, utils
 from math import sqrt
 import platform
 import time
+import shutil
 import subprocess
 import resource
 
@@ -108,6 +109,7 @@ class ubuntu_performance_latency(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
+        shutil.rmtree('stress-ng', ignore_errors=True)
         self.results = utils.system_output('git clone git://kernel.ubuntu.com/cking/stress-ng', retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
         self.results = utils.system_output('git checkout -b V0.09.56 V0.09.56', retain_output=True)

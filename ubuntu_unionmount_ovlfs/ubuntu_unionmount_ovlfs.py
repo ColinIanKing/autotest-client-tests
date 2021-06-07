@@ -1,6 +1,7 @@
 #
 #
 import os
+import shutil
 from autotest.client                        import test, utils
 
 class ubuntu_unionmount_ovlfs(test.test):
@@ -27,6 +28,7 @@ class ubuntu_unionmount_ovlfs(test.test):
     def setup(self):
         self.install_required_pkgs()
         os.chdir(self.srcdir)
+        shutil.rmtree('unionmount-testsuite', ignore_errors=True)
         cmd = 'git clone --depth=1 https://github.com/amir73il/unionmount-testsuite.git'
         self.results = utils.system_output(cmd, retain_output=True)
         # Print test suite HEAD SHA1 commit id for future reference

@@ -6,6 +6,7 @@ from math import sqrt
 import platform
 import time
 import json
+import shutil
 import socket
 import subprocess
 import resource
@@ -122,9 +123,8 @@ class ubuntu_performance_lkp(test.test):
             os.environ["http_proxy"] = "http://squid.internal:3128"
 
         os.chdir(self.srcdir)
-
-        if not os.path.isdir("lkp-tests"):
-            self.results += utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
+        shutil.rmtree('lkp-tests', ignore_errors=True)
+        self.results += utils.system_output('git clone https://github.com/intel/lkp-tests', retain_output=True)
 
         os.chdir(os.path.join(self.srcdir, 'lkp-tests'))
 

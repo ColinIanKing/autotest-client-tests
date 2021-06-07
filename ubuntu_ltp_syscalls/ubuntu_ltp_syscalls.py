@@ -8,8 +8,8 @@ import sys
 import time
 import shutil
 import signal
-from autotest.client                        import test, utils
-from autotest.client.shared     import error
+from autotest.client import test, utils
+from autotest.client.shared import error
 
 # python is redefining the SIGXFSZ handler internally, blocking the delivery of
 # this signal to any forked task. Make sure to restore the default signal
@@ -24,7 +24,7 @@ class ubuntu_ltp_syscalls(test.test):
     version = 1
 
     def install_required_pkgs(self):
-        arch   = platform.processor()
+        arch = platform.processor()
 
         pkgs = [
             'automake',
@@ -113,7 +113,7 @@ class ubuntu_ltp_syscalls(test.test):
         sys.path.append(os.path.dirname(__file__))
         from testcase_blacklist import blacklist_db
         try:
-            from packaging.version          import parse
+            from packaging.version import parse
         except ImportError:
             # Compatibility fix for release < xenial and release > groovy (no python-packaging on groovy)
             from distutils.version import StrictVersion

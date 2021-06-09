@@ -4,7 +4,7 @@
 # installed host can launch a kvm instance and that we can get
 # the lsb_release -c from that instance.
 #
-set -ex
+set -x
 SUT=bjf-test
 SSH_KEY="$HOME/.ssh/id_rsa"
 SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -i $SSH_KEY"
@@ -33,6 +33,7 @@ if [ $? != 0 ]; then
     exit 0
 fi
 
+set -e
 # Generate an ssh key so we can run commands on the KVM instance that we
 # create.
 #

@@ -35,5 +35,14 @@ blacklist_db = {
             'copy_file_range02 copy_file_range02': {
                 'comment': 'copy_file_range02 will not get fixed < 5.2.0 (https://lwn.net/Articles/774114)'}
         }
-    }
+    },
+    'libc': {
+        # Coming with commit 574500a108be ("sysvipc: Fix SEM_STAT_ANY kernel argument pass [BZ #26637]")
+        # in glibc v2.33
+        '2.33': {
+            'semctl09 semctl09': {
+                'comment': 'semctl09 will not get fixed for glibc < 2.33 (lp: 1910312)',
+            },
+        },
+    },
 }

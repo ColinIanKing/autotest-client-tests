@@ -72,6 +72,7 @@ class ubuntu_ltp_syscalls(test.test):
             self.series = distro.codename()
         self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
         self.kernel = platform.uname()[2].split('-')[0]
+        self.libc = platform.libc_ver()[1]
 
     # setup
     #
@@ -131,6 +132,16 @@ class ubuntu_ltp_syscalls(test.test):
             for _kernel in blacklist_db['kernel']:
                 if StrictVersion(self.kernel) < StrictVersion(_kernel):
                     _blacklist += list(blacklist_db['kernel'][_kernel].keys())
+
+        try:
+            current_version = parse(self.libc)
+            for _libc in blacklist_db['libc']:
+                if current_version < parse(_libc):
+                    _blacklist += list(blacklist_db['libc'][_libc].keys())
+        except NameError:
+            for _libc in blacklist_db['libc']:
+                if StrictVersion(self.libc) < StrictVersion(_libc):
+                    _blacklist += list(blacklist_db['libc'][_libc].keys())
 
         return _blacklist
 

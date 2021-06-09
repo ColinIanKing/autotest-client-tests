@@ -30,9 +30,6 @@ class ubuntu_lttng_smoke_test(test.test):
         self.results = utils.system_output(cmd, retain_output=True, ignore_status=True)
 
     def initialize(self):
-        pass
-
-    def setup(self):
         # Special case for Azure nodes lp: 1791032
         # Some nodes with small ram will need the swap to build lttng dkms
         if platform.uname()[2].split('-')[-1] == 'azure':

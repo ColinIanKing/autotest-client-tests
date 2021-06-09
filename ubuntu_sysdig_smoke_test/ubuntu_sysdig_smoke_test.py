@@ -15,9 +15,6 @@ class ubuntu_sysdig_smoke_test(test.test):
         self.results = utils.system_output(cmd, retain_output=True, ignore_status=True)
 
     def initialize(self):
-        pass
-
-    def setup(self):
         self.install_required_pkgs()
         cmd = 'dkms status -m sysdig | grep installed'
         try:

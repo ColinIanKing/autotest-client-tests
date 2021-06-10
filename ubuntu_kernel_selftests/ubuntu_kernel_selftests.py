@@ -223,7 +223,8 @@ class ubuntu_kernel_selftests(test.test):
                 os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
                 os.environ["LLVM_READELF"] = "llvm-readelf-9"
             cmd = "make -C linux/tools/testing/selftests TARGETS=bpf SKIP_TARGETS= KDIR=/usr/src/linux-headers-{}".format(platform.release())
-            utils.system(cmd)
+            # keep running selftests/net, even if selftests/bpf build fails
+            utils.system(cmd, ignore_status=True)
         cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
         self.results = utils.system_output(cmd, retain_output=True)
 

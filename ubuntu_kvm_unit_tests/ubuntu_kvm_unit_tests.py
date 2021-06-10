@@ -25,6 +25,12 @@ class ubuntu_kvm_unit_tests(test.test):
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)
 
+        # ncat command needed by run_migration
+        if series in ['bionic', 'xenial']:
+            pkgs.append('nmap')
+        else:
+            pkgs.append('ncat')
+
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 

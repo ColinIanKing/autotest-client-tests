@@ -187,14 +187,16 @@ class ubuntu_kernel_selftests(test.test):
                 utils.system(cmd)
 
             #
-            # memory hotplug test will fail on arm platforms from 5.6+
+            # memory hotplug test will fail on arm and several cloud platforms from 5.6+
             # as it was enabled in 5.6 but needs memory that does not
             # have boot time pages in the regions to be offlined and
-            # current test hardware cannot guarantee that constraint
-            # so disable it for arm platforms for now
+            # current test hardware cannot guarantee that constraint.
+            # Except ARM, also all cloud platforms on amd64 seems to have unmovable
+            # pages which makes memory hotplug failing.
             #
-            if self.arch.startswith('arm') or self.arch == 'aarch64':
-                print("Disabling memory hotplug test on ARM platform")
+            if self.arch.startswith('arm') or self.arch == 'aarch64' or \
+               self.flavour in ['aws', 'azure', 'azure-fips']:
+                print("Disabling memory hotplug test")
                 fn = 'linux/tools/testing/selftests/memory-hotplug/mem-on-off-test.sh'
                 mk = 'linux/tools/testing/selftests/memory-hotplug/Makefile'
                 if os.path.exists(fn):

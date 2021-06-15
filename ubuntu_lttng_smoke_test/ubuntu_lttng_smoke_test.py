@@ -37,7 +37,7 @@ class ubuntu_lttng_smoke_test(test.test):
             df_gb = os.statvfs('/').f_bsize * os.statvfs('/').f_bavail / (1024.**3)
             cmd = 'swapon --show'
             swapon = utils.system_output(cmd)
-            if mem_gb < 1.8 and df_gb > 4.0 and swapon == '':
+            if mem_gb < 3.0 and df_gb > 4.0 and swapon == '':
                 swap_file = '/tmp/swapfile'
                 cmd = 'fallocate -l 2G %s' % swap_file
                 utils.system(cmd)

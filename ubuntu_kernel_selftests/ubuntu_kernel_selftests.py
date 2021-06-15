@@ -170,6 +170,11 @@ class ubuntu_kernel_selftests(test.test):
                 'kprobe/kprobe_module.tc',
             ]
 
+            for fn in filenames:
+                fn = 'linux/tools/testing/selftests/ftrace/test.d/' + fn
+                if os.path.exists(fn):
+                    os.remove(fn)
+
             #
             # ptrace/vmaccess was introduced in 5.7-rc1 and is broken ATM,
             # see https://lkml.org/lkml/2020/4/9/648

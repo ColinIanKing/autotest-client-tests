@@ -196,8 +196,9 @@ class ubuntu_kernel_selftests(test.test):
             if self.arch.startswith('arm') or self.arch == 'aarch64':
                 print("Disabling memory hotplug test on ARM platform")
                 fn = 'linux/tools/testing/selftests/memory-hotplug/mem-on-off-test.sh'
+                mk = 'linux/tools/testing/selftests/memory-hotplug/Makefile'
                 if os.path.exists(fn):
-                    cmd = 'chmod -x ' + fn
+                    cmd = 'sed -i "s/ mem-on-off-test.sh//" ' + mk
                     utils.system(cmd)
 
             # net/txtimestamp.sh is very fragile, disable it

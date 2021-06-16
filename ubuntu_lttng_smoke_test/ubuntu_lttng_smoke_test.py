@@ -30,23 +30,22 @@ class ubuntu_lttng_smoke_test(test.test):
         self.results = utils.system_output(cmd, retain_output=True, ignore_status=True)
 
     def initialize(self):
-        # Special case for Azure nodes lp: 1791032
         # Some nodes with small ram will need the swap to build lttng dkms
-        if platform.uname()[2].split('-')[-1] == 'azure':
-            mem_gb = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / (1024.**3)
-            df_gb = os.statvfs('/').f_bsize * os.statvfs('/').f_bavail / (1024.**3)
-            cmd = 'swapon --show'
-            swapon = utils.system_output(cmd)
-            if mem_gb < 3.0 and df_gb > 4.0 and swapon == '':
-                swap_file = '/tmp/swapfile'
-                cmd = 'fallocate -l 2G %s' % swap_file
-                utils.system(cmd)
-                cmd = 'chmod 600 %s' % swap_file
-                utils.system(cmd)
-                cmd = 'mkswap %s' % swap_file
-                utils.system(cmd)
-                cmd = 'swapon %s' % swap_file
-                utils.system(cmd)
+        # Issue begins from Azure cloud (lp:1791032) and can be found on others (lp:1803118 / lp:1926962)
+        mem_gb = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / (1024.**3)
+        df_gb = os.statvfs('/').f_bsize * os.statvfs('/').f_bavail / (1024.**3)
+        cmd = 'swapon --show'
+        swapon = utils.system_output(cmd)
+        if mem_gb < 3.0 and df_gb > 4.0 and swapon == '':
+            swap_file = '/tmp/swapfile'
+            cmd = 'fallocate -l 2G %s' % swap_file
+            utils.system(cmd)
+            cmd = 'chmod 600 %s' % swap_file
+            utils.system(cmd)
+            cmd = 'mkswap %s' % swap_file
+            utils.system(cmd)
+            cmd = 'swapon %s' % swap_file
+            utils.system(cmd)
 
         self.install_required_pkgs()
         self.job.require_gcc()

@@ -22,6 +22,6 @@ tests = [
     'hugetlb',         'hyperthreading',  'can',        'input'
 ]
 for test in tests:
-    results = job.run_test_detail('ubuntu_ltp_stable', test_name=test, tag=test, timeout=60*60*2)
+    results = job.run_test_detail('ubuntu_ltp_stable', test_name=test, tag=test, timeout=60*30*7)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

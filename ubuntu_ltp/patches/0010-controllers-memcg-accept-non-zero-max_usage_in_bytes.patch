@@ -1,0 +1,45 @@
+From 8c8deb9fd2e41ab9122c28ab90bf2aa8b15f0113 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+Date: Tue, 8 Jun 2021 14:16:40 +0200
+Subject: [PATCH 10/12] controllers/memcg: accept non-zero max_usage_in_bytes
+ after reset
+
+Several Linux kernel versions report a non-zero max_usage_in_bytes after
+resetting the counter.  For example v5.4, v5.8, v5.10, v5.11, v5.12 and
+5.13.0-rc5:
+
+    memcg_max_usage_in_bytes_test 4 TINFO: Test reset memory.memsw.max_usage_in_bytes
+    memcg_max_usage_in_bytes_test 4 TINFO: Running memcg_process --mmap-anon -s 4194304
+    memcg_max_usage_in_bytes_test 4 TINFO: Warming up pid: 1416
+    memcg_max_usage_in_bytes_test 4 TINFO: Process is still here after warm up: 1416
+    memcg_max_usage_in_bytes_test 4 TFAIL: memory.memsw.max_usage_in_bytes is 4325376, 4194304 expected
+    memcg_max_usage_in_bytes_test 4 TFAIL: memory.memsw.max_usage_in_bytes is 122880, 0 expected
+
+It seems that recent Linux kernel still notices some memory allocation
+by the memcg tool.  Accept therefore a range from 0 to 32 pages.
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+---
+ .../memcg/functional/memcg_max_usage_in_bytes_test.sh       | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/controllers/memcg/functional/memcg_max_usage_in_bytes_test.sh b/testcases/kernel/controllers/memcg/functional/memcg_max_usage_in_bytes_test.sh
+index a940606cbd34..8f0fc33996f3 100755
+--- a/testcases/kernel/controllers/memcg/functional/memcg_max_usage_in_bytes_test.sh
++++ b/testcases/kernel/controllers/memcg/functional/memcg_max_usage_in_bytes_test.sh
+@@ -40,7 +40,11 @@ test_max_usage_in_bytes()
+ 
+ 	if [ $check_after_reset -eq 1 ]; then
+ 		echo 0 > $item
+-		check_mem_stat $item 0
++		# Recent Linux kernels (at least v5.4) started reporting
++		# a non-zero max_usage_in_bytes after resetting the counter.
++		# The typical values are 0, 4096, 8096 and up to 122880.
++		# Cause is not known, so let's just be flexible.
++		check_mem_stat $item 0 $((PAGESIZE * 32))
+ 	fi
+ 
+ 	stop_memcg_process
+-- 
+2.27.0
+

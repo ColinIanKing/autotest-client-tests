@@ -11,6 +11,33 @@ from autotest.client.shared     import error
 
 class ubuntu_ltp(test.test):
     version = 1
+    patches = [
+        # Each element is also a list of patch title (user printable) and relative path to patch from bindir
+        ['controllers/cpuacct: skip cpuacct_100_100 on small memory systems',
+         'patches/0001-controllers-cpuacct-skip-cpuacct_100_100-on-small-me.patch'],
+        ['include/tst_pid.h: fix language typo (subtraction)',
+         'patches/0002-include-tst_pid.h-fix-language-typo-subtraction.patch'],
+        ['syscalls/msgstress04: fix fork failure on small memory systems',
+         'patches/0003-syscalls-msgstress04-fix-fork-failure-on-small-memor.patch'],
+        ['syscalls/msgstress03: fix fork failure on small memory systems',
+         'patches/0004-syscalls-msgstress03-fix-fork-failure-on-small-memor.patch'],
+        ['syscalls/msgstress: tune limit of processes for small machines',
+         'patches/0005-syscalls-msgstress-tune-limit-of-processes-for-small.patch'],
+        ['patches/device-drivers/cpufreq_boost: skip test on virtual machines',
+         'patches/0006-device-drivers-cpufreq_boost-skip-test-on-virtual-ma.patch'],
+        ['lib: memutils: don\'t pollute entire system memory to avoid OoM',
+         'patches/0007-lib-memutils-don-t-pollute-entire-system-memory-to-a.patch'],
+        ['controllers/memcg: accept range of max_usage_in_bytes/memcg: accept range of max_usage_in_bytes',
+         'patches/0008-controllers-memcg-accept-range-of-max_usage_in_bytes.patch'],
+        ['controllers/memcg: accept range of usage_in_bytes',
+         'patches/0009-controllers-memcg-accept-range-of-usage_in_bytes.patch'],
+        ['controllers/memcg: accept non-zero max_usage_in_bytes after reset',
+         'patches/0010-controllers-memcg-accept-non-zero-max_usage_in_bytes.patch'],
+        ['controllers/memcg: increase memory limit in subgroup charge',
+         'patches/0011-controllers-memcg-increase-memory-limit-in-subgroup-.patch'],
+        ['tpci: accept ENOMEM resource failure with virtio-pci',
+         'patches/0012-tpci-accept-ENOMEM-resource-failure-with-virtio-pci.patch'],
+    ]
 
     def install_required_pkgs(self):
         try:
@@ -36,6 +63,7 @@ class ubuntu_ltp(test.test):
             'libselinux1-dev',
             'libssl-dev',
             'libtirpc-dev',
+            'patchutils',
             'pkg-config',
             'quota',
             'virt-what',
@@ -71,6 +99,10 @@ class ubuntu_ltp(test.test):
         os.chdir(os.path.join(self.srcdir, 'ltp'))
         sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
         print("Test suite HEAD SHA1: {}".format(sha1))
+
+        for patch in self.patches:
+            print("Patching with: %s" % patch[0])
+            utils.system('patch -p1 < %s/%s' % (self.bindir, patch[1]))
 
         # Disable NTFS as we disable RW support
         cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'

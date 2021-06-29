@@ -80,7 +80,7 @@ class ubuntu_performance_power(test.test):
             'libattr1-dev',
             'libbsd-dev',
             'libkeyutils-dev',
-            'zlib1g-dev'
+            'zlib1g-dev',
             'powerstat',
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'

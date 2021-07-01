@@ -156,6 +156,18 @@ class ubuntu_kernel_selftests(test.test):
                     utils.system(cmd)
 
             #
+            # cpu hotplug test might fail on Azure instances because Hyper-V
+            # does not allow it.
+            #
+            if self.flavour in ['azure', 'azure-fips']:
+                print("Disabling CPU hotplug test")
+                fn = 'linux/tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh'
+                mk = 'linux/tools/testing/selftests/cpu-hotplug/Makefile'
+                if os.path.exists(fn):
+                    cmd = 'sed -i "s/ cpu-on-off-test.sh//" ' + mk
+                    utils.system(cmd)
+
+            #
             # Disable new ftrace tests that don't work reliably across
             # architectures because of various symbols being checked
             #

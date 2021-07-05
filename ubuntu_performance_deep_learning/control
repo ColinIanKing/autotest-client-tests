@@ -1,0 +1,12 @@
+AUTHOR = 'Taihsiang Ho <taihsiang.ho@canonical.com>'
+TIME = 'MEDIUM'
+NAME = 'Basic TensorFlow Testing'
+TEST_TYPE = 'client'
+TEST_CLASS = 'General'
+TEST_CATEGORY = 'Benchmark'
+
+DOC = """
+Perform basic tensor flow testing
+"""
+
+job.run_test_detail('ubuntu_performance_deep_learning', test_name='tensor-flow-cnn-resnet', tag='tensor-flow-cnn-resnet', timeout=60*20)

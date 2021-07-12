@@ -44,6 +44,12 @@ class ubuntu_lxc(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
+
+        # Destroy the "reboot" container which might have been left
+        # behind (LP#1788574)
+        cmd = 'lxc-destroy reboot'
+        utils.system(cmd, ignore_status=True)
+
         if self.series in ['precise', 'trusty', 'xenial', 'artful']:
             cmd = '/bin/sh %s/exercise' % self.bindir
         else:

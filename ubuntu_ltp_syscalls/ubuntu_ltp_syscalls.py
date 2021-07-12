@@ -83,7 +83,7 @@ class ubuntu_ltp_syscalls(test.test):
         self.job.require_gcc()
         os.chdir(self.srcdir)
         shutil.rmtree('ltp', ignore_errors=True)
-        cmd = 'git clone https://github.com/linux-test-project/ltp.git'
+        cmd = 'git clone -b sru git://kernel.ubuntu.com/ubuntu/ltp.git'
         self.results = utils.system_output(cmd, retain_output=True)
 
         # Print test suite HEAD SHA1 commit id for future reference

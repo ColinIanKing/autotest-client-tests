@@ -88,14 +88,13 @@ class ubuntu_ltp_syscalls(test.test):
 
         # Print test suite HEAD SHA1 commit id for future reference
         os.chdir(os.path.join(self.srcdir, 'ltp'))
-        if self.series in ['trusty']:
-            print("Use a fixed SHA1 for ESM series - de9dd02b")
-            utils.system_output('git reset de9dd02be7b643f598004905ffef6a4245f0f0cf --hard', retain_output=False, verbose=False)
+        if self.series in ['trusty', 'xenial']:
+            branch = 'sru-' + self.series
+            print("Use a fixed branch for ESM series - {}".format(branch))
+            cmd = 'git checkout ' + branch
+            utils.system_output(cmd, retain_output=False, verbose=False)
         sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
         print("Test suite HEAD SHA1: {}".format(sha1))
-
-        print("Patching fanotify09 for older kernels...")
-        utils.system('patch -N -p1 < %s/0001-skip-fanotify09-test-2-for-older-kernel.patch' % self.bindir)
 
         # Disable NTFS as we disable RW support
         cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'

@@ -12,6 +12,7 @@ class ubuntu_bpf(test.test):
 
         pkgs = [
             'build-essential',
+            'docutils-common',
             'git',
             'libcap-dev',
             'libelf-dev',
@@ -20,7 +21,6 @@ class ubuntu_bpf(test.test):
         pkgs.append(gcc)
 
         if self.series == 'focal':
-            pkgs.append('python-docutils')
             if self.kv.startswith('5.6.0'):
                 # Specical case of F-oem-5.6 (lp:1879360)
                 pkgs.extend(['clang-10', 'llvm-10'])

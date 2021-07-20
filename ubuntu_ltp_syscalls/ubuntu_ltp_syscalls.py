@@ -185,9 +185,9 @@ class ubuntu_ltp_syscalls(test.test):
                     if 'getrandom02' in line and LTP_TIMEOUT_MUL > 1:
                         os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
 
-                    # Set the timeout multiplier for ioctl_sg01 on Oracle (lp:1895281)
-                    if 'ioctl_sg01' in line and self.flavour == 'oracle':
-                        print("Running on Oracle, set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1895281) for ioctl_sg01")
+                    # Set the timeout multiplier for ioctl_sg01 (lp:1895281, lp:1936886)
+                    if 'ioctl_sg01' in line:
+                        print("Set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1895281, lp:1936886) for ioctl_sg01")
                         os.environ["LTP_TIMEOUT_MUL"] = '3'
 
                     # Stop timesyncd when testing time change

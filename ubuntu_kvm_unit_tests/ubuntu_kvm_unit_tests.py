@@ -26,7 +26,7 @@ class ubuntu_kvm_unit_tests(test.test):
         pkgs.append(gcc)
 
         # ncat command needed by run_migration
-        if series in ['bionic', 'xenial']:
+        if series in ['bionic', 'xenial', 'trusty']:
             pkgs.append('nmap')
         else:
             pkgs.append('ncat')

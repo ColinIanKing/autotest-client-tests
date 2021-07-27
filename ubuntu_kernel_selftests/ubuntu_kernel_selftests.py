@@ -21,7 +21,8 @@ class ubuntu_kernel_selftests(test.test):
             'kernel-wedge',
             'netsniff-ng',
             'net-tools',
-            'pkg-config'
+            'pkg-config',
+            'uuid-runtime'
         ]
         if not (self.arch == 's390x' and self.series in ['precise', 'trusty', 'vivid', 'xenial']):
             pkgs.append('libnuma-dev')

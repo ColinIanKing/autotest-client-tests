@@ -33,7 +33,7 @@ run_test() {
          --shm-size=1g \
          --ulimit memlock=-1 \
          --ulimit stack=67108864 \
-         -ti --rm nvcr.io/nvidia/tensorflow:${CONTAINER_VER}-tf1-py3 -- \
+         --rm nvcr.io/nvidia/tensorflow:${CONTAINER_VER}-tf1-py3 -- \
          mpiexec \
          --bind-to socket \
          --allow-run-as-root \

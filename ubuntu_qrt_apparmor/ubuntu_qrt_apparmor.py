@@ -76,8 +76,20 @@ class ubuntu_qrt_apparmor(test.test):
         self.install_required_pkgs()
 
         os.chdir(self.srcdir)
-        shutil.rmtree('qa-regression-testing', ignore_errors=True)
-        cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
+        # Kernel QA Automation already copies the qa-regression-testing
+        # repo over to the SUT(system under test) via rsync+ssh.
+        # This resolves issues with extremely long git clones. Causing
+        # tests to fail.
+        # If qa-regression-testing exists in the SUT Homedir, just move
+        # it over to the autotest workarea. If not, then clone it
+        targetpath = os.path.expanduser("~") + "/qa-regression-testing"
+        if os.path.isdir(targetpath):
+            cmd = 'mv %s .' % targetpath
+        else:
+            # If the directory does not exist, then lets clone it as this test
+            # is probably being run by someone triaging a problem.
+            shutil.rmtree('qa-regression-testing', ignore_errors=True)
+            cmd = 'git clone --depth 1 https://git.launchpad.net/qa-regression-testing'
         self.results = utils.system_output(cmd, retain_output=True)
         # Print test suite HEAD SHA1 commit id for future reference
         os.chdir(os.path.join(self.srcdir, 'qa-regression-testing'))

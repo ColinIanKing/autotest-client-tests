@@ -11,10 +11,13 @@ TEST_TYPE = "client"
 DOC = ""
 
 name = 'ubuntu_bpf'
-tests = ['setup', 'test_verifier', 'test_maps']
+results = job.run_test_detail(name, test_name='setup', tag='setup', timeout=60*30)
 
-for test in tests:
-    results = job.run_test_detail(name, test_name=test, tag=test, timeout=60*30)
-
+if results == 'ERROR':
+    print("ERROR: test failed to build, skipping all the sub tests")
+else:
+    tests = ['test_verifier', 'test_maps']
+    for test in tests:
+        results = job.run_test_detail(name, test_name=test, tag=test, timeout=60*30)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

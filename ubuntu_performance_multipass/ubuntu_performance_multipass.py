@@ -104,31 +104,31 @@ class ubuntu_performance_multipass(test.test):
     def multipass_wait_for_start(self, vm):
         count = 0
         while count < 120:
-		cmd = 'multipass list'
-                results = utils.system_output(cmd, retain_output=True)
-		for line in results.splitlines():
-			if 'Running' in line and vm in line:
-				count = 0
-				while count < 60:
-					cmd = 'multipass exec ' + vm + ' -- ps'
-					if self.multipass_run_cmd(cmd) == 0:
-						return False
-					time.sleep(1)
-					count = count + 1
-				return True
+            cmd = 'multipass list'
+            results = utils.system_output(cmd, retain_output=True)
+            for line in results.splitlines():
+                if 'Running' in line and vm in line:
+                    count = 0
+                    while count < 60:
+                        cmd = 'multipass exec ' + vm + ' -- ps'
+                        if self.multipass_run_cmd(cmd) == 0:
+                            return False
+                        time.sleep(1)
+                        count = count + 1
+                    return True
 
-		time.sleep(1)
-		count = count + 1
+            time.sleep(1)
+            count = count + 1
 
-	return True
+        return True
 
     #
     #  run a command on a multipass instance named vm and return the output as
     #  a hunk of text
     #
     def multipass_run_cmd_output(self, vm, cmd):
-	cmd = 'multipass exec ' + vm + ' -- ' + cmd
-	return utils.system_output(cmd, retain_output=True)
+        cmd = 'multipass exec ' + vm + ' -- ' + cmd
+        return utils.system_output(cmd, retain_output=True)
 
     #
     #   look for text between str1 and str2 in line, extra times
@@ -136,13 +136,13 @@ class ubuntu_performance_multipass(test.test):
     #   and return the time in seconds (float)
     #
     def parse_chunk(self, str1, str2, line):
-	i = line.find(str1) + len(str1)
-	j = line.find(str2)
+        i = line.find(str1) + len(str1)
+        j = line.find(str2)
         r_sec = re.compile(r'[-+]?([0-9]+s|[0-9]*\.[0-9]+s)')
         r_msec = re.compile(r'[-+]?([0-9]+ms|[0-9]*\.[0-9]+ms)')
         r_min = re.compile(r'[-+]?([0-9]+min|[0-9]*\.[0-9]+min)')
         t = 0.
-	for str in line[i:j].split():
+        for str in line[i:j].split():
             if r_msec.match(str) != None:
                 t = t + (float(str[0:str.find('ms')]) / 1000.0)
             if r_sec.match(str) != None:
@@ -155,10 +155,10 @@ class ubuntu_performance_multipass(test.test):
     #  parse systemd_analyze output to get relevant times
     #
     def parse_systemd_analyze(self, results):
-	kern = 0.0
-	user = 0.0
-	total = 0.0
-	graphical = 0.0
+        kern = 0.0
+        user = 0.0
+        total = 0.0
+        graphical = 0.0
         for line in results.splitlines():
             if 'Startup' in line:
                 line = line + ' end'
@@ -179,33 +179,33 @@ class ubuntu_performance_multipass(test.test):
     #
     def multipass_boot(self, vm, release):
         cmd = 'multipass launch -v -c 8 -m 1G -n ' + vm + ' daily:' + release
-	if self.multipass_run_cmd(cmd):
-		print("failed to launch")
-                return None
-	if self.multipass_wait_for_start(vm):
-		print("failed to start")
-                cmd = 'multipass delete ' + vm
-		self.multipass_run_cmd(cmd)
-                cmd = 'multipass purge'
-	        self.multipass_run_cmd(cmd)
-                return None
+        if self.multipass_run_cmd(cmd):
+            print("failed to launch")
+            return None
+        if self.multipass_wait_for_start(vm):
+            print("failed to start")
+            cmd = 'multipass delete ' + vm
+            self.multipass_run_cmd(cmd)
+            cmd = 'multipass purge'
+            self.multipass_run_cmd(cmd)
+            return None
 
-	results = self.multipass_run_cmd_output(vm, 'uname -r').splitlines()[0].split()
-	if len(results) == 1:
-		kernel = results[0]
-	else:
-		kernel = 'unknown'
+        results = self.multipass_run_cmd_output(vm, 'uname -r').splitlines()[0].split()
+        if len(results) == 1:
+            kernel = results[0]
+        else:
+            kernel = 'unknown'
 
-	results = self.multipass_run_cmd_output(vm, 'systemd-analyze')
-	stats = self.parse_systemd_analyze(results)
+        results = self.multipass_run_cmd_output(vm, 'systemd-analyze')
+        stats = self.parse_systemd_analyze(results)
 
         cmd = 'multipass delete ' + vm
-	if self.multipass_run_cmd(cmd):
-		print("failed to delete VM " + vm)
+        if self.multipass_run_cmd(cmd):
+            print("failed to delete VM " + vm)
         cmd = 'multipass purge'
-	if self.multipass_run_cmd(cmd):
-		print("failed to purge")
-	return [ kernel, stats ]
+        if self.multipass_run_cmd(cmd):
+            print("failed to purge")
+        return [ kernel, stats ]
 
     def run_once(self, test_name):
         if test_name == 'setup':
@@ -218,7 +218,7 @@ class ubuntu_performance_multipass(test.test):
 
         for release in releases:
             kernel = 'unknown'
-	    boot_results = []
+            boot_results = []
             keys = []
             for i in range(test_iterations):
                 ret = self.multipass_boot('test%d%s' % (i, release), release)

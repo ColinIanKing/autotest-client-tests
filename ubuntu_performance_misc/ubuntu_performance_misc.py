@@ -94,23 +94,23 @@ class ubuntu_performance_misc(test.test):
         return 0.0
 
     def parse_vmstat_generic(self, output, field):
-	lines = output.splitlines()
-	if len(lines) < 3:
-		return 0.0
-	words = lines[0].split()
-	if field not in words:
-		return 0.0
-	idx = words.index(field)
-	words = lines[2].split()
-	if len(words) < idx:
-		return 0.0
-	return float(words[idx])
+        lines = output.splitlines()
+        if len(lines) < 3:
+            return 0.0
+        words = lines[0].split()
+        if field not in words:
+            return 0.0
+        idx = words.index(field)
+        words = lines[2].split()
+        if len(words) < idx:
+            return 0.0
+        return float(words[idx])
 
     def parse_vmstat_interrupts(self, output):
-	return self.parse_vmstat_generic(output, 'in')
+        return self.parse_vmstat_generic(output, 'in')
 
     def parse_vmstat_context_switches(self, output):
-	return self.parse_vmstat_generic(output, 'cs')
+        return self.parse_vmstat_generic(output, 'cs')
 
     def parse_forks(self, output):
         forks = 0
@@ -130,14 +130,14 @@ class ubuntu_performance_misc(test.test):
         elif test_name == 'userspace-wakeups':
             cmd = 'sudo eventstat 60 1 -u'
             self.parser = self.parse_eventstat
-	elif test_name == 'interrupts':
-	    cmd = 'vmstat 60 2 -n  | grep -v ^procs'
+        elif test_name == 'interrupts':
+            cmd = 'vmstat 60 2 -n  | grep -v ^procs'
             self.parser = self.parse_vmstat_interrupts
-	elif test_name == 'context-switches':
-	    cmd = 'vmstat 60 2 -n  | grep -v ^procs'
+        elif test_name == 'context-switches':
+            cmd = 'vmstat 60 2 -n  | grep -v ^procs'
             self.parser = self.parse_vmstat_context_switches
-	elif test_name == 'forks':
-	    cmd = 'forkstat -D 60 -e fork | grep fork || true'
+        elif test_name == 'forks':
+            cmd = 'forkstat -D 60 -e fork | grep fork || true'
             self.parser = self.parse_forks
         else:
             return

@@ -231,8 +231,8 @@ class ubuntu_performance_stream(test.test):
 
         if memory_required > memory_available:
                 print('WARNING: Not enough memory available to run stream for %d elements without swapping, skipping test' % stream_size)
-		return False
-	return True
+                return False
+        return True
 
     def run_once(self, test_name):
         if test_name == 'setup':

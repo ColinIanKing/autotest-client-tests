@@ -287,7 +287,7 @@ class ubuntu_performance_pts(test.test):
             'ttsiod-renderer': self.run_ttsiod_renderer,
         }
 
-	if subtest != "setup":
+        if subtest != "setup":
             self.stopped_services = self.stop_services()
             self.oldres = self.set_rlimit_nofile((500000, 500000))
             self.set_cpu_governor('performance')
@@ -298,7 +298,7 @@ class ubuntu_performance_pts(test.test):
         else:
             self.run_generic(test_name, subtest)
 
-	if subtest != "setup":
+        if subtest != "setup":
             self.set_swap_on(True)
             self.set_cpu_governor('powersave')
             self.set_rlimit_nofile(self.oldres)

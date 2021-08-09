@@ -218,7 +218,7 @@ class ubuntu_performance_fio(test.test):
         print('pages_available ' + utils.system_output('getconf _AVPHYS_PAGES', retain_output=True))
         print('pages_total ' + utils.system_output('getconf _PHYS_PAGES', retain_output=True))
         print('free_disk_mb %.2f' % (self.get_filesystem_free_mbytes()))
-	print('run_from_path %s' % (os.getcwd()))
+        print('run_from_path %s' % (os.getcwd()))
         print('')
 
     def print_stats(self, benchmark, results, fields):
@@ -291,8 +291,8 @@ class ubuntu_performance_fio(test.test):
                 line = line.replace("DIRECTORY", test_dir)
             else:
                 line = line.replace("DIRECTORY", TEST_MNT)
-	    if line.startswith("size="):
-	        file_size_mb = line.split("size=", 1)[1].rstrip('\n')
+            if line.startswith("size="):
+                file_size_mb = line.split("size=", 1)[1].rstrip('\n')
             #
             #  zfs and ramdisk can't do O_DIRECT, so skip this
             #

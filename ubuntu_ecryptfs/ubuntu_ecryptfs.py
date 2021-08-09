@@ -34,7 +34,7 @@ class ubuntu_ecryptfs(test.test):
         self.install_required_pkgs()
         self.job.require_gcc()
         utils.system('bzr branch --use-existing-dir lp:ecryptfs %s' % self.srcdir)
-        print(utils.system_output('bzr log %s | head' % self.srcdir, retain_output=True))
+        utils.system_output('bzr log %s | head' % self.srcdir, retain_output=True)
 
         os.chdir(self.srcdir)
         utils.system('patch -p1 < %s/fix-mkfs-for-older-xfs.patch' % self.bindir)

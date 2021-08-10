@@ -104,6 +104,6 @@ print(results)
 for lkp_job in sorted(lkp_jobs):
     print("JOB '%s'" % lkp_job)
     for sub_job in lkp_jobs[lkp_job]:
-        results = job.run_test_detail(name, tag=sub_job, lkp_job = lkp_job, sub_job = sub_job, lkp_jobs = lkp_jobs, lkp_commit = lkp_commit, timeout=60*30)
+        results = job.run_test_detail(name, tag=sub_job, lkp_job = lkp_job, sub_job = sub_job, lkp_jobs = lkp_jobs, lkp_commit = lkp_commit, timeout=60*40)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

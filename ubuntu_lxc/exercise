@@ -75,6 +75,9 @@ EOF
     chmod +x /usr/bin/dirmngr
 fi
 
+# Override the GPG server
+sed -i '/^DOWNLOAD_URL=$/a DOWNLOAD_KEYSERVER="hkp://keyserver.ubuntu.com:80"' /usr/share/lxc/templates/lxc-download
+
 # The actual tests
 ## Default testsuite
 for testbin in /usr/bin/lxc-test-*; do

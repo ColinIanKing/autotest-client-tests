@@ -30,45 +30,45 @@ tests = [
 ]
 
 results = job.run_test_detail('ubuntu_performance_fio', test_name='setup', tag='setup', media='', timeout=60*30)
-
-if 'TEST_DRIVE_DEV' in os.environ and 'TEST_FILESYSTEM' in os.environ:
-    #
-    #  Normal ubuntu kernel team regression fio tests (for graphana profile data)
-    #
-    for test in tests:
-        device = os.environ['TEST_DRIVE_DEV']
-        devname = device.replace('/dev/', '')
-        devname = devname.replace('/', '-')
-        hostname = os.uname()[1]
-        model = utils.system_output('lsblk ' + device + ' -io MODEL -n').splitlines()
-        if len(model) > 0:
-            model = model[0].rstrip()
-        else:
-            model = 'unknown'
-        model = model.replace(' ', '').replace('-', '')
-        model = model.lower()
-        media = hostname + '-' + devname + '-' + model + '-' + os.environ['TEST_FILESYSTEM']
-        meida = media
-        tag = 'ubuntu-performance-fio-' + media + '-' + test.replace(',','-')
-        results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag=tag, media=media, timeout=120*60)
+if results == 'ERROR':
+    print("ERROR: test failed to build, skipping all the sub tests")
 else:
-    #
-    #  Legacy fio tests for large host testing
-    #
-    media_types = [ 'ramdisk', 'dataset' ]
-    #
-    # Spec states that config1 should not run ramdisk tests
-    #
-    if 'TEST_CONFIG' in os.environ:
-        if  os.environ['TEST_CONFIG'] == 'config1':
-            media_types = [ 'dataset' ]
-    #
-    #  Media is 'ramdisk' (/dev/shm) or 'dataset' (normally a raid device)
-    #
-    for media_type in media_types:
+    if 'TEST_DRIVE_DEV' in os.environ and 'TEST_FILESYSTEM' in os.environ:
+        #
+        #  Normal ubuntu kernel team regression fio tests (for graphana profile data)
+        #
         for test in tests:
-            results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + media_type + '-' + test, media=media_type, timeout=120*60)
-
-print(results)
+            device = os.environ['TEST_DRIVE_DEV']
+            devname = device.replace('/dev/', '')
+            devname = devname.replace('/', '-')
+            hostname = os.uname()[1]
+            model = utils.system_output('lsblk ' + device + ' -io MODEL -n').splitlines()
+            if len(model) > 0:
+                model = model[0].rstrip()
+            else:
+                model = 'unknown'
+            model = model.replace(' ', '').replace('-', '')
+            model = model.lower()
+            media = hostname + '-' + devname + '-' + model + '-' + os.environ['TEST_FILESYSTEM']
+            meida = media
+            tag = 'ubuntu-performance-fio-' + media + '-' + test.replace(',','-')
+            results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag=tag, media=media, timeout=120*60)
+    else:
+        #
+        #  Legacy fio tests for large host testing
+        #
+        media_types = [ 'ramdisk', 'dataset' ]
+        #
+        # Spec states that config1 should not run ramdisk tests
+        #
+        if 'TEST_CONFIG' in os.environ:
+            if  os.environ['TEST_CONFIG'] == 'config1':
+                media_types = [ 'dataset' ]
+        #
+        #  Media is 'ramdisk' (/dev/shm) or 'dataset' (normally a raid device)
+        #
+        for media_type in media_types:
+            for test in tests:
+                results += job.run_test_detail('ubuntu_performance_fio', test_name=test, tag='ubuntu-performance-fio-' + media_type + '-' + test, media=media_type, timeout=120*60)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

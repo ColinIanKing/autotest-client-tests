@@ -8,7 +8,7 @@ from autotest.client.shared import error
 class ubuntu_boot(test.test):
     version = 1
     def setup(self):
-        pkgs = [ 'python3', 'keyutils' ]
+        pkgs = [ 'python3' ]
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
@@ -55,31 +55,6 @@ class ubuntu_boot(test.test):
         result = utils.system('python3 %s/kernel_taint_test.py' % self.bindir, ignore_status=True)
         return result
 
-    def kernel_revocation_list(self):
-        '''Test for kernel builtin revoked keys'''
-        config_file = "/boot/config-" + os.uname()[2]
-        revocation_list_available = False
-        for line in open(config_file):
-            if re.search("CONFIG_SYSTEM_REVOCATION_LIST", line):
-                revocation_list_available = True
-                break
-        if not revocation_list_available:
-            print('SKIP: Kernel Revocation List NA.')
-            raise error.TestNAError()
-        revocations = utils.system_output("keyctl list %:.blacklist", retain_output=True)
-        patterns = [
-            b'.* asymmetric: Canonical Ltd. Secure Boot Signing: 61482aa2830d0ab2ad5af10b7250da9033ddcef0',
-        ]
-        missing_patterns = False
-        for pat in patterns:
-            print('Scanning for pattern "{}"'.format(pat))
-            if not re.search(pat, revocations):
-                print('Pattern not found.')
-                missing_patterns = True
-        if missing_patterns:
-            raise error.TestFail()
-        print('GOOD: Kernel Revocation List.')
-
     def run_once(self, test_name, exit_on_error=True):
         if test_name == 'log_check':
             if not self.log_check():
@@ -92,9 +67,6 @@ class ubuntu_boot(test.test):
                 raise error.TestFail()
             else:
                 print('GOOD: Kernel not tainted.')
-            return
-        elif test_name == 'kernel_revocation_list':
-            self.kernel_revocation_list()
             return
 
         cmd = "uname -a"

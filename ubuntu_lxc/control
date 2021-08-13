@@ -12,7 +12,59 @@ DOC = "Test as much of the LXC kernel functionality as possible"
 
 name = 'ubuntu_lxc'
 
-results = job.run_test_detail('ubuntu_lxc', test_name='setup', tag='setup', timeout=60*30)
-results = job.run_test_detail('ubuntu_lxc', test_name='exercise', tag='exercise', timeout=60*60*2)
+result = job.run_test_detail('ubuntu_lxc', test_name='setup', tag='setup', timeout=60*30)
+if result == 'GOOD':
+    flist = os.listdir('/usr/bin/')
+    sub_tests = [fn for fn in flist if fn.startswith('lxc-test-')]
+    # For newer releases
+    if not sub_tests:
+        fpath = '/tmp/lxc-pkg-ubuntu/src/tests/'
+        flist = os.listdir(fpath)
+        for fn in flist:
+            fullpath = fpath + fn
+            if fn.startswith('lxc-test-') and os.access(fullpath, os.X_OK) and not fn.endswith('.in'):
+                sub_tests.append(fn)
+    sub_tests.sort()
+
+    # Python3 API test
+    fn = 'api_test.py'
+    fpath = '/usr/share/doc/python3-lxc/examples/'
+    if os.path.isfile(fpath + fn + '.gz'):
+        utils.system('gzip -d ' + fpath + fn + '.gz', ignore_status=True)
+    if os.path.isfile(fpath + fn):
+        sub_tests.append(fn)
+
+    if sub_tests:
+        for test in sub_tests:
+            # Some tests can't be run standalone
+            if test == 'lxc-test-may-control':
+                continue
+            # Skip some tests when running in a container
+            elif test in ['lxc-test-apparmor', 'lxc-test-device-add-remove', 'lxc-test-reboot']:
+                if os.path.isfile('/run/container_type') or (utils.system('type systemd-detect-virt &> /dev/null', ignore_status=True) == 0 and utils.system('systemd-detect-virt  --container &> /dev/null', ignore_status=True) == 0):
+                    continue
+            # Skip userns tests in unprivileged containers
+            elif test in ['lxc-test-unpriv', 'lxc-test-unpriv']:
+                if os.path.isfile('/proc/self/uid_map') and utils.system_output('! grep "4294967295$" /proc/self/uid_map', ignore_status=True) == 0:
+                    continue
+            # Skip some tests because of broken busybox, this is working on X/F/H but not B
+            elif test == 'lxc-test-state-server':
+                continue
+
+            # Skip some tests on old kernels, this must be in another if statement as we have lxc-test-unpriv checked above
+            if test in ['lxc-test-unpriv', 'lxc-test-usernic']:
+                if not os.path.isfile('/proc/self/uid_map') or not os.path.isfile('/etc/subuid') or not os.path.isfile('/etc/subgid'):
+                    continue
+
+            job.run_test_detail('ubuntu_lxc', test_name=test, tag=test, timeout=60*5)
+    else:
+        print('ERROR: no sub_tests found, please check test build if running on Bionic and later releases')
+
+    '''Cleanup the change made for broken gpg2'''
+    if os.environ.get('http_proxy') and os.path.isfile('/usr/bin/dirmngr') and os.path.isfile('/usr/bin/dirmngr.orig'):
+        os.remove('/usr/bin/dirmngr')
+        cmd = 'dpkg-divert --divert /usr/bin/dirmngr.orig --rename --remove /usr/bin/dirmngr'
+        utils.system(cmd, ignore_status=True)
+
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

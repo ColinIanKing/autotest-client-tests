@@ -1,8 +1,10 @@
 #
 #
 from autotest.client                        import test, utils
+import multiprocessing
 import os
 import platform
+import shutil
 
 class ubuntu_lxc(test.test):
     version = 1
@@ -15,44 +17,69 @@ class ubuntu_lxc(test.test):
             ]
         else:
             pkgs = [
-                'automake',
-                'autopkgtest',
+                'autoconf',
                 'build-essential',
-                'cloud-image-utils',
-                'debhelper',
-                'debootstrap',
-                'dh-apparmor',
-                'dh-autoreconf',
-                'docbook2x',
+                'dirmngr',
                 'libapparmor-dev',
                 'libcap-dev',
-                'libgnutls28-dev',
-                'libpam0g-dev',
-                'libseccomp-dev',
-                'libselinux1-dev',
+                'libtool',
                 'lxc',
-                'lxc1',
-                'lxc-dev',
                 'pkg-config',
-                'texinfo',
+                'python3-lxc',
             ]
             gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
             pkgs.append(gcc)
 
         pkgs.append('liblxc1')
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
-        self.results = utils.system_output(cmd, retain_output=True)
+        utils.system_output(cmd, retain_output=True)
 
-    def initialize(self):
+    def initialize(self, test_name):
         try:
             self.series = platform.dist()[2]
         except AttributeError:
             import distro
             self.series = distro.codename()
-        pass
 
-    def setup(self):
+        if test_name != 'setup':
+            return
+
         self.install_required_pkgs()
+        if self.series not in ['precise', 'trusty', 'xenial']:
+            os.chdir('/tmp')
+            shutil.rmtree('lxc-pkg-ubuntu', ignore_errors=True)
+            cmd = 'git clone --depth=1 https://github.com/lxc/lxc-pkg-ubuntu.git -b dpm-{}'.format(self.series)
+            utils.system(cmd)
+            os.chdir('/tmp/lxc-pkg-ubuntu')
+            gcc_multiarch = utils.system_output('gcc -print-multiarch',  retain_output=False)
+            utils.system('autoreconf -f -i')
+            cmd = '--enable-tests --disable-rpath --disable-doc --with-distro=ubuntu \
+                   --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+                   --libdir=\${{prefix}}/lib/{0} \
+                   --libexecdir=\${{prefix}}/lib/{0} \
+                    --with-rootfs-path=\${{prefix}}/lib/{0}/lxc'.format(gcc_multiarch)
+            utils.configure(cmd)
+            try:
+                nprocs = '-j' + str(multiprocessing.cpu_count())
+            except:
+                nprocs = ''
+            utils.make(nprocs)
+
+        # Override the GPG server
+        fn = '/usr/share/lxc/templates/lxc-download'
+        cmd = "grep -q 'DOWNLOAD_KEYSERVER=\"hkp://keyserver.ubuntu.com:80\"' {0} || sed -i '/^DOWNLOAD_URL=$/a DOWNLOAD_KEYSERVER=\"hkp://keyserver.ubuntu.com:80\"' {0}".format(fn)
+        utils.system(cmd)
+
+        # Workaround for broken gpg2
+        if os.environ.get('http_proxy') and os.path.isfile('/usr/bin/dirmngr'):
+            cmd = 'dpkg-divert --divert /usr/bin/dirmngr.orig --rename --add /usr/bin/dirmngr'
+            utils.system(cmd)
+            with open('/usr/bin/dirmngr', 'w') as f:
+                f.write('#!/bin/sh\n')
+                f.write('exec /usr/bin/dirmngr.orig --honor-http-proxy $@\n')
+            cmd = 'chmod +x /usr/bin/dirmngr'
+            utils.system(cmd)
+
 
     def run_once(self, test_name):
         if test_name == 'setup':
@@ -60,17 +87,20 @@ class ubuntu_lxc(test.test):
 
         # Destroy the "reboot" container which might have been left
         # behind (LP#1788574)
-        cmd = 'lxc-destroy reboot'
-        utils.system(cmd, ignore_status=True)
+        if test_name == 'lxc-test-api-reboot':
+            cmd = 'lxc-destroy reboot &> /dev/null'
+            utils.system(cmd, ignore_status=True)
 
-        if self.series in ['precise', 'trusty', 'xenial', 'artful']:
-            cmd = '/bin/sh %s/exercise' % self.bindir
+        if self.series in ['precise', 'trusty', 'xenial']:
+            fpath = '/usr/bin/'
         else:
-            proxy = ''
-            if os.environ.get('http_proxy'):
-                proxy = 'http_proxy=%s' % os.environ.get('http_proxy')
-            cmd = '%s autopkgtest lxc -- null' % proxy
+            fpath = '/tmp/lxc-pkg-ubuntu/src/tests/'
 
-        self.results = utils.system_output(cmd, retain_output=True)
+        # Override the path for Python3 API test
+        if test_name == 'api_test.py':
+            fpath = 'python3 /usr/share/doc/python3-lxc/examples/'
+
+        cmd = fpath + test_name
+        utils.system_output(cmd, retain_output=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -8,7 +8,7 @@ from autotest.client.shared import error
 class ubuntu_boot(test.test):
     version = 1
     def setup(self):
-        pkgs = [ 'python3' ]
+        pkgs = [ 'python3', 'keyutils' ]
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)
 
@@ -55,6 +55,12 @@ class ubuntu_boot(test.test):
         result = utils.system('python3 %s/kernel_taint_test.py' % self.bindir, ignore_status=True)
         return result
 
+    def kernel_revocation_list(self):
+        '''Test for kernel builtin revoked keys'''
+        print('Checking kernel revocation list')
+        result = utils.system('python3 %s/kernel_revocation_list.py' % self.bindir, ignore_status=True)
+        return result
+
     def run_once(self, test_name, exit_on_error=True):
         if test_name == 'log_check':
             if not self.log_check():
@@ -67,6 +73,12 @@ class ubuntu_boot(test.test):
                 raise error.TestFail()
             else:
                 print('GOOD: Kernel not tainted.')
+            return
+        elif test_name == 'kernel_revocation_list':
+            if self.kernel_revocation_list():
+                raise error.TestFail()
+            else:
+                print('GOOD: Kernel revocation list.')
             return
 
         cmd = "uname -a"

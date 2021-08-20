@@ -83,18 +83,20 @@ class ubuntu_ltp_syscalls(test.test):
         self.job.require_gcc()
         os.chdir(self.srcdir)
         shutil.rmtree('ltp', ignore_errors=True)
-        cmd = 'git clone -b sru git://kernel.ubuntu.com/ubuntu/ltp.git'
-        self.results = utils.system_output(cmd, retain_output=True)
-
-        # Print test suite HEAD SHA1 commit id for future reference
-        os.chdir(os.path.join(self.srcdir, 'ltp'))
+        branch = 'sru'
         if self.series in ['trusty', 'xenial']:
             branch = 'sru-' + self.series
             print("Use a fixed branch for ESM series - {}".format(branch))
-            cmd = 'git checkout ' + branch
-            utils.system_output(cmd, retain_output=False, verbose=False)
-        sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)
-        print("Test suite HEAD SHA1: {}".format(sha1))
+
+        cmd = 'git clone -b {} git://kernel.ubuntu.com/ubuntu/ltp.git'.format(branch)
+        utils.system_output(cmd, retain_output=True)
+
+        # Print test suite HEAD SHA1 commit id for future reference
+        os.chdir(os.path.join(self.srcdir, 'ltp'))
+        title_local = utils.system_output("git log --oneline -1 | sed 's/(.*)//'", retain_output=False, verbose=False)
+        title_upstream = utils.system_output("git log --oneline | grep -v SAUCE | head -1", retain_output=False, verbose=False)
+        print("Latest commit in '{}' branch: {}".format(branch, title_local))
+        print("Latest upstream commit: {}".format(title_upstream))
 
         # Disable NTFS as we disable RW support
         cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'

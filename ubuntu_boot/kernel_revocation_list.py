@@ -13,11 +13,11 @@ class TestRevocationList(unittest.TestCase):
         revocation_list_available = False
         with open(config_file) as f:
             for line in f:
-                if re.search("CONFIG_SYSTEM_REVOCATION_LIST", line):
+                if re.search("CONFIG_SYSTEM_REVOCATION_KEYS", line):
                     revocation_list_available = True
                     break
         if not revocation_list_available:
-            raise unittest.SkipTest("CONFIG_SYSTEM_REVOCATION_LIST not available")
+            raise unittest.SkipTest("CONFIG_SYSTEM_REVOCATION_KEYS not available")
 
         if not shutil.which("keyctl"):
             raise unittest.SkipTest("keyutils not installed")

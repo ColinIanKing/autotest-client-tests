@@ -6,7 +6,7 @@ import subprocess
 import unittest
 
 
-class RestRevocationList(unittest.TestCase):
+class TestRevocationList(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         config_file = "/boot/config-" + os.uname()[2]

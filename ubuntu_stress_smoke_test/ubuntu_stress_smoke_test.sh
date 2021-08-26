@@ -5,7 +5,7 @@ MAX_AGE=5
 # minimum required memory in MB
 MIN_MEM=$((3 * 1024))
 # minimum free disk required in GB
-MIN_DISK=$((8))
+MIN_DISK=$((4))
 # maximum bogo ops per stressor
 MAX_BOGO_OPS=5000
 
@@ -257,6 +257,15 @@ set_max_oom_level
 sleep 15
 sync
 
+#
+#  Handle cases where cgroup settings are enabled or not
+#
+if [ -e ${CGROUP_MEM}/memory.limit_in_bytes ]; then
+	RUN_STRESS='cgexec -g memory:stress-ng-test ./stress-ng'
+else
+	RUN_STRESS='./stress-ng'
+fi
+
 count=0
 s1=$(secs_now)
 for s in ${STRESSORS}
@@ -266,7 +275,7 @@ do
 		count=$((count + 1))
 		dmesg -c >& /dev/null
 		echo "$s STARTING"
-		cgexec -g memory:stress-ng-test ./stress-ng -v -t ${DURATION} --${s} ${INSTANCES} --${s}-ops ${MAX_BOGO_OPS} ${STRESS_OPTIONS} >& ${TMP_FILE}
+		${RUN_STRESS} -v -t ${DURATION} --${s} ${INSTANCES} --${s}-ops ${MAX_BOGO_OPS} ${STRESS_OPTIONS} >& ${TMP_FILE}
 		ret=$?
 		echo "$s RETURNED $ret"
 

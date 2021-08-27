@@ -7,7 +7,7 @@ MIN_MEM=$((3 * 1024))
 # minimum free disk required in GB
 MIN_DISK=$((4))
 # maximum bogo ops per stressor
-MAX_BOGO_OPS=5000
+MAX_BOGO_OPS=3000
 
 SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
 CGROUP_MEM=/sys/fs/cgroup/memory/stress-ng-test
@@ -228,7 +228,7 @@ SWPIMG=$PWD/swap.img
 #  Create 1GB swap file
 #
 swapoff ${SWPIMG} >& /dev/null
-dd if=/dev/zero of=${SWPIMG} bs=1M count=1024
+fallocate -l 1G ${SWPIMG}
 if [ $? -ne 0 ]; then
 	echo "FAILED: Count not create 1GB swap file, file system:"
 	df

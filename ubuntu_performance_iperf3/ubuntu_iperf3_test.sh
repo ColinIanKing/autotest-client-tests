@@ -215,57 +215,57 @@ do_iteration() {
 		i=0
 		for log in "${logfiles[@]}"; do
 			bps=$(jq -r '.end.sum_received.bits_per_second' "${log}")
-			printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "scale=2; ${bps}/1000000")
+			printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "${bps}/1000000")
 			bps_rx=("${bps_rx[@]}" "$bps")
 			bps_rx_tot=$(bc -l <<< "$bps_rx_tot + $bps")
 			let ++i
 		done
-		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_total" "${iteration}" $(bc -l <<< "scale=2; ${bps_rx_tot}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_total" "${iteration}" $(bc -l <<< "${bps_rx_tot}/1000000")
 		i=0
 		for log in "${logfiles[@]}"; do
 		        bps=$(jq -r '.end.sum_sent.bits_per_second' "${log}")
-			printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "scale=2; ${bps}/1000000")
+			printf "iperf3_%s_clients%d_instance%d_%s_%s_mbit_per_sec[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${i}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "${bps}/1000000")
 			bps_tx=("${bps_tx[@]}" "$bps")
 			bps_tx_tot=$(bc -l <<< "$bps_tx_tot + $bps")
 			let ++i
 		done
-		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_total" "${iteration}" $(bc -l <<< "scale=2; ${bps_tx_tot}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_total" "${iteration}" $(bc -l <<< "${bps_tx_tot}/1000000")
 		avg_bps_tx=$(bc -l <<< "$bps_tx_tot/${#bps_tx[@]}")
 		avg_bps_rx=$(bc -l <<< "$bps_rx_tot/${#bps_rx[@]}")
 		min_bps_tx=$(echo "${bps_tx[*]}" | tr ' ' '\n' | sort -nr | tail -n1)
 		min_bps_rx=$(echo "${bps_rx[*]}" | tr ' ' '\n' | sort -nr | tail -n1)
 		max_bps_tx=$(echo "${bps_tx[*]}" | tr ' ' '\n' | sort -nr | head -n1)
 		max_bps_rx=$(echo "${bps_rx[*]}" | tr ' ' '\n' | sort -nr | head -n1)
-		err_bps_tx=$(bc -l <<< "scale=5; ($max_bps_tx-$min_bps_tx)/$avg_bps_tx*100")
-		err_bps_rx=$(bc -l <<< "scale=5; ($max_bps_rx-$min_bps_rx)/$avg_bps_rx*100")
+		err_bps_tx=$(printf "%.5f" $(bc -l <<< "($max_bps_tx-$min_bps_tx)/$avg_bps_tx*100"))
+		err_bps_rx=$(printf "%.5f" $(bc -l <<< "($max_bps_rx-$min_bps_rx)/$avg_bps_rx*100"))
 		# Max throughput for Mellanox nic on DGX2 is 100G, 
-		expected_throughput=$(bc -l <<< "scale=5; 100000000000*0.90")
+		expected_throughput=$(printf "%.5f" $(bc -l <<< "100000000000*0.90"))
 
 		# Sender information
-		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_minimum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "scale=2; ${min_bps_tx}/1000000")
-		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "scale=2; ${max_bps_tx}/1000000")
-		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_average[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "scale=2; ${avg_bps_tx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_minimum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "${min_bps_tx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "${max_bps_tx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_average[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" $(bc -l <<< "${avg_bps_tx}/1000000")
 		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum_error[%d] %.2f%%\n" "${config_title}" "${iperf3_instances}" "${direction}" "sender_rate" "${iteration}" "${err_bps_tx}"
 		# Sum of Mbps rates for all instances of iperf3 should be 
 		# greater than 90% of expected throughput.
 		if (( $(echo "${expected_throughput} > ${bps_tx_tot}" | bc -l) )); then
-			printf "FAIL: average bitrate of %.2f Mbit/sec by is less than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_tx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
+			printf "FAIL: average bitrate of %.2f Mbit/sec by is less than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "${bps_tx_tot}/1000000") $(bc -l <<< "${expected_throughput}/1000000")
 		else
-			printf "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_tx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
+			printf "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "${bps_tx_tot}/1000000") $(bc -l <<< "${expected_throughput}/1000000")
 			printf "%s\n" "PASS: test passes specified performance thresholds"
 		fi
 		
 		# Receiver information
-		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_minimum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "scale=2; ${min_bps_rx}/1000000")
-		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "scale=2; ${max_bps_rx}/1000000")
-		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_average[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "scale=2; ${avg_bps_rx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_minimum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "${min_bps_rx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "${max_bps_rx}/1000000")
+		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_average[%d] %.2f\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" $(bc -l <<< "${avg_bps_rx}/1000000")
 		printf "iperf3_%s_clients%d_%s_%s_mbit_per_sec_maximum_error[%d] %.2f%%\n" "${config_title}" "${iperf3_instances}" "${direction}" "receiver_rate" "${iteration}" "${err_bps_rx}"
 		# Sum of Mbps rates for all instances of iperf3 should be 
 		# greater than 90% of expected throughput.
 		if (( $(echo "${expected_throughput} > ${bps_rx_tot}" | bc -l) )); then
-			printf "FAIL: average bitrate of %.2f Mbit/sec by is less than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_rx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
+			printf "FAIL: average bitrate of %.2f Mbit/sec by is less than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "${bps_rx_tot}/1000000") $(bc -l <<< "${expected_throughput}/1000000")
 		else
-			printf "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "scale=2; ${bps_rx_tot}/1000000") $(bc -l <<< "scale=2; ${expected_throughput}/1000000")
+			printf "bitrate of %.2f Mbit/sec is greater than minimum threshold of %.2f Mbit/sec\n" $(bc -l <<< "${bps_rx_tot}/1000000") $(bc -l <<< "${expected_throughput}/1000000")
 			printf "%s\n" "PASS: test passes specified performance thresholds"
 		fi
 

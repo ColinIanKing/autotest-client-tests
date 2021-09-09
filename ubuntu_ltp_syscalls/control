@@ -1,5 +1,5 @@
 AUTHOR = "Ubuntu"
-NAME = "ltp"
+NAME = "ubuntu_ltp_syscalls"
 CRITERIA = """
 Use the upstream LTP repository
 """
@@ -10,10 +10,19 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
 DOC = ""
 
-name = 'ubuntu_ltp_syscalls'
-
 # This test will take about 50min to run on google cloud
-results = job.run_test_detail('ubuntu_ltp_syscalls', test_name='setup', tag='setup', timeout=60*30)
-results = job.run_test_detail('ubuntu_ltp_syscalls', test_name='syscalls', tag='syscalls', timeout=60*120)
+result = job.run_test_detail(NAME, test_name='setup', tag='setup', timeout=60*30)
+if result == 'ERROR':
+    print("ERROR: test failed to build, skipping all the sub tests")
+else:
+    fn = '/opt/ltp/runtest/syscalls'
+    with open(fn , 'r') as f:
+        for line in f:
+            if line.strip() and not line.startswith('#'):
+                with open ('/tmp/target' , 'w') as t:
+                    t.write(line)
+                testcase = line.split()[0]
+                job.run_test_detail(NAME, test_name=testcase, tag=testcase, timeout=60*10)
+
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

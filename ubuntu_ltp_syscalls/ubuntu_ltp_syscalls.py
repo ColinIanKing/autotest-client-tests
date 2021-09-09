@@ -5,7 +5,6 @@ import os
 import platform
 import re
 import sys
-import time
 import shutil
 import signal
 from autotest.client import test, utils
@@ -19,6 +18,7 @@ try:
 except Exception, e:
     print(e)
     sys.stdout.flush()
+
 
 class ubuntu_ltp_syscalls(test.test):
     version = 1
@@ -72,7 +72,6 @@ class ubuntu_ltp_syscalls(test.test):
             self.series = distro.codename()
         self.flavour = re.split('-\d*-', platform.uname()[2])[-1]
         self.kernel = platform.uname()[2].split('-')[0]
-        self.libc = platform.libc_ver()[1]
 
     # setup
     #
@@ -111,47 +110,16 @@ class ubuntu_ltp_syscalls(test.test):
         utils.make(nprocs)
         utils.make('install')
 
-    def testcase_blacklist(self):
-        sys.path.append(os.path.dirname(__file__))
-        from testcase_blacklist import blacklist_db
-        try:
-            from packaging.version import parse
-        except ImportError:
-            # Compatibility fix for release < xenial and release > groovy (no python-packaging on groovy)
-            from distutils.version import StrictVersion
-        _blacklist = []
-        if self.flavour in blacklist_db['flavour']:
-            _blacklist += list(blacklist_db['flavour'][self.flavour].keys())
-        if self.flavour + '-' + self.series in blacklist_db['flavour-series']:
-            _blacklist += list(blacklist_db['flavour-series'][self.flavour + '-' + self.series].keys())
-        try:
-            current_version = parse(self.kernel)
-            for _kernel in blacklist_db['kernel']:
-                if current_version < parse(_kernel):
-                    _blacklist += list(blacklist_db['kernel'][_kernel].keys())
-        except NameError:
-            for _kernel in blacklist_db['kernel']:
-                if StrictVersion(self.kernel) < StrictVersion(_kernel):
-                    _blacklist += list(blacklist_db['kernel'][_kernel].keys())
+    def should_stop_timesyncd(self, test, action):
+        # Check if systemd-timesyncd is running before the test, if not, do not try to stop / start it
+        status_output = utils.system_output('systemctl status systemd-timesyncd 2>&1', ignore_status=True, verbose=False)
+        if action == 'stop':
+            skip_timesyncd = 'Active: inactive' in status_output or 'systemd-timesyncd.service could not be found' in status_output
+        else:
+            skip_timesyncd = 'Active: active' in status_output or 'systemd-timesyncd.service could not be found' in status_output
 
-        try:
-            current_version = parse(self.libc)
-            for _libc in blacklist_db['libc']:
-                if current_version < parse(_libc):
-                    _blacklist += list(blacklist_db['libc'][_libc].keys())
-        except NameError:
-            for _libc in blacklist_db['libc']:
-                if StrictVersion(self.libc) < StrictVersion(_libc):
-                    _blacklist += list(blacklist_db['libc'][_libc].keys())
-
-        return _blacklist
-
-    def should_stop_timesyncd(self, test):
         # trusty does not have systemd-timesyncd
-        testname = test.split()
-        if len(testname) < 1:
-            return False
-        return testname[0] in ['leapsec01','stime01','settimeofday01','clock_settime01'] and self.series != 'trusty'
+        return test in ['leapsec01', 'stime01', 'settimeofday01', 'clock_settime01'] and self.series != 'trusty' and not skip_timesyncd
 
     # run_once
     #
@@ -160,72 +128,37 @@ class ubuntu_ltp_syscalls(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
-        # Check if systemd-timesyncd is running before the test, if not, do not try to stop / start it
-        status_output = utils.system_output('systemctl status systemd-timesyncd 2>&1', ignore_status=True)
-        skip_timesyncd = 'inactive' in status_output or 'systemd-timesyncd.service could not be found' in status_output
-        fn = '/tmp/syscalls-' + time.strftime("%h%d-%H%M")
-        log_failed = fn + '.failed'
-        log_output = fn + '.output'
 
-        fn = '/opt/ltp/runtest/%s' % (test_name)
-        blacklisted = self.testcase_blacklist()
+        LTP_TIMEOUT_MUL = '3'
 
-        print("Checking virt-what to see if we need to set LTP_TIMEOUT_MUL for getrandom02...")
-        LTP_TIMEOUT_MUL = 1
-        if utils.system_output('virt-what', verbose=False):
-            print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1797327) for getrandom02")
-            LTP_TIMEOUT_MUL = 3
-        with open(fn , 'r') as f:
-            for line in f:
-                if line.strip() and not line.startswith('#'):
-                    if blacklisted and line.strip() in blacklisted:
-                        continue
-                    with open ('/tmp/target' , 'w') as t:
-                        t.write(line)
+        # Set the timeout multiplier exclusively for getrandom02 (lp:1831235) in a VM
+        if test_name == 'getrandom02':
+            if utils.system_output('virt-what', verbose=False):
+                print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL={} (lp:1797327) for getrandom02".format(LTP_TIMEOUT_MUL))
+                os.environ["LTP_TIMEOUT_MUL"] = LTP_TIMEOUT_MUL
+        # Set the timeout multiplier for ioctl_sg01 (lp:1895281, lp:1936886)
+        elif test_name == 'ioctl_sg01':
+            print("Set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1895281, lp:1936886) for ioctl_sg01")
+            os.environ["LTP_TIMEOUT_MUL"] = LTP_TIMEOUT_MUL
 
-                    # Set the timeout multiplier exclusively for getrandom02 (lp:1831235)
-                    if 'getrandom02' in line and LTP_TIMEOUT_MUL > 1:
-                        os.environ["LTP_TIMEOUT_MUL"] = str(LTP_TIMEOUT_MUL)
+        # Stop timesyncd when testing time change
+        if self.should_stop_timesyncd(test_name, 'stop'):
+            utils.run('systemctl stop systemd-timesyncd')
 
-                    # Set the timeout multiplier for ioctl_sg01 (lp:1895281, lp:1936886)
-                    if 'ioctl_sg01' in line:
-                        print("Set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1895281, lp:1936886) for ioctl_sg01")
-                        os.environ["LTP_TIMEOUT_MUL"] = '3'
+        cmd = '/opt/ltp/runltp -f /tmp/target -q -C /dev/null -l /dev/null -T /dev/null'
+        print(utils.system_output(cmd, verbose=False))
+        # /dev/loop# creation will be taken care by the runltp
 
-                    # Stop timesyncd when testing time change
-                    if not skip_timesyncd and self.should_stop_timesyncd(line):
-                        utils.run('systemctl stop systemd-timesyncd')
+    def cleanup(self, test_name):
+        if test_name == 'setup':
+            return
 
-                    cmd = '/opt/ltp/runltp -f /tmp/target -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
-                    utils.run(cmd, ignore_status=True, verbose=False)
-                    # /dev/loop# creation will be taken care by the runltp
+        # Restart timesyncd after the test
+        if self.should_stop_timesyncd(test_name, 'start'):
+            utils.run('systemctl start systemd-timesyncd')
 
-                    # Stop timesyncd when testing time change. Restart it now that it's done.
-                    if not skip_timesyncd and self.should_stop_timesyncd(line):
-                        utils.run('systemctl start systemd-timesyncd')
-
-                    # Restore the timeout multiplier
-                    if 'LTP_TIMEOUT_MUL' in os.environ:
-                        if 'getrandom02' in line or 'ioctl_sg01' in line:
-                            del os.environ["LTP_TIMEOUT_MUL"]
-
-        num_failed = sum(1 for line in open(log_failed))
-        num_blacklisted = len(blacklisted) if blacklisted else 0
-        print("== Test Suite Summary ==")
-        print("{} test cases failed".format(num_failed))
-        print("{} test cases blacklisted".format(num_blacklisted))
-
-        if num_failed > 0:
-            cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"
-            failed_list = utils.system_output(cmd, retain_output=False, verbose=False)
-            print("Failed test cases : %s" % failed_list)
-
-        if num_blacklisted > 0:
-            print("Blacklisted test cases: %s" % ', '.join(blacklisted))
-        cmd = 'cat ' + log_output
-        utils.system_output(cmd, retain_output=True, verbose=False)
-
-        if num_failed > 0:
-            raise error.TestFail()
-
+        # Restore the timeout multiplier
+        if 'LTP_TIMEOUT_MUL' in os.environ:
+            print("Restore timeout multiplier LTP_TIMEOUT_MUL back to default")
+            del os.environ["LTP_TIMEOUT_MUL"]
 # vi:set ts=4 sw=4 expandtab syntax=python:

@@ -114,10 +114,10 @@ class ubuntu_ltp_syscalls(test.test):
         # Check if systemd-timesyncd is running before the test, if not, do not try to stop / start it
         status_output = utils.system_output('systemctl status systemd-timesyncd 2>&1', ignore_status=True, verbose=False)
         if action == 'stop':
-            skip_timesyncd = 'Active: inactive' in status_output or 'systemd-timesyncd.service could not be found' in status_output
+            targets = ['Active: inactive', 'systemd-timesyncd.service could not be found', 'Loaded: masked']
         else:
-            skip_timesyncd = 'Active: active' in status_output or 'systemd-timesyncd.service could not be found' in status_output
-
+            targets = ['Active: active', 'systemd-timesyncd.service could not be found', 'Loaded: masked']
+        skip_timesyncd = any(string in status_output for string in targets)
         # trusty does not have systemd-timesyncd
         return test in ['leapsec01', 'stime01', 'settimeofday01', 'clock_settime01'] and self.series != 'trusty' and not skip_timesyncd
 

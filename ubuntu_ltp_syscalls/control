@@ -22,7 +22,7 @@ else:
                 with open ('/tmp/target' , 'w') as t:
                     t.write(line)
                 testcase = line.split()[0]
-                job.run_test_detail(NAME, test_name=testcase, tag=testcase, timeout=60*10)
+                job.run_test_detail(NAME, test_name=testcase, tag=testcase, timeout=60*15)
 
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

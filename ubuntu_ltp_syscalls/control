@@ -22,7 +22,11 @@ else:
                 with open ('/tmp/target' , 'w') as t:
                     t.write(line)
                 testcase = line.split()[0]
-                job.run_test_detail(NAME, test_name=testcase, tag=testcase, timeout=60*15)
+                timeout_threshold = 60*15
+                # Special case for msgstress04 (lp:1943802 / lp:1943652)
+                if testcase == 'msgstress04':
+                    timeout_threshold = 60*60
+                job.run_test_detail(NAME, test_name=testcase, tag=testcase, timeout=timeout_threshold)
 
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

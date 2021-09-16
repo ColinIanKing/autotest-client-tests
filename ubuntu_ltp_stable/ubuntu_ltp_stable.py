@@ -135,6 +135,9 @@ class ubuntu_ltp_stable(test.test):
                     # Restore the timeout multiplier
                     os.environ["LTP_TIMEOUT_MUL"] = '1'
 
+        cmd = 'cat ' + log_output
+        utils.system_output(cmd, retain_output=True, verbose=False)
+
         num_failed = sum(1 for line in open(log_failed))
         print("== Test Suite Summary ==")
         print("{} test cases failed".format(num_failed))
@@ -143,11 +146,6 @@ class ubuntu_ltp_stable(test.test):
             cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"
             failed_list = utils.system_output(cmd, retain_output=False, verbose=False)
             print("Failed test cases : %s" % failed_list)
-
-        cmd = 'cat ' + log_output
-        utils.system_output(cmd, retain_output=True, verbose=False)
-
-        if num_failed > 0:
             raise error.TestError('Test failed for ' + test_name)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

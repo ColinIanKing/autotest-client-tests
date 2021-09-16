@@ -113,6 +113,9 @@ class ubuntu_performance_latency(test.test):
         self.results = utils.system_output('git clone git://kernel.ubuntu.com/cking/stress-ng', retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
         self.results = utils.system_output('git checkout -b V0.09.56 V0.09.56', retain_output=True)
+        self.results = utils.system_output('patch -p1 < %s/0001-Add-build-time-check-for-struct-sockaddr_un.patch' % self.bindir, retain_output=True)
+        self.results = utils.system_output('patch -p1 < %s/0002-stress-efivar-only-exercise-FS_IOC_-FLAGS-if-they-ar.patch' % self.bindir, retain_output=True)
+        self.results = utils.system_output('patch -p1 < %s/0003-stress-ng.h-workaround-non-constant-stack-sizes-in-n.patch' % self.bindir, retain_output=True)
         self.results = utils.system_output('make', retain_output=True)
 
     def run_once(self, test_name):

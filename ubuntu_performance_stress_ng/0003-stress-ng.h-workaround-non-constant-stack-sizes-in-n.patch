@@ -1,0 +1,33 @@
+From 9b40065cffd439834c031975e7b3ea99442f58ca Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Thu, 16 Sep 2021 13:37:28 +0000
+Subject: [PATCH 3/3] stress-ng.h: workaround non-constant stack sizes in newer
+ libc
+
+Re-define signal stack sizes to be 32K to workaround run time evaluated
+stack size macros in newer libc
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ stress-ng.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/stress-ng.h b/stress-ng.h
+index f282f323..2bc5683c 100644
+--- a/stress-ng.h
++++ b/stress-ng.h
+@@ -541,6 +541,11 @@
+ #include <gnu/lib-names.h>
+ #endif
+ 
++#undef MINSIGSTKSZ
++#define MINSIGSTKSZ 32768
++#undef SIGSTKSZ
++#define SIGSTKSZ 32768
++
+ /*
+  *  Various system calls not included in libc (yet)
+  */
+-- 
+2.32.0
+

@@ -92,10 +92,8 @@ class ubuntu_ltp_syscalls(test.test):
 
         # Print test suite HEAD SHA1 commit id for future reference
         os.chdir(os.path.join(self.srcdir, 'ltp'))
-        title_local = utils.system_output("git log --oneline -1 | sed 's/(.*)//'", retain_output=False, verbose=False)
-        title_upstream = utils.system_output("git log --oneline | grep -v SAUCE | head -1", retain_output=False, verbose=False)
-        print("Latest commit in '{}' branch: {}".format(branch, title_local))
-        print("Latest upstream commit: {}".format(title_upstream))
+        title = utils.system_output("git log --oneline -1 | sed 's/(.*)//'", retain_output=False, verbose=False)
+        print("Latest commit in '{}' branch: {}".format(branch, title))
 
         # Disable NTFS as we disable RW support
         cmd = 'sed -i /ntfs/d lib/tst_supported_fs_types.c'

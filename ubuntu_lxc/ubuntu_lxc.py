@@ -88,7 +88,7 @@ class ubuntu_lxc(test.test):
         # Destroy the "reboot" container which might have been left
         # behind (LP#1788574)
         if test_name == 'lxc-test-api-reboot':
-            cmd = 'lxc-destroy reboot &> /dev/null'
+            cmd = 'lxc-destroy reboot'
             utils.system(cmd, ignore_status=True)
 
         if self.series in ['precise', 'trusty', 'xenial']:

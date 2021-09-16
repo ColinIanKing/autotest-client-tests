@@ -65,6 +65,11 @@ if result == 'GOOD':
         os.remove('/usr/bin/dirmngr')
         cmd = 'dpkg-divert --divert /usr/bin/dirmngr.orig --rename --remove /usr/bin/dirmngr'
         utils.system(cmd, ignore_status=True)
-
+    '''Cleanup the leftover reboot container on s390x otherwise the test cannot finish properly (lp:1941063)'''
+    reboot_exist = utils.system_output('lxc-info reboot', ignore_status=True, verbose=False)
+    if 'State:' in reboot_exist:
+        print('Cleaning leftover reboot container...')
+        utils.system('lxc-stop reboot', ignore_status=True)
+        utils.system('lxc-destroy reboot', ignore_status=True)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

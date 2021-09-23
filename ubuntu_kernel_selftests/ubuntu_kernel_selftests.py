@@ -131,13 +131,6 @@ class ubuntu_kernel_selftests(test.test):
             if os.path.exists(fn):
                 cmd = 'sed -i "s/ rtctest//" ' + fn
                 utils.system(cmd)
-            #
-            # systems without /dev/rtc0 should not run rtcpie test
-            #
-            fn = 'linux/tools/testing/selftests/timers/Makefile'
-            if not os.path.exists("/dev/rtc0") and os.path.exists(fn):
-                cmd = 'sed -i "s/ rtcpie//" ' + fn
-                utils.system(cmd)
 
             #
             # update fix CPU hotplug test, new and old versions

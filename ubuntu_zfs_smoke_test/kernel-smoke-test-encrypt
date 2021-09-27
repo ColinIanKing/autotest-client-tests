@@ -24,7 +24,7 @@ POOL=pool-smoke-$$
 ZFSENC_TYPES="aes-128-ccm,32,32 aes-192-ccm,32,32 aes-256-ccm,32,32 aes-128-gcm,32,32 aes-192-gcm,32,32 aes-256-gcm,32,32"
 
 ZFS_PKG_VER=$(dpkg -l | grep zfsutils | awk '{print $3}')
-ZFS_USER_VER=$(echo $ZFS_PKG_VER | awk '{print $3}' | tr '.' ' ' | awk {'print $1 * 10000 + $2 * 100 + $3}')
+ZFS_USER_VER=$(echo $ZFS_PKG_VER | tr '.' ' ' | awk {'print $1 * 10000 + $2 * 100 + $3}')
 if [ $ZFS_USER_VER -lt 803 ]; then
 	echo "ZFS utils version $ZFS_PKG_VER is less than 0.8.3, skipping test"
 	echo ""

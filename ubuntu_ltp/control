@@ -15,7 +15,7 @@ name = 'ubuntu_ltp'
 results = job.run_test_detail('ubuntu_ltp', test_name='setup', tag='setup', timeout=30*60)
 
 tests = [
-    'fs',         'mm',           'controllers', 'commands',
+    'fs',         'mm',           'commands',
     'cpuhotplug', 'net.ipv6_lib', 'cve',         'crypto',
     'kernel_misc'
 ]

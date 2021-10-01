@@ -38,7 +38,6 @@ class ubuntu_ltp(test.test):
             'libtirpc-dev',
             'pkg-config',
             'quota',
-            'virt-what',
             'xfslibs-dev',
             'xfsprogs',
         ]
@@ -106,9 +105,6 @@ class ubuntu_ltp(test.test):
 
         print("Setting LTP_TIMEOUT_MUL exceptions...")
         timeout_cases = { 'zram01': '5'}
-        if utils.system_output('virt-what', verbose=False):
-            print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL=3 for memcg_test_3 (lp:1836694)")
-            timeout_cases['memcg_test_3'] = '3'
         if self.flavour in ['azure', 'oracle']:
             print("Running on Azure / Oracle, set timeout multiplier LTP_TIMEOUT_MUL=3 for cve-2018-1000204 / ioctl_sg01 (lp:1899413)")
             timeout_cases['ioctl_sg01'] = '3'

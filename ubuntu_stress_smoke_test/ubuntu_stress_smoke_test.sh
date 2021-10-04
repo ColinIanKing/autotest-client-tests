@@ -10,9 +10,8 @@ MIN_DISK=$((4))
 MAX_BOGO_OPS=3000
 
 SYS_ZSWAP_ENABLED=/sys/module/zswap/parameters/enabled
-CGROUP_MEM=/sys/fs/cgroup/memory/stress-ng-test
-MEMORY=$((1024 * 1024 * 1024))
 
+MEMORY=$((1024 * 1024 * 1024))
 MEMFREE_KB=$(grep "MemFree" /proc/meminfo  | awk '{ print $2}')
 MEMFREE=$((MEMFREE_KB * 1024))
 MEMFREE_90PC=$((MEMFREE * 90 / 100))
@@ -28,10 +27,24 @@ fi
 echo "Free memory: $((MEMFREE / (1024 * 1024))) MB"
 echo "Memory used: $((MEMORY / (1024 * 1024))) MB"
 
+CGROUP_MEM1=/sys/fs/cgroup/memory/stress-ng-test
+CGROUP_LIMIT1=${CGROUP_MEM1}/memory.limit_in_bytes
+CGROUP_MEM2=/sys/fs/cgroup/stress-ng-test
+CGROUP_LIMIT2=${CGROUP_MEM2}/memory.max
+CGROUP=$(grep "/sys/fs/cgroup" /proc/mounts | cut -d' ' -f1)
+if [ $CGROUP == "cgroup2" ]; then
+	echo "Using cgroup version 2"
+	CGROUP_MEM=${CGROUP_MEM2}
+	CGROUP_LIMIT=${CGROUP_LIMIT2}
+else
+	echo "Using cgroup version 2"
+	CGROUP_MEM=${CGROUP_MEM1}
+	CGROUP_LIMIT=${CGROUP_LIMIT1}
+fi
 if [ ! -d ${CGROUP_MEM} ]; then
 	mkdir ${CGROUP_MEM}
 fi
-echo $MEMORY > ${CGROUP_MEM}/memory.limit_in_bytes
+echo $MEMORY > ${CGROUP_LIMIT}
 
 #
 # Stress test duration in seconds
@@ -260,10 +273,17 @@ sync
 #
 #  Handle cases where cgroup settings are enabled or not
 #
-if [ -e ${CGROUP_MEM}/memory.limit_in_bytes ]; then
-	RUN_STRESS='cgexec -g memory:stress-ng-test ./stress-ng'
-else
-	RUN_STRESS='./stress-ng'
+RUN_STRESS='./stress-ng'
+if [ -e ${CGROUP_LIMIT} ]; then
+	cgexec -g memory:stress-ng-test /bin/true
+	#
+	#  If cgexec works on trivial case then use it for stress-ng
+	#
+	if [ $? -eq 0 ]; then
+		RUN_STRESS='cgexec -g memory:stress-ng-test ./stress-ng'
+	else
+		echo "WARNING: cgexec fails, is ${CGROUP} working correctly?"
+	fi
 fi
 
 count=0

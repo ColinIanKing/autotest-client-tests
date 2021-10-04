@@ -114,6 +114,13 @@ check_machine()
 	case "$processor" in
 	i386 | i486 | i586 | i686 | x86_64)
 		datecheck=1
+
+		manufacturer=$(dmidecode -s system-manufacturer)
+		if [ "$manufacturer" == "QEMU" ]; then
+			echo "QEMU instance, no firmware date checking"
+			datecheck=0
+		fi
+
 		vendor=$(dmidecode -t 0x0000 | grep Vendor: | awk '{ print $2}')
 		if [ -z "$vendor" ]; then
 			vendor=$(dmidecode -t 0x000e | grep Vendor: | awk '{ print $2}')

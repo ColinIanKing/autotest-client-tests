@@ -37,7 +37,7 @@ if [ $CGROUP == "cgroup2" ]; then
 	CGROUP_MEM=${CGROUP_MEM2}
 	CGROUP_LIMIT=${CGROUP_LIMIT2}
 else
-	echo "Using cgroup version 2"
+	echo "Using cgroup version 1"
 	CGROUP_MEM=${CGROUP_MEM1}
 	CGROUP_LIMIT=${CGROUP_LIMIT1}
 fi

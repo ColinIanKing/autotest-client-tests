@@ -116,8 +116,22 @@ class ubuntu_ltp_controllers(test.test):
         if test_name == 'setup':
             return
 
+        if test_name == 'memcg_test_3':
+            if utils.system_output('virt-what', verbose=False):
+                print("Running in VM, set timeout multiplier LTP_TIMEOUT_MUL=12 for memcg_test_3 (lp:1836694)")
+                os.environ["LTP_TIMEOUT_MUL"] = '12'
+
         cmd = '/opt/ltp/runltp -f /tmp/target -q -C /dev/null -l /dev/null -T /dev/null'
         print(utils.system_output(cmd, verbose=False))
         # /dev/loop# creation will be taken care by the runltp
+
+    def cleanup(self, test_name):
+        if test_name == 'setup':
+            return
+
+        # Restore the timeout multiplier
+        if 'LTP_TIMEOUT_MUL' in os.environ:
+            print("Restore timeout multiplier LTP_TIMEOUT_MUL back to default")
+            del os.environ["LTP_TIMEOUT_MUL"]
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

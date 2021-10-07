@@ -18,7 +18,7 @@ class ubuntu_futex(test.test):
             series = distro.codename()
 
         pkgs = [
-            'build-essential', 'git',
+            'build-essential', 'git', 'ca-certificates'
         ]
         gcc = 'gcc' if arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
         pkgs.append(gcc)

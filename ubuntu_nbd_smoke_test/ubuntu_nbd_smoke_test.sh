@@ -182,7 +182,8 @@ do_test()
 
 	echo "NBD exports found:"
 	nbd-client -l localhost | grep -v Negotiation
-
+	# Sleep added due to LP# 1947031
+	sleep 10
 	do_log "starting client with NBD device ${NBD_DEV}"
 	nbd-client -t ${NBD_TIMEOUT} -b ${NBD_BLOCK_SIZE} -p -N test localhost ${NBD_DEV}
 	if [ $? -ne 0 ]; then

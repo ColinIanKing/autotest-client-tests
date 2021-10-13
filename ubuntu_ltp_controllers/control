@@ -11,7 +11,7 @@ TEST_TYPE = "client"
 DOC = ""
 
 # This test will take about 50min to run on google cloud
-result = job.run_test_detail(NAME, test_name='setup', tag='setup', timeout=60*30)
+result = job.run_test_detail(NAME, test_name='setup', tag='setup', timeout=60*40)
 if result == 'ERROR':
     print("ERROR: test failed to build, skipping all the sub tests")
 else:

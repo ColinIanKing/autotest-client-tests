@@ -12,7 +12,7 @@ DOC = ""
 
 name = 'ubuntu_ltp'
 
-results = job.run_test_detail('ubuntu_ltp', test_name='setup', tag='setup', timeout=30*60)
+results = job.run_test_detail('ubuntu_ltp', test_name='setup', tag='setup', timeout=40*60)
 
 tests = [
     'fs',         'mm',           'commands',

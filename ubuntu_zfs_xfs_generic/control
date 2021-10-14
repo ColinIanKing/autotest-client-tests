@@ -18,27 +18,30 @@ else:
     #
     # This forces setup() to be run, it is in fact a no-op test
     #
-    results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name='setup', tag='setup', timeout=60*30)
+    result = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name='setup', tag='setup', timeout=60*30)
 
-    tests = [
-        '002', '005', '006', '007', '010', '011',
-        '013', '014', '023', '028', '029', '035', '037',
-        '053', '069', '070', '075', '079', '080', '084',
-        '087', '088', '089', '100', '105', '112', '117',
-        '124', '126', '129', '131', '132', '141',
-        '184', '169', '192', '215', '221', '236',
-        '237', '241', '245', '246', '247', '248', '249',
-        '257', '258', '285', '294', '306', '307',
-        '308', '309', '310', '313'
-    ]
+    if result == 'ERROR':
+        print("ERROR: test failed to build, skipping all the sub tests")
+    else:
+        tests = [
+            '002', '005', '006', '007', '010', '011',
+            '013', '014', '023', '028', '029', '035', '037',
+            '053', '069', '070', '075', '079', '080', '084',
+            '087', '088', '089', '100', '105', '112', '117',
+            '124', '126', '129', '131', '132', '141',
+            '184', '169', '192', '215', '221', '236',
+            '237', '241', '245', '246', '247', '248', '249',
+            '257', '258', '285', '294', '306', '307',
+            '308', '309', '310', '313'
+        ]
 
-    #
-    # ..so run scripts that have the executable x flag set
-    #
-    print("Invoking zfs xfs generic functional tests..\n")
-    for test in tests:
-	    results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name=test, tag=test, timeout=60*120)
+        #
+        # ..so run scripts that have the executable x flag set
+        #
+        print("Invoking zfs xfs generic functional tests..\n")
+        for test in tests:
+    	    results = job.run_test_detail('ubuntu_zfs_xfs_generic', test_name=test, tag=test, timeout=60*120)
 
-    print("Done!\n")
+        print("Done!\n")
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

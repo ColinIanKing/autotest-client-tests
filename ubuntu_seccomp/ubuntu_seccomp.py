@@ -48,7 +48,7 @@ class ubuntu_seccomp(test.test):
         autogen = self.srcdir + '/libseccomp/autogen.sh'
         self.results = utils.system_output(autogen, retain_output=True)
         utils.configure()
-        utils.make()
+        utils.make('check-build')
 
     # run_once
     #

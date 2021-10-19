@@ -16,8 +16,7 @@ results = job.run_test_detail('ubuntu_ltp', test_name='setup', tag='setup', time
 
 tests = [
     'fs',         'mm',           'commands',
-    'cpuhotplug', 'net.ipv6_lib', 'cve',         'crypto',
-    'kernel_misc'
+    'cpuhotplug', 'net.ipv6_lib', 'cve',         'crypto'
 ]
 for test in tests:
     results = job.run_test_detail('ubuntu_ltp', test_name=test, tag=test, timeout=60*60*2)

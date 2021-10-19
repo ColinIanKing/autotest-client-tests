@@ -1,0 +1,1 @@
+Blacklisted on this series as this kernel_misc test was splitted out from ubuntu_ltp, which got this series blacklisted as well.

@@ -1,0 +1,28 @@
+AUTHOR = "Ubuntu"
+NAME = "ubuntu_ltp_kernel_misc"
+CRITERIA = """
+Use the upstream LTP repository
+"""
+SUITE = "None"
+TIME = "MEDIUM"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = ""
+
+# This test will take about 50min to run on google cloud
+result = job.run_test_detail(NAME, test_name='setup', tag='setup', timeout=60*40)
+if result == 'ERROR':
+    print("ERROR: test failed to build, skipping all the sub tests")
+else:
+    fn = '/opt/ltp/runtest/kernel_misc'
+    with open(fn , 'r') as f:
+        for line in f:
+            if line.strip() and not line.startswith('#'):
+                with open ('/tmp/target' , 'w') as t:
+                    t.write(line)
+                testcase = line.split()[0]
+                job.run_test_detail(NAME, test_name=testcase, tag=testcase, timeout=60*20)
+
+
+# vi:set ts=4 sw=4 expandtab syntax=python:

@@ -1,5 +1,5 @@
 AUTHOR = "Ubuntu"
-NAME = "seccomp"
+NAME = "ubuntu_seccomp"
 CRITERIA = """
 Uses Kees Cook's seccomp tests.
 """
@@ -10,12 +10,17 @@ TEST_CATEGORY = 'Functional'
 TEST_TYPE = "client"
 DOC = ""
 
-name = 'ubuntu_seccomp'
 
-result = job.run_test_detail('ubuntu_seccomp', test_name='setup', tag='setup', timeout=60*20)
+result = job.run_test_detail(NAME, test_name='setup', tag='setup', timeout=60*20)
 if result == 'ERROR':
     print("ERROR: test failed to build, skipping all the sub tests")
 else:
-    result = job.run_test_detail('ubuntu_seccomp', test_name='seccomp', tag='seccomp', timeout=60*40)
+    tests_dir = os.path.join(job.bindir, 'tmp', NAME, 'src', 'libseccomp', 'tests')
+    files_list = os.listdir(tests_dir)
+    files_list.sort()
+    for test in files_list:
+        if test.endswith('.tests'):
+            target = test.replace('.tests', '')
+            job.run_test_detail(NAME, test_name=target, tag=target, timeout=60*3)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

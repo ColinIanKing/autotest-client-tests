@@ -59,7 +59,7 @@ class ubuntu_seccomp(test.test):
             return
         os.chdir(os.path.join(self.srcdir, 'libseccomp', 'tests'))
 
-        cmd = 'make check'
-        self.results = utils.system_output(cmd, retain_output=True)
+        cmd = 'time ./regression -b {}'.format(test_name)
+        print(utils.system_output(cmd, verbose=False))
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

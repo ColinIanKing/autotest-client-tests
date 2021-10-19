@@ -1,0 +1,12 @@
+AUTHOR = 'Taihsiang Ho <taihsiang.ho@canonical.com>'
+TIME = 'SHORT'
+NAME = 'DGX MOFED build verification test'
+TEST_TYPE = 'client'
+TEST_CLASS = 'General'
+TEST_CATEGORY = 'Smoke'
+
+DOC = """
+Perform testing of Mellanox device
+"""
+
+job.run_test_detail('ubuntu_dgx_mofed_build', test_name='dkms', tag='dkms', timeout=60)

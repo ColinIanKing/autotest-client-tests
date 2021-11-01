@@ -10,6 +10,7 @@ class ubuntu_kernel_selftests(test.test):
     version = 1
 
     def install_required_pkgs(self):
+        '''Function to install necessary packages.'''
         pkgs = [
             'bc',
             'build-essential',
@@ -24,7 +25,7 @@ class ubuntu_kernel_selftests(test.test):
             'pkg-config',
             'uuid-runtime'
         ]
-        if not (self.arch == 's390x' and self.series in ['precise', 'trusty', 'vivid', 'xenial']):
+        if not (self.arch == 's390x' and self.series in ['trusty', 'xenial']):
             pkgs.append('libnuma-dev')
             pkgs.append('libfuse-dev')
         gcc = 'gcc' if self.arch in ['ppc64le', 'aarch64', 's390x', 'riscv64'] else 'gcc-multilib'
@@ -49,7 +50,7 @@ class ubuntu_kernel_selftests(test.test):
                 pkgs.extend(['clang', 'llvm'])
 
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
-        self.results = utils.system_output(cmd, retain_output=True)
+        utils.system_output(cmd, retain_output=True)
 
     def initialize(self):
         self.arch = platform.processor()
@@ -61,26 +62,20 @@ class ubuntu_kernel_selftests(test.test):
             self.series = distro.codename()
         self.kv = platform.release().split(".")[:2]
         self.kv = int(self.kv[0]) * 100 + int(self.kv[1])
-        pass
 
     def download(self):
+        '''Function to download kernel source.'''
         cmd = "dpkg -S /lib/modules/" + platform.release() + "/kernel | cut -d: -f 1 | cut -d, -f 1"
         pkg = os.popen(cmd).readlines()[0].strip()
         utils.system("apt-get source --download-only " + pkg)
 
     def extract(self):
+        '''Function to extract kernel source.'''
         os.system("rm -rf linux/")
         utils.system("dpkg-source -x linux*dsc linux")
 
-    def summary(self, pattern):
-        failures = list(re.finditer(pattern, self.results))
-        if failures:
-            for i in failures:
-                print('Sub test case: {} failed.'.format(i.group('case')))
-            return True
-        return False
-
     def setup(self):
+        '''Function to setup the test environment.'''
         self.install_required_pkgs()
         self.job.require_gcc()
         os.chdir(self.srcdir)
@@ -103,8 +98,8 @@ class ubuntu_kernel_selftests(test.test):
             #
             fn = 'linux/tools/testing/selftests/breakpoints/step_after_suspend_test.c'
             if os.path.exists(fn):
-               cmd = 'sed -i "s/tv_sec = 5;/tv_sec = 30;/" ' + fn
-               utils.system(cmd)
+                cmd = 'sed -i "s/tv_sec = 5;/tv_sec = 30;/" ' + fn
+                utils.system(cmd)
             # currently disable step_after_suspend_test as this breaks ssh'd login
             # connections to the test VMs and real H/W
             fn = 'linux/tools/testing/selftests/breakpoints/Makefile'
@@ -136,12 +131,12 @@ class ubuntu_kernel_selftests(test.test):
             # update fix CPU hotplug test, new and old versions
             #
             print("Updating CPU hotplug test")
-            fn="linux/tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh"
+            fn = "linux/tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh"
             if os.path.exists(fn) and 'present_cpus=' not in open(fn).read():
                 cmd = 'cp %s/cpu-on-off-test.sh %s' % (self.bindir, fn)
                 utils.system(cmd)
             else:
-                fn="linux/tools/testing/selftests/cpu-hotplug/on-off-test.sh"
+                fn = "linux/tools/testing/selftests/cpu-hotplug/on-off-test.sh"
                 if os.path.exists(fn) and 'present_cpus=' not in open(fn).read():
                     cmd = 'cp %s/cpu-on-off-test.sh %s' % (self.bindir, fn)
                     utils.system(cmd)
@@ -216,40 +211,45 @@ class ubuntu_kernel_selftests(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
+        if test_name.endswith('-build'):
+            os.chdir(self.srcdir)
+            if "net" in test_name:
+                cmd = "sh -c 'echo 1 > /proc/sys/net/ipv4/conf/all/accept_local'"
+                utils.system(cmd)
+                if self.kv >= 415:
+                    # net selftests use a module built by bpf selftests, bpf is available since bionic kernel
+                    if self.kv == 506:
+                        os.environ["CLANG"] = "clang-10"
+                        os.environ["LLC"] = "llc-10"
+                        os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-10"
+                        os.environ["LLVM_READELF"] = "llvm-readelf-10"
+                    elif self.kv in [504, 503]:
+                        os.environ["CLANG"] = "clang-9"
+                        os.environ["LLC"] = "llc-9"
+                        os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
+                        os.environ["LLVM_READELF"] = "llvm-readelf-9"
+                    cmd = "make -C linux/tools/testing/selftests TARGETS=bpf SKIP_TARGETS= KDIR=/usr/src/linux-headers-{}".format(platform.release())
+                    # keep running selftests/net, even if selftests/bpf build fails
+                    utils.system(cmd, ignore_status=True)
+            cmd = "make -C linux/tools/testing/selftests TARGETS={}".format(test_name.replace('-build', ''))
+            utils.system_output(cmd, retain_output=True)
+            return
 
-        cmd = "sudo sh -c 'echo 1 > /proc/sys/net/ipv4/conf/all/accept_local'"
-        utils.system(cmd)
-
-        os.chdir(self.srcdir)
-        if test_name == "net" and self.kv >= 415:
-            # net selftests use a module built by bpf selftests, bpf is available since bionic kernel
-            if self.kv == 506:
-                os.environ["CLANG"] = "clang-10"
-                os.environ["LLC"] = "llc-10"
-                os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-10"
-                os.environ["LLVM_READELF"] = "llvm-readelf-10"
-            elif self.kv in [504, 503]:
-                os.environ["CLANG"] = "clang-9"
-                os.environ["LLC"] = "llc-9"
-                os.environ["LLVM_OBJCOPY"] = "llvm-objcopy-9"
-                os.environ["LLVM_READELF"] = "llvm-readelf-9"
-            cmd = "make -C linux/tools/testing/selftests TARGETS=bpf SKIP_TARGETS= KDIR=/usr/src/linux-headers-{}".format(platform.release())
-            # keep running selftests/net, even if selftests/bpf build fails
-            utils.system(cmd, ignore_status=True)
-        cmd = "sudo make -C linux/tools/testing/selftests TARGETS=%s run_tests" % test_name
-        self.results = utils.system_output(cmd, retain_output=True)
-
-        print('========== Summary ===========')
+        category = test_name.split(':')[0]
+        sub_test = test_name.split(':')[1]
+        dir_root = os.path.join(self.srcdir, 'linux', 'tools', 'testing', 'selftests')
+        os.chdir(dir_root)
+        cmd = "make run_tests -C {} TEST_PROGS={} TEST_GEN_PROGS='' TEST_CUSTOM_PROGS=''".format(category, sub_test)
+        result = utils.system_output(cmd, retain_output=True)
 
         # Old pattern for Xenial
         pattern = re.compile('selftests: *(?P<case>[\w\-\.]+) \[FAIL\]\n')
-        if self.summary(pattern):
-            raise error.TestError('Test failed for ' + test_name)
+        if re.search(pattern, result):
+            raise error.TestError(test_name + ' failed.')
         # If the test was not end by previous check, check again with new pattern
-        pattern = re.compile('not ok [\d\.]* selftests: *({}.*: )?(?P<case>[\w\-\.]+)(?!.*SKIP)'.format(test_name))
-        if self.summary(pattern):
-            raise error.TestError('Test failed for ' + test_name)
+        pattern = re.compile('not ok [\d\.]* selftests: {}: {} # (?!.*SKIP)'.format(category, sub_test))
+        if re.search(pattern, result):
+            raise error.TestError(test_name + ' failed.')
 
-        print('No failed cases reported')
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

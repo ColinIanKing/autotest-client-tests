@@ -33,7 +33,7 @@ class ubuntu_kernel_selftests(test.test):
 
         if any(x in self.flavour for x in ['aws', 'azure', 'gcp', 'gke']):
             if not (self.flavour == 'aws' and self.series == 'trusty'):
-                pkgs.append('linux-modules-extra-' + self.flavour + '*')
+                pkgs.append('linux-modules-extra-' + platform.uname()[2])
 
         if self.kv >= 415:
             # extra packages for building bpf tests

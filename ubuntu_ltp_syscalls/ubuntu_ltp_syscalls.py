@@ -53,7 +53,7 @@ class ubuntu_ltp_syscalls(test.test):
 
         if self.flavour in ['aws', 'azure', 'azure-fips', 'gcp', 'gcp-fips', 'gke', 'gkeop']:
             if not (self.flavour == 'aws' and self.series == 'trusty'):
-                pkgs.append('linux-modules-extra-' + self.flavour + '*')
+                pkgs.append('linux-modules-extra-' + platform.uname()[2])
         if self.flavour not in ['kvm']:
             pkgs.append('nfs-kernel-server')
         if self.series not in ['trusty']:

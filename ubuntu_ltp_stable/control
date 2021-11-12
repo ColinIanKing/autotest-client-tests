@@ -12,16 +12,18 @@ DOC = ""
 
 name = 'ubuntu_ltp_stable'
 
-results = job.run_test_detail('ubuntu_ltp_stable', test_name='setup', tag='setup', timeout=40*60)
-
-tests = [
-    'fs_perms_simple', 'fsx',             'dio',        'io',
-    'ipc',             'sched',           'math',       'nptl',
-    'pty',             'containers',      'fs_bind',    'filecaps',
-    'cap_bounds',      'fcntl-locktests', 'connectors', 'power_management_tests',
-    'hugetlb',         'hyperthreading',  'can',        'input'
-]
-for test in tests:
-    results = job.run_test_detail('ubuntu_ltp_stable', test_name=test, tag=test, timeout=60*30*7)
+result = job.run_test_detail('ubuntu_ltp_stable', test_name='setup', tag='setup', timeout=40*60)
+if result == 'ERROR':
+    print("ERROR: test failed to build, skipping all the sub tests")
+else:
+    tests = [
+        'fs_perms_simple', 'fsx',             'dio',        'io',
+        'ipc',             'sched',           'math',       'nptl',
+        'pty',             'containers',      'fs_bind',    'filecaps',
+        'cap_bounds',      'fcntl-locktests', 'connectors', 'power_management_tests',
+        'hugetlb',         'hyperthreading',  'can',        'input'
+    ]
+    for test in tests:
+        results = job.run_test_detail('ubuntu_ltp_stable', test_name=test, tag=test, timeout=60*30*7)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

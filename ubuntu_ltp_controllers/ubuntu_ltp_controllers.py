@@ -53,7 +53,7 @@ class ubuntu_ltp_controllers(test.test):
 
         if any(x in self.flavour for x in ['aws', 'azure', 'gcp', 'gke']):
             if not (self.flavour == 'aws' and self.series == 'trusty'):
-                pgks.append('linux-modules-extra-' + platform.uname()[2])
+                pkgs.append('linux-modules-extra-' + platform.uname()[2])
         if self.flavour not in ['kvm']:
             pkgs.append('nfs-kernel-server')
         if self.series not in ['trusty']:

@@ -46,7 +46,7 @@ class ubuntu_ltp_stable(test.test):
         pkgs.append(gcc)
 
         if any(x in self.flavour for x in ['aws', 'azure', 'gcp', 'gke']):
-            pgks.append('linux-modules-extra-' + platform.uname()[2])
+            pkgs.append('linux-modules-extra-' + platform.uname()[2])
 
         cmd = 'yes "" | DEBIAN_FRONTEND=noninteractive apt-get install --yes --force-yes ' + ' '.join(pkgs)
         self.results = utils.system_output(cmd, retain_output=True)

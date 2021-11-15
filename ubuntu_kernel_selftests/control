@@ -36,6 +36,6 @@ else:
         tests = utils.system_output(cmd).split()
         for item in tests:
             test = "{}:{}".format(category, os.path.basename(item))
-            job.run_test_detail(NAME, test_name=test, tag=test, timeout=60*20)
+            job.run_test_detail(NAME, test_name=test, tag=test, timeout=60*30)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

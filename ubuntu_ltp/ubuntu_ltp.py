@@ -110,10 +110,11 @@ class ubuntu_ltp(test.test):
             print("Running on PowerPC, set timeout multiplier LTP_TIMEOUT_MUL=3 for fs_fill (lp:1878763)")
             timeout_cases['fs_fill'] = '3'
 
-        os.environ["LTP_TIMEOUT_MUL"] = '1'
         with open(fn , 'r') as f:
             for line in f:
                 if line.strip() and not line.startswith('#'):
+                    # Reset the timeout multiplier
+                    os.environ["LTP_TIMEOUT_MUL"] = '1'
                     with open ('/tmp/target' , 'w') as t:
                         t.write(line)
 
@@ -126,8 +127,6 @@ class ubuntu_ltp(test.test):
                     utils.run(cmd, ignore_status=True, verbose=False)
                     # /dev/loop# creation will be taken care by the runltp
 
-                    # Restore the timeout multiplier
-                    os.environ["LTP_TIMEOUT_MUL"] = '1'
 
         num_failed = sum(1 for line in open(log_failed))
         print("== Test Suite Summary ==")

@@ -32,13 +32,29 @@ else:
             print("ERROR: test suite '{}' failed to build, skipping all the sub tests".format(category))
             continue
         mk_helper = os.path.join(job.testdir, NAME, 'helper.mk')
-        dir_src = os.path.join(job.bindir, 'tmp', NAME, 'src', 'linux/tools/testing/selftests/', category)
+        dir_root = os.path.join(job.bindir, 'tmp', NAME, 'src', 'linux/tools/testing/selftests/')
+        dir_src = os.path.join(dir_root, category)
         mk_src = os.path.join(dir_src, 'Makefile')
         os.chdir(dir_src)
-        cmd = 'make -f {} -f {} gettests'.format(mk_helper, mk_src)
-        tests = utils.system_output(cmd).split()
-        for item in tests:
-            test = "{}:{}".format(category, os.path.basename(item))
-            job.run_test_detail(NAME, test_name=test, tag=test, timeout=60*30)
+        cmd = 'grep SUB_DIRS {}'.format(mk_src)
+        if utils.system_output(cmd, verbose=False, ignore_status=True):
+            cmd = 'make -f {} -f {} getsubdirs'.format(mk_helper, mk_src)
+            subdirs = utils.system_output(cmd).split()
+            for subdir in subdirs:
+                dir_src = os.path.join(dir_root, category, subdir)
+                os.chdir(dir_src)
+                mk_src = os.path.join(dir_src, 'Makefile')
+                if os.path.isfile(mk_src):
+                   cmd = 'make -f {} -f {} gettests'.format(mk_src, mk_helper)
+                   tests = utils.system_output(cmd).split()
+                   for item in tests:
+                       test = "{}/{}:{}".format(category, subdir, item)
+                       job.run_test_detail(NAME, test_name=test, tag=test, timeout=60*30)
+        elif os.path.isfile(mk_src):
+            cmd = 'make -f {} -f {} gettests'.format(mk_src, mk_helper)
+            tests = utils.system_output(cmd).split()
+            for item in tests:
+                test = "{}:{}".format(category, item)
+                job.run_test_detail(NAME, test_name=test, tag=test, timeout=60*30)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

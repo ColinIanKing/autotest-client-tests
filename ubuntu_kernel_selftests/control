@@ -27,7 +27,7 @@ if result == 'ERROR':
 else:
     for category in categories:
         build = '{}-build'.format(category)
-        job.run_test_detail(NAME, test_name=build, tag=build, timeout=60*10)
+        job.run_test_detail(NAME, test_name=build, tag=build, timeout=60*60)
         mk_helper = os.path.join(job.testdir, NAME, 'helper.mk')
         dir_src = os.path.join(job.bindir, 'tmp', NAME, 'src', 'linux/tools/testing/selftests/', category)
         mk_src = os.path.join(dir_src, 'Makefile')

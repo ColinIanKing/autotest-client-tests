@@ -1,0 +1,2 @@
+AUFS has been disable on GKE
+https://bugs.launchpad.net/ubuntu/+source/linux-gke/+bug/1938976

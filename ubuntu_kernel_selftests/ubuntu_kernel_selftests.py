@@ -18,6 +18,7 @@ class ubuntu_kernel_selftests(test.test):
             'docutils-common',
             'fuse',
             'git',
+            'iptables',
             'jq',
             'kernel-wedge',
             'netsniff-ng',

@@ -16,6 +16,7 @@ class ubuntu_kernel_selftests(test.test):
             'build-essential',
             'devscripts',
             'docutils-common',
+            'ethtool',
             'fuse',
             'git',
             'iptables',

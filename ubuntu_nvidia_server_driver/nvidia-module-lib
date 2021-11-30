@@ -1,0 +1,96 @@
+# Copyright 2021 Canonical Ltd.
+# Written by:
+#   Dann Frazier <dann.frazier@canonical.com>
+#   Taihsiang Ho <taihsiang.ho@canonical.com>
+#
+# shellcheck shell=bash
+module_loaded() {
+    module="$1"
+    # Check linux/include/linux/module.h for module_state enumeration
+    # There are the other states like Loading and Unloading besides Live. The
+    # other states usually only take only few microseconds but let's specify
+    # Live explicitly.
+    grep "^${module} " /proc/modules | grep -q Live
+}
+
+get_module_field() {
+    local module="$1"
+    local field="$2"
+    # shellcheck disable=SC2034
+    read -r mod size usecnt deps rest < <(grep "^${module} " /proc/modules)
+    case $field in
+        usecnt)
+            echo "$usecnt"
+            ;;
+        deps)
+            if [ "$deps" = "-" ]; then
+                return 0
+            fi
+            echo "$deps" | tr ',' ' '
+            ;;
+        *)
+            return 1
+    esac
+}
+
+module_in_use() {
+    module="$1"
+
+    usecnt="$(get_module_field "$module" usecnt)"
+
+    if [ "$usecnt" -eq 0 ]; then
+        return 1
+    fi
+    return 0
+}
+
+recursive_remove_module() {
+    local module="$1"
+
+    if ! module_loaded "$module"; then
+        return 0
+    fi
+
+    if ! module_in_use "$module"; then
+        sudo rmmod "$module"
+        return 0
+    fi
+
+    if [ "$(get_module_field "$module" deps)" = "" ]; then
+        echo "ERROR: $module is in use, but has no reverse dependencies"
+        echo "ERROR: Maybe an application is using it."
+        exit 1
+    fi
+    beforecnt="$(get_module_field "$module" usecnt)"
+    for dep in $(get_module_field "$module" deps); do
+        recursive_remove_module "$dep"
+    done
+    aftercnt="$(get_module_field "$module" usecnt)"
+    if [ "$beforecnt" -eq "$aftercnt" ]; then
+        echo "ERROR: Unable to reduce $module use count"
+        exit 1
+    fi
+    recursive_remove_module "$module"
+}
+
+uninstall_all_nvidia_mod_pkgs() {
+    for pkg in $(dpkg-query -f "\${Package}\n" -W 'linux-modules-nvidia-*'); do
+        sudo apt remove --purge "$pkg" -y
+    done
+    if sudo modinfo nvidia; then
+        echo "ERROR: Uninstallation of all nvidia modules failed."
+        exit 1
+    fi
+}
+
+product="$(sudo dmidecode -s baseboard-product-name)"
+pkg_compatible_with_platform() {
+    local pkg="$1"
+    branch="$(echo "$pkg" | cut -d- -f4)"
+
+    if [ "$product" = "DGXA100" ] && [ "$branch" -le "418" ]; then
+        return 1
+    fi
+
+    return 0
+}

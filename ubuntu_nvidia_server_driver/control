@@ -1,0 +1,12 @@
+AUTHOR = 'Taihsiang Ho <taihsiang.ho@canonical.com>'
+TIME = 'SHORT'
+NAME = 'Nvidia server driver build and load verification test'
+TEST_TYPE = 'client'
+TEST_CLASS = 'General'
+TEST_CATEGORY = 'Smoke'
+
+DOC = """
+Perform testing of Nvidia server drivers
+"""
+
+job.run_test_detail('ubuntu_nvidia_server_driver', test_name='load', tag='load', timeout=600)

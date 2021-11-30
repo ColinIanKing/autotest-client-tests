@@ -244,6 +244,10 @@ class ubuntu_kernel_selftests(test.test):
         cmd = "make run_tests -C {} TEST_PROGS={} TEST_GEN_PROGS='' TEST_CUSTOM_PROGS=''".format(category, sub_test)
         result = utils.system_output(cmd, retain_output=True)
 
+        # The output of test_bpf.sh test will be in the dmesg
+        if sub_test == "test_bpf.sh":
+            utils.system_output('dmesg', retain_output=True)
+
         # Old pattern for Xenial
         pattern = re.compile('selftests: *(?P<case>[\w\-\.]+) \[FAIL\]\n')
         if re.search(pattern, result):

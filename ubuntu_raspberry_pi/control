@@ -1,0 +1,28 @@
+AUTHOR = "Ubuntu"
+NAME = "Raspberry Pi Tests"
+CRITERIA = """
+Uses the raspberry pi kernel test repo.
+"""
+SUITE = "None"
+TIME = "SHORT"
+TEST_CLASS = 'kernel'
+TEST_CATEGORY = 'Functional'
+TEST_TYPE = "client"
+DOC = "Test basic Raspberry Pi kernel functionality"
+
+name = 'ubuntu_raspberry_pi'
+
+SKIP_LIST = [
+    'vc4',      # Requires a reboot
+]
+
+result = job.run_test_detail(name, test_name='setup', tag='setup', timeout=60*5)
+if result == 'GOOD':
+    tests_dir = os.path.join(job.bindir, 'tmp', name, 'src', 'raspi-rt', 'tests')
+    tests_list = os.listdir(tests_dir)
+    tests_list.sort()
+    for test in tests_list:
+        if test in SKIP_LIST:
+            print("SKIPPED: " + test)
+            continue
+        job.run_test_detail(name, test_name=test, tag=test, timeout=60*5)

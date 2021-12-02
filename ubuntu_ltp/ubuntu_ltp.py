@@ -5,9 +5,7 @@ import os
 import platform
 import re
 import shutil
-import time
 from autotest.client                        import test, utils
-from autotest.client.shared     import error
 
 class ubuntu_ltp(test.test):
     version = 1
@@ -87,8 +85,6 @@ class ubuntu_ltp(test.test):
         utils.make(nprocs)
         utils.make('install')
 
-        cmd = 'cat %s > /tmp/skip' % os.path.join(self.bindir, 'skip')
-        utils.system_output(cmd)
 
     # run_once
     #
@@ -97,50 +93,30 @@ class ubuntu_ltp(test.test):
     def run_once(self, test_name):
         if test_name == 'setup':
             return
-        fn = '/tmp/syscalls-' + time.strftime("%h%d-%H%M%S")
-        log_failed = fn + '.failed'
-        log_output = fn + '.output'
 
-        fn = '/opt/ltp/runtest/%s' % (test_name)
+        test_case = test_name.split(':')[1]
 
-        print("Setting LTP_TIMEOUT_MUL exceptions...")
-        print("Setting LTP_TIMEOUT_MUL=3 for cve-2018-1000204 / ioctl_sg01 (lp:1899413, lp:1936886, lp:1949934)")
-        timeout_cases = {'zram01': '5', 'ioctl_sg01': '3'}
-        if self.arch in ['ppc64le']:
-            print("Running on PowerPC, set timeout multiplier LTP_TIMEOUT_MUL=3 for fs_fill (lp:1878763)")
-            timeout_cases['fs_fill'] = '3'
+        if test_case == 'zram01':
+            print("Setting LTP_TIMEOUT_MUL=5 for zram01 test (lp:1897556)")
+            os.environ["LTP_TIMEOUT_MUL"] = '5'
+        elif test_case in ['cve-2018-1000204 ', 'ioctl_sg01']:
+            print("Setting LTP_TIMEOUT_MUL=3 for cve-2018-1000204 / ioctl_sg01 (lp:1899413, lp:1936886, lp:1949934)")
+            os.environ["LTP_TIMEOUT_MUL"] = '3'
+        elif test_case == 'fs_fill' and self.arch == 'ppc64le':
+            print("Setting LTP_TIMEOUT_MUL=3 for fs_fill on PowerPC")
+            os.environ["LTP_TIMEOUT_MUL"] = '3'
 
-        with open(fn , 'r') as f:
-            for line in f:
-                if line.strip() and not line.startswith('#'):
-                    # Reset the timeout multiplier
-                    os.environ["LTP_TIMEOUT_MUL"] = '1'
-                    with open ('/tmp/target' , 'w') as t:
-                        t.write(line)
+        cmd = '/opt/ltp/runltp -f /tmp/target -q -C /dev/null -l /dev/null -T /dev/null'
+        print(utils.system_output(cmd, verbose=False))
+        # /dev/loop# creation will be taken care by the runltp
 
-                    for _case in timeout_cases:
-                        if _case in line:
-                            os.environ["LTP_TIMEOUT_MUL"] = timeout_cases[_case]
-                            break
+    def cleanup(self, test_name):
+        if test_name == 'setup':
+            return
 
-                    cmd = '/opt/ltp/runltp -f /tmp/target -S /tmp/skip -C %s -q -l %s -o %s -T /dev/null' % (log_failed, log_output, log_output)
-                    utils.run(cmd, ignore_status=True, verbose=False)
-                    # /dev/loop# creation will be taken care by the runltp
-
-
-        num_failed = sum(1 for line in open(log_failed))
-        print("== Test Suite Summary ==")
-        print("{} test cases failed".format(num_failed))
-
-        if num_failed > 0:
-            cmd = "awk '{print$1}' " + log_failed + " | sort | uniq | tr '\n' ' '"
-            failed_list = utils.system_output(cmd, retain_output=False, verbose=False)
-            print("Failed test cases : %s" % failed_list)
-
-        cmd = 'cat ' + log_output
-        utils.system_output(cmd, retain_output=True, verbose=False)
-
-        if num_failed > 0:
-            raise error.TestError('Test failed for ' + test_name)
+        # Restore the timeout multiplier
+        if 'LTP_TIMEOUT_MUL' in os.environ:
+            print("Restore timeout multiplier LTP_TIMEOUT_MUL back to default")
+            del os.environ["LTP_TIMEOUT_MUL"]
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

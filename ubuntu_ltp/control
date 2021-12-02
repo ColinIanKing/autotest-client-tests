@@ -14,11 +14,22 @@ result = job.run_test_detail(NAME, test_name='setup', tag='setup', timeout=40*60
 if result == 'ERROR':
     print("ERROR: test failed to build, skipping all the sub tests")
 else:
-    tests = [
+    categories = [
         'fs',         'mm',           'commands',
         'cpuhotplug', 'net.ipv6_lib', 'cve',         'crypto'
     ]
-    for test in tests:
-        results = job.run_test_detail(NAME, test_name=test, tag=test, timeout=60*60*2)
+    blacklist = ['oom01', 'oom02', 'oom03', 'oom04' ,'oom05', 'mkswap01_sh'] # oom* (lp:1847963), mkswap01_sh (lp:1830584)
+    for category in categories:
+        fn = '/opt/ltp/runtest/' + category
+        with open(fn , 'r') as f:
+            for line in f:
+                if line.strip() and not line.startswith('#'):
+                    if line.split()[0] in blacklist:
+                        continue
+                    with open ('/tmp/target' , 'w') as t:
+                        t.write(line)
+                    testcase = '{}:{}'.format(category, line.split()[0])
+                    timeout_threshold = 60*60
+                    job.run_test_detail(NAME, test_name=testcase, tag=testcase, timeout=timeout_threshold)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

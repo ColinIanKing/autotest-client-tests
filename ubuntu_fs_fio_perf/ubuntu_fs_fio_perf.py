@@ -112,7 +112,7 @@ class ubuntu_fs_fio_perf(test.test):
 
         os.chdir(self.srcdir)
         utils.system('rm -rf fs-test-proto')
-        utils.system('git clone --depth=1 git://kernel.ubuntu.com/cking/fs-test-proto.git')
+        utils.system('git clone --depth=1 git://git.launchpad.net/~canonical-kernel-team/+git/fs-test-proto')
         # Print test suite HEAD SHA1 commit id for future reference
         os.chdir(os.path.join(self.srcdir, 'fs-test-proto'))
         sha1 = utils.system_output('git rev-parse --short HEAD', retain_output=False, verbose=False)

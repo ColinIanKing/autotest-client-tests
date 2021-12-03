@@ -64,7 +64,7 @@ class ubuntu_ltp(test.test):
         os.chdir(self.srcdir)
         shutil.rmtree('ltp', ignore_errors=True)
         branch = 'sru'
-        cmd = 'git clone -b {} git://kernel.ubuntu.com/ubuntu/ltp.git'.format(branch)
+        cmd = 'git clone -b {} git://git.launchpad.net/~canonical-kernel-team/+git/ltp'.format(branch)
         utils.system_output(cmd, retain_output=True)
 
         # Print test suite HEAD SHA1 commit id for future reference

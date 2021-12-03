@@ -76,7 +76,7 @@ class ubuntu_ltp_kernel_misc(test.test):
             branch = 'sru-' + self.series
             print("Use a fixed branch for ESM series - {}".format(branch))
 
-        cmd = 'git clone -b {} --depth 1 git://kernel.ubuntu.com/ubuntu/ltp.git'.format(branch)
+        cmd = 'git clone -b {} --depth 1 git://git.launchpad.net/~canonical-kernel-team/+git/ltp'.format(branch)
         utils.system_output(cmd, retain_output=True)
 
         # Print test suite HEAD SHA1 commit id for future reference

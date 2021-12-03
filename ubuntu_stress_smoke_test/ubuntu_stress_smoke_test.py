@@ -51,7 +51,7 @@ class ubuntu_stress_smoke_test(test.test):
         self.job.require_gcc()
         os.chdir(self.srcdir)
         shutil.rmtree('stress-ng', ignore_errors=True)
-        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/ubuntu/stress-ng.git'
+        cmd = 'git clone --depth=1 git://git.launchpad.net/~canonical-kernel-team/+git/stress-ng'
         self.results = utils.system_output(cmd, retain_output=True)
 
         # Print test suite HEAD SHA1 commit id for future reference

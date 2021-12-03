@@ -48,7 +48,7 @@ class ubuntu_stress_btrfs_cmd(test.test):
         utils.system('cp %s/ubuntu_stress_btrfs_cmd.sh %s' % (self.bindir, self.srcdir))
         os.chdir(self.srcdir)
         shutil.rmtree('stress-ng', ignore_errors=True)
-        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/ubuntu/stress-ng.git 2>&1'
+        cmd = 'git clone --depth=1 git://git.launchpad.net/~canonical-kernel-team/+git/stress-ng 2>&1'
         self.results = utils.system_output(cmd, retain_output=True)
 
         # Print test suite HEAD SHA1 commit id for future reference

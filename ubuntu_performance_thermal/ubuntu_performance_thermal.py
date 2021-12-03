@@ -95,7 +95,7 @@ class ubuntu_performance_thermal(test.test):
         self.job.require_gcc()
         os.chdir(self.srcdir)
         shutil.rmtree('stress-ng', ignore_errors=True)
-        self.results = utils.system_output('git clone git://kernel.ubuntu.com/ubuntu/stress-ng.git', retain_output=True)
+        self.results = utils.system_output('git clone git://git.launchpad.net/~canonical-kernel-team/+git/stress-ng', retain_output=True)
         os.chdir(os.path.join(self.srcdir, 'stress-ng'))
         self.results = utils.system_output('git checkout -b V0.09.56 V0.09.56', retain_output=True)
         self.results = utils.system_output('patch -p1 < %s/0001-Add-build-time-check-for-struct-sockaddr_un.patch' % self.bindir, retain_output=True)

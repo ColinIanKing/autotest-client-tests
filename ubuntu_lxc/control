@@ -56,7 +56,7 @@ if result == 'GOOD':
                 if not os.path.isfile('/proc/self/uid_map') or not os.path.isfile('/etc/subuid') or not os.path.isfile('/etc/subgid'):
                     continue
 
-            job.run_test_detail('ubuntu_lxc', test_name=test, tag=test, timeout=60*15)
+            job.run_test_detail('ubuntu_lxc', test_name=test, tag=test, timeout=60*20)
     else:
         print('ERROR: no sub_tests found, please check test build if running on Bionic and later releases')
 

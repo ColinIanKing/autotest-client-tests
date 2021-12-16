@@ -138,6 +138,8 @@ class ubuntu_ltp_syscalls(test.test):
         elif test_name == 'ioctl_sg01':
             print("Set timeout multiplier LTP_TIMEOUT_MUL>1 (lp:1895281, lp:1936886) for ioctl_sg01")
             os.environ["LTP_TIMEOUT_MUL"] = LTP_TIMEOUT_MUL
+        elif test_name == 'fanotify07' and self.kernel == '4.4.0':
+            raise error.TestError("fanotify07 (lp:1775165) won't fix on T/X and blocking test to finish properly (lp:1944545), mark it as failed directly")
 
         # Stop timesyncd when testing time change
         if self.should_stop_timesyncd(test_name, 'stop'):

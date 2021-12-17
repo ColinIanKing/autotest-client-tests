@@ -244,14 +244,16 @@ class ubuntu_kernel_selftests(test.test):
         cmd = "make run_tests -C {} TEST_PROGS={} TEST_GEN_PROGS='' TEST_CUSTOM_PROGS=''".format(category, sub_test)
         result = utils.system_output(cmd, retain_output=True)
 
-        # The output of test_bpf.sh test will be in the dmesg
-        if sub_test == "test_bpf.sh":
+        # The output of test_bpf.sh / test_blackhole_dev.sh test will be in the dmesg
+        kernel_module_tests = {'test_bpf.sh': 'CONFIG_TEST_BPF',
+                               'test_blackhole_dev.sh': 'CONFIG_TEST_BLACKHOLE_DEV'}
+        if sub_test in kernel_module_tests.keys():
             output = utils.system_output('dmesg', retain_output=True)
             if not output:
-                print("Looks like there's no dmesg output, checking for CONFIG_TEST_BPF...")
-                cmd = "grep CONFIG_TEST_BPF /boot/config-$(uname -r)"
+                print("Looks like there's no dmesg output, checking for {}...".format(kernel_module_tests[sub_test]))
+                cmd = "grep ^{} /boot/config-$(uname -r)".format(kernel_module_tests[sub_test])
                 if not utils.system_output(cmd, verbose=False, ignore_status=True):
-                    print("CONFIG_TEST_BPF not enabled.")
+                    print("{} not enabled.".format(kernel_module_tests[sub_test]))
 
         # Old pattern for Xenial
         pattern = re.compile('selftests: *(?P<case>[\w\-\.]+) \[FAIL\]\n')

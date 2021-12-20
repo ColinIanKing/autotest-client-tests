@@ -15,8 +15,8 @@ if result == 'ERROR':
     print("ERROR: test failed to build, skipping all the sub tests")
 else:
     categories = [
-        'fs',         'mm',           'commands',
-        'cpuhotplug', 'net.ipv6_lib', 'cve',         'crypto'
+        'fs',         'mm',  'sched', 'pty',
+        'cpuhotplug', 'cve', 'crypto'
     ]
     blacklist = ['oom01', 'oom02', 'oom03', 'oom04' ,'oom05', 'mkswap01_sh'] # oom* (lp:1847963), mkswap01_sh (lp:1830584)
     for category in categories:

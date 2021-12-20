@@ -48,6 +48,9 @@ class ubuntu_lxc(test.test):
         if self.series not in ['precise', 'trusty', 'xenial']:
             os.chdir('/tmp')
             shutil.rmtree('lxc-pkg-ubuntu', ignore_errors=True)
+            if self.series == 'jammy':
+                print("We don't have dpm-jammy branch yet, use the latest dpm-impish branch instead.")
+                self.series = 'impish'
             cmd = 'git clone --depth=1 https://github.com/lxc/lxc-pkg-ubuntu.git -b dpm-{}'.format(self.series)
             utils.system(cmd)
             os.chdir('/tmp/lxc-pkg-ubuntu')

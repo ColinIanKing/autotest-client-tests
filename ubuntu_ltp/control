@@ -29,7 +29,7 @@ else:
                     with open ('/tmp/target' , 'w') as t:
                         t.write(line)
                     testcase = '{}:{}'.format(category, line.split()[0])
-                    timeout_threshold = 60*60
+                    timeout_threshold = 60*80
                     job.run_test_detail(NAME, test_name=testcase, tag=testcase, timeout=timeout_threshold)
 
 # vi:set ts=4 sw=4 expandtab syntax=python:

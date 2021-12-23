@@ -97,11 +97,12 @@ class ubuntu_ltp(test.test):
         test_case = test_name.split(':')[1]
 
         if test_case == 'zram01':
+            # LTP_TIMEOUT_MUL = 1 -> 5 minutes
             print("Setting LTP_TIMEOUT_MUL=5 for zram01 test (lp:1897556)")
             os.environ["LTP_TIMEOUT_MUL"] = '5'
         elif test_case in ['cve-2018-1000204', 'ioctl_sg01']:
-            print("Setting LTP_TIMEOUT_MUL=3 for cve-2018-1000204 / ioctl_sg01 (lp:1899413, lp:1936886, lp:1949934)")
-            os.environ["LTP_TIMEOUT_MUL"] = '3'
+            print("Setting LTP_TIMEOUT_MUL=5 for cve-2018-1000204 / ioctl_sg01 (lp:1899413, lp:1936886, lp:1949934, lp:1955629)")
+            os.environ["LTP_TIMEOUT_MUL"] = '5'
         elif test_case == 'fs_fill' and self.arch == 'ppc64le':
             print("Setting LTP_TIMEOUT_MUL=3 for fs_fill on PowerPC")
             os.environ["LTP_TIMEOUT_MUL"] = '3'

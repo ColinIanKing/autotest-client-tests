@@ -313,6 +313,8 @@ touch $LOG
 
 do_test
 
+# Give it sometime to spin down (lp:1814572)
+sleep 5
 modprobe -r nbd
 if [ $? -ne 0 ]; then
 	do_log "Cannot unload Network Block Device module nbd.o"

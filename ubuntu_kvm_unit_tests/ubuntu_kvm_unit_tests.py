@@ -46,7 +46,7 @@ class ubuntu_kvm_unit_tests(test.test):
         opt = []
         os.chdir(self.srcdir)
         shutil.rmtree('kvm-unit-tests', ignore_errors=True)
-        cmd = 'git clone --depth=1 git://kernel.ubuntu.com/ubuntu/kvm-unit-tests/ -b hirsute'
+        cmd = 'git clone --depth=1 https://git.launchpad.net/~canonical-kernel-team/+git/kvm-unit-tests -b hirsute'
         self.results = utils.system_output(cmd, retain_output=True)
         # Print test suite HEAD SHA1 commit id for future reference
         os.chdir(os.path.join(self.srcdir, 'kvm-unit-tests'))
